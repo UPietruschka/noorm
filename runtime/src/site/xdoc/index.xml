@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<document>
+
+  <properties>
+    <title>Welcome</title>
+    <author email="ulf.pietruschka@etenso.com">Ulf Pietruschka</author>
+  </properties>
+
+  <body>
+    <section name="Welcome">
+      <p>
+        NoORM
+      </p>
+    </section>
+
+  </body>
+</document>

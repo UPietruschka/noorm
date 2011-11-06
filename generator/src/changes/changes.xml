@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<document>
+  <properties>
+    <title>NoORM</title>
+    <author email="ulf.pietruschka@etenso.com">Ulf Pietruschka</author>
+  </properties>
+
+  <body>
+    <release date="" description="Current Development" version="0.9.9">
+      <action date="2011-11-06" dev="pietrusu" type="add">
+		project start up
+      </action>
+    </release>
+  </body>
+</document>
