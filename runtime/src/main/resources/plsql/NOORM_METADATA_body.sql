@@ -18,7 +18,24 @@ PACKAGE BODY noorm_metadata AS
            user_updatable_columns uc
     WHERE  tc.table_name  = uc.table_name
     AND    tc.column_name = uc.column_name
-    ORDER  BY tc.table_name, tc.column_id;
+    UNION
+    SELECT us.synonym_name,
+           tc.column_name,
+           tc.data_type,
+           tc.data_precision,
+           tc.data_scale,
+           tc.char_length,
+           tc.nullable,
+           tc.column_id,
+           uc.updatable,
+           uc.insertable
+    FROM   all_tab_columns tc,
+           all_updatable_columns uc,
+           user_synonyms us
+    WHERE  tc.table_name  = uc.table_name
+    AND    tc.column_name = uc.column_name
+    AND    tc.table_name  = us.table_name
+    ORDER  BY table_name, column_id;
   END find_table_metadata;
 
   PROCEDURE find_package_names(p_search_regex IN VARCHAR2, p_package_names OUT name_refcur) AS
