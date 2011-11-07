@@ -193,7 +193,10 @@ public class BeanMapper<T> {
 			// Bean specification.
 
 			if (fieldType == Long.class) {
-				field.set(pBean, pResultSet.getLong(fieldName));
+				final Long value = pResultSet.getLong(fieldName);
+				if (!pResultSet.wasNull()) {
+					field.set(pBean, value);
+				}
 			}
 
 			if (fieldType == String.class) {
@@ -204,11 +207,17 @@ public class BeanMapper<T> {
 			}
 
 			if (fieldType == Integer.class) {
-				field.set(pBean, pResultSet.getInt(fieldName));
+				final Integer value = pResultSet.getInt(fieldName);
+				if (!pResultSet.wasNull()) {
+					field.set(pBean, value);
+				}
 			}
 
 			if (fieldType == Double.class) {
-				field.set(pBean, pResultSet.getDouble(fieldName));
+				final Double value = pResultSet.getDouble(fieldName);
+				if (!pResultSet.wasNull()) {
+					field.set(pBean, value);
+				}
 			}
 
 			if (fieldType == java.util.Date.class || fieldType == java.sql.Date.class) {
@@ -226,11 +235,17 @@ public class BeanMapper<T> {
 			}
 
 			if (fieldType == Float.class) {
-				field.set(pBean, pResultSet.getFloat(fieldName));
+				final Float value = pResultSet.getFloat(fieldName);
+				if (!pResultSet.wasNull()) {
+					field.set(pBean, value);
+				}
 			}
 
 			if (fieldType == Short.class) {
-				field.set(pBean, pResultSet.getShort(fieldName));
+				final Short value = pResultSet.getShort(fieldName);
+				if (!pResultSet.wasNull()) {
+					field.set(pBean, value);
+				}
 			}
 
 			if (fieldType == Timestamp.class) {
