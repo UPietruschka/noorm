@@ -56,6 +56,7 @@ public final class DataAccessException extends RuntimeException {
 		STALE_TRANSACTION(1600L, "STALE_TRANSACTION", "Previous transaction in this thread has not been terminated properly."),
 		CONNECTION_ACCESS_FAILURE(1700L, "CONNECTION_ACCESS_FAILURE", "Failure accessing database connection."),
 		UNSUPPORTED_VERSION_COLUMN_TYPE(1800L, "UNSUPPORTED_VERSION_COLUMN_TYPE", "Unsupported version column type (Only 'Long' supported yet)."),
+		VERSION_COLUMN_NULL(1810L, "VERSION_COLUMN_NULL", "Version column is null. Record has not been initialized properly."),
 		OPTIMISTIC_LOCK_CONFLICT(1900L, "OPTIMISTIC_LOCK_CONFLICT", "Optimistic lock conflict. Record subject to modification has been "
 				+ "changed or modfied by another process atfer it has been loaded for this operation."),
 		COULD_NOT_ACCESS_PK_BY_REFLECTION(2000L, "COULD_NOT_ACCESS_PK_BY_REFLECTION", "Could not access method of bean by reflection."),

@@ -593,6 +593,9 @@ public class JDBCStatementProcessor<T> {
 								final Long incVersion = ((Long) value) + 1L;
 								pstmt.setObjectAtName(fieldName, incVersion);
 							} else {
+								if (value == null) {
+									throw new DataAccessException(DataAccessException.Type.VERSION_COLUMN_NULL);
+								}
 								throw new DataAccessException(DataAccessException.Type.UNSUPPORTED_VERSION_COLUMN_TYPE);
 							}
 						} else {
