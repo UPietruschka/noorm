@@ -189,6 +189,14 @@ public class GeneratorMojo extends AbstractMojo {
 	protected String singleRowFinderRegex;
 
 	/**
+	 * Large query results can be mapped into a PageableBeanList to provide efficient
+	 * access to the data by loading the full record only for the requested page.
+	 *
+	 * @parameter
+	 */
+	protected String pageableProcedureNameRegex;
+
+	/**
 	 * Beans generated from database entities are often subject to data enrichment in
 	 * the service utilizing the bean data. One option to add additional data to the
 	 * bean is the generic (generated) bean property "auxiliaryData". However, some
