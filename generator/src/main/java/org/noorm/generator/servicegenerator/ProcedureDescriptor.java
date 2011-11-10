@@ -19,7 +19,7 @@ public class ProcedureDescriptor {
 	private boolean isOutParamRefCursor = false;
 	private boolean isOutParamScalar = false;
 	private boolean isSingleRowFinder = false;
-	private boolean isIdListFinder = false;
+	private boolean pageableFinder = false;
 
 	public void setJavaName(final String pJavaName) {
 		javaName = pJavaName;
@@ -93,11 +93,11 @@ public class ProcedureDescriptor {
 		isSingleRowFinder = pSingleRowFinder;
 	}
 
-	public boolean isIdListFinder() {
-		return isIdListFinder;
+	public boolean isPageableFinder() {
+		return pageableFinder;
 	}
 
-	public void setIdListFinder(final boolean pIdListFinder) {
-		isIdListFinder = pIdListFinder;
+	public void setPageableFinder(final boolean pPageableFinder) {
+		pageableFinder = pPageableFinder;
 	}
 }
