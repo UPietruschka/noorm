@@ -21,7 +21,7 @@
 		<dependency>
             <groupId>org.noorm</groupId>
             <artifactId>runtime</artifactId>
-            <version>0.9.9</version>
+            <version>${parent.version}</version>
         </dependency>
 
         <dependency>
