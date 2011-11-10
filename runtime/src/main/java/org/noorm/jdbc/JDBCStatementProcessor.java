@@ -3,7 +3,6 @@ package org.noorm.jdbc;
 import oracle.jdbc.OracleCallableStatement;
 import oracle.jdbc.OracleConnection;
 import oracle.jdbc.OraclePreparedStatement;
-import oracle.jdbc.OracleTypes;
 import oracle.sql.ARRAY;
 import oracle.sql.ArrayDescriptor;
 import org.slf4j.Logger;
@@ -107,7 +106,7 @@ public class JDBCStatementProcessor<T> {
 		}
 
 		if (log.isDebugEnabled()) {
-			debugPLSQLCall(pPLSQLCallable, pInParameters, null, null);
+			debugPLSQLCall(pPLSQLCallable, pInParameters, null);
 		}
 
 		boolean success = true;
@@ -116,7 +115,10 @@ public class JDBCStatementProcessor<T> {
 		try {
 			con = DataSourceProvider.getConnection();
 			final String plSQLCall = statementBuilder.buildPLSQLCall
-					(pPLSQLCallable, pOutParamName, pInParameters, null, USE_NAMED_PARAMETERS);
+					(pPLSQLCallable, pOutParamName, pInParameters, USE_NAMED_PARAMETERS);
+			if (log.isDebugEnabled()) {
+				log.debug("PL/SQL Call: ".concat(plSQLCall));
+			}
 			cstmt = (OracleCallableStatement) con.prepareCall(plSQLCall);
 
 			int parameterIndex = 1;
@@ -137,7 +139,7 @@ public class JDBCStatementProcessor<T> {
 			}
 
 			if (pInParameters != null) {
-				bindParameters(pInParameters, cstmt, parameterIndex);
+				bindParameters(con, pInParameters, cstmt, parameterIndex);
 			}
 
 			cstmt.execute();
@@ -257,7 +259,7 @@ public class JDBCStatementProcessor<T> {
 							  final Class<T> pBeanClass) {
 
 		final List<T> beanList = getBeanListFromPLSQL
-				(pPLSQLCallable, pRefCursorName, pInParameters, null, null, pBeanClass);
+				(pPLSQLCallable, pRefCursorName, pInParameters, pBeanClass);
 		if (beanList.isEmpty()) {
 			return null;
 		}
@@ -272,43 +274,20 @@ public class JDBCStatementProcessor<T> {
 	 *
 	 * @param pPLSQLCallable the name of PL/SQL procedure or the notation PACKAGENAME.PROCEDURE.
 	 * @param pRefCursorName the parameter name of the procedure out parameter ref cursor.
-	 * @param pInParameters  the map containing all IN parameters.
 	 * @param pBeanClass	 the type of the Bean matching the fields of the ResultSet.
 	 * @return The list of Beans containing the retrieved data.
 	 */
+	public List<T> getBeanListFromPLSQL(final String pPLSQLCallable,
+										final String pRefCursorName,
+										final Class<T> pBeanClass) {
+
+		return getBeanListFromPLSQL(pPLSQLCallable, pRefCursorName, null, pBeanClass);
+	}
+
 	public List<T> getBeanListFromPLSQL(final String pPLSQLCallable,
 										final String pRefCursorName,
 										final Map<String, Object> pInParameters,
 										final Class<T> pBeanClass) {
-
-		return getBeanListFromPLSQL(pPLSQLCallable, pRefCursorName, pInParameters, null, null, pBeanClass);
-	}
-
-	/**
-	 * Calls a PL/SQL procedure with a ref cursor as OUT parameter.
-	 *
-	 * @param pPLSQLCallable the name of PL/SQL procedure or the notation PACKAGENAME.PROCEDURE.
-	 * @param pRefCursorName the parameter name of the procedure out parameter ref cursor.
-	 * @param pIDListName	the a list of IDs uniquely identifying the records.
-	 * @param pIDArray	   the array containing the Ids of type Long.
-	 * @param pBeanClass	 the type of the Bean matching the fields of the ResultSet.
-	 * @return The list of Beans containing the retrieved data.
-	 */
-	public List<T> getBeanListFromPLSQL(final String pPLSQLCallable,
-										final String pRefCursorName,
-										final String pIDListName,
-										final Long[] pIDArray,
-										final Class<T> pBeanClass) {
-
-		return getBeanListFromPLSQL(pPLSQLCallable, pRefCursorName, null, pIDListName, pIDArray, pBeanClass);
-	}
-
-	private List<T> getBeanListFromPLSQL(final String pPLSQLCallable,
-										 final String pRefCursorName,
-										 final Map<String, Object> pInParameters,
-										 final String pIDListName,
-										 final Long[] pIDArray,
-										 final Class<T> pBeanClass) {
 
 		try {
 			if (pPLSQLCallable == null || pPLSQLCallable.isEmpty()) {
@@ -320,15 +299,15 @@ public class JDBCStatementProcessor<T> {
 			if (pBeanClass == null) {
 				throw new IllegalArgumentException("Parameter [pBeanClass] must not be null.");
 			}
-			if (pInParameters == null && pIDArray == null) {
-				throw new IllegalArgumentException("Parameter [pInParameters,pIDList] must not be null.");
+			if (pInParameters == null) {
+				throw new IllegalArgumentException("Parameter [pInParameters] must not be null.");
 			}
 		} catch (IllegalArgumentException e) {
 			throw new DataAccessException(DataAccessException.Type.PARAMETERS_MUST_NOT_BE_NULL, e);
 		}
 
 		if (log.isDebugEnabled()) {
-			debugPLSQLCall(pPLSQLCallable, pInParameters, pIDArray, pBeanClass);
+			debugPLSQLCall(pPLSQLCallable, pInParameters, pBeanClass);
 		}
 
 		boolean success = true;
@@ -338,7 +317,10 @@ public class JDBCStatementProcessor<T> {
 		try {
 			con = DataSourceProvider.getConnection();
 			final String plSQLCall = statementBuilder.buildPLSQLCall
-					(pPLSQLCallable, pRefCursorName, pInParameters, pIDListName, USE_NAMED_PARAMETERS);
+					(pPLSQLCallable, pRefCursorName, pInParameters, USE_NAMED_PARAMETERS);
+			if (log.isDebugEnabled()) {
+				log.debug("PL/SQL Call: ".concat(plSQLCall));
+			}
 			cstmt = (OracleCallableStatement) con.prepareCall(plSQLCall);
 
 			int parameterIndex = 1;
@@ -348,32 +330,11 @@ public class JDBCStatementProcessor<T> {
 				cstmt.registerOutParameter(parameterIndex++, oracle.jdbc.OracleTypes.CURSOR);
 			}
 
-			// Check, whether the parameter map contains an idList or a named parameter map.
-			if (pInParameters != null) {
-				bindParameters(pInParameters, cstmt, parameterIndex);
-			} else { // pIDList provided
-				if (pIDListName == null || pIDListName.isEmpty()) {
-					try {
-						throw new IllegalArgumentException("Parameter [pIDListName] must not be null.");
-					} catch (IllegalArgumentException e) {
-						throw new DataAccessException(DataAccessException.Type.PARAMETERS_MUST_NOT_BE_NULL, e);
-					}
-				}
-				final ArrayDescriptor descriptor =
-						ArrayDescriptor.createDescriptor(NOORM_ID_LIST_ORACLE_TYPE_NAME, con);
-				final ARRAY arrayToPass = new ARRAY(descriptor, con, pIDArray);
-				if (USE_NAMED_PARAMETERS) {
-					// The following works for the Oracle JDBC 11.2.0.1.0 driver, but is actually not correct,
-					// since named parameter binding should use the setXXXAtName methods (which does NOT work).
-					cstmt.setARRAY(pIDListName, arrayToPass);
-				} else {
-					cstmt.setARRAY(parameterIndex++, arrayToPass);
-				}
-			}
+			bindParameters(con, pInParameters, cstmt, parameterIndex);
 
 			cstmt.execute();
 
-			ResultSet rs = null;
+			ResultSet rs;
 			if (USE_NAMED_PARAMETERS) {
 				rs = (ResultSet) cstmt.getObject(pRefCursorName);
 			} else {
@@ -511,7 +472,7 @@ public class JDBCStatementProcessor<T> {
 			// There is currently no full support for returning generated keys in batch operation
 			// Thus we support this for single-row inserts only.
 			if (pBeanList.size() == 1 && pBatchType.equals(BatchType.INSERT) &&
-				primaryKeyColumnName != null && !primaryKeyColumnName.isEmpty()) {
+					primaryKeyColumnName != null && !primaryKeyColumnName.isEmpty()) {
 				returnGeneratedKey = true;
 			}
 			final String versionColumnName = firstBean.getVersionColumnName();
@@ -559,7 +520,7 @@ public class JDBCStatementProcessor<T> {
 			// regular database updates using "executeBatch". Note that "executeUpdate" does NOT issue a
 			// direct database update, but adds the given statement to the batch list (Neither "addBatch"
 			// nor "executeBatch" are needed for "Oracle style" batching).
-			if (!returnGeneratedKey)  {
+			if (!returnGeneratedKey) {
 				pstmt.setExecuteBatch(DataSourceProvider.getBatchUpdateSize());
 			}
 			int batchCount = 0;
@@ -574,7 +535,7 @@ public class JDBCStatementProcessor<T> {
 					}
 					if (pBatchType.equals(BatchType.INSERT)) {
 						if (!fieldName.toUpperCase().equals(primaryKeyColumnName) ||
-							sequenceName == null || sequenceName.isEmpty()) {
+								sequenceName == null || sequenceName.isEmpty()) {
 							if (fieldName.equals(versionColumnName)) {
 								// When the version column has not been initialized by the caller,
 								// we set it here, otherwise NULL in the version column will result
@@ -631,7 +592,7 @@ public class JDBCStatementProcessor<T> {
 			}
 			if (returnGeneratedKey) {
 				ResultSet generatedKeyResultSet = pstmt.getGeneratedKeys();
-				while(generatedKeyResultSet.next()) {
+				while (generatedKeyResultSet.next()) {
 					Long generatedKey = generatedKeyResultSet.getLong(1);
 					log.debug("Generated key value " + generatedKey + " retrieved for table " + tableName);
 					BeanMetaDataUtil.setPrimaryKeyValue(firstBean, generatedKey);
@@ -717,7 +678,7 @@ public class JDBCStatementProcessor<T> {
 
 		if (log.isDebugEnabled()) {
 			Class beanClass = pBeanList.get(0).getClass();
-			debugPLSQLCall(pPLSQLCallable, null, null, beanClass);
+			debugPLSQLCall(pPLSQLCallable, null, beanClass);
 		}
 
 		DataSourceProvider.begin();
@@ -793,45 +754,58 @@ public class JDBCStatementProcessor<T> {
 		throw new DataAccessException(DataAccessException.Type.COULD_NOT_ACCESS_DATA, message.toString());
 	}
 
-	private void bindParameters(final Map<String, Object> pInParameters,
+	private void bindParameters(final OracleConnection pCon,
+								final Map<String, Object> pInParameters,
 								final OracleCallableStatement pCstmt,
 								final int pParameterIndex) throws SQLException {
 
 		int parameterIndex = pParameterIndex;
 		Map<String, Object> orderedParameters = new TreeMap<String, Object>(pInParameters);
 		for (final String paramName : orderedParameters.keySet()) {
-			Object filterValue = orderedParameters.get(paramName);
-			if (filterValue == null) {
+			Object value = orderedParameters.get(paramName);
+			if (value == null) {
 				continue;
 			}
-			if (filterValue instanceof String) {
-				if ((filterValue).equals("")) {
+			if (value instanceof Long[]) {
+				final ArrayDescriptor descriptor =
+						ArrayDescriptor.createDescriptor(NOORM_ID_LIST_ORACLE_TYPE_NAME, pCon);
+				final ARRAY arrayToPass = new ARRAY(descriptor, pCon, (Long[]) value);
+				if (USE_NAMED_PARAMETERS) {
+					// The following works for the Oracle JDBC 11.2.0.1.0 driver, but is actually not correct,
+					// since named parameter binding should use the setXXXAtName methods (which does NOT work).
+					pCstmt.setARRAY(paramName, arrayToPass);
+				} else {
+					pCstmt.setARRAY(parameterIndex++, arrayToPass);
+				}
+				continue;
+			}
+			if (value instanceof String) {
+				if ((value).equals("")) {
 					continue;
 				} else {
-					filterValue = ((String) filterValue).trim();
+					value = ((String) value).trim();
 				}
 			}
-			if (filterValue instanceof byte[]) {
-				if (((byte[]) filterValue).length == 0) {
+			if (value instanceof byte[]) {
+				if (((byte[]) value).length == 0) {
 					continue;
 				}
 			}
-			if (filterValue instanceof java.util.Date) {
-				filterValue = new Timestamp(((java.util.Date) filterValue).getTime());
+			if (value instanceof java.util.Date) {
+				value = new Timestamp(((java.util.Date) value).getTime());
 			}
 			if (USE_NAMED_PARAMETERS) {
 				// The following works for the Oracle JDBC 11.2.0.1.0 driver, but is actually not correct,
 				// since named parameter binding should use the setXXXAtName methods (which does NOT work).
-				pCstmt.setObject(paramName, filterValue);
+				pCstmt.setObject(paramName, value);
 			} else {
-				pCstmt.setObject(parameterIndex++, filterValue);
+				pCstmt.setObject(parameterIndex++, value);
 			}
 		}
 	}
 
 	private void debugPLSQLCall(final String pPLSQLCallable,
 								final Map<String, Object> pInParameters,
-								final Long[] pIDArray,
 								final Class<T> pBeanClass) {
 
 		StringBuilder formattedParameters = new StringBuilder();
@@ -845,22 +819,25 @@ public class JDBCStatementProcessor<T> {
 					HexBinaryAdapter hexBinaryAdapter = new HexBinaryAdapter();
 					parameterToString = hexBinaryAdapter.marshal((byte[]) parameter);
 				} else {
-					Object parameterValue = pInParameters.get(paramName);
-					if (parameterValue != null) {
-						parameterToString = parameterValue.toString();
+					if (parameter instanceof Long[]) {
+						StringBuilder formattedIDList = new StringBuilder();
+						String delimiter = "";
+						for (final Long id : (Long[]) parameter) {
+							formattedIDList.append(delimiter).append(id);
+							delimiter = ", ";
+						}
+						parameterToString = formattedIDList.toString();
 					} else {
-						parameterToString = "NULL";
+						Object parameterValue = pInParameters.get(paramName);
+						if (parameterValue != null) {
+							parameterToString = parameterValue.toString();
+						} else {
+							parameterToString = "NULL";
+						}
 					}
 				}
 				formattedParameters.append(prefix).append(paramName).append(" : ").append(parameterToString);
 				prefix = "\n                  ";
-			}
-		}
-		if (pIDArray != null) {
-			String prefix = "\nInput ID List:    ";
-			for (final Long id : pIDArray) {
-				formattedParameters.append(prefix).append(id);
-				prefix = ", ";
 			}
 		}
 		if (pBeanClass != null) {

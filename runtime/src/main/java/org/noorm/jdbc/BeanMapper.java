@@ -90,8 +90,13 @@ public class BeanMapper<T> {
 		}
 		while (pResultSet.next()) {
 			try {
-				bean = pBeanClass.newInstance();
-				populateFields(pResultSet, bean, fields);
+				if (pBeanClass.equals(Long.class)) {
+					// Support for num_array based on java.lang.Long.
+					bean = (T) new Long(pResultSet.getLong(1));
+				} else {
+					bean = pBeanClass.newInstance();
+					populateFields(pResultSet, bean, fields);
+				}
 			} catch (InstantiationException ex) {
 				throw new DataAccessException(ex);
 			} catch (IllegalAccessException ex) {

@@ -18,8 +18,6 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.util.List;
 import java.util.Properties;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 /**
  * Generator for database related service source files based on Velocity templates.
@@ -33,10 +31,11 @@ public class ServiceGenerator {
 	private static final Logger log = LoggerFactory.getLogger(ServiceGenerator.class);
 	private static final String INPUT_PARAMETER = "IN";
 	private static final String ORACLE_REF_CURSOR_TYPE_NAME = "REF CURSOR";
-	private static final String NOORM_ID_LIST_JAVA_TYPE_NAME = "List<IDBean>";
+	private static final String NOORM_ID_LIST_JAVA_TYPE_NAME = "Long[]";
 	private static final String NOORM_METADATA_ID_RECORD = "NOORM_METADATA_ID_RECORD";
 	private static final String SERVICE_VM_TEMPLATE_FILE = "/service.vm";
 	private static final String DEFAULT_PACKAGE_FILTER_REGEX = ".*";
+	private static final String DEFAULT_PAGEABLE_PROC_NAME_REGEX = "(find_pageable.*)";
 	private static ServiceGenerator serviceGenerator;
 
 	/**
@@ -83,6 +82,14 @@ public class ServiceGenerator {
 	private String singleRowFinderRegex;
 
 	/**
+	 * Large query results can be mapped into a PageableBeanList to provide efficient
+	 * access to the data by loading the full record only for the requested page.
+	 *
+	 * @parameter
+	 */
+	private String pageableProcedureNameRegex;
+
+	/**
 	 * Beans generated from database entities are often subject to data enrichment in
 	 * the service utilizing the bean data. One option to add additional data to the
 	 * bean is the generic (generated) bean property "auxiliaryData". However, some
@@ -119,6 +126,10 @@ public class ServiceGenerator {
 
 	public void setSingleRowFinderRegex(final String pSingleRowFinderRegex) {
 		singleRowFinderRegex = pSingleRowFinderRegex;
+	}
+
+	public void setPageableProcedureNameRegex(final String pPageableProcedureNameRegex) {
+		pageableProcedureNameRegex = pPageableProcedureNameRegex;
 	}
 
 	public void setExtendedBeans(final Properties pExtendedBeans) {
@@ -183,12 +194,20 @@ public class ServiceGenerator {
 						final String oracleType = parameter.getTypeName();
 						if (oracleType.equals(JDBCStatementProcessor.NOORM_ID_LIST_ORACLE_TYPE_NAME)) {
 							parameterDescriptor.setJavaType(NOORM_ID_LIST_JAVA_TYPE_NAME);
-							procedureDescriptor.setIdListFinder(true);
 						} else {
 							final String javaType = Utils.convertOracleType2JavaType(oracleType, null, null);
 							parameterDescriptor.setJavaType(javaType);
 						}
 						procedureDescriptor.addParameter(parameterDescriptor);
+						if (pageableProcedureNameRegex != null && !pageableProcedureNameRegex.isEmpty()) {
+							if (procedureName.getName().toLowerCase().matches(pageableProcedureNameRegex)) {
+								procedureDescriptor.setPageableFinder(true);
+							}
+						} else {
+							if (procedureName.getName().toLowerCase().matches(DEFAULT_PAGEABLE_PROC_NAME_REGEX)) {
+								procedureDescriptor.setPageableFinder(true);
+							}
+						}
 					} else { // OUT parameter
 						procedureDescriptor.setHasOutParam(true);
 						procedureDescriptor.setOutParamOracleName(parameter.getName().toLowerCase());
@@ -196,7 +215,7 @@ public class ServiceGenerator {
 							final String rowTypeName = metadataService.getParameterRowtype
 									(packageName.getName(), procedureName.getName(), parameter.getName());
 							if (rowTypeName.equals(NOORM_METADATA_ID_RECORD)) {
-								procedureDescriptor.setOutParamJavaType(org.noorm.jdbc.IDBean.class.getSimpleName());
+								procedureDescriptor.setOutParamJavaType(Long.class.getSimpleName());
 							} else {
 								String javaBeanName = Utils.convertTableName2BeanName
 										(rowTypeName.toUpperCase(), ignoreTableNamePrefixes);

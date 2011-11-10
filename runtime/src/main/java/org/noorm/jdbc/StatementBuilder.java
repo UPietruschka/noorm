@@ -25,7 +25,6 @@ public class StatementBuilder {
 	public String buildPLSQLCall(final String pPLSQLCallable,
 								 final String pOutParamName,
 								 final Map<String, Object> pInParameters,
-								 final String pIDListName,
 								 final boolean useNamedParameters) {
 
 		StringBuilder plSQLCall = new StringBuilder();
@@ -42,17 +41,17 @@ public class StatementBuilder {
 		if (pInParameters != null) {
 			Map<String, Object> orderedParameters = new TreeMap<String, Object>(pInParameters);
 			for (String paramName : orderedParameters.keySet()) {
-				Object filterValue = orderedParameters.get(paramName);
-				if (filterValue == null) {
+				Object value = orderedParameters.get(paramName);
+				if (value == null) {
 					continue;
 				}
-				if (filterValue instanceof String) {
-					if ((filterValue).equals("")) {
+				if (value instanceof String) {
+					if ((value).equals("")) {
 						continue;
 					}
 				}
-				if (filterValue instanceof byte[]) {
-					if (((byte[]) filterValue).length == 0) {
+				if (value instanceof byte[]) {
+					if (((byte[]) value).length == 0) {
 						continue;
 					}
 				}
@@ -63,14 +62,6 @@ public class StatementBuilder {
 				}
 				delim = CALL_DELIM_2;
 			}
-		}
-		if (pIDListName != null) {
-			if (useNamedParameters) {
-				plSQLCall.append(delim).append(pIDListName).append(CALL_PLSQL_ASG).append(pIDListName);
-			} else {
-				plSQLCall.append(delim).append(pIDListName).append(CALL_PLSQL_ASG2);
-			}
-			delim = CALL_DELIM_2;
 		}
 		if (delim.equals(CALL_DELIM_2)) {
 			// When no parameters are used, PL/SQL does not even expect empty brackets,

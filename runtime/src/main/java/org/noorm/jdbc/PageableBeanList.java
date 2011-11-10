@@ -2,10 +2,13 @@ package org.noorm.jdbc;
 
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.ListIterator;
+import java.util.Map;
 
 /**
  * Pageable list to provide detached access to data from a data source.
@@ -34,17 +37,15 @@ public class PageableBeanList<T extends IBean> implements Serializable, List<T> 
 
 	private static final String UNSUPPORTED_METHOD_MESSAGE =
 			"Only methods subList(), size() and isEmpty() are supported. This list implementation is "
-			+ "immutable and neither supports modifications nor single record access. Use method subList() "
-			+ "to get the sub-list, resp. page of your choice. The ArrayList returned by subList contains "
-			+ "the actually requested Bean objects (in contrast to the PageableDataList, which contains "
-			+ "objects of type Long). For integration with Wicket use a DataView in combination with "
-			+ "a ListDataProvider instead of a PageableDataList to avoid single record access directly "
-			+ "on the PageableDataList.";
+					+ "immutable and neither supports modifications nor single record access. Use method subList() "
+					+ "to get the sub-list, resp. page of your choice. The ArrayList returned by subList contains "
+					+ "the actually requested Bean objects (in contrast to the PageableBeanList, which contains "
+					+ "objects of type Long).";
 
 	/**
 	 * Backing store for the full list of Ids for the detached data objects
 	 */
-	private final List<Long> beanIds = new ArrayList<Long>();
+	private List<Long> beanIds = new ArrayList<Long>();
 
 	private String plsqlIdListCallable;
 	private String refCursorName;
@@ -57,16 +58,14 @@ public class PageableBeanList<T extends IBean> implements Serializable, List<T> 
 
 	private BeanTransformer<T> beanTransformer;
 
-	public PageableBeanList(final List<IDBean> pIDBeans,
+	public PageableBeanList(final Long[] pIDArray,
 							final String pPLSQLIdListCallable,
 							final String pRefCursorName,
 							final String pIDListName,
 							final Class pBeanClass) {
 
-		for (IDBean idBean : pIDBeans) {
-			beanIds.add(idBean.getId());
-		}
-		prefetchArray = new Object[pIDBeans.size()];
+		beanIds = Arrays.asList(pIDArray);
+		prefetchArray = new Object[beanIds.size()];
 		plsqlIdListCallable = pPLSQLIdListCallable;
 		refCursorName = pRefCursorName;
 		idListName = pIDListName;
@@ -81,8 +80,10 @@ public class PageableBeanList<T extends IBean> implements Serializable, List<T> 
 		if (!idSubList.isEmpty()) {
 			JDBCStatementProcessor<T> statementProcessor = JDBCStatementProcessor.getInstance();
 			Long[] dataIdArray = idSubList.toArray(new Long[]{});
+			final Map<String, Object> filterParameters = new HashMap<String, Object>();
+			filterParameters.put(idListName, dataIdArray);
 			beanSubList = statementProcessor.getBeanListFromPLSQL
-					(plsqlIdListCallable, refCursorName, idListName, dataIdArray, beanClass);
+					(plsqlIdListCallable, refCursorName, filterParameters, beanClass);
 		}
 
 		// Unfortunately, the query based on the ID list does not preserve the order of the
@@ -177,6 +178,7 @@ public class PageableBeanList<T extends IBean> implements Serializable, List<T> 
 	 * Throws an UnsupportedOperationException.
 	 * Could be implemented using a single round-trip to the data-source for
 	 * a single data object, which is not the desired behaviour.
+	 *
 	 * @param pIndex position of the element.
 	 * @return the element at the position given with index pIndex
 	 */
@@ -247,9 +249,13 @@ public class PageableBeanList<T extends IBean> implements Serializable, List<T> 
 
 	public static abstract class BeanTransformer<T> {
 
-		public void preTransformAction(final List<T> beanList) { }
+		public void preTransformAction(final List<T> beanList) {
+		}
+
 		public abstract void transformBean(final T bean);
-		public void postTransformAction(final List<T> beanList) { }
+
+		public void postTransformAction(final List<T> beanList) {
+		}
 	}
 
 	class PageableIterator<T> implements Iterator {
