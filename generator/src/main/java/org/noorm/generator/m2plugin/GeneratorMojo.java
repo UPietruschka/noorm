@@ -270,6 +270,7 @@ public class GeneratorMojo extends AbstractMojo {
 		serviceGenerator.setPackageFilterRegex(packageFilterRegex);
 		serviceGenerator.setIgnoreTableNamePrefixes(ignoreTableNamePrefixes);
 		serviceGenerator.setSingleRowFinderRegex(singleRowFinderRegex);
+		serviceGenerator.setPageableProcedureNameRegex(pageableProcedureNameRegex);
 		serviceGenerator.setExtendedBeans(extendedBeans);
 		serviceGenerator.execute();
 	}
