@@ -58,7 +58,7 @@ public final class DataAccessException extends RuntimeException {
 		UNSUPPORTED_VERSION_COLUMN_TYPE(1800L, "UNSUPPORTED_VERSION_COLUMN_TYPE", "Unsupported version column type (Only 'Long' supported yet)."),
 		VERSION_COLUMN_NULL(1810L, "VERSION_COLUMN_NULL", "Version column is null. Record has not been initialized properly."),
 		OPTIMISTIC_LOCK_CONFLICT(1900L, "OPTIMISTIC_LOCK_CONFLICT", "Optimistic lock conflict. Record subject to modification has been "
-				+ "changed or modfied by another process atfer it has been loaded for this operation."),
+				+ "modified or deleted by another process atfer it has been loaded for this operation."),
 		COULD_NOT_ACCESS_PK_BY_REFLECTION(2000L, "COULD_NOT_ACCESS_PK_BY_REFLECTION", "Could not access method of bean by reflection."),
 		GENERIC_UPDATE_NOT_SUPPORTED_WITHOUT_PK(2100L, "GENERIC_UPDATE_NOT_SUPPORTED_WITHOUT_PK", "Generic update not supported without primary key definition."),
 		GENERIC_DELETE_NOT_SUPPORTED_WITHOUT_PK(2200L, "GENERIC_DELETE_NOT_SUPPORTED_WITHOUT_PK", "Generic delete not supported without primary key definition."),

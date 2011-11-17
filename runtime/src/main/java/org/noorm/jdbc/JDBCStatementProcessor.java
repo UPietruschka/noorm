@@ -560,9 +560,7 @@ public class JDBCStatementProcessor<T> {
 								throw new DataAccessException(DataAccessException.Type.UNSUPPORTED_VERSION_COLUMN_TYPE);
 							}
 						} else {
-							if (pBatchType.equals(BatchType.UPDATE)) {
-								pstmt.setObjectAtName(fieldName, value);
-							}
+							pstmt.setObjectAtName(fieldName, value);
 						}
 					}
 					if (pBatchType.equals(BatchType.DELETE)) {

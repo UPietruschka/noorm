@@ -62,7 +62,7 @@ public class $class.Name<T> implements IBean<T>, Serializable {
 		if (this == pObject) return true;
 		if (!(pObject instanceof $class.Name)) return false;
 		$class.Name other = ($class.Name) pObject;
-		return get${class.FirstUpperPrimaryKeyColumnName}() == other.get${class.FirstUpperPrimaryKeyColumnName}();
+		return get${class.FirstUpperPrimaryKeyColumnName}().equals(other.get${class.FirstUpperPrimaryKeyColumnName}());
 	}
 
 	@Override
