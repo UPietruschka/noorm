@@ -1,5 +1,7 @@
 package org.noorm.jdbc;
 
+import org.noorm.metadata.BeanMetaDataUtil;
+
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Arrays;

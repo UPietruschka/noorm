@@ -5,6 +5,7 @@ import oracle.jdbc.OracleConnection;
 import oracle.jdbc.OraclePreparedStatement;
 import oracle.sql.ARRAY;
 import oracle.sql.ArrayDescriptor;
+import org.noorm.metadata.BeanMetaDataUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

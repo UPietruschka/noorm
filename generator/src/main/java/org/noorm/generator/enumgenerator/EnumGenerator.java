@@ -4,9 +4,9 @@ import org.apache.velocity.Template;
 import org.apache.velocity.VelocityContext;
 import org.apache.velocity.app.Velocity;
 import org.noorm.generator.GeneratorException;
-import org.noorm.generator.MetadataService;
+import org.noorm.metadata.MetadataService;
 import org.noorm.jdbc.Utils;
-import org.noorm.generator.beans.TableMetadataBean;
+import org.noorm.metadata.beans.TableMetadataBean;
 import org.noorm.jdbc.JDBCStatementProcessor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -15,13 +15,9 @@ import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 /**
  * Generator for database related Enum source files based on Velocity templates.
@@ -110,20 +106,7 @@ public class EnumGenerator {
 
 		log.info("Retrieving table metadata from Oracle database.");
 		final MetadataService metadataService = MetadataService.getInstance();
-		final List<TableMetadataBean> tableMetadataBeanList = metadataService.findTableMetadata();
-		final Map<String, List<TableMetadataBean>> tableColumnMap = new HashMap<String, List<TableMetadataBean>>();
-		String tableName = "";
-		List<TableMetadataBean> tableMetadataBeanList0 = null;
-		for (TableMetadataBean tableMetadataBean : tableMetadataBeanList) {
-			// Filter out duplicates
-			if (!tableName.equals(tableMetadataBean.getTableName())) {
-				tableName = tableMetadataBean.getTableName();
-				log.info("Collecting table metadata for table ".concat(tableName));
-				tableMetadataBeanList0 = new ArrayList<TableMetadataBean>();
-				tableColumnMap.put(tableName, tableMetadataBeanList0);
-			}
-			tableMetadataBeanList0.add(tableMetadataBean);
-		}
+		final Map<String, List<TableMetadataBean>> tableColumnMap = metadataService.findTableMetadata();
 
 		log.info("Generating NoORM Enum classes.");
 		final File enumPackageDir = new File(destinationDirectory, enumPackageName.replace(".", File.separator));

@@ -1,5 +1,9 @@
-package org.noorm.jdbc;
+package org.noorm.metadata;
 
+import org.noorm.jdbc.DataAccessException;
+import org.noorm.jdbc.IBean;
+import org.noorm.jdbc.JDBCColumn;
+import org.noorm.jdbc.Utils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -34,7 +38,7 @@ public class BeanMetaDataUtil {
 	 * @param pClass
 	 * @return all declared fields of the provided class and its super-class, if any.
 	 */
-	static Field[] getDeclaredFieldsInclParent(final Class pClass) {
+	public static Field[] getDeclaredFieldsInclParent(final Class pClass) {
 
 		log.debug("Retrieving declared fields by reflection for class ".concat(pClass.getName()));
 		final Field[] fields = pClass.getDeclaredFields();

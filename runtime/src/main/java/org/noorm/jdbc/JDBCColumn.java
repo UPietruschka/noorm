@@ -14,6 +14,7 @@ import java.lang.annotation.Target;
 public @interface JDBCColumn {
 
 	String name() default "";
+	String dataType() default "";
 	boolean updatable() default true;
 	boolean nullable() default true;
 	int maxLength() default 0;

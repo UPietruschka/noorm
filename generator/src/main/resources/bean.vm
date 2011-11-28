@@ -17,7 +17,7 @@ public class $class.Name<T> implements IBean<T>, Serializable {
 	private static final String SEQUENCE_NAME = "$class.SequenceName";
 	private static final String VERSION_COLUMN_NAME = "$class.VersionColumnName";
 #foreach ($att in $class.Attributes)
-	@JDBCColumn(name="$att.ColumnName"#if(!$att.Updatable), updatable=false#end#if(!$att.Nullable), nullable=false#end#if($att.MaxLength>0), maxLength=$att.MaxLength#end)
+	@JDBCColumn(name="$att.ColumnName", dataType="$att.DataType"#if(!$att.Updatable), updatable=false#end#if(!$att.Nullable), nullable=false#end#if($att.MaxLength>0), maxLength=$att.MaxLength#end)
 	protected $att.Type $att.Name;
 #end
 	private T auxiliaryData;

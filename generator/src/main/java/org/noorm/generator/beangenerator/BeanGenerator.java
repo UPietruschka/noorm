@@ -4,10 +4,10 @@ import org.apache.velocity.Template;
 import org.apache.velocity.VelocityContext;
 import org.apache.velocity.app.Velocity;
 import org.noorm.generator.GeneratorException;
-import org.noorm.generator.MetadataService;
-import org.noorm.generator.beans.NameBean;
-import org.noorm.generator.beans.PrimaryKeyColumnBean;
-import org.noorm.generator.beans.TableMetadataBean;
+import org.noorm.metadata.MetadataService;
+import org.noorm.metadata.beans.NameBean;
+import org.noorm.metadata.beans.PrimaryKeyColumnBean;
+import org.noorm.metadata.beans.TableMetadataBean;
 import org.noorm.jdbc.Utils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -16,14 +16,10 @@ import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 import java.util.Random;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 /**
  * Generator for database related Bean source files based on Velocity templates.
@@ -36,6 +32,8 @@ public class BeanGenerator {
 
 	private static final Logger log = LoggerFactory.getLogger(BeanGenerator.class);
 	private static final String BEAN_VM_TEMPLATE_FILE = "/bean.vm";
+	private static final String BEAN_VALIDATOR_VM_TEMPLATE_FILE = "/bean_validator.vm";
+	private static final String BEAN_VALIDATOR_CLASS_NAME = "GenericBeanValidator";
 	private static final String NO = "NO";
 	private static final String N = "N";
 	private static BeanGenerator beanGenerator;
@@ -146,22 +144,13 @@ public class BeanGenerator {
 			throw new IllegalArgumentException("Parameter [destinationDirectory] is null or mis-configured.");
 		}
 
-		log.info("Retrieving table metadata from Oracle database.");
+		BeanValidatorClassDescriptor beanValidatorClassDescriptor = new BeanValidatorClassDescriptor();
+		beanValidatorClassDescriptor.setPackageName(beanPackageName);
+
 		final MetadataService metadataService = MetadataService.getInstance();
-		final List<TableMetadataBean> tableMetadataBeanList = metadataService.findTableMetadata();
-		final Map<String, List<TableMetadataBean>> tableColumnMap = new HashMap<String, List<TableMetadataBean>>();
-		String tableName = "";
-		List<TableMetadataBean> tableMetadataBeanList0 = null;
-		for (TableMetadataBean tableMetadataBean : tableMetadataBeanList) {
-			// Filter out duplicates
-			if (!tableName.equals(tableMetadataBean.getTableName())) {
-				tableName = tableMetadataBean.getTableName();
-				log.info("Collecting table metadata for table ".concat(tableName));
-				tableMetadataBeanList0 = new ArrayList<TableMetadataBean>();
-				tableColumnMap.put(tableName, tableMetadataBeanList0);
-			}
-			tableMetadataBeanList0.add(tableMetadataBean);
-		}
+
+		log.info("Retrieving table metadata from Oracle database.");
+		final Map<String, List<TableMetadataBean>> tableColumnMap = metadataService.findTableMetadata();
 
 		log.info("Retrieving primary key metadata from Oracle database.");
 		final List<PrimaryKeyColumnBean> pkColumnNameList = metadataService.findPkColumns();
@@ -187,6 +176,7 @@ public class BeanGenerator {
 			final List<TableMetadataBean> tableMetadataBeanList1 = tableColumnMap.get(tableName0);
 			final BeanClassDescriptor beanClassDescriptor = new BeanClassDescriptor();
 			beanClassDescriptor.setName(javaBeanName);
+			beanValidatorClassDescriptor.getBeanClassNames().add(javaBeanName);
 			beanClassDescriptor.setTableName(tableName0);
 			String primaryKeyColumnName = getPrimaryKeyColumnName(tableName0, pkColumnNameList);
 			beanClassDescriptor.setPrimaryKeyColumnName(primaryKeyColumnName);
@@ -210,6 +200,7 @@ public class BeanGenerator {
 					beanAttributeDescriptor.setUpdatable(false);
 				}
 				beanAttributeDescriptor.setType(javaType);
+				beanAttributeDescriptor.setDataType(tableMetadataBean.getDataType());
 				beanAttributeDescriptor.setColumnName(tableMetadataBean.getColumnName());
 				beanAttributeDescriptor.setMaxLength(tableMetadataBean.getCharLength().intValue());
 				if (tableMetadataBean.getNullable().equals(N)) {
@@ -218,6 +209,26 @@ public class BeanGenerator {
 				beanClassDescriptor.addAttribute(beanAttributeDescriptor);
 			}
 			generateBean(beanPackageDir, beanClassDescriptor);
+		}
+		generateBeanValidator(beanPackageDir, beanValidatorClassDescriptor);
+	}
+
+	private void generateBeanValidator(final File pBeanPackageDir,
+									   final BeanValidatorClassDescriptor pBeanValidatorClassDescriptor)
+			throws GeneratorException {
+
+		final File javaSourceFile =
+				new File(pBeanPackageDir, BEAN_VALIDATOR_CLASS_NAME + Utils.JAVA_SOURCE_FILE_APPENDIX);
+		try {
+			final VelocityContext context = new VelocityContext();
+			context.put("class", pBeanValidatorClassDescriptor);
+			final Template template = Velocity.getTemplate(BEAN_VALIDATOR_VM_TEMPLATE_FILE);
+			final BufferedWriter writer = new BufferedWriter(new FileWriter(javaSourceFile));
+			template.merge(context, writer);
+			writer.flush();
+			writer.close();
+		} catch (IOException e) {
+			throw new GeneratorException("Writing Java Bean Validator source file failed.", e);
 		}
 	}
 

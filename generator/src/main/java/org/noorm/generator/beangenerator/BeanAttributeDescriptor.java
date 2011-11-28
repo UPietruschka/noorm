@@ -12,6 +12,7 @@ public class BeanAttributeDescriptor {
 	private String name;
 	private String columnName;
 	private String type;
+	private String dataType;
 	private boolean updatable = true;
 	private boolean nullable = true;
 	private int maxLength = 0;
@@ -39,6 +40,14 @@ public class BeanAttributeDescriptor {
 
 	public String getType() {
 		return type;
+	}
+
+	public String getDataType() {
+		return dataType;
+	}
+
+	public void setDataType(final String pDataType) {
+		dataType = pDataType;
 	}
 
 	public String getFirstUpperName() {

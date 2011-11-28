@@ -1,4 +1,4 @@
-package org.noorm.generator.beans;
+package org.noorm.metadata.beans;
 
 import org.noorm.jdbc.JDBCColumn;
 

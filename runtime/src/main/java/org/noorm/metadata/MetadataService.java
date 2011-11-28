@@ -1,11 +1,14 @@
-package org.noorm.generator;
+package org.noorm.metadata;
 
-import org.noorm.generator.beans.NameBean;
-import org.noorm.generator.beans.ParameterBean;
-import org.noorm.generator.beans.PrimaryKeyColumnBean;
-import org.noorm.generator.beans.TableMetadataBean;
+import org.noorm.metadata.beans.NameBean;
+import org.noorm.metadata.beans.ParameterBean;
+import org.noorm.metadata.beans.PrimaryKeyColumnBean;
+import org.noorm.metadata.beans.TableMetadataBean;
 import org.noorm.jdbc.JDBCStatementProcessor;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -16,6 +19,8 @@ import java.util.Map;
  *         Time: 14:48
  */
 public class MetadataService {
+
+	private static final Logger log = LoggerFactory.getLogger(MetadataService.class);
 
 	private static MetadataService metadataService;
 
@@ -32,7 +37,26 @@ public class MetadataService {
 		return metadataService;
 	}
 
-	public List<TableMetadataBean> findTableMetadata() {
+	public Map<String, List<TableMetadataBean>> findTableMetadata() {
+
+		final List<TableMetadataBean> tableMetadataBeanList = findTableMetadata0();
+		final Map<String, List<TableMetadataBean>> tableColumnMap = new HashMap<String, List<TableMetadataBean>>();
+		String tableName = "";
+		List<TableMetadataBean> tableMetadataBeanList0 = null;
+		for (TableMetadataBean tableMetadataBean : tableMetadataBeanList) {
+			// Filter out duplicates
+			if (!tableName.equals(tableMetadataBean.getTableName())) {
+				tableName = tableMetadataBean.getTableName();
+				log.info("Collecting table metadata for table ".concat(tableName));
+				tableMetadataBeanList0 = new ArrayList<TableMetadataBean>();
+				tableColumnMap.put(tableName, tableMetadataBeanList0);
+			}
+			tableMetadataBeanList0.add(tableMetadataBean);
+		}
+		return tableColumnMap;
+	}
+
+	private List<TableMetadataBean> findTableMetadata0() {
 
 		final JDBCStatementProcessor<TableMetadataBean> statementProcessor = JDBCStatementProcessor.getInstance();
 		final Map<String, Object> filterParameters = new HashMap<String, Object>();
