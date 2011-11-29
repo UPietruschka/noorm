@@ -10,9 +10,7 @@
     </parent>
 
     <modelVersion>4.0.0</modelVersion>
-    <groupId>org.noorm</groupId>
     <artifactId>runtime</artifactId>
-    <version>${parent.version}</version>
     <name>NoORM Runtime Library</name>
 
 </project>
