@@ -108,6 +108,15 @@ public class MetadataService {
 				("noorm_metadata.find_procedure_parameters", "p_parameters", filterParameters, ParameterBean.class);
 	}
 
+	public Integer getPackageHashValue(final String pPackageName) {
+
+		final JDBCStatementProcessor<Integer> statementProcessor = JDBCStatementProcessor.getInstance();
+		final Map<String, Object> filterParameters = new HashMap<String, Object>();
+		filterParameters.put("p_package_name", pPackageName);
+		return statementProcessor.callPLSQL
+				("noorm_metadata.get_package_hash_value", "p_code_hash_value", filterParameters, Integer.class);
+	}
+
 	public String getParameterRowtype(final String pPackageName,
 									  final String pProcedureName,
 									  final String pParameterName) {

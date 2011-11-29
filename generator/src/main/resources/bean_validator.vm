@@ -12,7 +12,7 @@ public class GenericBeanValidator extends BeanValidator {
 	public void validateDatabase() {
 
 		loadMetadata();
-#foreach ($className in $class.BeanClassNames)
+#foreach ($className in $class.ClassNames)
 		validateBean(new ${className}());
 #end
 	}

@@ -44,7 +44,7 @@ public class BeanValidator {
 
 		final String tableName = pBean.getTableName();
 		final String javaBeanName = pBean.getClass().getName();
-		List<TableMetadataBean> tableMetadataBeanList = tableColumnMap.get(tableName);
+		final List<TableMetadataBean> tableMetadataBeanList = tableColumnMap.get(tableName);
 		if (tableMetadataBeanList == null || tableMetadataBeanList.isEmpty()) {
 			throw new ValidationException("Cannot find table ".concat(tableName).concat(" in connected DB schema."));
 		}
@@ -54,12 +54,18 @@ public class BeanValidator {
 			boolean beanColumnValidated = false;
 			String javaAttributeName = null;
 			for (final Map.Entry<String, JDBCColumn> beanMetaDataEntry : beanMetadata.entrySet()) {
-				JDBCColumn jdbcColumn = beanMetaDataEntry.getValue();
+				final JDBCColumn jdbcColumn = beanMetaDataEntry.getValue();
 				if (jdbcColumn.name().equals(columnName)) {
+					if (!jdbcColumn.dataType().equals(tableMetadataBean.getDataType())) {
+						throw new ValidationException("Table column ".concat(tableName).concat(".").concat(columnName)
+								.concat(" datatype ").concat(tableMetadataBean.getDataType())
+								.concat(" does not match datatype ").concat(jdbcColumn.dataType())
+								.concat(" in Java Bean ").concat(javaBeanName));
+					}
 					// BeanValidator does not yet validate JDBCColumn attributes nullable, updatable
 					// and maxLength against the data dictionary of the database.
 					log.debug("Table column ".concat(tableName).concat(".")
-							.concat(columnName).concat(" validated against bean specification."));
+							.concat(columnName).concat(" successfully validated against bean specification."));
 					javaAttributeName = beanMetaDataEntry.getKey();
 					beanColumnValidated = true;
 				}
@@ -72,7 +78,7 @@ public class BeanValidator {
 			}
 		}
 		if (!beanMetadata.isEmpty()) {
-			StringBuilder message = new StringBuilder();
+			final StringBuilder message = new StringBuilder();
 			String delimiter = "";
 			for (final String javaAttributeName : beanMetadata.keySet()) {
 				message.append(delimiter);

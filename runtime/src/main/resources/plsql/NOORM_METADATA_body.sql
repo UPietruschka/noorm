@@ -102,6 +102,29 @@ PACKAGE BODY noorm_metadata AS
     ORDER  BY sequence;
   END find_procedure_parameters;
 
+  PROCEDURE get_package_hash_value(p_package_name IN VARCHAR2,
+                                   p_code_hash_value OUT NUMBER) AS
+
+    l_full_package_text VARCHAR2(32767);
+    CURSOR c_package_source IS
+      SELECT text
+      FROM   user_source
+      WHERE  type = 'PACKAGE'
+      AND    name = UPPER(p_package_name)
+      ORDER  BY line;
+  BEGIN
+    l_full_package_text := '';
+    FOR source_line IN c_package_source LOOP
+      l_full_package_text := concat(l_full_package_text, source_line.text);
+    END LOOP;
+    IF l_full_package_text IS NULL THEN
+      p_code_hash_value := -1;
+    ELSE
+      l_full_package_text := regexp_replace(l_full_package_text, '\s*', '');
+      p_code_hash_value := DBMS_UTILITY.GET_HASH_VALUE(l_full_package_text, 0, 2147483647);
+    END IF;
+  END get_package_hash_value;
+
   PROCEDURE get_parameter_rowtype(p_package_name IN VARCHAR2,
                                   p_procedure_name IN VARCHAR2,
                                   p_parameter_name IN VARCHAR2,

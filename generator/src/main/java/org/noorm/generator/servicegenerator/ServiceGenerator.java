@@ -4,6 +4,7 @@ import org.apache.velocity.Template;
 import org.apache.velocity.VelocityContext;
 import org.apache.velocity.app.Velocity;
 import org.noorm.generator.GeneratorException;
+import org.noorm.generator.ValidatorClassDescriptor;
 import org.noorm.metadata.MetadataService;
 import org.noorm.jdbc.Utils;
 import org.noorm.metadata.beans.NameBean;
@@ -34,6 +35,8 @@ public class ServiceGenerator {
 	private static final String NOORM_ID_LIST_JAVA_TYPE_NAME = "Long[]";
 	private static final String NOORM_METADATA_ID_RECORD = "NOORM_METADATA_ID_RECORD";
 	private static final String SERVICE_VM_TEMPLATE_FILE = "/service.vm";
+	private static final String SERVICE_VALIDATOR_VM_TEMPLATE_FILE = "/service_validator.vm";
+	private static final String SERVICE_VALIDATOR_CLASS_NAME = "GenericServiceValidator";
 	private static final String DEFAULT_PACKAGE_FILTER_REGEX = ".*";
 	private static final String DEFAULT_PAGEABLE_PROC_NAME_REGEX = "(find_pageable.*)";
 	private static ServiceGenerator serviceGenerator;
@@ -158,6 +161,9 @@ public class ServiceGenerator {
 			throw new IllegalArgumentException("Parameter [destinationDirectory] is null or mis-configured.");
 		}
 
+		ValidatorClassDescriptor validatorClassDescriptor = new ValidatorClassDescriptor();
+		validatorClassDescriptor.setPackageName(servicePackageName);
+
 		log.info("Generating NoORM Service classes.");
 		final File servicePackageDir =
 				new File(destinationDirectory, servicePackageName.replace(".", File.separator));
@@ -169,7 +175,7 @@ public class ServiceGenerator {
 		if (packageFilterRegex == null || packageFilterRegex.isEmpty()) {
 			setPackageFilterRegex(DEFAULT_PACKAGE_FILTER_REGEX);
 		}
-		final List<NameBean> packageNames =	metadataService.findPackageNames(packageFilterRegex);
+		final List<NameBean> packageNames = metadataService.findPackageNames(packageFilterRegex);
 		for (final NameBean packageName : packageNames) {
 			final ServiceClassDescriptor serviceClassDescriptor = new ServiceClassDescriptor();
 			final String javaClassName = Utils.convertDBName2JavaName(packageName.getName(), true);
@@ -177,6 +183,9 @@ public class ServiceGenerator {
 			serviceClassDescriptor.setDatabasePackageName(packageName.getName().toLowerCase());
 			serviceClassDescriptor.setPackageName(servicePackageName);
 			serviceClassDescriptor.setBeanPackageName(beanPackageName);
+			final Integer codeHashValue = metadataService.getPackageHashValue(packageName.getName());
+			serviceClassDescriptor.setCodeHashValue(codeHashValue);
+			validatorClassDescriptor.getClassNames().add(javaClassName);
 			final List<NameBean> procedureNames = metadataService.findProcedureNames(packageName.getName());
 			for (NameBean procedureName : procedureNames) {
 				final ProcedureDescriptor procedureDescriptor = new ProcedureDescriptor();
@@ -247,6 +256,26 @@ public class ServiceGenerator {
 				serviceClassDescriptor.addProcedure(procedureDescriptor);
 			}
 			generateService(servicePackageDir, serviceClassDescriptor);
+		}
+		generateServiceValidator(servicePackageDir, validatorClassDescriptor);
+	}
+
+	private void generateServiceValidator(final File pServicePackageDir,
+										  final ValidatorClassDescriptor pValidatorClassDescriptor)
+			throws GeneratorException {
+
+		final File javaSourceFile =
+				new File(pServicePackageDir, SERVICE_VALIDATOR_CLASS_NAME + Utils.JAVA_SOURCE_FILE_APPENDIX);
+		try {
+			final VelocityContext context = new VelocityContext();
+			context.put("class", pValidatorClassDescriptor);
+			final Template template = Velocity.getTemplate(SERVICE_VALIDATOR_VM_TEMPLATE_FILE);
+			final BufferedWriter writer = new BufferedWriter(new FileWriter(javaSourceFile));
+			template.merge(context, writer);
+			writer.flush();
+			writer.close();
+		} catch (IOException e) {
+			throw new GeneratorException("Writing Java Service Validator source file failed.", e);
 		}
 	}
 

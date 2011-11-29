@@ -54,6 +54,9 @@ PACKAGE noorm_metadata AS
                                       p_procedure_name IN VARCHAR2,
                                       p_parameters OUT parameter_refcur);
 
+  PROCEDURE get_package_hash_value(p_package_name IN VARCHAR2,
+                                   p_code_hash_value OUT NUMBER);
+
   PROCEDURE get_parameter_rowtype(p_package_name IN VARCHAR2,
                                   p_procedure_name IN VARCHAR2,
                                   p_parameter_name IN VARCHAR2,

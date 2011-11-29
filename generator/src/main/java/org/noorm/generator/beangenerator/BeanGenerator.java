@@ -4,6 +4,7 @@ import org.apache.velocity.Template;
 import org.apache.velocity.VelocityContext;
 import org.apache.velocity.app.Velocity;
 import org.noorm.generator.GeneratorException;
+import org.noorm.generator.ValidatorClassDescriptor;
 import org.noorm.metadata.MetadataService;
 import org.noorm.metadata.beans.NameBean;
 import org.noorm.metadata.beans.PrimaryKeyColumnBean;
@@ -144,8 +145,8 @@ public class BeanGenerator {
 			throw new IllegalArgumentException("Parameter [destinationDirectory] is null or mis-configured.");
 		}
 
-		BeanValidatorClassDescriptor beanValidatorClassDescriptor = new BeanValidatorClassDescriptor();
-		beanValidatorClassDescriptor.setPackageName(beanPackageName);
+		ValidatorClassDescriptor validatorClassDescriptor = new ValidatorClassDescriptor();
+		validatorClassDescriptor.setPackageName(beanPackageName);
 
 		final MetadataService metadataService = MetadataService.getInstance();
 
@@ -176,7 +177,7 @@ public class BeanGenerator {
 			final List<TableMetadataBean> tableMetadataBeanList1 = tableColumnMap.get(tableName0);
 			final BeanClassDescriptor beanClassDescriptor = new BeanClassDescriptor();
 			beanClassDescriptor.setName(javaBeanName);
-			beanValidatorClassDescriptor.getBeanClassNames().add(javaBeanName);
+			validatorClassDescriptor.getClassNames().add(javaBeanName);
 			beanClassDescriptor.setTableName(tableName0);
 			String primaryKeyColumnName = getPrimaryKeyColumnName(tableName0, pkColumnNameList);
 			beanClassDescriptor.setPrimaryKeyColumnName(primaryKeyColumnName);
@@ -210,18 +211,18 @@ public class BeanGenerator {
 			}
 			generateBean(beanPackageDir, beanClassDescriptor);
 		}
-		generateBeanValidator(beanPackageDir, beanValidatorClassDescriptor);
+		generateBeanValidator(beanPackageDir, validatorClassDescriptor);
 	}
 
 	private void generateBeanValidator(final File pBeanPackageDir,
-									   final BeanValidatorClassDescriptor pBeanValidatorClassDescriptor)
+									   final ValidatorClassDescriptor pValidatorClassDescriptor)
 			throws GeneratorException {
 
 		final File javaSourceFile =
 				new File(pBeanPackageDir, BEAN_VALIDATOR_CLASS_NAME + Utils.JAVA_SOURCE_FILE_APPENDIX);
 		try {
 			final VelocityContext context = new VelocityContext();
-			context.put("class", pBeanValidatorClassDescriptor);
+			context.put("class", pValidatorClassDescriptor);
 			final Template template = Velocity.getTemplate(BEAN_VALIDATOR_VM_TEMPLATE_FILE);
 			final BufferedWriter writer = new BufferedWriter(new FileWriter(javaSourceFile));
 			template.merge(context, writer);

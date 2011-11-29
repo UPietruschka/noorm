@@ -13,12 +13,21 @@ import java.util.Set;
  */
 public class ServiceClassDescriptor {
 
+	private int codeHashValue;
 	private String javaName;
 	private String databasePackageName;
 	private String packageName;
 	private String beanPackageName;
 	private List<ProcedureDescriptor> procedures = new ArrayList<ProcedureDescriptor>();
 	private Map<String, String> returnTypeNames = new HashMap<String, String>();
+
+	public int getCodeHashValue() {
+		return codeHashValue;
+	}
+
+	public void setCodeHashValue(final int pCodeHashValue) {
+		codeHashValue = pCodeHashValue;
+	}
 
 	public void setJavaName(final String pJavaName) {
 		javaName = pJavaName;
