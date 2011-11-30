@@ -4,6 +4,7 @@ import org.apache.velocity.Template;
 import org.apache.velocity.VelocityContext;
 import org.apache.velocity.app.Velocity;
 import org.noorm.generator.GeneratorException;
+import org.noorm.generator.GeneratorUtil;
 import org.noorm.generator.ValidatorClassDescriptor;
 import org.noorm.metadata.MetadataService;
 import org.noorm.jdbc.Utils;
@@ -255,47 +256,10 @@ public class ServiceGenerator {
 				}
 				serviceClassDescriptor.addProcedure(procedureDescriptor);
 			}
-			generateService(servicePackageDir, serviceClassDescriptor);
+			GeneratorUtil.generateFile(servicePackageDir, SERVICE_VM_TEMPLATE_FILE,
+					serviceClassDescriptor.getJavaName(), serviceClassDescriptor);
 		}
-		generateServiceValidator(servicePackageDir, validatorClassDescriptor);
-	}
-
-	private void generateServiceValidator(final File pServicePackageDir,
-										  final ValidatorClassDescriptor pValidatorClassDescriptor)
-			throws GeneratorException {
-
-		final File javaSourceFile =
-				new File(pServicePackageDir, SERVICE_VALIDATOR_CLASS_NAME + Utils.JAVA_SOURCE_FILE_APPENDIX);
-		try {
-			final VelocityContext context = new VelocityContext();
-			context.put("class", pValidatorClassDescriptor);
-			final Template template = Velocity.getTemplate(SERVICE_VALIDATOR_VM_TEMPLATE_FILE);
-			final BufferedWriter writer = new BufferedWriter(new FileWriter(javaSourceFile));
-			template.merge(context, writer);
-			writer.flush();
-			writer.close();
-		} catch (IOException e) {
-			throw new GeneratorException("Writing Java Service Validator source file failed.", e);
-		}
-	}
-
-	private void generateService(final File pServicePackageDir,
-								 final ServiceClassDescriptor pServiceClassDescriptor) throws GeneratorException {
-
-		final File javaSourceFile =
-				new File(pServicePackageDir, pServiceClassDescriptor.getJavaName() + Utils.JAVA_SOURCE_FILE_APPENDIX);
-		try {
-			final VelocityContext context = new VelocityContext();
-			context.put("class", pServiceClassDescriptor);
-			context.put("nl", "\n");
-			context.put("subindent", "\t\t\t\t\t");
-			final Template template = Velocity.getTemplate(SERVICE_VM_TEMPLATE_FILE);
-			final BufferedWriter writer = new BufferedWriter(new FileWriter(javaSourceFile));
-			template.merge(context, writer);
-			writer.flush();
-			writer.close();
-		} catch (IOException e) {
-			throw new GeneratorException("Writing Java Service source file failed.", e);
-		}
+		GeneratorUtil.generateFile(servicePackageDir, SERVICE_VALIDATOR_VM_TEMPLATE_FILE,
+				SERVICE_VALIDATOR_CLASS_NAME, validatorClassDescriptor);
 	}
 }

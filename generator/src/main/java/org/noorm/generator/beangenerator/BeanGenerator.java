@@ -4,6 +4,7 @@ import org.apache.velocity.Template;
 import org.apache.velocity.VelocityContext;
 import org.apache.velocity.app.Velocity;
 import org.noorm.generator.GeneratorException;
+import org.noorm.generator.GeneratorUtil;
 import org.noorm.generator.ValidatorClassDescriptor;
 import org.noorm.metadata.MetadataService;
 import org.noorm.metadata.beans.NameBean;
@@ -209,46 +210,11 @@ public class BeanGenerator {
 				}
 				beanClassDescriptor.addAttribute(beanAttributeDescriptor);
 			}
-			generateBean(beanPackageDir, beanClassDescriptor);
+			GeneratorUtil.generateFile(beanPackageDir, BEAN_VM_TEMPLATE_FILE,
+					beanClassDescriptor.getName(), beanClassDescriptor);
 		}
-		generateBeanValidator(beanPackageDir, validatorClassDescriptor);
-	}
-
-	private void generateBeanValidator(final File pBeanPackageDir,
-									   final ValidatorClassDescriptor pValidatorClassDescriptor)
-			throws GeneratorException {
-
-		final File javaSourceFile =
-				new File(pBeanPackageDir, BEAN_VALIDATOR_CLASS_NAME + Utils.JAVA_SOURCE_FILE_APPENDIX);
-		try {
-			final VelocityContext context = new VelocityContext();
-			context.put("class", pValidatorClassDescriptor);
-			final Template template = Velocity.getTemplate(BEAN_VALIDATOR_VM_TEMPLATE_FILE);
-			final BufferedWriter writer = new BufferedWriter(new FileWriter(javaSourceFile));
-			template.merge(context, writer);
-			writer.flush();
-			writer.close();
-		} catch (IOException e) {
-			throw new GeneratorException("Writing Java Bean Validator source file failed.", e);
-		}
-	}
-
-	private void generateBean(final File pBeanPackageDir,
-							  final BeanClassDescriptor pBeanClassDescriptor) throws GeneratorException {
-
-		final File javaSourceFile =
-				new File(pBeanPackageDir, pBeanClassDescriptor.getName() + Utils.JAVA_SOURCE_FILE_APPENDIX);
-		try {
-			final VelocityContext context = new VelocityContext();
-			context.put("class", pBeanClassDescriptor);
-			final Template template = Velocity.getTemplate(BEAN_VM_TEMPLATE_FILE);
-			final BufferedWriter writer = new BufferedWriter(new FileWriter(javaSourceFile));
-			template.merge(context, writer);
-			writer.flush();
-			writer.close();
-		} catch (IOException e) {
-			throw new GeneratorException("Writing Java Bean source file failed.", e);
-		}
+		GeneratorUtil.generateFile(beanPackageDir, BEAN_VALIDATOR_VM_TEMPLATE_FILE,
+				BEAN_VALIDATOR_CLASS_NAME, validatorClassDescriptor);
 	}
 
 	private String getSequenceName(final String pTableName,

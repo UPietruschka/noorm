@@ -4,6 +4,7 @@ import org.apache.velocity.Template;
 import org.apache.velocity.VelocityContext;
 import org.apache.velocity.app.Velocity;
 import org.noorm.generator.GeneratorException;
+import org.noorm.generator.GeneratorUtil;
 import org.noorm.metadata.MetadataService;
 import org.noorm.jdbc.Utils;
 import org.noorm.metadata.beans.TableMetadataBean;
@@ -175,33 +176,8 @@ public class EnumGenerator {
 				}
 				enumClassDescriptor.addRecord(enumRecordDescriptor);
 			}
-			generateEnum(enumPackageDir, enumClassDescriptor);
-		}
-	}
-
-	private void generateEnum(final File pEnumPackageDir,
-							  final EnumClassDescriptor pEnumClassDescriptor) throws GeneratorException {
-
-		final File javaSourceFile =
-				new File(pEnumPackageDir, pEnumClassDescriptor.getName() + Utils.JAVA_SOURCE_FILE_APPENDIX);
-		try {
-			final VelocityContext context = new VelocityContext();
-			context.put("class", pEnumClassDescriptor);
-			// The following macro is used as a workaround for an un-intentional Velocity behaviour.
-			// Usually, Velocity just takes the newlines of the template as they occur in the template.
-			// However, when a line ends with a velocity command like "#if(...)" or "#end", Velocity
-			// omits the newline. When a newline is desired here, we need to append something to the
-			// lines end to force a newline. Since this addendum should not be visible in the generated
-			// code, we define a macro here, which is visible in the template, but not in the generated
-			// code (just an empty macro).
-			context.put("force_newline", "");
-			final Template template = Velocity.getTemplate(ENUM_VM_TEMPLATE_FILE);
-			final BufferedWriter writer = new BufferedWriter(new FileWriter(javaSourceFile));
-			template.merge(context, writer);
-			writer.flush();
-			writer.close();
-		} catch (IOException e) {
-			throw new GeneratorException("Writing Java Enum source file failed.", e);
+			GeneratorUtil.generateFile(enumPackageDir, ENUM_VM_TEMPLATE_FILE,
+					enumClassDescriptor.getName(), enumClassDescriptor);
 		}
 	}
 }
