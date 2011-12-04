@@ -1,8 +1,5 @@
 package org.noorm.generator.beangenerator;
 
-import org.apache.velocity.Template;
-import org.apache.velocity.VelocityContext;
-import org.apache.velocity.app.Velocity;
 import org.noorm.generator.GeneratorException;
 import org.noorm.generator.GeneratorUtil;
 import org.noorm.generator.ValidatorClassDescriptor;
@@ -14,10 +11,7 @@ import org.noorm.jdbc.Utils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.BufferedWriter;
 import java.io.File;
-import java.io.FileWriter;
-import java.io.IOException;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;

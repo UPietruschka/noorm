@@ -22,9 +22,9 @@ public class BeanValidator {
 
 	private static final Logger log = LoggerFactory.getLogger(BeanValidator.class);
 
-	Map<String, List<TableMetadataBean>> tableColumnMap;
-	List<PrimaryKeyColumnBean> pkColumnNameList;
-	List<NameBean> sequenceDBNameList;
+	protected Map<String, List<TableMetadataBean>> tableColumnMap;
+	protected List<PrimaryKeyColumnBean> pkColumnNameList;
+	protected List<NameBean> sequenceDBNameList;
 
 	public void loadMetadata() {
 

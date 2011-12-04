@@ -40,6 +40,8 @@ PACKAGE noorm_metadata AS
     );
   TYPE pk_refcur IS REF CURSOR RETURN pk_record;
 
+  PROCEDURE get_version(p_version OUT VARCHAR2);
+
   PROCEDURE find_table_metadata(p_table_metadata OUT table_metadata_refcur);
 
   PROCEDURE find_package_names(p_search_regex IN VARCHAR2, p_package_names OUT name_refcur);

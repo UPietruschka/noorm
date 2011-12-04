@@ -6,8 +6,6 @@ package org.noorm.generator;
  */
 public final class GeneratorException extends RuntimeException {
 
-	private static final long serialVersionUID = 5411237569293407394L;
-
 	public GeneratorException(final Throwable pCause) {
 		super(pCause);
 	}

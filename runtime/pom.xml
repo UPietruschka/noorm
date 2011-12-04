@@ -9,6 +9,15 @@
         <version>0.9.10-SNAPSHOT</version>
     </parent>
 
+    <build>
+        <resources>
+            <resource>
+                <directory>src/main/resources</directory>
+                <filtering>true</filtering>
+            </resource>
+        </resources>
+    </build>
+
     <modelVersion>4.0.0</modelVersion>
     <artifactId>runtime</artifactId>
     <name>NoORM Runtime Library</name>

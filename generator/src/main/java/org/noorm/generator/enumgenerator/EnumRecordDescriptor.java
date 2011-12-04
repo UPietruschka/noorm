@@ -1,5 +1,7 @@
 package org.noorm.generator.enumgenerator;
 
+import org.noorm.jdbc.Utils;
+
 import java.math.BigDecimal;
 import java.util.HashMap;
 import java.util.Map;
@@ -15,7 +17,7 @@ public class EnumRecordDescriptor {
 	private Map<EnumAttributeDescriptor, Object> attributeValues = new HashMap<EnumAttributeDescriptor, Object>();
 
 	public String getTypeColumnValue() {
-		return typeColumnValue.trim().toUpperCase().replaceAll("[ /\\-\\,\\.;]", "_");
+		return Utils.getNormalizedTypeColumnValue(typeColumnValue);
 	}
 
 	public void setTypeColumnValue(final String pTypeColumnValue) {

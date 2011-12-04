@@ -1,6 +1,11 @@
 CREATE OR REPLACE
 PACKAGE BODY noorm_metadata AS
 
+  PROCEDURE get_version(p_version OUT VARCHAR2) AS
+  BEGIN
+    p_version := '${pom.version}';
+  END get_version;
+
   PROCEDURE find_table_metadata(p_table_metadata OUT table_metadata_refcur) AS
   BEGIN
 	OPEN p_table_metadata FOR

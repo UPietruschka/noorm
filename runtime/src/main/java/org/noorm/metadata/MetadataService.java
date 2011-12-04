@@ -37,6 +37,15 @@ public class MetadataService {
 		return metadataService;
 	}
 
+	public String getVersion() {
+
+		final JDBCStatementProcessor<String> statementProcessor = JDBCStatementProcessor.getInstance();
+		final Map<String, Object> filterParameters = new HashMap<String, Object>();
+		return statementProcessor.callPLSQL
+				("noorm_metadata.get_version", "p_version", filterParameters, String.class);
+
+	}
+
 	public Map<String, List<TableMetadataBean>> findTableMetadata() {
 
 		final List<TableMetadataBean> tableMetadataBeanList = findTableMetadata0();

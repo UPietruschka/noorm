@@ -17,6 +17,8 @@ public class Utils {
 	public static final String JAVA_SOURCE_FILE_APPENDIX = ".java";
 	private static final String DB_NAME_TOKEN_SPLIT = "_";
 	private static final String BEAN_NAME_APPENDIX = "Bean";
+	private static final String ENUM_UNSUPPORTED_REGEX = "[ /\\-\\,\\.;]";
+	private static final String ENUM_UNSUPPORTED_REGEX_SUBSTITUTE = "_";
 
 	public static String convertJavaName2DBName(final String pJavaName) {
 
@@ -115,5 +117,11 @@ public class Utils {
 			}
 		}
 		return propertyString;
+	}
+
+	public static String getNormalizedTypeColumnValue(final String pTypeColumnValue) {
+
+		return pTypeColumnValue.trim().toUpperCase().replaceAll
+				(ENUM_UNSUPPORTED_REGEX, ENUM_UNSUPPORTED_REGEX_SUBSTITUTE);
 	}
 }

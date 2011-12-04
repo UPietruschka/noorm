@@ -1,10 +1,8 @@
 package org.noorm.generator.enumgenerator;
 
-import org.apache.velocity.Template;
-import org.apache.velocity.VelocityContext;
-import org.apache.velocity.app.Velocity;
 import org.noorm.generator.GeneratorException;
 import org.noorm.generator.GeneratorUtil;
+import org.noorm.generator.ValidatorClassDescriptor;
 import org.noorm.metadata.MetadataService;
 import org.noorm.jdbc.Utils;
 import org.noorm.metadata.beans.TableMetadataBean;
@@ -12,10 +10,7 @@ import org.noorm.jdbc.JDBCStatementProcessor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.BufferedWriter;
 import java.io.File;
-import java.io.FileWriter;
-import java.io.IOException;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
@@ -31,6 +26,8 @@ public class EnumGenerator {
 
 	private static final Logger log = LoggerFactory.getLogger(EnumGenerator.class);
 	private static final String ENUM_VM_TEMPLATE_FILE = "/enum.vm";
+	private static final String ENUM_VALIDATOR_VM_TEMPLATE_FILE = "/enum_validator.vm";
+	private static final String ENUM_VALIDATOR_CLASS_NAME = "GenericEnumValidator";
 	private static EnumGenerator enumGenerator;
 
 	/**
@@ -105,6 +102,9 @@ public class EnumGenerator {
 			throw new IllegalArgumentException("Parameter [destinationDirectory] is null or mis-configured.");
 		}
 
+		ValidatorClassDescriptor validatorClassDescriptor = new ValidatorClassDescriptor();
+		validatorClassDescriptor.setPackageName(enumPackageName);
+
 		log.info("Retrieving table metadata from Oracle database.");
 		final MetadataService metadataService = MetadataService.getInstance();
 		final Map<String, List<TableMetadataBean>> tableColumnMap = metadataService.findTableMetadata();
@@ -127,6 +127,7 @@ public class EnumGenerator {
 			final List<TableMetadataBean> tableMetadataBeanList1 = tableColumnMap.get(tableName0);
 			final EnumClassDescriptor enumClassDescriptor = new EnumClassDescriptor();
 			enumClassDescriptor.setName(javaEnumName);
+			validatorClassDescriptor.getClassNames().add(javaEnumName);
 			enumClassDescriptor.setTableName(tableName0);
 			enumClassDescriptor.setPackageName(enumPackageName);
 			String typeColumnName = "";
@@ -179,5 +180,7 @@ public class EnumGenerator {
 			GeneratorUtil.generateFile(enumPackageDir, ENUM_VM_TEMPLATE_FILE,
 					enumClassDescriptor.getName(), enumClassDescriptor);
 		}
+		GeneratorUtil.generateFile(enumPackageDir, ENUM_VALIDATOR_VM_TEMPLATE_FILE,
+				ENUM_VALIDATOR_CLASS_NAME, validatorClassDescriptor);
 	}
 }
