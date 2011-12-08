@@ -37,7 +37,7 @@ public class JDBCStatementProcessor<T> {
 
 	private static JDBCStatementProcessor statementProcessor;
 
-	private StatementBuilder statementBuilder = new StatementBuilder();
+	private final StatementBuilder statementBuilder = new StatementBuilder();
 
 	public static final String NOORM_ID_LIST_ORACLE_TYPE_NAME = "NUM_ARRAY";
 	private static final Long VERSION_COLUMN_DEFAULT = 1L;
@@ -768,7 +768,7 @@ public class JDBCStatementProcessor<T> {
 			if (value instanceof Long[]) {
 				final ArrayDescriptor descriptor =
 						ArrayDescriptor.createDescriptor(NOORM_ID_LIST_ORACLE_TYPE_NAME, pCon);
-				final ARRAY arrayToPass = new ARRAY(descriptor, pCon, (Long[]) value);
+				final ARRAY arrayToPass = new ARRAY(descriptor, pCon, value);
 				if (USE_NAMED_PARAMETERS) {
 					// The following works for the Oracle JDBC 11.2.0.1.0 driver, but is actually not correct,
 					// since named parameter binding should use the setXXXAtName methods (which does NOT work).
