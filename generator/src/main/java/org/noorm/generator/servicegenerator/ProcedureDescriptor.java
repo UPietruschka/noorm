@@ -8,11 +8,11 @@ import java.util.List;
  *         Date: 16.05.11
  *         Time: 18:18
  */
-public class ProcedureDescriptor {
+class ProcedureDescriptor {
 
 	private String javaName;
 	private String oracleName;
-	private List<ParameterDescriptor> parameters = new ArrayList<ParameterDescriptor>();
+	private final List<ParameterDescriptor> parameters = new ArrayList<ParameterDescriptor>();
 	private String outParamOracleName;
 	private String outParamJavaType;
 	private boolean hasOutParam;

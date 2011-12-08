@@ -11,15 +11,15 @@ import java.util.Set;
  *         Date: 16.05.11
  *         Time: 18:12
  */
-public class ServiceClassDescriptor {
+class ServiceClassDescriptor {
 
 	private int codeHashValue;
 	private String javaName;
 	private String databasePackageName;
 	private String packageName;
 	private String beanPackageName;
-	private List<ProcedureDescriptor> procedures = new ArrayList<ProcedureDescriptor>();
-	private Map<String, String> returnTypeNames = new HashMap<String, String>();
+	private final List<ProcedureDescriptor> procedures = new ArrayList<ProcedureDescriptor>();
+	private final Map<String, String> returnTypeNames = new HashMap<String, String>();
 
 	public int getCodeHashValue() {
 		return codeHashValue;
