@@ -21,7 +21,7 @@ public class BeanClassDescriptor {
 	private String sequenceName;
 	private String versionColumnName;
 	private String packageName;
-	private List<BeanAttributeDescriptor> attributes = new ArrayList<BeanAttributeDescriptor>();
+	private final List<BeanAttributeDescriptor> attributes = new ArrayList<BeanAttributeDescriptor>();
 
 	public long getSerialVersionUID() {
 		return serialVersionUID;
