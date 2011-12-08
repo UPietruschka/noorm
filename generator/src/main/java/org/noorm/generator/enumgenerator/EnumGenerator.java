@@ -58,7 +58,7 @@ public class EnumGenerator {
 	 * for the enums constant type generation. Typically, a table with constant content has a column
 	 * with a code or denominator in uppercase letters, which uniquely identifies the row.
 	 */
-	private Properties enumTable2TypeColumnMapping;
+	private Properties enumTable2DisplayColumnMapping;
 
 	protected EnumGenerator() {
 	}
@@ -79,8 +79,8 @@ public class EnumGenerator {
 		enumTableFilterRegex = pEnumTableFilterRegex;
 	}
 
-	public void setEnumTable2TypeColumnMapping(final Properties pEnumTable2TypeColumnMapping) {
-		enumTable2TypeColumnMapping = pEnumTable2TypeColumnMapping;
+	public void setEnumTable2DisplayColumnMapping(final Properties pEnumTable2DisplayColumnMapping) {
+		enumTable2DisplayColumnMapping = pEnumTable2DisplayColumnMapping;
 	}
 
 	public static EnumGenerator getInstance() {
@@ -130,18 +130,18 @@ public class EnumGenerator {
 			validatorClassDescriptor.getClassNames().add(javaEnumName);
 			enumClassDescriptor.setTableName(tableName0);
 			enumClassDescriptor.setPackageName(enumPackageName);
-			String typeColumnName = "";
-			if (enumTable2TypeColumnMapping != null) {
-				typeColumnName = Utils.getPropertyString(tableName0, enumTable2TypeColumnMapping);
+			String displayColumnName;
+			if (enumTable2DisplayColumnMapping != null) {
+				displayColumnName = Utils.getPropertyString(tableName0, enumTable2DisplayColumnMapping);
 			} else {
 				throw new GeneratorException
-						("Parameter [enumTable2TypeColumnMapping] must be set to enable enum generation.");
+						("Parameter [enumTable2DisplayColumnMapping] must be set to enable enum generation.");
 			}
-			if (typeColumnName.isEmpty()) {
+			if (displayColumnName.isEmpty()) {
 				throw new GeneratorException
-						("Could not resolve the enum type column name using [enumTable2TypeColumnMapping].");
+						("Could not resolve the enum display column name using [enumTable2DisplayColumnMapping].");
 			}
-			enumClassDescriptor.setTypeColumnName(typeColumnName);
+			enumClassDescriptor.setDisplayColumnName(displayColumnName);
 			for (TableMetadataBean tableMetadataBean : tableMetadataBeanList1) {
 				final EnumAttributeDescriptor enumAttributeDescriptor = new EnumAttributeDescriptor();
 				final String javaColumnName = Utils.convertDBName2JavaName(tableMetadataBean.getColumnName(), false);
@@ -161,14 +161,15 @@ public class EnumGenerator {
 			}
 			for (Map<String, Object> record : recordList) {
 				final EnumRecordDescriptor enumRecordDescriptor = new EnumRecordDescriptor();
-				final String typeColumnValue = (String) record.get(typeColumnName);
-				if (typeColumnValue == null || typeColumnValue.isEmpty()) {
-					String errMsg = "Could not resolve the enum type column value using [enumTable2TypeColumnMapping]"
+				final String displayColumnValue = (String) record.get(displayColumnName);
+				if (displayColumnValue == null || displayColumnValue.isEmpty()) {
+					String errMsg =
+							"Could not resolve the enum display column value using [enumTable2DisplayColumnMapping]"
 							.concat(" for table [".concat(tableName0)
-							.concat("] and type column name [").concat(typeColumnName).concat("]."));
+							.concat("] and display column name [").concat(displayColumnName).concat("]."));
 					throw new GeneratorException(errMsg);
 				}
-				enumRecordDescriptor.setTypeColumnValue(typeColumnValue);
+				enumRecordDescriptor.setDisplayColumnValue(displayColumnValue);
 				final List<EnumAttributeDescriptor> enumAttributeDescriptorList = enumClassDescriptor.getAttributes();
 				for (EnumAttributeDescriptor enumAttributeDescriptor : enumAttributeDescriptorList) {
 					final String columnName = enumAttributeDescriptor.getColumnName();

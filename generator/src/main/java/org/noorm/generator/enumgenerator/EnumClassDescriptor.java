@@ -14,10 +14,10 @@ public class EnumClassDescriptor {
 
 	private String name;
 	private String tableName;
-	private String typeColumnName;
+	private String displayColumnName;
 	private String packageName;
-	private List<EnumAttributeDescriptor> attributes = new ArrayList<EnumAttributeDescriptor>();
-	private List<EnumRecordDescriptor> records = new ArrayList<EnumRecordDescriptor>();
+	private final List<EnumAttributeDescriptor> attributes = new ArrayList<EnumAttributeDescriptor>();
+	private final List<EnumRecordDescriptor> records = new ArrayList<EnumRecordDescriptor>();
 
 	public void setName(final String pName) {
 		name = pName;
@@ -35,12 +35,12 @@ public class EnumClassDescriptor {
 		tableName = pTableName;
 	}
 
-	public String getTypeColumnName() {
-		return typeColumnName;
+	public String getDisplayColumnName() {
+		return displayColumnName;
 	}
 
-	public void setTypeColumnName(final String pTypeColumnName) {
-		typeColumnName = pTypeColumnName;
+	public void setDisplayColumnName(final String pDisplayColumnName) {
+		displayColumnName = pDisplayColumnName;
 	}
 
 	public String getPackageName() {

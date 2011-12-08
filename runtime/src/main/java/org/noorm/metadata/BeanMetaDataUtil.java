@@ -29,6 +29,9 @@ public class BeanMetaDataUtil {
 	private static final Logger log = LoggerFactory.getLogger(BeanMetaDataUtil.class);
 	private static final String BEAN_GETTER_METHOD_NAME_PREFIX = "get";
 	private static final String BEAN_SETTER_METHOD_NAME_PREFIX = "set";
+
+	public static final String NOT_UPDATABLE = "NO";
+	public static final String NOT_NULLABLE = "N";
 	public static final String SERIAL_VERSION_UID = "serialVersionUID";
 
 	/**
@@ -48,7 +51,7 @@ public class BeanMetaDataUtil {
 			sFields = superClass.getDeclaredFields();
 		}
 		final Field[] allFields = Arrays.copyOf(fields, fields.length + sFields.length);
-		System.arraycopy(sFields, 0, allFields, fields.length + 0, sFields.length);
+		System.arraycopy(sFields, 0, allFields, fields.length, sFields.length);
 
 		if (log.isTraceEnabled()) {
 			int i = 0;
@@ -104,7 +107,11 @@ public class BeanMetaDataUtil {
 	public static Long getPrimaryKeyValue(final IBean pBean) {
 
 		final String primaryKeyColumnName = pBean.getPrimaryKeyColumnName();
-		return getBeanPropertyByName(pBean, primaryKeyColumnName);
+		final Object property = getBeanPropertyByName(pBean, primaryKeyColumnName);
+		if (!(property instanceof Long)) {
+			throw new DataAccessException(DataAccessException.Type.UNSUPPORTED_DATATYPE);
+		}
+		return (Long) property;
 	}
 
 	/**
@@ -116,26 +123,30 @@ public class BeanMetaDataUtil {
 	public static Long getVersionColumnValue(final IBean pBean) {
 
 		final String versionColumnName = pBean.getVersionColumnName();
-		return getBeanPropertyByName(pBean, versionColumnName);
+		final Object property = getBeanPropertyByName(pBean, versionColumnName);
+		if (!(property instanceof Long)) {
+			throw new DataAccessException(DataAccessException.Type.UNSUPPORTED_VERSION_COLUMN_TYPE);
+		}
+		return (Long) property;
 	}
 
-	private static Long getBeanPropertyByName(final IBean pBean, final String pPropertyName) {
+	public static Object getBeanPropertyByName(final Object pObject, final String pPropertyName) {
 
 		Method propertyGetter;
 		try {
 			final String propertyGetterMethodName = BEAN_GETTER_METHOD_NAME_PREFIX
 					.concat(Utils.convertDBName2JavaName(pPropertyName, true));
-			propertyGetter = pBean.getClass().getMethod(propertyGetterMethodName);
+			propertyGetter = pObject.getClass().getMethod(propertyGetterMethodName);
 		} catch (NoSuchMethodException e) {
-			throw new DataAccessException(DataAccessException.Type.COULD_NOT_ACCESS_PK_BY_REFLECTION, e);
+			throw new DataAccessException(DataAccessException.Type.COULD_NOT_ACCESS_PROPERTY_BY_REFLECTION, e);
 		}
 
 		try {
-			return (Long) propertyGetter.invoke(pBean);
+			return propertyGetter.invoke(pObject);
 		} catch (InvocationTargetException e) {
-			throw new DataAccessException(DataAccessException.Type.COULD_NOT_ACCESS_PK_BY_REFLECTION, e);
+			throw new DataAccessException(DataAccessException.Type.COULD_NOT_ACCESS_PROPERTY_BY_REFLECTION, e);
 		} catch (IllegalAccessException e) {
-			throw new DataAccessException(DataAccessException.Type.COULD_NOT_ACCESS_PK_BY_REFLECTION, e);
+			throw new DataAccessException(DataAccessException.Type.COULD_NOT_ACCESS_PROPERTY_BY_REFLECTION, e);
 		}
 	}
 
@@ -171,15 +182,15 @@ public class BeanMetaDataUtil {
 					.concat(Utils.convertDBName2JavaName(pPropertyName, true));
 			propertySetter = pBean.getClass().getMethod(propertySetterMethodName, Long.class);
 		} catch (NoSuchMethodException e) {
-			throw new DataAccessException(DataAccessException.Type.COULD_NOT_ACCESS_PK_BY_REFLECTION, e);
+			throw new DataAccessException(DataAccessException.Type.COULD_NOT_ACCESS_PROPERTY_BY_REFLECTION, e);
 		}
 
 		try {
 			propertySetter.invoke(pBean, pPKValue);
 		} catch (InvocationTargetException e) {
-			throw new DataAccessException(DataAccessException.Type.COULD_NOT_ACCESS_PK_BY_REFLECTION, e);
+			throw new DataAccessException(DataAccessException.Type.COULD_NOT_ACCESS_PROPERTY_BY_REFLECTION, e);
 		} catch (IllegalAccessException e) {
-			throw new DataAccessException(DataAccessException.Type.COULD_NOT_ACCESS_PK_BY_REFLECTION, e);
+			throw new DataAccessException(DataAccessException.Type.COULD_NOT_ACCESS_PROPERTY_BY_REFLECTION, e);
 		}
 	}
 }

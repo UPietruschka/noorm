@@ -3,6 +3,7 @@ package org.noorm.generator.beangenerator;
 import org.noorm.generator.GeneratorException;
 import org.noorm.generator.GeneratorUtil;
 import org.noorm.generator.ValidatorClassDescriptor;
+import org.noorm.metadata.BeanMetaDataUtil;
 import org.noorm.metadata.MetadataService;
 import org.noorm.metadata.beans.NameBean;
 import org.noorm.metadata.beans.PrimaryKeyColumnBean;
@@ -30,8 +31,6 @@ public class BeanGenerator {
 	private static final String BEAN_VM_TEMPLATE_FILE = "/bean.vm";
 	private static final String BEAN_VALIDATOR_VM_TEMPLATE_FILE = "/bean_validator.vm";
 	private static final String BEAN_VALIDATOR_CLASS_NAME = "GenericBeanValidator";
-	private static final String NO = "NO";
-	private static final String N = "N";
 	private static BeanGenerator beanGenerator;
 
 	/**
@@ -192,14 +191,15 @@ public class BeanGenerator {
 				beanAttributeDescriptor.setName(javaColumnName);
 				final String javaType = Utils.convertOracleType2JavaType(tableMetadataBean.getDataType(),
 						tableMetadataBean.getDataPrecision(), tableMetadataBean.getDataScale());
-				if (tableMetadataBean.getUpdatable().equals(NO) || tableMetadataBean.getInsertable().equals(NO)) {
+				if (tableMetadataBean.getUpdatable().equals(BeanMetaDataUtil.NOT_UPDATABLE) ||
+						tableMetadataBean.getInsertable().equals(BeanMetaDataUtil.NOT_UPDATABLE)) {
 					beanAttributeDescriptor.setUpdatable(false);
 				}
 				beanAttributeDescriptor.setType(javaType);
 				beanAttributeDescriptor.setDataType(tableMetadataBean.getDataType());
 				beanAttributeDescriptor.setColumnName(tableMetadataBean.getColumnName());
 				beanAttributeDescriptor.setMaxLength(tableMetadataBean.getCharLength().intValue());
-				if (tableMetadataBean.getNullable().equals(N)) {
+				if (tableMetadataBean.getNullable().equals(BeanMetaDataUtil.NOT_NULLABLE)) {
 					beanAttributeDescriptor.setNullable(false);
 				}
 				beanClassDescriptor.addAttribute(beanAttributeDescriptor);

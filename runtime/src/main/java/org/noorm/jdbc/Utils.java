@@ -15,6 +15,7 @@ import java.util.regex.Pattern;
 public class Utils {
 
 	public static final String JAVA_SOURCE_FILE_APPENDIX = ".java";
+
 	private static final String DB_NAME_TOKEN_SPLIT = "_";
 	private static final String BEAN_NAME_APPENDIX = "Bean";
 	private static final String ENUM_UNSUPPORTED_REGEX = "[ /\\-\\,\\.;]";
@@ -119,9 +120,9 @@ public class Utils {
 		return propertyString;
 	}
 
-	public static String getNormalizedTypeColumnValue(final String pTypeColumnValue) {
+	public static String getNormalizedDisplayColumnValue(final String pDisplayColumnValue) {
 
-		return pTypeColumnValue.trim().toUpperCase().replaceAll
+		return pDisplayColumnValue.trim().toUpperCase().replaceAll
 				(ENUM_UNSUPPORTED_REGEX, ENUM_UNSUPPORTED_REGEX_SUBSTITUTE);
 	}
 }

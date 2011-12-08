@@ -51,19 +51,46 @@ public class BeanValidator {
 		final Map<String, JDBCColumn> beanMetadata = BeanMetaDataUtil.getColumnMetaData(pBean.getClass());
 		for (final TableMetadataBean tableMetadataBean : tableMetadataBeanList) {
 			final String columnName = tableMetadataBean.getColumnName();
+			final StringBuilder msgBuilder = new StringBuilder();
+			msgBuilder.append("Table column ");
+			msgBuilder.append(tableName);
+			msgBuilder.append(".");
+			msgBuilder.append(columnName);
+			msgBuilder.append(" does not match corresponding Java Bean attribute for ");
+			msgBuilder.append(javaBeanName);
+			msgBuilder.append(". ");
+			final String exceptionPrefix = msgBuilder.toString();
 			boolean beanColumnValidated = false;
 			String javaAttributeName = null;
 			for (final Map.Entry<String, JDBCColumn> beanMetaDataEntry : beanMetadata.entrySet()) {
 				final JDBCColumn jdbcColumn = beanMetaDataEntry.getValue();
 				if (jdbcColumn.name().equals(columnName)) {
+					// Validating annotated data-type against database metadata.
 					if (!jdbcColumn.dataType().equals(tableMetadataBean.getDataType())) {
-						throw new ValidationException("Table column ".concat(tableName).concat(".").concat(columnName)
-								.concat(" datatype ").concat(tableMetadataBean.getDataType())
-								.concat(" does not match datatype ").concat(jdbcColumn.dataType())
-								.concat(" in Java Bean ").concat(javaBeanName));
+						throw new ValidationException(exceptionPrefix.concat("Data-type mismatch: [")
+								.concat(tableMetadataBean.getDataType()).concat(" / ")
+								.concat(jdbcColumn.dataType().concat("].")));
 					}
-					// BeanValidator does not yet validate JDBCColumn attributes nullable, updatable
-					// and maxLength against the data dictionary of the database.
+					// Validating annotated nullable-attribute against database metadata.
+					boolean isNullable = true;
+					if (tableMetadataBean.getNullable().equals(BeanMetaDataUtil.NOT_NULLABLE)) {
+						isNullable = false;
+					}
+					if (jdbcColumn.nullable() != isNullable) {
+						throw new ValidationException(exceptionPrefix.concat("Nullable indicator mismatch"));
+					}
+					// Validating annotated updatable-attribute against database metadata.
+					boolean isUpdatable = true;
+					if (tableMetadataBean.getUpdatable().equals(BeanMetaDataUtil.NOT_UPDATABLE)) {
+						isUpdatable = false;
+					}
+					if (jdbcColumn.updatable() != isUpdatable) {
+						throw new ValidationException(exceptionPrefix.concat("Updatable indicator mismatch"));
+					}
+					// Validating annotated max-length against database metadata.
+					if (jdbcColumn.maxLength() > 0 && (jdbcColumn.maxLength() != tableMetadataBean.getCharLength())) {
+						throw new ValidationException(exceptionPrefix.concat("Data length mismatch"));
+					}
 					log.debug("Table column ".concat(tableName).concat(".")
 							.concat(columnName).concat(" successfully validated against bean specification."));
 					javaAttributeName = beanMetaDataEntry.getKey();

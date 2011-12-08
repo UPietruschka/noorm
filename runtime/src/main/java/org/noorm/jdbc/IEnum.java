@@ -16,5 +16,5 @@ public interface IEnum {
 	 * The name of the database column used to give the particular enum its display name.
 	 * @return the database name
 	 */
-	String getTypeColumnName();
+	String getDisplayColumnName();
 }

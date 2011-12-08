@@ -10,11 +10,11 @@ import org.noorm.jdbc.IEnum;
 public enum $class.Name implements IEnum {
 
 #foreach ($rec in $class.Records)
-	$rec.getTypeColumnValue()(#foreach ($att in $class.Attributes)$rec.getFormattedValue($att)#if($velocityCount<$class.Attributes.size()), #end#end)#if($velocityCount<$class.Records.size()),#else;#end${force_newline}
+	$rec.getDisplayColumnValue()(#foreach ($att in $class.Attributes)$rec.getFormattedValue($att)#if($velocityCount<$class.Attributes.size()), #end#end)#if($velocityCount<$class.Records.size()),#else;#end${force_newline}
 #end
 
 	private static final String TABLE_NAME = "$class.TableName";
-	private static final String TYPE_COLUMN_NAME = "$class.TypeColumnName";
+	private static final String DISPLAY_COLUMN_NAME = "$class.DisplayColumnName";
 #foreach ($att in $class.Attributes)
 	private $att.Type $att.Name;
 #end
@@ -29,8 +29,8 @@ public enum $class.Name implements IEnum {
 		return TABLE_NAME;
 	}
 
-	public String getTypeColumnName() {
-		return TYPE_COLUMN_NAME;
+	public String getDisplayColumnName() {
+		return DISPLAY_COLUMN_NAME;
 	}
 #foreach ($att in $class.Attributes)
 

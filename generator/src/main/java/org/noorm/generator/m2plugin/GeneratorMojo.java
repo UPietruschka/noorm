@@ -124,7 +124,7 @@ public class GeneratorMojo extends AbstractMojo {
 	 *
 	 * @parameter
 	 */
-	protected Properties enumTable2TypeColumnMapping;
+	protected Properties enumTable2DisplayColumnMapping;
 
 	/**
 	 * Primary key generation for new records being inserted into the database is based on
@@ -259,7 +259,7 @@ public class GeneratorMojo extends AbstractMojo {
 		enumGenerator.setEnumPackageName(enumPackageName);
 		enumGenerator.setIgnoreTableNamePrefixes(ignoreTableNamePrefixes);
 		enumGenerator.setEnumTableFilterRegex(enumTableFilterRegex);
-		enumGenerator.setEnumTable2TypeColumnMapping(enumTable2TypeColumnMapping);
+		enumGenerator.setEnumTable2DisplayColumnMapping(enumTable2DisplayColumnMapping);
 		enumGenerator.execute();
 
 		// Generate Services

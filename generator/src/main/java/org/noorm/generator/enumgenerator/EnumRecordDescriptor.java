@@ -11,17 +11,17 @@ import java.util.Map;
  *         Date: 27.07.11
  *         Time: 16:56
  */
-public class EnumRecordDescriptor {
+class EnumRecordDescriptor {
 
-	private String typeColumnValue;
-	private Map<EnumAttributeDescriptor, Object> attributeValues = new HashMap<EnumAttributeDescriptor, Object>();
+	private String displayColumnValue;
+	private final Map<EnumAttributeDescriptor, Object> attributeValues = new HashMap<EnumAttributeDescriptor, Object>();
 
-	public String getTypeColumnValue() {
-		return Utils.getNormalizedTypeColumnValue(typeColumnValue);
+	public String getDisplayColumnValue() {
+		return Utils.getNormalizedDisplayColumnValue(displayColumnValue);
 	}
 
-	public void setTypeColumnValue(final String pTypeColumnValue) {
-		typeColumnValue = pTypeColumnValue;
+	public void setDisplayColumnValue(final String pDisplayColumnValue) {
+		displayColumnValue = pDisplayColumnValue;
 	}
 
 	public void setAttributeValue(final EnumAttributeDescriptor pAttributeDescriptor, final Object pValue) {
@@ -38,7 +38,7 @@ public class EnumRecordDescriptor {
 			if (value instanceof BigDecimal) {
 				value = ((BigDecimal) value).longValue();
 			}
-			return ((Long) value).toString().concat("L");
+			return value.toString().concat("L");
 		}
 		throw new UnsupportedOperationException("EnumGenerator only supports String and Long types.");
 	}

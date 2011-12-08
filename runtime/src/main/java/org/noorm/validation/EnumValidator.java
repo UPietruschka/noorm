@@ -3,6 +3,7 @@ package org.noorm.validation;
 import org.noorm.jdbc.IEnum;
 import org.noorm.jdbc.JDBCStatementProcessor;
 import org.noorm.jdbc.Utils;
+import org.noorm.metadata.BeanMetaDataUtil;
 import org.noorm.metadata.MetadataService;
 import org.noorm.metadata.beans.TableMetadataBean;
 import org.slf4j.Logger;
@@ -43,10 +44,10 @@ public class EnumValidator {
 		msgBuilder.append(tableName);
 		msgBuilder.append(" failed.");
 		final String exceptionPrefix = msgBuilder.toString();
-		final String typeColumnName = enumArray[0].getTypeColumnName();
+		final String displayColumnName = enumArray[0].getDisplayColumnName();
 		final List<TableMetadataBean> tableMetadataBeanList = tableColumnMap.get(tableName);
 		if (tableMetadataBeanList == null || tableMetadataBeanList.isEmpty()) {
-			throw new ValidationException(exceptionPrefix.concat(" Cannot find table database table."));
+			throw new ValidationException(exceptionPrefix.concat(" Cannot find database table."));
 		}
 		// We omit direct meta-data validation here (like we do in BeanValidator), since we do access
 		// the contained data, which would fail with non-validating meta-data anyway.
@@ -54,30 +55,48 @@ public class EnumValidator {
 		final String query = "SELECT * FROM ".concat(tableName);
 		final List<Map<String, Object>> recordList = jdbcStatementProcessor.executeGenericSelect(query);
 		if (recordList.isEmpty()) {
-			throw new ValidationException(exceptionPrefix.concat(" Table does not contain any data."));
+			throw new ValidationException(exceptionPrefix.concat(" Database table does not contain any data."));
 		}
-		final Map<String, Map<String, Object>> typeColumnValue2Record = new HashMap<String, Map<String, Object>>();
+		final Map<String, Map<String, Object>> displayColumnValue2Record = new HashMap<String, Map<String, Object>>();
 		for (Map<String, Object> record : recordList) {
-			final Object typeColumnValue = record.get(typeColumnName);
-			if (typeColumnValue == null) {
+			final Object displayColumnValue = record.get(displayColumnName);
+			if (displayColumnValue == null) {
 				throw new ValidationException(exceptionPrefix
-						.concat(" Table does not contain the enum type column ".concat(typeColumnName).concat(".")));
+						.concat(" Database table does not contain the enum display column "
+						.concat(displayColumnName).concat(".")));
 			}
-			if (!(typeColumnValue instanceof String)) {
+			if (!(displayColumnValue instanceof String)) {
 				throw new ValidationException(exceptionPrefix
-						.concat(" Type columns other than type String are not supported yet."));
+						.concat(" Display columns other than type String are not yet supported."));
 			}
-			final String typeColumnStringValue = Utils.getNormalizedTypeColumnValue((String) typeColumnValue);
-			typeColumnValue2Record.put(typeColumnStringValue, record);
+			final String displayColumnStringValue = Utils.getNormalizedDisplayColumnValue((String) displayColumnValue);
+			displayColumnValue2Record.put(displayColumnStringValue, record);
 		}
 
 		log.debug("Validating Enum ".concat(pEnumClass.getName()));
 		for (T enum0 : enumArray) {
-			final Map<String, Object> record = typeColumnValue2Record.get(enum0.toString());
+			final Map<String, Object> record = displayColumnValue2Record.get(enum0.toString());
 			if (record == null) {
 				throw new ValidationException(exceptionPrefix
-						.concat(" No matching table row found for type column value "
+						.concat(" No matching table row found for display column value "
 						.concat(enum0.toString())).concat("."));
+			}
+			// Iterate over the remaining fields and validate enum against database content
+			for (Map.Entry<String, Object> columnMap : record.entrySet()) {
+				final String columnName = columnMap.getKey();
+				if (!columnName.equals((displayColumnName))) {
+					final Object columnValue = columnMap.getValue();
+					final Object enumValue = BeanMetaDataUtil.getBeanPropertyByName(enum0, columnName);
+					log.debug("Validating Enum value against database value for column [".concat(columnName)
+							.concat("]; ").concat(enumValue.toString()).concat(" / ")
+							.concat(columnValue.toString()).concat("."));
+					// Using "toString" provides a suitable normalization for the data subject to comparison,
+					// at least for the data-types supported for enums so far (Long, String)
+					if (!enumValue.toString().equals(columnValue.toString())) {
+						throw new ValidationException(exceptionPrefix
+								.concat(" Content mismatch for column ").concat(columnName).concat("."));
+					}
+				}
 			}
 			log.debug(enum0.toString().concat(" validated."));
 		}
