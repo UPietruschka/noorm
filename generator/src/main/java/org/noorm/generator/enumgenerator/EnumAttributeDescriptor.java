@@ -7,7 +7,7 @@ package org.noorm.generator.enumgenerator;
  *         Date: 03.05.11
  *         Time: 17:12
  */
-public class EnumAttributeDescriptor {
+class EnumAttributeDescriptor {
 
 	private String name;
 	private String columnName;
