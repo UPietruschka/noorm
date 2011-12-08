@@ -6,6 +6,11 @@ PACKAGE BODY dynamic_sql AS
   l_sorting_column VARCHAR2(32);
   l_sorting_direction VARCHAR2(4);
 
+  PROCEDURE get_version(p_version OUT VARCHAR2) AS
+  BEGIN
+    p_version := '${pom.version}';
+  END get_version;
+
   PROCEDURE init AS
   BEGIN
     l_parameters.DELETE;

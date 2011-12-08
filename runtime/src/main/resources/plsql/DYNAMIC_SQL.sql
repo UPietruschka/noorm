@@ -4,6 +4,7 @@ PACKAGE dynamic_sql AS
   dynsql_configuration_exception EXCEPTION;
   PRAGMA EXCEPTION_INIT(dynsql_configuration_exception, -20150);
 
+  PROCEDURE get_version(p_version OUT VARCHAR2);
   PROCEDURE init;
   PROCEDURE add_parameter(p_param_name IN CHAR, p_param_value IN NUMBER);
   PROCEDURE add_parameter(p_param_name IN CHAR, p_param_value IN VARCHAR2);
