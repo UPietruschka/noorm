@@ -9,7 +9,7 @@ public final class DataAccessException extends RuntimeException {
 
 	private static final long serialVersionUID = 7434517703293407685L;
 
-	private Type type;
+	private final Type type;
 
 	public DataAccessException(final Throwable pCause) {
 		super(pCause);
@@ -59,7 +59,7 @@ public final class DataAccessException extends RuntimeException {
 		VERSION_COLUMN_NULL(1810L, "VERSION_COLUMN_NULL", "Version column is null. Record has not been initialized properly."),
 		OPTIMISTIC_LOCK_CONFLICT(1900L, "OPTIMISTIC_LOCK_CONFLICT", "Optimistic lock conflict. Record subject to modification has been "
 				+ "modified or deleted by another process atfer it has been loaded for this operation."),
-		COULD_NOT_ACCESS_PK_BY_REFLECTION(2000L, "COULD_NOT_ACCESS_PK_BY_REFLECTION", "Could not access method of bean by reflection."),
+		COULD_NOT_ACCESS_PROPERTY_BY_REFLECTION(2000L, "COULD_NOT_ACCESS_PROPERTY_BY_REFLECTION", "Could not access method of bean by reflection."),
 		GENERIC_UPDATE_NOT_SUPPORTED_WITHOUT_PK(2100L, "GENERIC_UPDATE_NOT_SUPPORTED_WITHOUT_PK", "Generic update not supported without primary key definition."),
 		GENERIC_DELETE_NOT_SUPPORTED_WITHOUT_PK(2200L, "GENERIC_DELETE_NOT_SUPPORTED_WITHOUT_PK", "Generic delete not supported without primary key definition."),
 		COULD_NOT_UPDATE_NON_UPDATABLE_BEAN(2300L, "COULD_NOT_UPDATE_NON_UPDATABLE_BEAN", "Could not update bean without any updatable fields.");
