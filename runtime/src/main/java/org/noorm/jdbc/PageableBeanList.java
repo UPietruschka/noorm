@@ -49,14 +49,14 @@ public class PageableBeanList<T extends IBean> implements Serializable, List<T> 
 	 */
 	private List<Long> beanIds = new ArrayList<Long>();
 
-	private String plsqlIdListCallable;
-	private String refCursorName;
-	private String idListName;
-	private Class beanClass;
+	private final String plsqlIdListCallable;
+	private final String refCursorName;
+	private final String idListName;
+	private final Class beanClass;
 
 	// We must pre-instantiate the array for the given number of Ids, thus we cannot
 	// define the array to be of type T.
-	private Object[] prefetchArray;
+	private final Object[] prefetchArray;
 
 	private BeanTransformer<T> beanTransformer;
 
