@@ -198,7 +198,7 @@ public class DataSourceProvider {
 				throw new DataAccessException(DataAccessException.Type.INITIALIZATION_FAILURE, ex);
 			}
 		} else {
-			String batchUpdateSizeS = (new Integer(batchUpdateSize).toString());
+			final String batchUpdateSizeS = (new Integer(batchUpdateSize).toString());
 			log.info("Setting (default) ".concat(DATABASE_BATCH_UPDATE_SIZE).concat(" = ").concat(batchUpdateSizeS));
 		}
 
