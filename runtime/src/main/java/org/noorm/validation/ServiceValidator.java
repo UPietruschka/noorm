@@ -20,7 +20,7 @@ public class ServiceValidator {
 
 		final String databasePackageName = pService.getDatabasePackageName().toUpperCase();
 		log.info("Retrieving PL/SQL package code checksum (hash) from database.");
-		int codeHashValue = metadataService.getPackageHashValue(databasePackageName);
+		final int codeHashValue = metadataService.getPackageHashValue(databasePackageName);
 		if (codeHashValue == -1) {
 			throw new ValidationException("Service ".concat(pService.getClass().getName())
 					.concat(" could not be validated against PL/SQL package code for ")
