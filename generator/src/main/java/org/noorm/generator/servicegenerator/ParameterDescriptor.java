@@ -5,7 +5,7 @@ package org.noorm.generator.servicegenerator;
  *         Date: 17.05.11
  *         Time: 08:16
  */
-class ParameterDescriptor {
+public class ParameterDescriptor {
 
 	private String javaName;
 	private String oracleName;

@@ -112,7 +112,9 @@ public class EnumGenerator {
 		log.info("Generating NoORM Enum classes.");
 		final File enumPackageDir = new File(destinationDirectory, enumPackageName.replace(".", File.separator));
 		if (!enumPackageDir.exists()) {
-			enumPackageDir.mkdirs();
+			if (!enumPackageDir.mkdirs()) {
+				throw new GeneratorException("Could not create directory ".concat(enumPackageDir.toString()));
+			}
 		}
 
 		for (final String tableName0 : tableColumnMap.keySet()) {

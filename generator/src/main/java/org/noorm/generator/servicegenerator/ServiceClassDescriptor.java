@@ -11,7 +11,7 @@ import java.util.Set;
  *         Date: 16.05.11
  *         Time: 18:12
  */
-class ServiceClassDescriptor {
+public class ServiceClassDescriptor {
 
 	private int codeHashValue;
 	private String javaName;

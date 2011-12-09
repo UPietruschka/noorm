@@ -1,5 +1,6 @@
 package org.noorm.generator.servicegenerator;
 
+import org.noorm.generator.GeneratorException;
 import org.noorm.generator.GeneratorUtil;
 import org.noorm.generator.ValidatorClassDescriptor;
 import org.noorm.metadata.MetadataService;
@@ -162,7 +163,9 @@ public class ServiceGenerator {
 		final File servicePackageDir =
 				new File(destinationDirectory, servicePackageName.replace(".", File.separator));
 		if (!servicePackageDir.exists()) {
-			servicePackageDir.mkdirs();
+			if (!servicePackageDir.mkdirs()) {
+				throw new GeneratorException("Could not create directory ".concat(servicePackageDir.toString()));
+			}
 		}
 
 		final MetadataService metadataService = MetadataService.getInstance();

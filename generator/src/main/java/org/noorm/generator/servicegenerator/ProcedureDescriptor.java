@@ -8,7 +8,7 @@ import java.util.List;
  *         Date: 16.05.11
  *         Time: 18:18
  */
-class ProcedureDescriptor {
+public class ProcedureDescriptor {
 
 	private String javaName;
 	private String oracleName;

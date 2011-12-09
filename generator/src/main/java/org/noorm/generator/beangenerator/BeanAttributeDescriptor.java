@@ -7,7 +7,7 @@ package org.noorm.generator.beangenerator;
  *         Date: 03.05.11
  *         Time: 17:12
  */
-class BeanAttributeDescriptor {
+public class BeanAttributeDescriptor {
 
 	private String name;
 	private String columnName;

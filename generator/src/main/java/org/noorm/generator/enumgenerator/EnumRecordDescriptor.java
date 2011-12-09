@@ -11,7 +11,7 @@ import java.util.Map;
  *         Date: 27.07.11
  *         Time: 16:56
  */
-class EnumRecordDescriptor {
+public class EnumRecordDescriptor {
 
 	private String displayColumnValue;
 	private final Map<EnumAttributeDescriptor, Object> attributeValues = new HashMap<EnumAttributeDescriptor, Object>();

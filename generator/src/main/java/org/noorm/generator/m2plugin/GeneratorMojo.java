@@ -6,6 +6,7 @@ import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
 import org.apache.maven.project.MavenProject;
 import org.apache.velocity.app.Velocity;
+import org.noorm.generator.GeneratorException;
 import org.noorm.generator.beangenerator.BeanGenerator;
 import org.noorm.generator.enumgenerator.EnumGenerator;
 import org.noorm.generator.servicegenerator.ServiceGenerator;
@@ -233,7 +234,9 @@ public class GeneratorMojo extends AbstractMojo {
 
 		log.info("Creating destination directory for generated sources.");
 		if (!destinationDirectory.exists()) {
-			destinationDirectory.mkdirs();
+			if (!destinationDirectory.mkdirs()) {
+				throw new MojoFailureException("Could not create directory ".concat(destinationDirectory.toString()));
+			}
 		}
 		project.addCompileSourceRoot(destinationDirectory.getAbsolutePath());
 
@@ -280,7 +283,9 @@ public class GeneratorMojo extends AbstractMojo {
 		log.info("Generating NoORM Service classes.");
 		final File servicePackageDir = new File(destinationDirectory, servicePackageName.replace(".", File.separator));
 		if (!servicePackageDir.exists()) {
-			servicePackageDir.mkdirs();
+			if (!servicePackageDir.mkdirs()) {
+				throw new GeneratorException("Could not create directory ".concat(servicePackageDir.toString()));
+			}
 		}
 	}
 }

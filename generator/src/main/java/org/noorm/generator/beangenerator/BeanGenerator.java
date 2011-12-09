@@ -156,7 +156,9 @@ public class BeanGenerator {
 		log.info("Generating NoORM Bean classes.");
 		final File beanPackageDir = new File(destinationDirectory, beanPackageName.replace(".", File.separator));
 		if (!beanPackageDir.exists()) {
-			beanPackageDir.mkdirs();
+			if (!beanPackageDir.mkdirs()) {
+				throw new GeneratorException("Could not create directory ".concat(beanPackageDir.toString()));
+			}
 		}
 
 		for (final String tableName0 : tableColumnMap.keySet()) {
