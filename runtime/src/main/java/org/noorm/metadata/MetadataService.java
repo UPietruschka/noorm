@@ -56,7 +56,7 @@ public class MetadataService {
 			// Filter out duplicates
 			if (!tableName.equals(tableMetadataBean.getTableName())) {
 				tableName = tableMetadataBean.getTableName();
-				log.info("Collecting table metadata for table ".concat(tableName));
+				log.debug("Collecting table metadata for table ".concat(tableName));
 				tableMetadataBeanList0 = new ArrayList<TableMetadataBean>();
 				tableColumnMap.put(tableName, tableMetadataBeanList0);
 			}

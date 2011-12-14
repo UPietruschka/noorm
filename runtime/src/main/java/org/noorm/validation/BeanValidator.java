@@ -10,6 +10,8 @@ import org.noorm.metadata.beans.TableMetadataBean;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
@@ -23,20 +25,20 @@ public class BeanValidator {
 	private static final Logger log = LoggerFactory.getLogger(BeanValidator.class);
 
 	protected Map<String, List<TableMetadataBean>> tableColumnMap;
-	protected List<PrimaryKeyColumnBean> pkColumnNameList;
+	protected List<PrimaryKeyColumnBean> allPKColumnNameList;
 	protected List<NameBean> sequenceDBNameList;
 
 	public void loadMetadata() {
 
 		final MetadataService metadataService = MetadataService.getInstance();
 
-		log.info("Retrieving table metadata from Oracle database.");
+		log.debug("Retrieving table metadata from Oracle database.");
 		tableColumnMap = metadataService.findTableMetadata();
 
-		log.info("Retrieving primary key metadata from Oracle database.");
-		pkColumnNameList = metadataService.findPkColumns();
+		log.debug("Retrieving primary key metadata from Oracle database.");
+		allPKColumnNameList = metadataService.findPkColumns();
 
-		log.info("Retrieving sequence metadata from Oracle database.");
+		log.debug("Retrieving sequence metadata from Oracle database.");
 		sequenceDBNameList = metadataService.findSequenceNames();
 	}
 
@@ -44,6 +46,7 @@ public class BeanValidator {
 
 		final String tableName = pBean.getTableName();
 		final String javaBeanName = pBean.getClass().getName();
+		log.info("Validating Java Bean ".concat(javaBeanName).concat(" against database table ".concat(tableName)));
 		final List<TableMetadataBean> tableMetadataBeanList = tableColumnMap.get(tableName);
 		if (tableMetadataBeanList == null || tableMetadataBeanList.isEmpty()) {
 			throw new ValidationException("Cannot find table ".concat(tableName).concat(" in connected DB schema."));
@@ -119,5 +122,49 @@ public class BeanValidator {
 			}
 			throw new ValidationException(message.toString());
 		}
+
+		final List<String> beanPKColumnList = Arrays.asList(pBean.getPrimaryKeyColumnNames());
+		final ArrayList<String> databasePKColumnList = new ArrayList<String>();
+		for (final PrimaryKeyColumnBean primaryKeyColumnBean : allPKColumnNameList) {
+			if (tableName.equals(primaryKeyColumnBean.getTableName())) {
+				databasePKColumnList.add(primaryKeyColumnBean.getColumnName());
+				if (!beanPKColumnList.contains(primaryKeyColumnBean.getColumnName())) {
+					throw new ValidationException("Primary key column ".concat(primaryKeyColumnBean.getColumnName())
+							.concat(" of database table ".concat(tableName)
+									.concat(" is not configured in Java Bean ").concat(javaBeanName)));
+				}
+			}
+		}
+
+		// We do not check, whether the primary keys configured with the Java Bean do exist in the database, too.
+		// This is omitted, since generator configuration parameter "viewName2PrimaryKeyMapping" allows for a generic
+		// primary key definition for views (which do not have an implicit primary key definition in the database).
+
+		//if (!databasePKColumnList.containsAll(beanPKColumnList)) {
+		//	String pkColumnNames = "";
+		//	String delimiter = "";
+		//	for (final String pkColumnName : beanPKColumnList) {
+		//		pkColumnNames = pkColumnNames.concat(delimiter).concat(pkColumnName);
+		//		delimiter = ",";
+		//	}
+		//	throw new ValidationException("Primary key column(s) ".concat(pkColumnNames)
+		//			.concat(" of Java Bean ".concat(javaBeanName)
+		//					.concat(" is/are not defined for database table ").concat(tableName)));
+		//}
+
+		if (!pBean.getSequenceName().isEmpty()) {
+			boolean sequenceFound = false;
+			for (final NameBean sequenceName : sequenceDBNameList) {
+				if (sequenceName.getName().equals(pBean.getSequenceName())) {
+					sequenceFound = true;
+				}
+			}
+			if (!sequenceFound) {
+				throw new ValidationException("Sequence "
+						.concat(pBean.getSequenceName()).concat(" not found in database."));
+			}
+		}
+
+		log.info("Validation of Java Bean ".concat(javaBeanName).concat(" successful."));
 	}
 }

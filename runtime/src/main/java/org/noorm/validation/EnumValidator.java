@@ -28,7 +28,7 @@ public class EnumValidator {
 
 		final MetadataService metadataService = MetadataService.getInstance();
 
-		log.info("Retrieving table metadata from Oracle database.");
+		log.debug("Retrieving table metadata from Oracle database.");
 		tableColumnMap = metadataService.findTableMetadata();
 	}
 
@@ -73,7 +73,7 @@ public class EnumValidator {
 			displayColumnValue2Record.put(displayColumnStringValue, record);
 		}
 
-		log.debug("Validating Enum ".concat(pEnumClass.getName()));
+		log.info("Validating Enum ".concat(pEnumClass.getName()));
 		for (T enum0 : enumArray) {
 			final Map<String, Object> record = displayColumnValue2Record.get(enum0.toString());
 			if (record == null) {
@@ -98,7 +98,7 @@ public class EnumValidator {
 					}
 				}
 			}
-			log.debug(enum0.toString().concat(" validated."));
+			log.info(enum0.toString().concat(" validated."));
 		}
 	}
 }

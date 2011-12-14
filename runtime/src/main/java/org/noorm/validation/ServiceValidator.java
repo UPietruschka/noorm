@@ -19,7 +19,7 @@ public class ServiceValidator {
 		final MetadataService metadataService = MetadataService.getInstance();
 
 		final String databasePackageName = pService.getDatabasePackageName().toUpperCase();
-		log.info("Retrieving PL/SQL package code checksum (hash) from database.");
+		log.debug("Retrieving PL/SQL package code checksum (hash) from database.");
 		final int codeHashValue = metadataService.getPackageHashValue(databasePackageName);
 		if (codeHashValue == -1) {
 			throw new ValidationException("Service ".concat(pService.getClass().getName())
@@ -27,7 +27,7 @@ public class ServiceValidator {
 					.concat(databasePackageName).concat(" (No database package found with this name)."));
 		}
 		if (codeHashValue == pService.getCodeHashValue()) {
-			log.debug("Service ".concat(pService.getClass().getName())
+			log.info("Service ".concat(pService.getClass().getName())
 					.concat(" successfully validated against PL/SQL database code for package ")
 					.concat(databasePackageName));
 		} else {

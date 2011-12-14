@@ -59,5 +59,7 @@ public class NoORMValidator {
 					.concat(" does not match version ").concat(metaDataServiceNoORMVersion)
 					.concat(" of PL/SQL package NOORM_METADATA."));
 		}
+		log.info("Validation of NoORM runtime version [".concat(noormJavaVersion)
+				.concat("] against PL/SQL packages successful."));
 	}
 }
