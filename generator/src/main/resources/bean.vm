@@ -13,7 +13,7 @@ public class $class.Name<T> implements IBean<T>, Serializable {
 
 	private static final long serialVersionUID = $class.getSerialVersionUID()L;
 	private static final String TABLE_NAME = "$class.TableName";
-	private static final String PK_COLUMN_NAME = "$class.PrimaryKeyColumnName";
+	private static final String[] PK_COLUMN_NAMES = new String[]{ #foreach ($param in $class.PrimaryKeyColumnNames)"$param"#if($velocityCount<$class.PrimaryKeyColumnNames.size()), #end#end };
 	private static final String SEQUENCE_NAME = "$class.SequenceName";
 	private static final String VERSION_COLUMN_NAME = "$class.VersionColumnName";
 #foreach ($att in $class.Attributes)
@@ -34,8 +34,8 @@ public class $class.Name<T> implements IBean<T>, Serializable {
 		return TABLE_NAME;
 	}
 
-	public String getPrimaryKeyColumnName() {
-		return PK_COLUMN_NAME;
+	public String[] getPrimaryKeyColumnNames() {
+		return PK_COLUMN_NAMES;
 	}
 
 	public String getSequenceName() {
@@ -62,12 +62,12 @@ public class $class.Name<T> implements IBean<T>, Serializable {
 		if (this == pObject) return true;
 		if (!(pObject instanceof $class.Name)) return false;
 		$class.Name other = ($class.Name) pObject;
-		return get${class.FirstUpperPrimaryKeyColumnName}().equals(other.get${class.FirstUpperPrimaryKeyColumnName}());
+		return #foreach ($param in $class.PrimaryKeyColumnNames)get${class.getFirstUpperColumnName($param)}().equals(other.get${class.getFirstUpperColumnName($param)}())#if($velocityCount<$class.PrimaryKeyColumnNames.size()) && #end#end;
 	}
 
 	@Override
 	public int hashCode() {
-		return get${class.FirstUpperPrimaryKeyColumnName}().intValue();
+		return #foreach ($param in $class.PrimaryKeyColumnNames)get${class.getFirstUpperColumnName($param)}().intValue()#if($velocityCount<$class.PrimaryKeyColumnNames.size()) + #end#end;
 	}
 #end
 }

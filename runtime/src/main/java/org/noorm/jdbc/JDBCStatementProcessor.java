@@ -469,11 +469,10 @@ public class JDBCStatementProcessor<T> {
 			con = DataSourceProvider.getConnection();
 			final IBean firstBean = pBeanList.get(0);
 			String tableName = firstBean.getTableName();
-			final String primaryKeyColumnName = firstBean.getPrimaryKeyColumnName();
+			final String[] primaryKeyColumnNames = firstBean.getPrimaryKeyColumnNames();
 			// There is currently no full support for returning generated keys in batch operation
 			// Thus we support this for single-row inserts only.
-			if (pBeanList.size() == 1 && pBatchType.equals(BatchType.INSERT) &&
-					primaryKeyColumnName != null && !primaryKeyColumnName.isEmpty()) {
+			if (pBeanList.size() == 1 && pBatchType.equals(BatchType.INSERT) &&	primaryKeyColumnNames.length > 0) {
 				returnGeneratedKey = true;
 			}
 			final String versionColumnName = firstBean.getVersionColumnName();
@@ -491,28 +490,31 @@ public class JDBCStatementProcessor<T> {
 			String batch = null;
 			if (pBatchType.equals(BatchType.INSERT)) {
 				batch = statementBuilder.buildInsert
-						(tableName, primaryKeyColumnName, sequenceName, fieldMap);
+						(tableName, primaryKeyColumnNames, sequenceName, fieldMap);
 			}
 			if (pBatchType.equals(BatchType.UPDATE)) {
-				if (primaryKeyColumnName == null || primaryKeyColumnName.isEmpty()) {
+				if (primaryKeyColumnNames.length == 0) {
 					throw new DataAccessException(DataAccessException.Type.GENERIC_UPDATE_NOT_SUPPORTED_WITHOUT_PK);
 				}
 				batch = statementBuilder.buildUpdate
-						(tableName, primaryKeyColumnName, versionColumnName, fieldMap);
+						(tableName, primaryKeyColumnNames, versionColumnName, fieldMap);
 			}
 			if (pBatchType.equals(BatchType.DELETE)) {
-				if (primaryKeyColumnName == null || primaryKeyColumnName.isEmpty()) {
+				if (primaryKeyColumnNames.length == 0) {
 					throw new DataAccessException(DataAccessException.Type.GENERIC_DELETE_NOT_SUPPORTED_WITHOUT_PK);
 				}
 				batch = statementBuilder.buildDelete
-						(tableName, primaryKeyColumnName, versionColumnName);
+						(tableName, primaryKeyColumnNames, versionColumnName);
 			}
 			if (log.isDebugEnabled()) {
 				debugDML(tableName, sequenceName, batch);
 			}
 			if (returnGeneratedKey) {
+				if (primaryKeyColumnNames.length != 1) {
+					throw new DataAccessException(DataAccessException.Type.OPERATION_NOT_SUPPORTED_WITH_COMPOSITE_PK);
+				}
 				pstmt = (OraclePreparedStatement)
-						con.prepareStatement(batch, new String[]{primaryKeyColumnName, versionColumnName});
+						con.prepareStatement(batch, new String[]{primaryKeyColumnNames[0], versionColumnName});
 			} else {
 				pstmt = (OraclePreparedStatement) con.prepareStatement(batch);
 			}
@@ -530,13 +532,18 @@ public class JDBCStatementProcessor<T> {
 				fieldMap = mapper.toMap(bean);
 				for (final String fieldName : fieldMap.keySet()) {
 
+					boolean isPKColumn = false;
+					for (final String pkColumnName : primaryKeyColumnNames) {
+						if (fieldName.toUpperCase().equals(pkColumnName)) {
+							isPKColumn = true;
+						}
+					}
 					Object value = fieldMap.get(fieldName);
 					if (value instanceof java.util.Date) {
 						value = new Timestamp(((java.util.Date) value).getTime());
 					}
 					if (pBatchType.equals(BatchType.INSERT)) {
-						if (!fieldName.toUpperCase().equals(primaryKeyColumnName) ||
-								sequenceName == null || sequenceName.isEmpty()) {
+						if (!isPKColumn || sequenceName == null || sequenceName.isEmpty()) {
 							if (fieldName.equals(versionColumnName)) {
 								// When the version column has not been initialized by the caller,
 								// we set it here, otherwise NULL in the version column will result
@@ -565,7 +572,7 @@ public class JDBCStatementProcessor<T> {
 						}
 					}
 					if (pBatchType.equals(BatchType.DELETE)) {
-						if (fieldName.toUpperCase().equals(primaryKeyColumnName)) {
+						if (isPKColumn) {
 							pstmt.setObjectAtName(fieldName, value);
 						}
 					}

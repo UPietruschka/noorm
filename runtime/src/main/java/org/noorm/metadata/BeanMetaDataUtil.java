@@ -106,7 +106,10 @@ public class BeanMetaDataUtil {
 	 */
 	public static Long getPrimaryKeyValue(final IBean pBean) {
 
-		final String primaryKeyColumnName = pBean.getPrimaryKeyColumnName();
+		if (pBean.getPrimaryKeyColumnNames().length != 1) {
+			throw new DataAccessException(DataAccessException.Type.OPERATION_NOT_SUPPORTED_WITH_COMPOSITE_PK);
+		}
+		final String primaryKeyColumnName = pBean.getPrimaryKeyColumnNames()[0];
 		final Object property = getBeanPropertyByName(pBean, primaryKeyColumnName);
 		if (!(property instanceof Long)) {
 			throw new DataAccessException(DataAccessException.Type.UNSUPPORTED_DATATYPE);
@@ -158,7 +161,10 @@ public class BeanMetaDataUtil {
 	 */
 	public static void setPrimaryKeyValue(final IBean pBean, final Long pPKValue) {
 
-		final String primaryKeyColumnName = pBean.getPrimaryKeyColumnName();
+		if (pBean.getPrimaryKeyColumnNames().length != 1) {
+			throw new DataAccessException(DataAccessException.Type.OPERATION_NOT_SUPPORTED_WITH_COMPOSITE_PK);
+		}
+		final String primaryKeyColumnName = pBean.getPrimaryKeyColumnNames()[0];
 		setBeanPropertyByName(pBean, primaryKeyColumnName, pPKValue);
 	}
 

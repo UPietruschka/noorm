@@ -13,6 +13,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.File;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
@@ -175,8 +176,8 @@ public class BeanGenerator {
 			beanClassDescriptor.setName(javaBeanName);
 			validatorClassDescriptor.getClassNames().add(javaBeanName);
 			beanClassDescriptor.setTableName(tableName0);
-			String primaryKeyColumnName = getPrimaryKeyColumnName(tableName0, pkColumnNameList);
-			beanClassDescriptor.setPrimaryKeyColumnName(primaryKeyColumnName);
+			String[] primaryKeyColumnNames = getPrimaryKeyColumnNames(tableName0, pkColumnNameList);
+			beanClassDescriptor.setPrimaryKeyColumnNames(primaryKeyColumnNames);
 			final String sequenceName = getSequenceName(tableName0, sequenceDBNameList);
 			beanClassDescriptor.setSequenceName(sequenceName);
 			final String versionColumnName = getVersionColumnName(tableName0, tableMetadataBeanList1);
@@ -232,38 +233,31 @@ public class BeanGenerator {
 		return sequenceName;
 	}
 
-	private String getPrimaryKeyColumnName(final String pTableName,
-										   final List<PrimaryKeyColumnBean> pPrimaryKeyColumnList) {
+	private String[] getPrimaryKeyColumnNames(final String pTableName,
+										      final List<PrimaryKeyColumnBean> pPrimaryKeyColumnList) {
 
-		String pkColumnName = "";
+		final List<String> pkColumnNames = new ArrayList<String>();
 		for (PrimaryKeyColumnBean primaryKeyBean : pPrimaryKeyColumnList) {
 			if (pTableName.equals(primaryKeyBean.getTableName())) {
-				if (primaryKeyBean.getPosition() == 1L) {
-					pkColumnName = primaryKeyBean.getColumnName();
-				} else {
-					// A position > 1 indicates that we have a composite primary key.
-					// We do not support composite primary keys yet, so we return null,
-					// which causes the BeanGenerator to omit automatic support for DML.
-					log.info("Composite primary keys are not yet supported. "
-							.concat("Automatic support for DML will not be available for table ")
-							.concat(pTableName));
-					return "";
-				}
+				log.info("Primary key column ".concat(primaryKeyBean.getColumnName())
+						.concat(" found for table ").concat(pTableName));
+				pkColumnNames.add(primaryKeyBean.getColumnName());
 			}
 		}
-		if (!pkColumnName.isEmpty()) {
-			log.info("Primary key column ".concat(pkColumnName).concat(" found for table ").concat(pTableName));
-		} else {
+		if (pkColumnNames.isEmpty()) {
 			if (viewName2PrimaryKeyMapping != null) {
-				pkColumnName = Utils.getPropertyString(pTableName, viewName2PrimaryKeyMapping);
+				final String viewPKName = Utils.getPropertyString(pTableName, viewName2PrimaryKeyMapping);
+				if (!viewPKName.isEmpty()) {
+					pkColumnNames.add(viewPKName);
+				}
 			}
-			if (!pkColumnName.isEmpty()) {
+			if (pkColumnNames.isEmpty()) {
 				log.info("No primary key found."
 						.concat("Automatic support for DML will not be available for table ")
 						.concat(pTableName));
 			}
 		}
-		return pkColumnName;
+		return pkColumnNames.toArray(new String[pkColumnNames.size()]);
 	}
 
 	private String getVersionColumnName(final String pTableName,

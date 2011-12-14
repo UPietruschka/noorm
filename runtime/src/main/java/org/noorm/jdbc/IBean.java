@@ -26,11 +26,10 @@ public interface IBean<T> {
 	String getTableName();
 
 	/**
-	 * The Oracle name of the primary key column. There is no support for composite keys yet, i.e.,
-	 * a table with a composite primary key will return an empty string.
-	 * @return the primary key column name.
+	 * The Oracle name of the primary key columns.
+	 * @return the primary key column names.
 	 */
-	String getPrimaryKeyColumnName();
+	String[] getPrimaryKeyColumnNames();
 
 	/**
 	 * The Oracle sequence name used to generate numeric primary keys for this table or view.

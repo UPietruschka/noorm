@@ -27,7 +27,7 @@ class StatementBuilder {
 								 final Map<String, Object> pInParameters,
 								 final boolean useNamedParameters) {
 
-		StringBuilder plSQLCall = new StringBuilder();
+		final StringBuilder plSQLCall = new StringBuilder();
 		plSQLCall.append(CALL_PREFIX).append(pPLSQLCallable);
 		String delim = CALL_DELIM_1;
 		if (pOutParamName != null) {
@@ -81,25 +81,28 @@ class StatementBuilder {
 	private static final String INSERT_DELIM_3 = ")";
 
 	public String buildInsert(final String pTableName,
-							  final String pPrimaryKeyColumnName,
+							  final String[] pPrimaryKeyColumnNames,
 							  final String pSequenceName,
 							  final Map<String, Object> fieldMap) {
 
-		StringBuilder insert = new StringBuilder();
+		final StringBuilder insert = new StringBuilder();
 		insert.append(INSERT_PREFIX).append(pTableName);
 		String delim = INSERT_DELIM_1;
 		for (final String fieldName : fieldMap.keySet()) {
-			if (!fieldName.toUpperCase().equals(pPrimaryKeyColumnName) || pSequenceName != null) {
-				insert.append(delim).append(fieldName);
-				delim = INSERT_DELIM_2;
-			}
+			insert.append(delim).append(fieldName);
+			delim = INSERT_DELIM_2;
 		}
 		insert.append(INSERT_VALUES);
 		delim = INSERT_DELIM_1;
 		for (final String fieldName : fieldMap.keySet()) {
 			insert.append(delim);
-			if (fieldName.toUpperCase().equals(pPrimaryKeyColumnName) &&
-					pSequenceName != null && !pSequenceName.isEmpty()) {
+			boolean isPKColumn = false;
+			for (final String pkColumnName : pPrimaryKeyColumnNames) {
+				if (fieldName.equals(pkColumnName)) {
+					isPKColumn = true;
+				}
+			}
+			if (isPKColumn && pSequenceName != null && !pSequenceName.isEmpty()) {
 				insert.append(pSequenceName).append(INSERT_NEXT_PK_VAL);
 				delim = INSERT_DELIM_2;
 			} else {
@@ -120,23 +123,33 @@ class StatementBuilder {
 	private static final String UPDATE_ASG = ":";
 
 	public String buildUpdate(final String pTableName,
-							  final String pPrimaryKeyColumnName,
+							  final String[] pPrimaryKeyColumnNames,
 							  final String pVersionColumnName,
 							  final Map<String, Object> fieldMap) {
 
-		StringBuilder update = new StringBuilder();
+		final StringBuilder update = new StringBuilder();
 		update.append(UPDATE_PREFIX).append(pTableName);
 		String delim = UPDATE_DELIM_1;
 		for (final String fieldName : fieldMap.keySet()) {
-			if (!fieldName.equals(pPrimaryKeyColumnName)) {
+			boolean isPKColumn = false;
+			for (final String pkColumnName : pPrimaryKeyColumnNames) {
+				if (fieldName.equals(pkColumnName)) {
+					isPKColumn = true;
+				}
+			}
+			if (!isPKColumn) {
 				update.append(delim).append(fieldName).append(UPDATE_EQUALS).append(INSERT_ASG).append(fieldName);
 				delim = UPDATE_DELIM_2;
 			}
 		}
-		update.append(UPDATE_WHERE);
-		update.append(pPrimaryKeyColumnName);
-		update.append(UPDATE_EQUALS);
-		update.append(UPDATE_ASG).append(pPrimaryKeyColumnName);
+		String updateAnd = UPDATE_WHERE;
+		for (final String pkColumnName : pPrimaryKeyColumnNames) {
+			update.append(updateAnd);
+			update.append(pkColumnName);
+			update.append(UPDATE_EQUALS);
+			update.append(UPDATE_ASG).append(pkColumnName);
+			updateAnd = UPDATE_AND;
+		}
 		if (pVersionColumnName != null && !pVersionColumnName.isEmpty()) {
 			update.append(UPDATE_AND);
 			update.append(pVersionColumnName);
@@ -153,15 +166,19 @@ class StatementBuilder {
 	private static final String DELETE_ASG = ":";
 
 	public String buildDelete(final String pTableName,
-							  final String pPrimaryKeyColumnName,
+							  final String[] pPrimaryKeyColumnNames,
 							  final String pVersionColumnName) {
 
-		StringBuilder delete = new StringBuilder();
+		final StringBuilder delete = new StringBuilder();
 		delete.append(DELETE_PREFIX).append(pTableName);
-		delete.append(DELETE_WHERE);
-		delete.append(pPrimaryKeyColumnName);
-		delete.append(DELETE_EQUALS);
-		delete.append(DELETE_ASG).append(pPrimaryKeyColumnName);
+		String deleteAnd = DELETE_WHERE;
+		for (final String pkColumnName : pPrimaryKeyColumnNames) {
+			delete.append(deleteAnd);
+			delete.append(pkColumnName);
+			delete.append(DELETE_EQUALS);
+			delete.append(DELETE_ASG).append(pkColumnName);
+			deleteAnd = DELETE_AND;
+		}
 		if (pVersionColumnName != null && !pVersionColumnName.isEmpty()) {
 			delete.append(DELETE_AND);
 			delete.append(pVersionColumnName);

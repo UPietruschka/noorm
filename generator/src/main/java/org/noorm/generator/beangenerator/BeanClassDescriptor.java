@@ -17,7 +17,7 @@ public class BeanClassDescriptor {
 	private long serialVersionUID;
 	private String name;
 	private String tableName;
-	private String primaryKeyColumnName;
+	private String[] primaryKeyColumnNames;
 	private String sequenceName;
 	private String versionColumnName;
 	private String packageName;
@@ -47,20 +47,20 @@ public class BeanClassDescriptor {
 		tableName = pTableName;
 	}
 
-	public String getPrimaryKeyColumnName() {
-		return primaryKeyColumnName;
+	public String[] getPrimaryKeyColumnNames() {
+		return primaryKeyColumnNames;
 	}
 
-	public void setPrimaryKeyColumnName(final String pPrimaryKeyColumnName) {
-		primaryKeyColumnName = pPrimaryKeyColumnName;
+	public void setPrimaryKeyColumnNames(final String[] pPrimaryKeyColumnNames) {
+		primaryKeyColumnNames = pPrimaryKeyColumnNames;
 	}
 
 	public boolean hasPrimaryKey() {
-		return !primaryKeyColumnName.isEmpty();
+		return primaryKeyColumnNames.length > 0;
 	}
 
-	public String getFirstUpperPrimaryKeyColumnName() {
-		return Utils.convertDBName2JavaName(primaryKeyColumnName, true);
+	public String getFirstUpperColumnName(final String pColumnName) {
+		return Utils.convertDBName2JavaName(pColumnName, true);
 	}
 
 	public String getSequenceName() {
