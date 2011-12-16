@@ -33,6 +33,7 @@ public class ServiceGenerator {
 	private static final String SERVICE_VALIDATOR_VM_TEMPLATE_FILE = "/service_validator.vm";
 	private static final String SERVICE_VALIDATOR_CLASS_NAME = "GenericServiceValidator";
 	private static final String DEFAULT_PACKAGE_FILTER_REGEX = ".*";
+	private static final String IGNORE_PACKAGE_FILTER_REGEX = "(NOORM_METADATA|DYNAMIC_SQL)";
 	private static final String DEFAULT_PAGEABLE_PROC_NAME_REGEX = "(find_pageable.*)";
 	private static ServiceGenerator serviceGenerator;
 
@@ -174,6 +175,10 @@ public class ServiceGenerator {
 		}
 		final List<NameBean> packageNames = metadataService.findPackageNames(packageFilterRegex);
 		for (final NameBean packageName : packageNames) {
+			if (packageName.getName().matches(IGNORE_PACKAGE_FILTER_REGEX)) {
+				// Ignore the NoORM packages
+				continue;
+			}
 			final ServiceClassDescriptor serviceClassDescriptor = new ServiceClassDescriptor();
 			final String javaClassName = Utils.convertDBName2JavaName(packageName.getName(), true);
 			serviceClassDescriptor.setJavaName(javaClassName);
@@ -255,7 +260,9 @@ public class ServiceGenerator {
 			GeneratorUtil.generateFile(servicePackageDir, SERVICE_VM_TEMPLATE_FILE,
 					serviceClassDescriptor.getJavaName(), serviceClassDescriptor);
 		}
-		GeneratorUtil.generateFile(servicePackageDir, SERVICE_VALIDATOR_VM_TEMPLATE_FILE,
-				SERVICE_VALIDATOR_CLASS_NAME, validatorClassDescriptor);
+		if (!validatorClassDescriptor.getClassNames().isEmpty()) {
+			GeneratorUtil.generateFile(servicePackageDir, SERVICE_VALIDATOR_VM_TEMPLATE_FILE,
+					SERVICE_VALIDATOR_CLASS_NAME, validatorClassDescriptor);
+		}
 	}
 }

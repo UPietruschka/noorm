@@ -67,7 +67,7 @@ public class $class.Name<T> implements IBean<T>, Serializable {
 
 	@Override
 	public int hashCode() {
-		return #foreach ($param in $class.PrimaryKeyColumnNames)get${class.getFirstUpperColumnName($param)}().intValue()#if($velocityCount<$class.PrimaryKeyColumnNames.size()) + #end#end;
+		return #foreach ($param in $class.PrimaryKeyColumnNames)get${class.getFirstUpperColumnName($param)}().hashCode()#if($velocityCount<$class.PrimaryKeyColumnNames.size()) + #end#end;
 	}
 #end
 }

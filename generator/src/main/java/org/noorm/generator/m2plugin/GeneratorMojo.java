@@ -55,7 +55,6 @@ public class GeneratorMojo extends AbstractMojo {
 	 * Package name for generated Service source files.
 	 *
 	 * @parameter
-	 * @required
 	 */
 	protected String servicePackageName;
 
@@ -257,25 +256,29 @@ public class GeneratorMojo extends AbstractMojo {
 		beanGenerator.execute();
 
 		// Generate Enums
-		final EnumGenerator enumGenerator = EnumGenerator.getInstance();
-		enumGenerator.setDestinationDirectory(destinationDirectory);
-		enumGenerator.setEnumPackageName(enumPackageName);
-		enumGenerator.setIgnoreTableNamePrefixes(ignoreTableNamePrefixes);
-		enumGenerator.setEnumTableFilterRegex(enumTableFilterRegex);
-		enumGenerator.setEnumTable2DisplayColumnMapping(enumTable2DisplayColumnMapping);
-		enumGenerator.execute();
+		if (enumPackageName != null && !enumPackageName.isEmpty()) {
+			final EnumGenerator enumGenerator = EnumGenerator.getInstance();
+			enumGenerator.setDestinationDirectory(destinationDirectory);
+			enumGenerator.setEnumPackageName(enumPackageName);
+			enumGenerator.setIgnoreTableNamePrefixes(ignoreTableNamePrefixes);
+			enumGenerator.setEnumTableFilterRegex(enumTableFilterRegex);
+			enumGenerator.setEnumTable2DisplayColumnMapping(enumTable2DisplayColumnMapping);
+			enumGenerator.execute();
+		}
 
 		// Generate Services
-		final ServiceGenerator serviceGenerator = ServiceGenerator.getInstance();
-		serviceGenerator.setDestinationDirectory(destinationDirectory);
-		serviceGenerator.setServicePackageName(servicePackageName);
-		serviceGenerator.setBeanPackageName(beanPackageName);
-		serviceGenerator.setPackageFilterRegex(packageFilterRegex);
-		serviceGenerator.setIgnoreTableNamePrefixes(ignoreTableNamePrefixes);
-		serviceGenerator.setSingleRowFinderRegex(singleRowFinderRegex);
-		serviceGenerator.setPageableProcedureNameRegex(pageableProcedureNameRegex);
-		serviceGenerator.setExtendedBeans(extendedBeans);
-		serviceGenerator.execute();
+		if (servicePackageName !=null && !servicePackageName.isEmpty()) {
+			final ServiceGenerator serviceGenerator = ServiceGenerator.getInstance();
+			serviceGenerator.setDestinationDirectory(destinationDirectory);
+			serviceGenerator.setServicePackageName(servicePackageName);
+			serviceGenerator.setBeanPackageName(beanPackageName);
+			serviceGenerator.setPackageFilterRegex(packageFilterRegex);
+			serviceGenerator.setIgnoreTableNamePrefixes(ignoreTableNamePrefixes);
+			serviceGenerator.setSingleRowFinderRegex(singleRowFinderRegex);
+			serviceGenerator.setPageableProcedureNameRegex(pageableProcedureNameRegex);
+			serviceGenerator.setExtendedBeans(extendedBeans);
+			serviceGenerator.execute();
+		}
 	}
 
 	private void callServiceGeneration() {

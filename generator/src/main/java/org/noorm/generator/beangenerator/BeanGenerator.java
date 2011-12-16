@@ -32,6 +32,7 @@ public class BeanGenerator {
 	private static final String BEAN_VM_TEMPLATE_FILE = "/bean.vm";
 	private static final String BEAN_VALIDATOR_VM_TEMPLATE_FILE = "/bean_validator.vm";
 	private static final String BEAN_VALIDATOR_CLASS_NAME = "GenericBeanValidator";
+	private static final String IGNORE_BEAN_FILTER_REGEX = "(DYNSQL_QUERY_TEMPLATE)";
 	private static BeanGenerator beanGenerator;
 
 	/**
@@ -168,6 +169,10 @@ public class BeanGenerator {
 						.concat(", table name does not match regex '")
 						.concat(beanTableFilterRegex)
 						.concat("'"));
+				continue;
+			}
+			if (tableName0.matches(IGNORE_BEAN_FILTER_REGEX)) {
+				// Ignore the NoORM tables
 				continue;
 			}
 			final String javaBeanName = Utils.convertTableName2BeanName(tableName0, ignoreTableNamePrefixes);

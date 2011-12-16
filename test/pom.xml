@@ -6,14 +6,82 @@
     <parent>
         <groupId>org.noorm</groupId>
         <artifactId>noorm</artifactId>
-        <version>0.9.10</version>
+        <version>0.9.11-SNAPSHOT</version>
     </parent>
 
     <modelVersion>4.0.0</modelVersion>
     <artifactId>test</artifactId>
     <name>NoORM Oracle Test Suite</name>
 
+    <properties>
+        <jdbc.driver.name>oracle.jdbc.OracleDriver</jdbc.driver.name>
+        <jdbc.url>
+            jdbc:oracle:thin:@(DESCRIPTION =
+            (ADDRESS_LIST = (ADDRESS = (PROTOCOL = TCP)(HOST = localhost)(PORT = 1521)))
+            (CONNECT_DATA = (SERVER = DEDICATED)(SERVICE_NAME = orcl.accounts.intern)) )
+        </jdbc.url>
+        <jdbc.username>se</jdbc.username>
+        <jdbc.password>se</jdbc.password>
+    </properties>
+
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.noorm</groupId>
+                <artifactId>generator</artifactId>
+                <version>${parent.version}</version>
+                <dependencies>
+                    <dependency>
+                        <groupId>${oracle.groupId}</groupId>
+                        <artifactId>${oracle.driver.artifactId}</artifactId>
+                        <version>${oracle.version}</version>
+                    </dependency>
+                </dependencies>
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>generate-noorm</goal>
+                        </goals>
+                    </execution>
+                </executions>
+                <configuration>
+                    <url>jdbc:oracle:thin:@localhost:1521:orcl</url>
+                    <username>hr</username>
+                    <password>hr</password>
+                    <beanPackageName>org.noorm.test.hr.beans</beanPackageName>
+                    <servicePackageName>org.noorm.test.hr.services</servicePackageName>
+                    <oracleTable2SequenceMapping>
+                        <property>
+                            <name>EMPLOYEES</name>
+                            <value>EMPLOYEES_SEQ</value>
+                        </property>
+                        <property>
+                            <name>DEPARTMENTS</name>
+                            <value>DEPARTMENTS_SEQ</value>
+                        </property>
+                        <property>
+                            <name>LOCATIONS</name>
+                            <value>LOCATIONS_SEQ</value>
+                        </property>
+                    </oracleTable2SequenceMapping>
+                    <optimisticLockColumnMapping>
+                        <property>
+                            <name>TBL_(.*)</name>
+                            <value>VERSION</value>
+                        </property>
+                    </optimisticLockColumnMapping>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
+
     <dependencies>
+
+        <dependency>
+            <groupId>org.noorm</groupId>
+            <artifactId>runtime</artifactId>
+            <version>${parent.version}</version>
+        </dependency>
 
         <dependency>
             <groupId>junit</groupId>
