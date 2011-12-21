@@ -133,6 +133,19 @@ public class BeanMetaDataUtil {
 		return (Long) property;
 	}
 
+	public static Class getBeanPropertyType(final Object pObject, final String pPropertyName) {
+
+		Method propertyGetter;
+		try {
+			final String propertyGetterMethodName = BEAN_GETTER_METHOD_NAME_PREFIX
+					.concat(Utils.convertDBName2JavaName(pPropertyName, true));
+			propertyGetter = pObject.getClass().getMethod(propertyGetterMethodName);
+			return propertyGetter.getReturnType();
+		} catch (NoSuchMethodException e) {
+			throw new DataAccessException(DataAccessException.Type.COULD_NOT_ACCESS_PROPERTY_BY_REFLECTION, e);
+		}
+	}
+
 	public static Object getBeanPropertyByName(final Object pObject, final String pPropertyName) {
 
 		Method propertyGetter;
