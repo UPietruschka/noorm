@@ -50,26 +50,20 @@
                     <password>hr</password>
                     <beanPackageName>org.noorm.test.hr.beans</beanPackageName>
                     <servicePackageName>org.noorm.test.hr.services</servicePackageName>
+                    <enumPackageName>org.noorm.test.hr.enums</enumPackageName>
+                    <enumTableFilterRegex>REGIONS</enumTableFilterRegex>
+                    <enumTable2DisplayColumnMapping>
+                        <property>
+                            <name>REGIONS</name>
+                            <value>REGION_NAME</value>
+                        </property>
+                    </enumTable2DisplayColumnMapping>
                     <oracleTable2SequenceMapping>
                         <property>
-                            <name>EMPLOYEES</name>
-                            <value>EMPLOYEES_SEQ</value>
-                        </property>
-                        <property>
-                            <name>DEPARTMENTS</name>
-                            <value>DEPARTMENTS_SEQ</value>
-                        </property>
-                        <property>
-                            <name>LOCATIONS</name>
-                            <value>LOCATIONS_SEQ</value>
+                            <name>(EMPLOYEES|DEPARTMENTS|LOCATIONS)</name>
+                            <value>$1_SEQ</value>
                         </property>
                     </oracleTable2SequenceMapping>
-                    <optimisticLockColumnMapping>
-                        <property>
-                            <name>TBL_(.*)</name>
-                            <value>VERSION</value>
-                        </property>
-                    </optimisticLockColumnMapping>
                 </configuration>
             </plugin>
         </plugins>
