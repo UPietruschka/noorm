@@ -28,7 +28,7 @@ public class EnumGenerator {
 	private static final String ENUM_VM_TEMPLATE_FILE = "/enum.vm";
 	private static final String ENUM_VALIDATOR_VM_TEMPLATE_FILE = "/enum_validator.vm";
 	private static final String ENUM_VALIDATOR_CLASS_NAME = "GenericEnumValidator";
-	private static EnumGenerator enumGenerator;
+	private static EnumGenerator enumGenerator = new EnumGenerator();
 
 	/**
 	 * Destination directory for generated source files.
@@ -85,11 +85,6 @@ public class EnumGenerator {
 
 	public static EnumGenerator getInstance() {
 
-		synchronized (EnumGenerator.class) {
-			if (enumGenerator == null) {
-				enumGenerator = new EnumGenerator();
-			}
-		}
 		return enumGenerator;
 	}
 
