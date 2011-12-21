@@ -29,16 +29,11 @@ import java.util.Map;
  */
 public class BeanMapper<T> {
 
-	private static BeanMapper mapper;
+	private static BeanMapper mapper = new BeanMapper();
 	private static final Logger log = LoggerFactory.getLogger(BeanMapper.class);
 
 	public static <T> BeanMapper<T> getInstance() {
 
-		synchronized (BeanMapper.class) {
-			if (mapper == null) {
-				mapper = new BeanMapper<T>();
-			}
-		}
 		return mapper;
 	}
 
@@ -226,12 +221,14 @@ public class BeanMapper<T> {
 				}
 			}
 
-			if (fieldType == java.util.Date.class || fieldType == java.sql.Date.class) {
-				java.util.Date sqlDate = pResultSet.getDate(fieldName);
-				if (sqlDate != null) {
-					field.set(pBean, new java.util.Date(sqlDate.getTime()));
-				}
+			// Oracle has no data-type representing a date only (without time). Oracle data-types DATE and
+			// TIMESTAMP differ in precision, but both have a time included. Since the time part of the Java
+			// type is stored in the database unchanged, we should retrieve it unchanged, i.e., we do not
+			// make use of JDBC method getDate, which omits the time part, but use always getTimestamp.
+			if (fieldType == java.util.Date.class || fieldType == java.sql.Date.class || fieldType == Timestamp.class) {
+				field.set(pBean, pResultSet.getTimestamp(fieldName));
 			}
+
 			if (fieldType == BigDecimal.class) {
 				field.set(pBean, pResultSet.getBigDecimal(fieldName));
 			}
@@ -252,10 +249,6 @@ public class BeanMapper<T> {
 				if (!pResultSet.wasNull()) {
 					field.set(pBean, value);
 				}
-			}
-
-			if (fieldType == Timestamp.class) {
-				field.set(pBean, pResultSet.getTimestamp(fieldName));
 			}
 
 			if (fieldType == byte[].class) {
