@@ -33,7 +33,7 @@ public class BeanGenerator {
 	private static final String BEAN_VALIDATOR_VM_TEMPLATE_FILE = "/bean_validator.vm";
 	private static final String BEAN_VALIDATOR_CLASS_NAME = "GenericBeanValidator";
 	private static final String IGNORE_BEAN_FILTER_REGEX = "(DYNSQL_QUERY_TEMPLATE)";
-	private static BeanGenerator beanGenerator;
+	private static BeanGenerator beanGenerator = new BeanGenerator();
 
 	/**
 	 * Destination directory for generated source files.
@@ -124,11 +124,6 @@ public class BeanGenerator {
 
 	public static BeanGenerator getInstance() {
 
-		synchronized (BeanGenerator.class) {
-			if (beanGenerator == null) {
-				beanGenerator = new BeanGenerator();
-			}
-		}
 		return beanGenerator;
 	}
 
@@ -268,7 +263,10 @@ public class BeanGenerator {
 	private String getVersionColumnName(final String pTableName,
 										final List<TableMetadataBean> pTableMetadataBeanList) {
 
-		String versionColumnName = Utils.getPropertyString(pTableName, optimisticLockColumnMapping);
+		String versionColumnName = "";
+		if (optimisticLockColumnMapping != null) {
+			versionColumnName = Utils.getPropertyString(pTableName, optimisticLockColumnMapping);
+		}
 		if (versionColumnName.isEmpty()) {
 			log.info("No matching version-column-name has been found for table-name ".concat(pTableName));
 			return versionColumnName;
@@ -280,7 +278,8 @@ public class BeanGenerator {
 			}
 		}
 		log.info("Matching version-column-name ".concat(versionColumnName).concat(" has been found for ")
-				.concat("table-name ").concat(pTableName).concat(", but no table-column with this name could be found."));
-		return "";
+				.concat("table-name ").concat(pTableName)
+				.concat(", but no table-column with this name could be found."));
+		return versionColumnName;
 	}
 }
