@@ -55,6 +55,7 @@ public class GeneratorMojo extends AbstractMojo {
 	 * Package name for generated Service source files.
 	 *
 	 * @parameter
+	 * @required
 	 */
 	protected String servicePackageName;
 
@@ -135,7 +136,6 @@ public class GeneratorMojo extends AbstractMojo {
 	 * "TBL_(.*)" -> "SEQ_$1" (This rule would map TBL_PRODUCT to SEQ_PRODUCT, for example).
 	 *
 	 * @parameter
-	 * @required
 	 */
 	protected Properties oracleTable2SequenceMapping;
 
@@ -150,7 +150,6 @@ public class GeneratorMojo extends AbstractMojo {
 	 * rule ".*" -> "ORA_ROWSCN".
 	 *
 	 * @parameter
-	 * @required
 	 */
 	protected Properties optimisticLockColumnMapping;
 
