@@ -35,7 +35,7 @@ public class JDBCStatementProcessor<T> {
 
 	private static final Logger log = LoggerFactory.getLogger(JDBCStatementProcessor.class);
 
-	private static JDBCStatementProcessor statementProcessor;
+	private static JDBCStatementProcessor statementProcessor = new JDBCStatementProcessor();
 
 	private final StatementBuilder statementBuilder = new StatementBuilder();
 
@@ -58,12 +58,6 @@ public class JDBCStatementProcessor<T> {
 
 	public static <T> JDBCStatementProcessor<T> getInstance() {
 
-		synchronized (JDBCStatementProcessor.class) {
-			if (statementProcessor == null) {
-				log.debug("Instantiating JDBCStatementProcessor.");
-				statementProcessor = new JDBCStatementProcessor<T>();
-			}
-		}
 		return statementProcessor;
 	}
 
@@ -513,8 +507,13 @@ public class JDBCStatementProcessor<T> {
 				if (primaryKeyColumnNames.length != 1) {
 					throw new DataAccessException(DataAccessException.Type.OPERATION_NOT_SUPPORTED_WITH_COMPOSITE_PK);
 				}
-				pstmt = (OraclePreparedStatement)
-						con.prepareStatement(batch, new String[]{primaryKeyColumnNames[0], versionColumnName});
+				if (versionColumnName != null && !versionColumnName.isEmpty()) {
+					pstmt = (OraclePreparedStatement)
+							con.prepareStatement(batch, new String[]{primaryKeyColumnNames[0], versionColumnName});
+				} else {
+					pstmt = (OraclePreparedStatement)
+							con.prepareStatement(batch, new String[]{primaryKeyColumnNames[0]});
+				}
 			} else {
 				pstmt = (OraclePreparedStatement) con.prepareStatement(batch);
 			}
@@ -599,16 +598,24 @@ public class JDBCStatementProcessor<T> {
 			if (returnGeneratedKey) {
 				ResultSet generatedKeyResultSet = pstmt.getGeneratedKeys();
 				while (generatedKeyResultSet.next()) {
-					Long generatedKey = generatedKeyResultSet.getLong(1);
-					log.debug("Generated key value " + generatedKey + " retrieved for table " + tableName);
-					BeanMetaDataUtil.setPrimaryKeyValue(firstBean, generatedKey);
+					// Generated keys are supported for a numeric primary key only. For other data-types we
+					// assume that the primary has already been set by the caller.
+					final Class primaryKeyType =
+							BeanMetaDataUtil.getBeanPropertyType(firstBean, primaryKeyColumnNames[0]);
+					if (primaryKeyType.equals(Long.class)) {
+						Long generatedKey = generatedKeyResultSet.getLong(1);
+						log.debug("Generated key value " + generatedKey + " retrieved for table " + tableName);
+						BeanMetaDataUtil.setPrimaryKeyValue(firstBean, generatedKey);
+					}
 					// We must handle the value for the version column, too. When the caller does not set
 					// the version column, we set it it to VERSION_COLUMN_DEFAULT. To reflect this in the
 					// returned record, we must set it here, too. NOTE THAT ENABLING THE RETURN OF THE
 					// GENERATED KEYS FOR ALL RECORDS, SOME MORE CHANGES ARE REQUIRED!
-					Long versionColumnValue = generatedKeyResultSet.getLong(2);
-					log.debug("Version column value " + versionColumnValue + " retrieved for table " + tableName);
-					BeanMetaDataUtil.setVersionColumnValue(firstBean, versionColumnValue);
+					if (versionColumnName != null && !versionColumnName.isEmpty()) {
+						Long versionColumnValue = generatedKeyResultSet.getLong(2);
+						log.debug("Version column value " + versionColumnValue + " retrieved for table " + tableName);
+						BeanMetaDataUtil.setVersionColumnValue(firstBean, versionColumnValue);
+					}
 					return (T) firstBean;
 				}
 			}
