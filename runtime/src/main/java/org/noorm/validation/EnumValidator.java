@@ -98,7 +98,7 @@ public class EnumValidator {
 					}
 				}
 			}
-			log.info(enum0.toString().concat(" validated."));
 		}
+		log.info("Enum ".concat(pEnumClass.getName()).concat(" validated."));
 	}
 }
