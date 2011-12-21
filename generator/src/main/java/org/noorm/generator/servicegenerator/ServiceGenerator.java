@@ -35,7 +35,7 @@ public class ServiceGenerator {
 	private static final String DEFAULT_PACKAGE_FILTER_REGEX = ".*";
 	private static final String IGNORE_PACKAGE_FILTER_REGEX = "(NOORM_METADATA|DYNAMIC_SQL)";
 	private static final String DEFAULT_PAGEABLE_PROC_NAME_REGEX = "(find_pageable.*)";
-	private static ServiceGenerator serviceGenerator;
+	private static ServiceGenerator serviceGenerator = new ServiceGenerator();
 
 	/**
 	 * Destination directory for generated source files.
@@ -137,11 +137,6 @@ public class ServiceGenerator {
 
 	public static ServiceGenerator getInstance() {
 
-		synchronized (ServiceGenerator.class) {
-			if (serviceGenerator == null) {
-				serviceGenerator = new ServiceGenerator();
-			}
-		}
 		return serviceGenerator;
 	}
 
