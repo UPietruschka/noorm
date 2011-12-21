@@ -22,18 +22,13 @@ public class MetadataService {
 
 	private static final Logger log = LoggerFactory.getLogger(MetadataService.class);
 
-	private static MetadataService metadataService;
+	private static MetadataService metadataService = new MetadataService();
 
 	protected MetadataService() {
 	}
 
 	public static MetadataService getInstance() {
 
-		synchronized (MetadataService.class) {
-			if (metadataService == null) {
-				metadataService = new MetadataService();
-			}
-		}
 		return metadataService;
 	}
 
