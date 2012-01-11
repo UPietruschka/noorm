@@ -108,15 +108,17 @@ public class Utils {
 	public static String getPropertyString(final String pRegex, final Properties pProperties) {
 
 		String propertyString = "";
-		for (String searchPattern : pProperties.stringPropertyNames()) {
-			final Pattern finder = Pattern.compile(searchPattern);
-			final Matcher matcher = finder.matcher(pRegex);
-			if (matcher.matches()) {
-				final String replacePattern = pProperties.getProperty(searchPattern);
-				propertyString = matcher.replaceAll(replacePattern);
-				break;
-			}
-		}
+        if (pProperties != null) {
+            for (String searchPattern : pProperties.stringPropertyNames()) {
+                final Pattern finder = Pattern.compile(searchPattern);
+                final Matcher matcher = finder.matcher(pRegex);
+                if (matcher.matches()) {
+                    final String replacePattern = pProperties.getProperty(searchPattern);
+                    propertyString = matcher.replaceAll(replacePattern);
+                    break;
+                }
+            }
+        }
 		return propertyString;
 	}
 
