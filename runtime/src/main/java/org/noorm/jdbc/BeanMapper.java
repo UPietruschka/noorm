@@ -109,7 +109,7 @@ public class BeanMapper<T> {
 	 * the attributes value. The attribute name used is the database column name.
 	 *
 	 * @param pBean the Bean subject to conversion
-	 * @return
+	 * @return a map containing the content of the bean.
 	 */
 	public Map<String, Object> toMap(final T pBean) {
 

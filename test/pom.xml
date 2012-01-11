@@ -13,17 +13,6 @@
     <artifactId>test</artifactId>
     <name>NoORM Oracle Test Suite</name>
 
-    <properties>
-        <jdbc.driver.name>oracle.jdbc.OracleDriver</jdbc.driver.name>
-        <jdbc.url>
-            jdbc:oracle:thin:@(DESCRIPTION =
-            (ADDRESS_LIST = (ADDRESS = (PROTOCOL = TCP)(HOST = localhost)(PORT = 1521)))
-            (CONNECT_DATA = (SERVER = DEDICATED)(SERVICE_NAME = orcl.accounts.intern)) )
-        </jdbc.url>
-        <jdbc.username>se</jdbc.username>
-        <jdbc.password>se</jdbc.password>
-    </properties>
-
     <build>
         <plugins>
             <plugin>
@@ -36,6 +25,11 @@
                         <artifactId>${oracle.driver.artifactId}</artifactId>
                         <version>${oracle.version}</version>
                     </dependency>
+                    <dependency>
+                        <groupId>ch.qos.logback</groupId>
+                        <artifactId>logback-classic</artifactId>
+                        <version>1.0.0</version>
+                    </dependency>
                 </dependencies>
                 <executions>
                     <execution>
@@ -45,7 +39,7 @@
                     </execution>
                 </executions>
                 <configuration>
-                    <url>jdbc:oracle:thin:@localhost:1521:orcl</url>
+                    <url>jdbc:oracle:thin:@localhost:1521:XE</url>
                     <username>hr</username>
                     <password>hr</password>
                     <beanPackageName>org.noorm.test.hr.beans</beanPackageName>

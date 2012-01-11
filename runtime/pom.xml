@@ -9,6 +9,10 @@
         <version>0.9.11-SNAPSHOT</version>
     </parent>
 
+    <modelVersion>4.0.0</modelVersion>
+    <artifactId>runtime</artifactId>
+    <name>NoORM Runtime Library</name>
+
     <build>
         <resources>
             <resource>
@@ -17,9 +21,5 @@
             </resource>
         </resources>
     </build>
-
-    <modelVersion>4.0.0</modelVersion>
-    <artifactId>runtime</artifactId>
-    <name>NoORM Runtime Library</name>
 
 </project>

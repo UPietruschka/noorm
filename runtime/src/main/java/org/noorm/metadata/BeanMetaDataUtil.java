@@ -75,7 +75,7 @@ public class BeanMetaDataUtil {
 	 * annotations.
 	 *
 	 * @param pClass the Bean type
-	 * @return
+	 * @return a map containing all columns, resp. fields with their associated JDBCColumn.
 	 */
 	public static Map<String, JDBCColumn> getColumnMetaData(final Class pClass) {
 
