@@ -141,7 +141,7 @@ public class DataSourceProvider {
 			//}
 			log.info(validationInfo.toString());
 			dataSourceFactory.dataSource.getConnection();
-		} catch (SQLException e) {
+		} catch (Exception e) {
 			throw new DataAccessException(DataAccessException.Type.COULD_NOT_ESTABLISH_CONNECTION, e);
 		}
 	}
@@ -383,7 +383,7 @@ public class DataSourceProvider {
 
 		try {
 			getConnection(true);
-		} catch (SQLException e) {
+		} catch (Exception e) {
 			throw new DataAccessException(DataAccessException.Type.CONNECTION_ACCESS_FAILURE, e);
 		}
 	}

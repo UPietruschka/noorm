@@ -149,7 +149,7 @@ public class JDBCStatementProcessor<T> {
 			}
 
 			return outValue;
-		} catch (SQLException e) {
+		} catch (Exception e) {
 			log.error(DataAccessException.Type.COULD_NOT_ACCESS_DATA.getDescription(), e);
 			success = false;
 			throw new DataAccessException(DataAccessException.Type.COULD_NOT_ACCESS_DATA, e);
@@ -347,7 +347,7 @@ public class JDBCStatementProcessor<T> {
 			}
 
 			return beanList;
-		} catch (SQLException e) {
+		} catch (Exception e) {
 			log.error(DataAccessException.Type.COULD_NOT_ACCESS_DATA.getDescription(), e);
 			success = false;
 			throw new DataAccessException(DataAccessException.Type.COULD_NOT_ACCESS_DATA, e);
@@ -739,7 +739,7 @@ public class JDBCStatementProcessor<T> {
 				recordList.add(record);
 			}
 			return recordList;
-		} catch (SQLException e) {
+		} catch (Exception e) {
 			log.error(DataAccessException.Type.COULD_NOT_ACCESS_DATA.getDescription(), e);
 			success = false;
 			throw new DataAccessException(DataAccessException.Type.COULD_NOT_ACCESS_DATA, e);
