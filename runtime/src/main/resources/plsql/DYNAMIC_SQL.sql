@@ -12,6 +12,7 @@ PACKAGE dynamic_sql AS
   -- does not work without some hint for the procedure (resp. type) of choice. This is accomplished
   -- by an explicit notation of the parameter name, or by another name for the procedure.
   PROCEDURE add_raw_parameter(p_param_name IN CHAR, p_param_value IN RAW);
+  PROCEDURE add_parameter(p_param_name IN CHAR, p_param_value IN DATE);
   PROCEDURE add_parameter(p_param_name IN CHAR, p_param_value IN TIMESTAMP WITH TIME ZONE);
   PROCEDURE set_sorting_column(p_sorting_column IN CHAR, p_sorting_direction IN CHAR DEFAULT 'ASC');
   PROCEDURE execute(p_query_template_name IN CHAR, p_refcursor OUT sys_refcursor);
