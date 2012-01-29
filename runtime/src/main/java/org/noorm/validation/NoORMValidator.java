@@ -45,19 +45,23 @@ public class NoORMValidator {
 		final JDBCStatementProcessor<String> statementProcessor = JDBCStatementProcessor.getInstance();
 		final Map<String, Object> filterParameters = new HashMap<String, Object>();
 		final String dynamicSQLNoORMVersion = statementProcessor.callPLSQL
-				("noorm_metadata.get_version", "p_version", filterParameters, String.class);
+				("dynamic_sql.get_version", "p_version", filterParameters, String.class);
 		if (!dynamicSQLNoORMVersion.equals(noormJavaVersion)) {
-			throw new ValidationException("NoORM Java runtime version ".concat(noormJavaVersion)
+			final String errMsg = "NoORM Java runtime version ".concat(noormJavaVersion)
 					.concat(" does not match version ").concat(dynamicSQLNoORMVersion)
-					.concat(" of PL/SQL package DYNAMIC_SQL."));
+					.concat(" of PL/SQL package DYNAMIC_SQL.");
+			log.error(errMsg);
+			throw new ValidationException(errMsg);
 		}
 		log.info("Validating NoORM runtime version [".concat(noormJavaVersion)
 				.concat("] against PL/SQL package NOORM_METADATA."));
 		final String metaDataServiceNoORMVersion = MetadataService.getInstance().getVersion();
 		if (!metaDataServiceNoORMVersion.equals(noormJavaVersion)) {
-			throw new ValidationException("NoORM Java runtime version ".concat(noormJavaVersion)
+			final String errMsg = "NoORM Java runtime version ".concat(noormJavaVersion)
 					.concat(" does not match version ").concat(metaDataServiceNoORMVersion)
-					.concat(" of PL/SQL package NOORM_METADATA."));
+					.concat(" of PL/SQL package NOORM_METADATA.");
+			log.error(errMsg);
+			throw new ValidationException(errMsg);
 		}
 		log.info("Validation of NoORM runtime version [".concat(noormJavaVersion)
 				.concat("] against PL/SQL packages successful."));
