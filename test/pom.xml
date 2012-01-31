@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <project xmlns="http://maven.apache.org/POM/4.0.0"
-		 xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-		 xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 
     <parent>
         <groupId>org.noorm</groupId>
@@ -13,8 +13,109 @@
     <artifactId>test</artifactId>
     <name>NoORM Oracle Test Suite</name>
 
+    <properties>
+        <oracle.version>11.2.0.2.0</oracle.version>
+        <jdbc.driver.artifactId>ojdbc6</jdbc.driver.artifactId>
+        <jdbc.driver.name>oracle.jdbc.OracleDriver</jdbc.driver.name>
+        <jdbc.url>jdbc:oracle:thin:@localhost:1521:XE</jdbc.url>
+        <jdbc.username>hr</jdbc.username>
+        <jdbc.password>hr</jdbc.password>
+    </properties>
+
     <build>
         <plugins>
+
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-dependency-plugin</artifactId>
+                <version>2.4</version>
+                <executions>
+                    <execution>
+                        <id>unpack</id>
+                        <phase>initialize</phase>
+                        <goals>
+                            <goal>unpack</goal>
+                        </goals>
+                        <configuration>
+                            <artifactItems>
+                                <artifactItem>
+                                    <groupId>org.noorm</groupId>
+                                    <artifactId>runtime</artifactId>
+                                    <version>${parent.version}</version>
+                                    <type>jar</type>
+                                    <overWrite>true</overWrite>
+                                    <outputDirectory>target/noorm</outputDirectory>
+                                    <includes>**/*.sql</includes>
+                                </artifactItem>
+                            </artifactItems>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>sql-maven-plugin</artifactId>
+                <version>1.5</version>
+                <dependencies>
+                    <dependency>
+                        <groupId>${oracle.groupId}</groupId>
+                        <artifactId>${jdbc.driver.artifactId}</artifactId>
+                        <version>${oracle.version}</version>
+                    </dependency>
+                </dependencies>
+                <configuration>
+                    <driver>${jdbc.driver.name}</driver>
+                    <url>${jdbc.url}</url>
+                    <username>${jdbc.username}</username>
+                    <password>${jdbc.password}</password>
+                </configuration>
+                <executions>
+                    <!-- Creation and removal of the pre-defined schema objects for Oracle sample schema
+                         HR have been omitted intentionally, since these object are not expected to change
+                         over time. For custom application development, it is recommended to integrate
+                         the required DML with the build process -->
+                    <execution>
+                        <id>create NoORM dynamic SQL template table</id>
+                        <goals>
+                            <goal>execute</goal>
+                        </goals>
+                        <phase>initialize</phase>
+                        <configuration>
+                            <delimiter>;</delimiter>
+                            <delimiterType>normal</delimiterType>
+                            <keepFormat>false</keepFormat>
+                            <onError>continue</onError>
+                            <srcFiles>
+                                <srcFile>target/noorm/plsql/DYNSQL_QUERY_TEMPLATE.sql</srcFile>
+                                <srcFile>src/main/resources/sql/QUERY_TEMPLATES.sql</srcFile>
+                            </srcFiles>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <id>create PL/SQL packages</id>
+                        <goals>
+                            <goal>execute</goal>
+                        </goals>
+                        <phase>initialize</phase>
+                        <configuration>
+                            <delimiter>/</delimiter>
+                            <delimiterType>row</delimiterType>
+                            <keepFormat>true</keepFormat>
+                            <srcFiles>
+                                <srcFile>target/noorm/plsql/NOORM_METADATA.sql</srcFile>
+                                <srcFile>target/noorm/plsql/NOORM_METADATA_body.sql</srcFile>
+                                <srcFile>target/noorm/plsql/DYNAMIC_SQL.sql</srcFile>
+                                <srcFile>target/noorm/plsql/DYNAMIC_SQL_body.sql</srcFile>
+                                <srcFile>src/main/resources/sql/EMPLOYEE_SEARCH.sql</srcFile>
+                                <srcFile>src/main/resources/sql/EMPLOYEE_SERVICE.sql</srcFile>
+                                <srcFile>src/main/resources/sql/JOB_SERVICE.sql</srcFile>
+                            </srcFiles>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+
             <plugin>
                 <groupId>org.noorm</groupId>
                 <artifactId>generator</artifactId>
@@ -39,9 +140,9 @@
                     </execution>
                 </executions>
                 <configuration>
-                    <url>jdbc:oracle:thin:@localhost:1521:XE</url>
-                    <username>hr</username>
-                    <password>hr</password>
+                    <url>${jdbc.url}</url>
+                    <username>${jdbc.username}</username>
+                    <password>${jdbc.password}</password>
                     <beanPackageName>org.noorm.test.hr.beans</beanPackageName>
                     <servicePackageName>org.noorm.test.hr.services</servicePackageName>
                     <enumPackageName>org.noorm.test.hr.enums</enumPackageName>
@@ -61,6 +162,7 @@
                 </configuration>
             </plugin>
         </plugins>
+
     </build>
 
     <dependencies>
@@ -78,6 +180,6 @@
             <scope>test</scope>
         </dependency>
 
-	</dependencies>
+    </dependencies>
 
 </project>
