@@ -88,13 +88,13 @@ PACKAGE BODY dynamic_sql AS
       END IF;
     END LOOP;
     IF (c_query_template%ROWCOUNT = 0) THEN
-      RAISE_APPLICATION_ERROR(-20150, 'Query template not found: ' || p_query_template_name);
+      RAISE_APPLICATION_ERROR(-20160, 'Query template not found: ' || p_query_template_name);
     END IF;
     CLOSE c_query_template;
     -- Set order criteria, if specified
     IF (l_sorting_column IS NOT NULL) THEN
       IF (l_sorting_direction NOT IN ('asc', 'ASC', 'desc', 'DESC')) THEN
-        RAISE_APPLICATION_ERROR(-20150, 'Invalid sorting direction: ' || l_sorting_direction);
+        RAISE_APPLICATION_ERROR(-20161, 'Invalid sorting direction: ' || l_sorting_direction);
       END IF;
       final_query := final_query || ' ORDER BY ';
       final_query := final_query || l_sorting_column;
@@ -123,14 +123,14 @@ PACKAGE BODY dynamic_sql AS
         THEN dbms_sql.bind_variable(l_cursor, param_name, param_value.AccessTimestampTZ());
         WHEN dbms_types.typecode_raw
         THEN dbms_sql.bind_variable(l_cursor, param_name, param_value.AccessRaw());
-        ELSE RAISE_APPLICATION_ERROR(-20150, 'Unsupported data type for parameter: ' || param_name);
+        ELSE RAISE_APPLICATION_ERROR(-20162, 'Unsupported data type for parameter: ' || param_name);
       END CASE;
       param_name := l_parameters.NEXT(param_name);
     END LOOP;
     l_return := dbms_sql.EXECUTE(l_cursor);
     p_refcursor := dbms_sql.to_refcursor(l_cursor);
   EXCEPTION WHEN OTHERS THEN
-    RAISE_APPLICATION_ERROR(-20150, 'Could not bind parameter: ' || param_name);
+    RAISE_APPLICATION_ERROR(-20163, 'Could not bind parameter: ' || param_name);
   END execute;
 
 END dynamic_sql;

@@ -45,14 +45,14 @@ public class GeneratorMojo extends AbstractMojo {
 	protected String beanPackageName;
 
 	/**
-	 * Package name for generated Bean source files.
+	 * Package name for generated Enum source files.
 	 *
 	 * @parameter
 	 */
 	protected String enumPackageName;
 
 	/**
-	 * Package name for generated Service source files.
+	 * Package name for generated Service / DAO source files.
 	 *
 	 * @parameter
 	 * @required
@@ -68,7 +68,7 @@ public class GeneratorMojo extends AbstractMojo {
 	protected MavenProject project;
 
 	/**
-	 * JDBC connection URL for the Oracle schema containing the tables, view and stored procedures
+	 * JDBC connection URL for the Oracle schema containing the tables, views and stored procedures
 	 * subject to Java code generation.
 	 *
 	 * @parameter
@@ -145,9 +145,6 @@ public class GeneratorMojo extends AbstractMojo {
 	 * how specific the column-names are with respect to the table-names, one or more
 	 * mapping are required. In case of a unique name of the version column for all tables,
 	 * one simple rule like ".*" -> "VERSION" is sufficient.
-	 * Note that using the Oracle pseudo-column "ORA_ROWSCN" for optimistic locking is also
-	 * supported. To enable optimistic locking by using "ORA_ROWSCN", specify the mapping
-	 * rule ".*" -> "ORA_ROWSCN".
 	 *
 	 * @parameter
 	 */

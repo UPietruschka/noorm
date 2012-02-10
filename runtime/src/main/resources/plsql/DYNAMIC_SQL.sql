@@ -1,8 +1,14 @@
 CREATE OR REPLACE
 PACKAGE dynamic_sql AS 
 
-  dynsql_configuration_exception EXCEPTION;
-  PRAGMA EXCEPTION_INIT(dynsql_configuration_exception, -20150);
+  noorm_unknown_query_template EXCEPTION;
+  noorm_invalid_sorting EXCEPTION;
+  noorm_unsupported_datatype EXCEPTION;
+  noorm_could_not_bin_parameter EXCEPTION;
+  PRAGMA EXCEPTION_INIT(noorm_unknown_query_template, -20160);
+  PRAGMA EXCEPTION_INIT(noorm_invalid_sorting, -20161);
+  PRAGMA EXCEPTION_INIT(noorm_unsupported_datatype, -20162);
+  PRAGMA EXCEPTION_INIT(noorm_could_not_bin_parameter, -20163);
 
   PROCEDURE get_version(p_version OUT VARCHAR2);
   PROCEDURE init;
