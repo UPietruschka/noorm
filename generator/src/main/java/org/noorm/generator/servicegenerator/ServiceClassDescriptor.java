@@ -13,19 +13,24 @@ import java.util.Set;
  */
 public class ServiceClassDescriptor {
 
+	private static final String INTERFACE_PREFIX = "I";
+
 	private int codeHashValue;
 	private String javaName;
 	private String databasePackageName;
 	private String packageName;
+	private String interfacePackageName;
 	private String beanPackageName;
 	private final List<ProcedureDescriptor> procedures = new ArrayList<ProcedureDescriptor>();
 	private final Map<String, String> returnTypeNames = new HashMap<String, String>();
+	private boolean isInterface = false;
 
 	public int getCodeHashValue() {
 		return codeHashValue;
 	}
 
 	public void setCodeHashValue(final int pCodeHashValue) {
+
 		codeHashValue = pCodeHashValue;
 	}
 
@@ -35,6 +40,10 @@ public class ServiceClassDescriptor {
 
 	public String getJavaName() {
 		return javaName;
+	}
+
+	public String getJavaInterfaceName() {
+		return INTERFACE_PREFIX.concat(javaName);
 	}
 
 	public String getDatabasePackageName() {
@@ -83,5 +92,25 @@ public class ServiceClassDescriptor {
 
 	public String getFirstLowerName() {
 		return javaName.toLowerCase().substring(0, 1).concat(javaName.substring(1));
+	}
+
+	public String getInterfacePackageName() {
+		return interfacePackageName;
+	}
+
+	public void setInterfacePackageName(final String pInterfacePackageName) {
+		interfacePackageName = pInterfacePackageName;
+	}
+
+	public boolean isInterface() {
+		return isInterface;
+	}
+
+	public void setInterface(final boolean pInterface) {
+		isInterface = pInterface;
+	}
+
+	public boolean hasInterface() {
+		return interfacePackageName != null && !interfacePackageName.isEmpty();
 	}
 }

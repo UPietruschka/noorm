@@ -28,9 +28,9 @@ public class EmployeeSearchTest {
 		java.util.Date hireDateTo = null;
 		Long salaryFrom = null;
 		Long salaryTo = null;
-		final EmployeeSearch employeeService = EmployeeSearch.getInstance();
+		final EmployeeSearch employeeSearch = EmployeeSearch.getInstance();
 
-		List<EmployeesBean> employeesBeanList = employeeService.findEmployeesByFilter
+		List<EmployeesBean> employeesBeanList = employeeSearch.findEmployeesByFilter
 				(jobTitle, lastName, hireDateFrom, hireDateTo, salaryFrom, salaryTo);
 		assertEquals(2, employeesBeanList.size());
 
@@ -40,7 +40,7 @@ public class EmployeeSearchTest {
 		hireDateTo = null;
 		salaryFrom = null;
 		salaryTo = null;
-		employeesBeanList = employeeService.findEmployeesByFilter
+		employeesBeanList = employeeSearch.findEmployeesByFilter
 				(jobTitle, lastName, hireDateFrom, hireDateTo, salaryFrom, salaryTo);
 		assertEquals(1, employeesBeanList.size());
 
@@ -50,7 +50,7 @@ public class EmployeeSearchTest {
 		hireDateTo = getDate(2005, 06, 30);
 		salaryFrom = null;
 		salaryTo = null;
-		employeesBeanList = employeeService.findEmployeesByFilter
+		employeesBeanList = employeeSearch.findEmployeesByFilter
 				(jobTitle, lastName, hireDateFrom, hireDateTo, salaryFrom, salaryTo);
 		assertEquals(24, employeesBeanList.size());
 
@@ -60,7 +60,7 @@ public class EmployeeSearchTest {
 		hireDateTo = getDate(2005, 06, 30);
 		salaryFrom = 9000L;
 		salaryTo = 11000L;
-		employeesBeanList = employeeService.findEmployeesByFilter
+		employeesBeanList = employeeSearch.findEmployeesByFilter
 				(jobTitle, lastName, hireDateFrom, hireDateTo, salaryFrom, salaryTo);
 		assertEquals(6, employeesBeanList.size());
 	}

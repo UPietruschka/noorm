@@ -14,6 +14,11 @@ import org.noorm.validation.NoORMValidator;
 public class ValidationTest {
 
 	@Test
+	public void testNoORMValidation() {
+		NoORMValidator.validateNoORM();
+	}
+
+	@Test
 	public void testBeanValidation() {
 		GenericBeanValidator beanValidator = new GenericBeanValidator();
 		beanValidator.validateDatabase();
