@@ -47,6 +47,12 @@
                     <ignoreTableNamePrefixes>
                         <prefix>JOB_</prefix>
                     </ignoreTableNamePrefixes>
+                    <extendedBeans>
+                        <property>
+                            <name>JobsBean</name>
+                            <value>org.noorm.test.JobsBeanExt</value>
+                        </property>
+                    </extendedBeans>
                     <serviceInterfacePackageName>org.noorm.test.hr.services</serviceInterfacePackageName>
                     <servicePackageName>org.noorm.test.hr.services.impl</servicePackageName>
                     <singleRowFinderRegex>(find_unique.*)</singleRowFinderRegex>

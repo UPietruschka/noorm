@@ -6,7 +6,6 @@ import org.noorm.jdbc.DataSourceProvider;
 import org.noorm.test.hr.beans.EmpDetailsViewBean;
 import org.noorm.test.hr.beans.EmployeesBean;
 import org.noorm.test.hr.beans.HistoryBean;
-import org.noorm.test.hr.beans.JobsBean;
 import org.noorm.test.hr.services.IEmployeeService;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
@@ -127,26 +126,26 @@ public class EmployeeServiceInterfaceTest {
 		DataSourceProvider.begin();
 
 		// Create a new record and insert it into the database
-		final JobsBean jobsBean = new JobsBean();
+		final JobsBeanExt jobsBean = new JobsBeanExt();
 		jobsBean.setJobId("CT_MGR");
 		jobsBean.setJobTitle("Controller");
 		jobsBean.setMinSalary(8000L);
 		jobsBean.setMaxSalary(12000L);
-		final JobsBean newJobsBean =  employeeService.insertJobs(jobsBean);
-		final List<JobsBean> jobsBeanList = employeeService.findJobById("CT_MGR");
+		final JobsBeanExt newJobsBean =  employeeService.insertJobs(jobsBean);
+		final List<JobsBeanExt> jobsBeanList = employeeService.findJobById("CT_MGR");
 		assertEquals(jobsBeanList.size(), 1);
 		assertEquals(jobsBeanList.get(0), newJobsBean);
 
 		// Modify the just inserted record
 		newJobsBean.setJobTitle("Controlling");
 		employeeService.updateJobs(newJobsBean);
-		final List<JobsBean> jobsBeanList2 = employeeService.findJobById("CT_MGR");
+		final List<JobsBeanExt> jobsBeanList2 = employeeService.findJobById("CT_MGR");
 		assertEquals(jobsBeanList2.size(), 1);
 		assertEquals(jobsBeanList2.get(0).getJobTitle(), "Controlling");
 
 		// Delete the just inserted record.
 		employeeService.deleteJobs(newJobsBean);
-		final List<JobsBean> jobsBeanList3 = employeeService.findJobById("CT_MGR");
+		final List<JobsBeanExt> jobsBeanList3 = employeeService.findJobById("CT_MGR");
 		assertEquals(jobsBeanList3.size(), 0);
 
 		DataSourceProvider.commit();
