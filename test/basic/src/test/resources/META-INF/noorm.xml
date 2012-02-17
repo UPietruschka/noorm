@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE properties SYSTEM "http://java.sun.com/dtd/properties.dtd">
+<properties>
+    <comment>NoORM property file</comment>
+    <entry key="database.url">jdbc:oracle:thin:@
+        (DESCRIPTION =
+        (ADDRESS_LIST = (ADDRESS = (PROTOCOL = TCP)(HOST = localhost)(PORT = 1521)))
+        (CONNECT_DATA = (SERVER = DEDICATED)(SERVICE_NAME = orcl.accounts.intern))
+        )
+    </entry>
+    <entry key="database.username">hr</entry>
+    <entry key="database.password">hr</entry>
+    <entry key="database.batch_update_size">20</entry>
+    <entry key="debug.mode">false</entry>
+    <entry key="debug.host">localhost</entry>
+    <entry key="debug.port">4000</entry>
+</properties>

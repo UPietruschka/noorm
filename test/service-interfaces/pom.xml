@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <parent>
+        <artifactId>test</artifactId>
+        <groupId>org.noorm</groupId>
+        <version>0.9.11-SNAPSHOT</version>
+    </parent>
+    <modelVersion>4.0.0</modelVersion>
+
+    <artifactId>service-interfaces</artifactId>
+    <name>NoORM Oracle Test Suite - Service Interfaces</name>
+
+    <build>
+        <plugins>
+
+            <plugin>
+                <groupId>org.noorm</groupId>
+                <artifactId>generator</artifactId>
+                <version>${parent.version}</version>
+                <dependencies>
+                    <dependency>
+                        <groupId>${oracle.groupId}</groupId>
+                        <artifactId>${oracle.driver.artifactId}</artifactId>
+                        <version>${oracle.version}</version>
+                    </dependency>
+                    <dependency>
+                        <groupId>ch.qos.logback</groupId>
+                        <artifactId>logback-classic</artifactId>
+                        <version>1.0.0</version>
+                    </dependency>
+                </dependencies>
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>generate-noorm</goal>
+                        </goals>
+                    </execution>
+                </executions>
+                <configuration>
+                    <url>${jdbc.url}</url>
+                    <username>${jdbc.username}</username>
+                    <password>${jdbc.password}</password>
+                    <beanPackageName>org.noorm.test.hr.beans</beanPackageName>
+                    <serviceInterfacePackageName>org.noorm.test.hr.services</serviceInterfacePackageName>
+                    <servicePackageName>org.noorm.test.hr.services.impl</servicePackageName>
+                    <enumPackageName>org.noorm.test.hr.enums</enumPackageName>
+                    <enumTableFilterRegex>REGIONS</enumTableFilterRegex>
+                    <enumTable2DisplayColumnMapping>
+                        <property>
+                            <name>REGIONS</name>
+                            <value>REGION_NAME</value>
+                        </property>
+                    </enumTable2DisplayColumnMapping>
+                    <oracleTable2SequenceMapping>
+                        <property>
+                            <name>(EMPLOYEES|DEPARTMENTS|LOCATIONS)</name>
+                            <value>$1_SEQ</value>
+                        </property>
+                    </oracleTable2SequenceMapping>
+                </configuration>
+            </plugin>
+        </plugins>
+
+    </build>
+
+</project>
