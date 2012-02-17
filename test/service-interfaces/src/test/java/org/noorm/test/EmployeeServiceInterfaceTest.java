@@ -1,14 +1,17 @@
 package org.noorm.test;
 
 import org.junit.Test;
+import org.junit.runner.RunWith;
 import org.noorm.jdbc.DataSourceProvider;
 import org.noorm.test.hr.beans.EmpDetailsViewBean;
 import org.noorm.test.hr.beans.EmployeesBean;
 import org.noorm.test.hr.beans.JobHistoryBean;
 import org.noorm.test.hr.beans.JobsBean;
 import org.noorm.test.hr.services.IEmployeeService;
-import org.noorm.test.hr.services.impl.EmployeeService;
+import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
+import javax.annotation.Resource;
 import java.util.List;
 
 import static org.junit.Assert.*;
@@ -18,7 +21,12 @@ import static org.junit.Assert.*;
  *         Date: 20.12.11
  *         Time: 20:21
  */
+@RunWith(SpringJUnit4ClassRunner.class)
+@ContextConfiguration(locations = {"/META-INF/services.xml"})
 public class EmployeeServiceInterfaceTest {
+
+    @Resource
+    private IEmployeeService employeeService;
 
 	@Test
 	public void testFindEmployees() {
@@ -27,7 +35,6 @@ public class EmployeeServiceInterfaceTest {
 		// do not use a connection pool here, the loop over all employees could easily exhaust the maximum
 		// number of available connections of the Oracle test database.
 		DataSourceProvider.begin();
-		final IEmployeeService employeeService = new EmployeeService();
 		final List<EmployeesBean> employeesBeanList = employeeService.findAllEmployees();
 		for (final EmployeesBean employeesBean : employeesBeanList) {
 
@@ -59,7 +66,6 @@ public class EmployeeServiceInterfaceTest {
 		DataSourceProvider.begin();
 
 		// Create a new record and insert it into the database
-		final IEmployeeService employeeService = new EmployeeService();
 		final EmployeesBean employeesBean = new EmployeesBean();
 		employeesBean.setFirstName("John");
 		employeesBean.setLastName("Doe");
@@ -103,7 +109,6 @@ public class EmployeeServiceInterfaceTest {
 		// do not use a connection pool here, the loop over all employees could easily exhaust the maximum
 		// number of available connections of the Oracle test database.
 		DataSourceProvider.begin();
-		final IEmployeeService employeeService = new EmployeeService();
 		final List<EmpDetailsViewBean> empDetailsBeanList = employeeService.findAllEmployeeDetails();
 		for (final EmpDetailsViewBean empDetailsBean : empDetailsBeanList) {
 
@@ -123,7 +128,6 @@ public class EmployeeServiceInterfaceTest {
 		DataSourceProvider.begin();
 
 		// Create a new record and insert it into the database
-		final IEmployeeService employeeService = new EmployeeService();
 		final JobsBean jobsBean = new JobsBean();
 		jobsBean.setJobId("CT_MGR");
 		jobsBean.setJobTitle("Controller");
