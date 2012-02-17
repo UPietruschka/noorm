@@ -8,7 +8,7 @@ PACKAGE employee_service AS
 
   PROCEDURE find_all_employees(p_employee_set OUT employee_refcur);
 
-  PROCEDURE find_employee_by_id(p_id IN NUMBER, p_employee_set OUT employee_refcur);
+  PROCEDURE find_unique_employee_by_id(p_id IN NUMBER, p_employee_set OUT employee_refcur);
 
   PROCEDURE find_employees_by_lastname(p_last_name IN VARCHAR2, p_employee_set OUT employee_refcur);
 
@@ -30,7 +30,7 @@ PACKAGE BODY employee_service AS
     SELECT * FROM employees;
   END;
 
-  PROCEDURE find_employee_by_id(p_id IN NUMBER, p_employee_set OUT employee_refcur) AS
+  PROCEDURE find_unique_employee_by_id(p_id IN NUMBER, p_employee_set OUT employee_refcur) AS
   BEGIN
     OPEN p_employee_set FOR
     SELECT * FROM employees

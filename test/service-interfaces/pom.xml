@@ -43,8 +43,13 @@
                     <username>${jdbc.username}</username>
                     <password>${jdbc.password}</password>
                     <beanPackageName>org.noorm.test.hr.beans</beanPackageName>
+                    <beanTableFilterRegex>(C.*|D.*|E.*|G.*|H.*|J.*|L.*)</beanTableFilterRegex>
+                    <ignoreTableNamePrefixes>
+                        <prefix>JOB_</prefix>
+                    </ignoreTableNamePrefixes>
                     <serviceInterfacePackageName>org.noorm.test.hr.services</serviceInterfacePackageName>
                     <servicePackageName>org.noorm.test.hr.services.impl</servicePackageName>
+                    <singleRowFinderRegex>(find_unique.*)</singleRowFinderRegex>
                     <enumPackageName>org.noorm.test.hr.enums</enumPackageName>
                     <enumTableFilterRegex>REGIONS</enumTableFilterRegex>
                     <enumTable2DisplayColumnMapping>

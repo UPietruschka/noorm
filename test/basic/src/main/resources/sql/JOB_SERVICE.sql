@@ -18,12 +18,12 @@ PACKAGE BODY job_service AS
     UPDATE employees
     SET    salary = salary * (1 + p_percentage)
     WHERE  department_id = p_department_id;
-  END increase_salary;
+  END;
 
   PROCEDURE get_employee_count(p_employee_count OUT NUMBER) AS
   BEGIN
     SELECT COUNT(*) INTO p_employee_count FROM employees;
-  END get_employee_count;
+  END;
 
 END job_service;
 /

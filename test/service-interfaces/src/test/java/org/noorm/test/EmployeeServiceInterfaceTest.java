@@ -5,7 +5,7 @@ import org.junit.runner.RunWith;
 import org.noorm.jdbc.DataSourceProvider;
 import org.noorm.test.hr.beans.EmpDetailsViewBean;
 import org.noorm.test.hr.beans.EmployeesBean;
-import org.noorm.test.hr.beans.JobHistoryBean;
+import org.noorm.test.hr.beans.HistoryBean;
 import org.noorm.test.hr.beans.JobsBean;
 import org.noorm.test.hr.services.IEmployeeService;
 import org.springframework.test.context.ContextConfiguration;
@@ -39,16 +39,15 @@ public class EmployeeServiceInterfaceTest {
 		for (final EmployeesBean employeesBean : employeesBeanList) {
 
 			final Long employeeId = employeesBean.getEmployeeId();
-			final List<EmployeesBean> employeesBeanList1 = employeeService.findEmployeeById(employeeId);
-			assertEquals(employeesBeanList1.size(), 1);
-			assertEquals(employeesBeanList1.get(0), employeesBean);
+			final EmployeesBean employeesBean1 = employeeService.findUniqueEmployeeById(employeeId);
+			assertEquals(employeesBean1, employeesBean);
 
 			final String employeeLastName = employeesBean.getLastName();
 			final List<EmployeesBean> employeesBeanList2 = employeeService.findEmployeesByLastname(employeeLastName);
 			// Multiple employees with the same last name may exist. Just check, if the desired employee is contained
 			boolean employeeFound = false;
-			for (final EmployeesBean employeesBean1 : employeesBeanList2) {
-				if (employeesBean.equals(employeesBean1)) {
+			for (final EmployeesBean employeesBean2 : employeesBeanList2) {
+				if (employeesBean.equals(employeesBean2)) {
 					employeeFound = true;
 				}
 			}
@@ -92,9 +91,9 @@ public class EmployeeServiceInterfaceTest {
 		assertEquals(employeesBeanList3.get(0), newEmployeesBean);
 
 		// Delete the just inserted record. We have to delete the job history record inserted by the trigger, too
-		final List<JobHistoryBean> jobHistoryBeanList =
+		final List<HistoryBean> jobHistoryBeanList =
 				employeeService.findJobHistoryByEmpId(newEmployeesBean.getEmployeeId());
-		employeeService.deleteJobHistoryList(jobHistoryBeanList);
+		employeeService.deleteHistoryList(jobHistoryBeanList);
 		employeeService.deleteEmployees(newEmployeesBean);
 		final List<EmployeesBean> employeesBeanList4 = employeeService.findEmployeesByLastname("Public");
 		assertEquals(employeesBeanList4.size(), 0);
@@ -113,8 +112,8 @@ public class EmployeeServiceInterfaceTest {
 		for (final EmpDetailsViewBean empDetailsBean : empDetailsBeanList) {
 
 			final Long employeeId = empDetailsBean.getEmployeeId();
-			final List<EmployeesBean> employeesBeanList1 = employeeService.findEmployeeById(employeeId);
-			assertEquals(employeesBeanList1.size(), 1);
+			final EmployeesBean employeesBean1 = employeeService.findUniqueEmployeeById(employeeId);
+			assertNotNull(employeesBean1);
 		}
 		DataSourceProvider.commit();
 	}

@@ -33,7 +33,7 @@ PACKAGE BODY employee_search AS
     dynamic_sql.add_parameter('p_salary_from', p_salary_from);
     dynamic_sql.add_parameter('p_salary_to', p_salary_to);
     dynamic_sql.execute('EMPLOYEE_QUERY', p_employee_set);
-  END find_employees_by_filter;
+  END;
 
 END employee_search;
 /

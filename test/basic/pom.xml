@@ -135,6 +135,7 @@
                     <username>${jdbc.username}</username>
                     <password>${jdbc.password}</password>
                     <beanPackageName>org.noorm.test.hr.beans</beanPackageName>
+                    <packageFilterRegex>(.*SERVICE|.*SEARCH)</packageFilterRegex>
                     <servicePackageName>org.noorm.test.hr.services</servicePackageName>
                     <enumPackageName>org.noorm.test.hr.enums</enumPackageName>
                     <enumTableFilterRegex>REGIONS</enumTableFilterRegex>
