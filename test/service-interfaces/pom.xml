@@ -43,7 +43,7 @@
                     <username>${jdbc.username}</username>
                     <password>${jdbc.password}</password>
                     <beanPackageName>org.noorm.test.hr.beans</beanPackageName>
-                    <beanTableFilterRegex>(C.*|D.*|E.*|G.*|H.*|J.*|L.*)</beanTableFilterRegex>
+                    <beanTableFilterRegex>(C.*|D.*|E.*|G.*|H.*|J.*|L.*|V.*)</beanTableFilterRegex>
                     <ignoreTableNamePrefixes>
                         <prefix>JOB_</prefix>
                     </ignoreTableNamePrefixes>

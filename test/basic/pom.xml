@@ -101,6 +101,8 @@
                                 <srcFile>src/main/resources/sql/EMPLOYEE_SEARCH.sql</srcFile>
                                 <srcFile>src/main/resources/sql/EMPLOYEE_SERVICE.sql</srcFile>
                                 <srcFile>src/main/resources/sql/JOB_SERVICE.sql</srcFile>
+                                <srcFile>src/main/resources/sql/V_DEPARTMENTS.sql</srcFile>
+                                <srcFile>src/main/resources/sql/DEPARTMENT_SERVICE.sql</srcFile>
                             </srcFiles>
                         </configuration>
                     </execution>
@@ -150,7 +152,17 @@
                             <name>(EMPLOYEES|DEPARTMENTS|LOCATIONS)</name>
                             <value>$1_SEQ</value>
                         </property>
+                        <property>
+                            <name>(V_DEPARTMENTS)</name>
+                            <value>DEPARTMENTS_SEQ</value>
+                        </property>
                     </oracleTable2SequenceMapping>
+                    <viewName2PrimaryKeyMapping>
+                        <property>
+                            <name>V_DEPARTMENTS</name>
+                            <value>DEPARTMENT_ID</value>
+                        </property>
+                    </viewName2PrimaryKeyMapping>
                 </configuration>
             </plugin>
         </plugins>
