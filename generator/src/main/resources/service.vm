@@ -124,7 +124,7 @@ public class $class.JavaName implements IService {
 
 	void insert${bean}List(final List<$class.getReturnTypeBeanName($bean)> p${bean}List);
 
-	void update$bean(final $class.getReturnTypeBeanName($bean) p${bean});
+	$class.getReturnTypeBeanName($bean) update$bean(final $class.getReturnTypeBeanName($bean) p${bean});
 
 	void update${bean}List(final List<$class.getReturnTypeBeanName($bean)> p${bean}List);
 
@@ -141,8 +141,9 @@ public class $class.JavaName implements IService {
 		typelessStatementProcessor.insert(p${bean}List);
 	}
 
-	public void update$bean(final $class.getReturnTypeBeanName($bean) p${bean}) {
-		typelessStatementProcessor.update(p${bean});
+	public $class.getReturnTypeBeanName($bean) update$bean(final $class.getReturnTypeBeanName($bean) p${bean}) {
+		final JDBCStatementProcessor<$class.getReturnTypeBeanName($bean)> statementProcessor = JDBCStatementProcessor.getInstance();
+		return statementProcessor.update(p${bean});
 	}
 
 	public void update${bean}List(final List<$class.getReturnTypeBeanName($bean)> p${bean}List) {

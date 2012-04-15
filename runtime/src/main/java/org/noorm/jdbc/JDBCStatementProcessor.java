@@ -368,7 +368,7 @@ public class JDBCStatementProcessor<T> {
 	 * Convenience wrapper for the list insert for inserting a single Bean.
 	 *
 	 * @param pBean beans object for insertion
-	 * @return the generated primary key for this record.
+	 * @return the passed bean with new primary key and initialized optimistic lock version.
 	 */
 	public T insert(final IBean pBean) {
 
@@ -394,12 +394,13 @@ public class JDBCStatementProcessor<T> {
 	 * Convenience wrapper for the list update for modifying a single Bean.
 	 *
 	 * @param pBean beans object for modification
+	 * @return the passed bean with updated optimistic lock version.
 	 */
-	public void update(final IBean pBean) {
+	public T update(final IBean pBean) {
 
 		List<IBean> beanList = new ArrayList<IBean>();
 		beanList.add(pBean);
-		update(beanList);
+		return batch(beanList, BatchType.UPDATE, null);
 	}
 
 	/**
@@ -454,7 +455,7 @@ public class JDBCStatementProcessor<T> {
 			throw new DataAccessException(DataAccessException.Type.PARAMETERS_MUST_NOT_BE_NULL, e);
 		}
 
-		boolean returnGeneratedKey = false;
+		boolean returnModifiedBean = false;
 		boolean success = true;
 		OracleConnection con = null;
 		OraclePreparedStatement pstmt = null;
@@ -466,8 +467,8 @@ public class JDBCStatementProcessor<T> {
 			final String[] primaryKeyColumnNames = firstBean.getPrimaryKeyColumnNames();
 			// There is currently no full support for returning generated keys in batch operation
 			// Thus we support this for single-row inserts only.
-			if (pBeanList.size() == 1 && pBatchType.equals(BatchType.INSERT) &&	primaryKeyColumnNames.length > 0) {
-				returnGeneratedKey = true;
+			if (pBeanList.size() == 1 && pBatchType.equals(BatchType.INSERT) && primaryKeyColumnNames.length > 0) {
+				returnModifiedBean = true;
 			}
 			final String versionColumnName = firstBean.getVersionColumnName();
 			final String sequenceName = firstBean.getSequenceName();
@@ -503,17 +504,11 @@ public class JDBCStatementProcessor<T> {
 			if (log.isDebugEnabled()) {
 				debugDML(tableName, sequenceName, batch);
 			}
-			if (returnGeneratedKey) {
+			if (returnModifiedBean) {
 				if (primaryKeyColumnNames.length != 1) {
 					throw new DataAccessException(DataAccessException.Type.OPERATION_NOT_SUPPORTED_WITH_COMPOSITE_PK);
 				}
-				if (versionColumnName != null && !versionColumnName.isEmpty()) {
-					pstmt = (OraclePreparedStatement)
-							con.prepareStatement(batch, new String[]{primaryKeyColumnNames[0], versionColumnName});
-				} else {
-					pstmt = (OraclePreparedStatement)
-							con.prepareStatement(batch, new String[]{primaryKeyColumnNames[0]});
-				}
+				pstmt = (OraclePreparedStatement) con.prepareStatement(batch, new String[]{primaryKeyColumnNames[0]});
 			} else {
 				pstmt = (OraclePreparedStatement) con.prepareStatement(batch);
 			}
@@ -522,7 +517,7 @@ public class JDBCStatementProcessor<T> {
 			// regular database updates using "executeBatch". Note that "executeUpdate" does NOT issue a
 			// direct database update, but adds the given statement to the batch list (Neither "addBatch"
 			// nor "executeBatch" are needed for "Oracle style" batching).
-			if (!returnGeneratedKey) {
+			if (!returnModifiedBean) {
 				pstmt.setExecuteBatch(DataSourceProvider.getBatchUpdateSize());
 			}
 			int batchCount = 0;
@@ -550,6 +545,7 @@ public class JDBCStatementProcessor<T> {
 								if (value == null) {
 									value = VERSION_COLUMN_DEFAULT;
 								}
+								BeanMetaDataUtil.setVersionColumnValue(bean, (Long) value);
 							}
 							pstmt.setObjectAtName(fieldName, value);
 						}
@@ -559,6 +555,7 @@ public class JDBCStatementProcessor<T> {
 						if (fieldName.equals(versionColumnName)) {
 							if (value instanceof Long) {
 								final Long incVersion = ((Long) value) + 1L;
+								BeanMetaDataUtil.setVersionColumnValue(bean, incVersion);
 								pstmt.setObjectAtName(fieldName, incVersion);
 							} else {
 								if (value == null) {
@@ -595,7 +592,7 @@ public class JDBCStatementProcessor<T> {
 					throw new DataAccessException(DataAccessException.Type.OPTIMISTIC_LOCK_CONFLICT);
 				}
 			}
-			if (returnGeneratedKey) {
+			if (returnModifiedBean) {
 				ResultSet generatedKeyResultSet = pstmt.getGeneratedKeys();
 				while (generatedKeyResultSet.next()) {
 					// Generated keys are supported for a numeric primary key only. For other data-types we
@@ -607,19 +604,9 @@ public class JDBCStatementProcessor<T> {
 						log.debug("Generated key value " + generatedKey + " retrieved for table " + tableName);
 						BeanMetaDataUtil.setPrimaryKeyValue(firstBean, generatedKey);
 					}
-					// We must handle the value for the version column, too. When the caller does not set
-					// the version column, we set it it to VERSION_COLUMN_DEFAULT. To reflect this in the
-					// returned record, we must set it here, too. NOTE THAT ENABLING THE RETURN OF THE
-					// GENERATED KEYS FOR ALL RECORDS, SOME MORE CHANGES ARE REQUIRED!
-					if (versionColumnName != null && !versionColumnName.isEmpty()) {
-						Long versionColumnValue = generatedKeyResultSet.getLong(2);
-						log.debug("Version column value " + versionColumnValue + " retrieved for table " + tableName);
-						BeanMetaDataUtil.setVersionColumnValue(firstBean, versionColumnValue);
-					}
-					return (T) firstBean;
 				}
 			}
-			return null;
+			return (T) firstBean;
 		} catch (Exception e) {
 			log.error(DataAccessException.Type.COULD_NOT_ACCESS_DATA.getDescription(), e);
 			success = false;
