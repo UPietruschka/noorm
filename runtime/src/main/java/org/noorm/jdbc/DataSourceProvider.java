@@ -21,20 +21,11 @@ import javax.sql.DataSource;
 
 /**
  * The DataSourceProvider organizes  data source access and transaction control for NoORM.
- * Currently, DataSourceProvider only supports UCP (Oracle Universal Connection Pool).
- * Keeping into consideration that the Oracle connection pool implementation delivered with
- * the Oracle JDBC driver is deprecated and that a Java Enterprise application will use a
- * connection pool almost certain, this is not considered a serious restriction.
- * Other connection pool implementations will be supported in the future.
- * <p/>
- * At its simplest, a minimum UCP configuration can be provided using the noorm.properties
- * file. However, for a production ready configuration, usage of method setDataSource
- * should be used to utilize all capabilities of UCP.
- * <p/>
- * Access to the JDBC connection objects is not allowed outside of NoORM. The only reason
+ * Access to the JDBC connection objects is discouraged outside of NoORM. The only reason
  * to use DataSourceProvider directly in an application is for fine grained transaction
  * control. DataSourceProvider provides the required methods begin(), commit() and rollback()
- * to control a transaction in an application.
+ * to control a transaction in an application (direct access to the underlying JDBC
+ * connection is possible for special purposes like integration with Oracle AQ).
  * When these methods for explicit transaction control are not used, DataSourceProvider will
  * manage transactions automatically by issuing an auto-commit for every database access.
  * Issuing a commit even for read-only database access imposes a little performance overhead.
