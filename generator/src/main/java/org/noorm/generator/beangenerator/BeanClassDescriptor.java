@@ -94,4 +94,14 @@ public class BeanClassDescriptor {
 	public void setPackageName(final String pPackageName) {
 		packageName = pPackageName;
 	}
+
+	public boolean isUpdatable() {
+		boolean isUpdatable = false;
+		for (final BeanAttributeDescriptor beanAttributeDescriptor : attributes) {
+			if (beanAttributeDescriptor.isUpdatable()) {
+				isUpdatable = true;
+			}
+		}
+		return isUpdatable;
+	}
 }

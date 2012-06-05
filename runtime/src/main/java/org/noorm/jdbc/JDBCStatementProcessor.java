@@ -40,7 +40,7 @@ public class JDBCStatementProcessor<T> {
 	private final StatementBuilder statementBuilder = new StatementBuilder();
 
 	public static final String NOORM_ID_LIST_ORACLE_TYPE_NAME = "NUM_ARRAY";
-	private static final Long VERSION_COLUMN_DEFAULT = 1L;
+	private static final Long VERSION_COLUMN_LONG_DEFAULT = 1L;
 	/*
 	 * Using named parameters for callable statements does not work consistently over the various supported
 	 * combinations of JDBC driver versions and database version. In addition, a bug in Oracle 11.2.0.1.0
@@ -543,7 +543,7 @@ public class JDBCStatementProcessor<T> {
 								// we set it here, otherwise NULL in the version column will result
 								// in an OPTIMISTIC_LOCK_CONFLICT with the next update.
 								if (value == null) {
-									value = VERSION_COLUMN_DEFAULT;
+									value = VERSION_COLUMN_LONG_DEFAULT;
 								}
 								BeanMetaDataUtil.setVersionColumnValue(bean, (Long) value);
 							}

@@ -143,6 +143,9 @@ public class BeanGenerator {
 
 		log.info("Retrieving table metadata from Oracle database.");
 		final Map<String, List<TableMetadataBean>> tableColumnMap = metadataService.findTableMetadata();
+		log.info("Retrieving record metadata from Oracle database.");
+		final Map<String, List<TableMetadataBean>> recordColumnMap = metadataService.findRecordMetadata();
+		tableColumnMap.putAll(recordColumnMap);
 
 		log.info("Retrieving primary key metadata from Oracle database.");
 		final List<PrimaryKeyColumnBean> pkColumnNameList = metadataService.findPkColumns();
@@ -174,7 +177,11 @@ public class BeanGenerator {
 			final List<TableMetadataBean> tableMetadataBeanList1 = tableColumnMap.get(tableName0);
 			final BeanClassDescriptor beanClassDescriptor = new BeanClassDescriptor();
 			beanClassDescriptor.setName(javaBeanName);
-			validatorClassDescriptor.getClassNames().add(javaBeanName);
+			// Do not add PL/SQL record beans to the validator (record beans are declared in the PL/SQL code
+			// and get automatically validated by the service validator)
+			if (!recordColumnMap.containsKey(tableName0)) {
+				validatorClassDescriptor.getClassNames().add(javaBeanName);
+			}
 			beanClassDescriptor.setTableName(tableName0);
 			String[] primaryKeyColumnNames = getPrimaryKeyColumnNames(tableName0, pkColumnNameList);
 			beanClassDescriptor.setPrimaryKeyColumnNames(primaryKeyColumnNames);

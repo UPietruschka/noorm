@@ -11,6 +11,8 @@ public class ParameterBean {
 
 	@JDBCColumn(name="NAME", updatable=false)
 	private String name;
+	@JDBCColumn(name="DATA_TYPE", updatable=false)
+	private String dataType;
 	@JDBCColumn(name="TYPE_NAME", updatable=false)
 	private String typeName;
 	@JDBCColumn(name="DIRECTION", updatable=false)
@@ -22,6 +24,14 @@ public class ParameterBean {
 
 	public void setName(final String pName) {
 		name = pName;
+	}
+
+	public String getDataType() {
+		return dataType;
+	}
+
+	public void setDataType(final String pDataType) {
+		dataType = pDataType;
 	}
 
 	public String getTypeName() {

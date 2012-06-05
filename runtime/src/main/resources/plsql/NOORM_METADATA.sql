@@ -28,6 +28,7 @@ PACKAGE noorm_metadata AS
   TYPE parameter_record IS RECORD
     (
     name VARCHAR2(30),
+    data_type VARCHAR2(30),
     type_name VARCHAR2(30),
     direction VARCHAR2(18)
     );
@@ -63,6 +64,8 @@ PACKAGE noorm_metadata AS
                                   p_procedure_name IN VARCHAR2,
                                   p_parameter_name IN VARCHAR2,
                                   p_rowtype_name OUT VARCHAR2);
+
+  PROCEDURE find_record_metadata(p_record_metadata OUT table_metadata_refcur);
 
 END noorm_metadata;
 /

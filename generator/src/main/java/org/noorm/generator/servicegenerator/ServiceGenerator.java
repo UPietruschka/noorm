@@ -224,8 +224,10 @@ public class ServiceGenerator {
 						parameterDescriptor.setOracleName(parameter.getName().toLowerCase());
 						final String javaParameterName = Utils.convertDBName2JavaName(parameter.getName(), false);
 						parameterDescriptor.setJavaName(javaParameterName);
-						final String oracleType = parameter.getTypeName();
-						if (oracleType.equals(JDBCStatementProcessor.NOORM_ID_LIST_ORACLE_TYPE_NAME)) {
+						final String oracleType = parameter.getDataType();
+						final String oracleTypeName = parameter.getTypeName();
+						if (oracleTypeName != null &&
+								oracleTypeName.equals(JDBCStatementProcessor.NOORM_ID_LIST_ORACLE_TYPE_NAME)) {
 							parameterDescriptor.setJavaType(NOORM_ID_LIST_JAVA_TYPE_NAME);
 						} else {
 							final String javaType = Utils.convertOracleType2JavaType(oracleType, null, null);
@@ -244,7 +246,7 @@ public class ServiceGenerator {
 					} else { // OUT parameter
 						procedureDescriptor.setHasOutParam(true);
 						procedureDescriptor.setOutParamOracleName(parameter.getName().toLowerCase());
-						if (parameter.getTypeName().equals(ORACLE_REF_CURSOR_TYPE_NAME)) {
+						if (parameter.getDataType().equals(ORACLE_REF_CURSOR_TYPE_NAME)) {
 							final String rowTypeName = metadataService.getParameterRowtype
 									(packageName.getName(), procedureName.getName(), parameter.getName());
 							if (rowTypeName.equals(NOORM_METADATA_ID_RECORD)) {
@@ -271,7 +273,7 @@ public class ServiceGenerator {
 							}
 						} else {
 							final String javaType =
-									Utils.convertOracleType2JavaType(parameter.getTypeName(), null, null);
+									Utils.convertOracleType2JavaType(parameter.getDataType(), null, null);
 							procedureDescriptor.setOutParamJavaType(javaType);
 							procedureDescriptor.setOutParamScalar(true);
 						}

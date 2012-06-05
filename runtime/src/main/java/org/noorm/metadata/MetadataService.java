@@ -133,4 +133,31 @@ public class MetadataService {
 		return statementProcessor.callPLSQL
 				("noorm_metadata.get_parameter_rowtype", "p_rowtype_name", filterParameters, String.class);
 	}
+
+	public Map<String, List<TableMetadataBean>> findRecordMetadata() {
+
+		final List<TableMetadataBean> recordMetadataBeanList = findRecordMetadata0();
+		final Map<String, List<TableMetadataBean>> recordColumnMap = new HashMap<String, List<TableMetadataBean>>();
+		String recordName = "";
+		List<TableMetadataBean> recordMetadataBeanList0 = null;
+		for (TableMetadataBean recordMetadataBean : recordMetadataBeanList) {
+			// Filter out duplicates
+			if (!recordName.equals(recordMetadataBean.getTableName())) {
+				recordName = recordMetadataBean.getTableName();
+				log.debug("Collecting record metadata for record ".concat(recordName));
+				recordMetadataBeanList0 = new ArrayList<TableMetadataBean>();
+				recordColumnMap.put(recordName, recordMetadataBeanList0);
+			}
+			recordMetadataBeanList0.add(recordMetadataBean);
+		}
+		return recordColumnMap;
+	}
+
+	private List<TableMetadataBean> findRecordMetadata0() {
+
+		final JDBCStatementProcessor<TableMetadataBean> statementProcessor = JDBCStatementProcessor.getInstance();
+		final Map<String, Object> filterParameters = new HashMap<String, Object>();
+		return statementProcessor.getBeanListFromPLSQL
+				("noorm_metadata.find_record_metadata", "p_record_metadata", filterParameters, TableMetadataBean.class);
+	}
 }

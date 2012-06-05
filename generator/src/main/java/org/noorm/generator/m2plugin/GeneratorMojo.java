@@ -253,6 +253,11 @@ public class GeneratorMojo extends AbstractMojo {
 		Velocity.setProperty("class.resource.loader.class", "org.apache.velocity.runtime.resource.loader.ClasspathResourceLoader");
 		Velocity.init();
 
+		// To avoid acquiring a new database connection for every single access to the MetadataService, the generators
+		// run in one single transaction. Exception handling with clean rollback handling has been omitted, since all
+		// database operations are read-only.
+		DataSourceProvider.begin();
+
 		// Generate Beans
 		final BeanGenerator beanGenerator = BeanGenerator.getInstance();
 		beanGenerator.setDestinationDirectory(destinationDirectory);
@@ -289,6 +294,8 @@ public class GeneratorMojo extends AbstractMojo {
 			serviceGenerator.setServiceInterfacePackageName(serviceInterfacePackageName);
 			serviceGenerator.execute();
 		}
+
+		DataSourceProvider.commit();
 	}
 
 	private void callServiceGeneration() {
