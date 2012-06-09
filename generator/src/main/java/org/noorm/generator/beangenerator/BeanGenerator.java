@@ -3,6 +3,7 @@ package org.noorm.generator.beangenerator;
 import org.noorm.generator.GeneratorException;
 import org.noorm.generator.GeneratorUtil;
 import org.noorm.generator.ValidatorClassDescriptor;
+import org.noorm.generator.m2plugin.IParameters;
 import org.noorm.metadata.BeanMetaDataUtil;
 import org.noorm.metadata.MetadataService;
 import org.noorm.metadata.beans.NameBean;
@@ -32,112 +33,32 @@ public class BeanGenerator {
 	private static final String BEAN_VM_TEMPLATE_FILE = "/bean.vm";
 	private static final String BEAN_VALIDATOR_VM_TEMPLATE_FILE = "/bean_validator.vm";
 	private static final String BEAN_VALIDATOR_CLASS_NAME = "GenericBeanValidator";
+	private static final String BEAN_DML_VM_TEMPLATE_FILE = "/bean_dml.vm";
+	private static final String BEAN_DML_CLASS_NAME = "BeanDML";
 	private static final String IGNORE_BEAN_FILTER_REGEX = "(DYNSQL_QUERY_TEMPLATE)";
-	private static BeanGenerator beanGenerator = new BeanGenerator();
 
-	/**
-	 * Destination directory for generated source files.
-	 */
-	private File destinationDirectory;
+	private IParameters parameters;
 
-	/**
-	 * Package name for generated Bean source files.
-	 */
-	private String beanPackageName;
-
-	/**
-	 * List of table name prefixes to be ignored for java class name construction.
-	 * Some data modelers use a common table name prefix to identify tables of a
-	 * given schema or group. When those prefixes are not desired in the constructed
-	 * java class name, they should be listed here.
-	 */
-	private List<String> ignoreTableNamePrefixes;
-
-	/**
-	 * Regular expression to filter tables and views for Bean generation.
-	 */
-	private String beanTableFilterRegex;
-
-	/**
-	 * Primary key generation for new records being inserted into the database is based on
-	 * a numeric ID column and an Oracle sequence. Oracle sequences are not tied to a table
-	 * by definition, so associating a table with a sequence is done using this property
-	 * list. Note that the association TABLE_NAME/SEQUENCE_NAME can either be done on a per
-	 * table basis, or using one or more regular expressions to specify a mapping rule like
-	 * "TBL_(.*)" / "SEQ_$1".
-	 */
-	private Properties oracleTable2SequenceMapping;
-
-	/**
-	 * Concurrency control is based on optimistic locking. To identify the version column,
-	 * a mapping from the table-name to the version column should be specified. Dependent on
-	 * how specific the column-names are with respect to the table-names, one or more
-	 * mapping are required. In case of a unique name of the version column for all tables,
-	 * one simple rule like ".*" -> "VERSION" is sufficient.
-	 * Note that using the Oracle pseudo-column "ORA_ROWSCN" for optimistic locking is also
-	 * supported. To enable optimistic locking by using "ORA_ROWSCN", specify the mapping
-	 * rule ".*" -> "ORA_ROWSCN".
-	 */
-	private Properties optimisticLockColumnMapping;
-
-	/**
-	 * The Oracle data dictionary does not provide unambiguous information for the primary key
-	 * of a view (for tables, this information is available). When the intended use of a view
-	 * includes DML operations (which requires the view to contain one and only one key-preserved
-	 * table) or data access with the PageableBeanList, NoORM needs a key to uniquely distinguish
-	 * the records of this view. Use this parameter to specify the column name of the key used
-	 * for a given view. Typically, this key is the primary key of the single key-preserved table
-	 * contained in the view definition.
-	 */
-	private Properties viewName2PrimaryKeyMapping;
-
-	protected BeanGenerator() {
-	}
-
-	public void setDestinationDirectory(final File pDestinationDirectory) {
-		destinationDirectory = pDestinationDirectory;
-	}
-
-	public void setBeanPackageName(final String pBeanPackageName) {
-		beanPackageName = pBeanPackageName;
-	}
-
-	public void setIgnoreTableNamePrefixes(final List<String> pIgnoreTableNamePrefixes) {
-		ignoreTableNamePrefixes = pIgnoreTableNamePrefixes;
-	}
-
-	public void setBeanTableFilterRegex(String pBeanTableFilterRegex) {
-		beanTableFilterRegex = pBeanTableFilterRegex;
-	}
-
-	public void setOracleTable2SequenceMapping(final Properties pOracleTable2SequenceMapping) {
-		oracleTable2SequenceMapping = pOracleTable2SequenceMapping;
-	}
-
-	public void setOptimisticLockColumnMapping(final Properties pOptimisticLockColumnMapping) {
-		optimisticLockColumnMapping = pOptimisticLockColumnMapping;
-	}
-
-	public void setViewName2PrimaryKeyMapping(final Properties pViewName2PrimaryKeyMapping) {
-		viewName2PrimaryKeyMapping = pViewName2PrimaryKeyMapping;
-	}
-
-	public static BeanGenerator getInstance() {
-
-		return beanGenerator;
+	public BeanGenerator(final IParameters pParameters) {
+		parameters = pParameters;
 	}
 
 	public void execute() throws GeneratorException {
 
-		if (beanPackageName == null || beanPackageName.isEmpty()) {
+		if (parameters.getBeanPackageName() == null || parameters.getBeanPackageName().isEmpty()) {
 			throw new IllegalArgumentException("Parameter [beanPackageName] is null.");
 		}
-		if (destinationDirectory == null || !destinationDirectory.exists()) {
+		if (parameters.getDestinationDirectory() == null || !parameters.getDestinationDirectory().exists()) {
 			throw new IllegalArgumentException("Parameter [destinationDirectory] is null or mis-configured.");
 		}
 
 		ValidatorClassDescriptor validatorClassDescriptor = new ValidatorClassDescriptor();
-		validatorClassDescriptor.setPackageName(beanPackageName);
+		validatorClassDescriptor.setPackageName(parameters.getBeanPackageName());
+
+		BeanDMLClassDescriptor beanDMLClassDescriptor = new BeanDMLClassDescriptor();
+		beanDMLClassDescriptor.setBeanPackageName(parameters.getBeanPackageName());
+		beanDMLClassDescriptor.setInterfacePackageName(parameters.getServiceInterfacePackageName());
+		beanDMLClassDescriptor.setPackageName(parameters.getServicePackageName());
 
 		final MetadataService metadataService = MetadataService.getInstance();
 
@@ -154,18 +75,23 @@ public class BeanGenerator {
 		final List<NameBean> sequenceDBNameList = metadataService.findSequenceNames();
 
 		log.info("Generating NoORM Bean classes.");
-		final File beanPackageDir = new File(destinationDirectory, beanPackageName.replace(".", File.separator));
-		if (!beanPackageDir.exists()) {
-			if (!beanPackageDir.mkdirs()) {
-				throw new GeneratorException("Could not create directory ".concat(beanPackageDir.toString()));
-			}
+		final File beanPackageDir = GeneratorUtil.createPackageDir
+				(parameters.getDestinationDirectory(), parameters.getBeanPackageName());
+		final File servicePackageDir = GeneratorUtil.createPackageDir
+				(parameters.getDestinationDirectory(), parameters.getServicePackageName());
+		File serviceInterfacePackageDir = null;
+		if (parameters.getServiceInterfacePackageName() != null &&
+				!parameters.getServiceInterfacePackageName().isEmpty()) {
+			serviceInterfacePackageDir = GeneratorUtil.createPackageDir
+					(parameters.getDestinationDirectory(), parameters.getServiceInterfacePackageName());
 		}
 
 		for (final String tableName0 : tableColumnMap.keySet()) {
-			if (beanTableFilterRegex != null && !tableName0.matches(beanTableFilterRegex)) {
+			if (parameters.getBeanTableFilterRegex() != null &&
+					!tableName0.matches(parameters.getBeanTableFilterRegex())) {
 				log.info("Exclude table ".concat(tableName0)
 						.concat(", table name does not match regex '")
-						.concat(beanTableFilterRegex)
+						.concat(parameters.getBeanTableFilterRegex())
 						.concat("'"));
 				continue;
 			}
@@ -173,10 +99,20 @@ public class BeanGenerator {
 				// Ignore the NoORM tables
 				continue;
 			}
-			final String javaBeanName = Utils.convertTableName2BeanName(tableName0, ignoreTableNamePrefixes);
+			final String javaBeanName =
+					Utils.convertTableName2BeanName(tableName0, parameters.getIgnoreTableNamePrefixes());
+			final String shortName =
+					Utils.convertTableName2ShortName(tableName0, parameters.getIgnoreTableNamePrefixes());
 			final List<TableMetadataBean> tableMetadataBeanList1 = tableColumnMap.get(tableName0);
 			final BeanClassDescriptor beanClassDescriptor = new BeanClassDescriptor();
 			beanClassDescriptor.setName(javaBeanName);
+			beanClassDescriptor.setShortName(shortName);
+			if (parameters.getExtendedBeans() != null) {
+				final String extJavaBeanName = Utils.getPropertyString(javaBeanName, parameters.getExtendedBeans());
+				if (!extJavaBeanName.isEmpty()) {
+					beanClassDescriptor.setExtendedName(extJavaBeanName);
+				}
+			}
 			// Do not add PL/SQL record beans to the validator (record beans are declared in the PL/SQL code
 			// and get automatically validated by the service validator)
 			if (!recordColumnMap.containsKey(tableName0)) {
@@ -189,7 +125,7 @@ public class BeanGenerator {
 			beanClassDescriptor.setSequenceName(sequenceName);
 			final String versionColumnName = getVersionColumnName(tableName0, tableMetadataBeanList1);
 			beanClassDescriptor.setVersionColumnName(versionColumnName);
-			beanClassDescriptor.setPackageName(beanPackageName);
+			beanClassDescriptor.setPackageName(parameters.getBeanPackageName());
 			// Use a unique seed for serialVersionUID generation to guarantee the generation of a reproducible
 			// serialVersionUID with every new source code generation cycle.
 			final Random random = new Random(javaBeanName.hashCode());
@@ -216,15 +152,24 @@ public class BeanGenerator {
 			}
 			GeneratorUtil.generateFile(beanPackageDir, BEAN_VM_TEMPLATE_FILE,
 					beanClassDescriptor.getName(), beanClassDescriptor);
+			beanDMLClassDescriptor.addBean(beanClassDescriptor);
 		}
 		GeneratorUtil.generateFile(beanPackageDir, BEAN_VALIDATOR_VM_TEMPLATE_FILE,
 				BEAN_VALIDATOR_CLASS_NAME, validatorClassDescriptor);
+		GeneratorUtil.generateFile(servicePackageDir, BEAN_DML_VM_TEMPLATE_FILE,
+				BEAN_DML_CLASS_NAME, beanDMLClassDescriptor);
+		if (parameters.getServiceInterfacePackageName() != null &&
+				!parameters.getServiceInterfacePackageName().isEmpty()) {
+			beanDMLClassDescriptor.setInterface(true);
+			GeneratorUtil.generateFile(serviceInterfacePackageDir, BEAN_DML_VM_TEMPLATE_FILE,
+					beanDMLClassDescriptor.getJavaInterfaceName(), beanDMLClassDescriptor);
+		}
 	}
 
 	private String getSequenceName(final String pTableName,
 								   final List<NameBean> pSequenceDBNameList) {
 
-		String sequenceName = Utils.getPropertyString(pTableName, oracleTable2SequenceMapping);
+		String sequenceName = Utils.getPropertyString(pTableName, parameters.getOracleTable2SequenceMapping());
 		if (sequenceName.isEmpty()) {
 			log.info("No matching sequence-name has been found for table-name ".concat(pTableName));
 			return sequenceName;
@@ -252,8 +197,9 @@ public class BeanGenerator {
 			}
 		}
 		if (pkColumnNames.isEmpty()) {
-			if (viewName2PrimaryKeyMapping != null) {
-				final String viewPKName = Utils.getPropertyString(pTableName, viewName2PrimaryKeyMapping);
+			if (parameters.getViewName2PrimaryKeyMapping() != null) {
+				final String viewPKName =
+						Utils.getPropertyString(pTableName, parameters.getViewName2PrimaryKeyMapping());
 				if (!viewPKName.isEmpty()) {
 					pkColumnNames.add(viewPKName);
 				}
@@ -271,8 +217,8 @@ public class BeanGenerator {
 										final List<TableMetadataBean> pTableMetadataBeanList) {
 
 		String versionColumnName = "";
-		if (optimisticLockColumnMapping != null) {
-			versionColumnName = Utils.getPropertyString(pTableName, optimisticLockColumnMapping);
+		if (parameters.getOptimisticLockColumnMapping() != null) {
+			versionColumnName = Utils.getPropertyString(pTableName, parameters.getOptimisticLockColumnMapping());
 		}
 		if (versionColumnName.isEmpty()) {
 			log.info("No matching version-column-name has been found for table-name ".concat(pTableName));

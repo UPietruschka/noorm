@@ -6,6 +6,13 @@ PACKAGE employee_service AS
   TYPE job_refcur IS REF CURSOR RETURN jobs%ROWTYPE;
   TYPE job_history_refcur IS REF CURSOR RETURN job_history%ROWTYPE;
 
+  TYPE salary_group_record IS RECORD
+    (
+    salary_group NUMBER,
+    cnt NUMBER
+    );
+  TYPE salary_group_refcur IS REF CURSOR RETURN salary_group_record;
+
   PROCEDURE find_all_employees(p_employee_set OUT employee_refcur);
 
   PROCEDURE find_unique_employee_by_id(p_id IN NUMBER, p_employee_set OUT employee_refcur);
@@ -17,6 +24,8 @@ PACKAGE employee_service AS
   PROCEDURE find_job_by_id(p_id IN VARCHAR2, p_job_set OUT job_refcur);
 
   PROCEDURE find_job_history_by_emp_id(p_id IN NUMBER, p_job_history_set OUT job_history_refcur);
+
+  PROCEDURE find_salary_groups(p_salary_group_set OUT salary_group_refcur);
 
 END employee_service;
 /
@@ -62,6 +71,15 @@ PACKAGE BODY employee_service AS
     OPEN p_job_set FOR
     SELECT * FROM jobs
     WHERE  job_id = p_id;
+  END;
+
+  PROCEDURE find_salary_groups(p_salary_group_set OUT salary_group_refcur) AS
+  BEGIN
+    OPEN p_salary_group_set FOR
+    SELECT ROUND(salary,-3) salary_group, COUNT(*) cnt
+    FROM   employees
+    GROUP  BY ROUND(salary,-3)
+    ORDER  BY salary_group;
   END;
 
 END employee_service;

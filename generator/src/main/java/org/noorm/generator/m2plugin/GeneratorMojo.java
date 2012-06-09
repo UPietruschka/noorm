@@ -25,7 +25,7 @@ import java.util.*;
  * @goal generate-noorm
  * @phase generate-sources
  */
-public class GeneratorMojo extends AbstractMojo {
+public class GeneratorMojo extends AbstractMojo implements IParameters {
 
 	private static final Logger log = LoggerFactory.getLogger(GeneratorMojo.class);
 
@@ -259,39 +259,18 @@ public class GeneratorMojo extends AbstractMojo {
 		DataSourceProvider.begin();
 
 		// Generate Beans
-		final BeanGenerator beanGenerator = BeanGenerator.getInstance();
-		beanGenerator.setDestinationDirectory(destinationDirectory);
-		beanGenerator.setBeanPackageName(beanPackageName);
-		beanGenerator.setIgnoreTableNamePrefixes(ignoreTableNamePrefixes);
-		beanGenerator.setBeanTableFilterRegex(beanTableFilterRegex);
-		beanGenerator.setOracleTable2SequenceMapping(oracleTable2SequenceMapping);
-		beanGenerator.setOptimisticLockColumnMapping(optimisticLockColumnMapping);
-		beanGenerator.setViewName2PrimaryKeyMapping(viewName2PrimaryKeyMapping);
+		final BeanGenerator beanGenerator = new BeanGenerator(this);
 		beanGenerator.execute();
 
 		// Generate Enums
 		if (enumPackageName != null && !enumPackageName.isEmpty()) {
-			final EnumGenerator enumGenerator = EnumGenerator.getInstance();
-			enumGenerator.setDestinationDirectory(destinationDirectory);
-			enumGenerator.setEnumPackageName(enumPackageName);
-			enumGenerator.setIgnoreTableNamePrefixes(ignoreTableNamePrefixes);
-			enumGenerator.setEnumTableFilterRegex(enumTableFilterRegex);
-			enumGenerator.setEnumTable2DisplayColumnMapping(enumTable2DisplayColumnMapping);
+			final EnumGenerator enumGenerator = new EnumGenerator(this);
 			enumGenerator.execute();
 		}
 
 		// Generate Services
 		if (servicePackageName !=null && !servicePackageName.isEmpty()) {
-			final ServiceGenerator serviceGenerator = ServiceGenerator.getInstance();
-			serviceGenerator.setDestinationDirectory(destinationDirectory);
-			serviceGenerator.setServicePackageName(servicePackageName);
-			serviceGenerator.setBeanPackageName(beanPackageName);
-			serviceGenerator.setPackageFilterRegex(packageFilterRegex);
-			serviceGenerator.setIgnoreTableNamePrefixes(ignoreTableNamePrefixes);
-			serviceGenerator.setSingleRowFinderRegex(singleRowFinderRegex);
-			serviceGenerator.setPageableProcedureNameRegex(pageableProcedureNameRegex);
-			serviceGenerator.setExtendedBeans(extendedBeans);
-			serviceGenerator.setServiceInterfacePackageName(serviceInterfacePackageName);
+			final ServiceGenerator serviceGenerator = new ServiceGenerator(this);
 			serviceGenerator.execute();
 		}
 
@@ -307,5 +286,100 @@ public class GeneratorMojo extends AbstractMojo {
 				throw new GeneratorException("Could not create directory ".concat(servicePackageDir.toString()));
 			}
 		}
+	}
+
+	@Override
+	public File getDestinationDirectory() {
+		return destinationDirectory;
+	}
+
+	@Override
+	public String getBeanPackageName() {
+		return beanPackageName;
+	}
+
+	@Override
+	public String getEnumPackageName() {
+		return enumPackageName;
+	}
+
+	@Override
+	public String getServicePackageName() {
+		return servicePackageName;
+	}
+
+	@Override
+	public String getURL() {
+		return url;
+	}
+
+	@Override
+	public String getUsername() {
+		return username;
+	}
+
+	@Override
+	public String getPassword() {
+		return password;
+	}
+
+	@Override
+	public List<String> getIgnoreTableNamePrefixes() {
+		return ignoreTableNamePrefixes;
+	}
+
+	@Override
+	public String getBeanTableFilterRegex() {
+		return beanTableFilterRegex;
+	}
+
+	@Override
+	public String getEnumTableFilterRegex() {
+		return enumTableFilterRegex;
+	}
+
+	@Override
+	public Properties getEnumTable2DisplayColumnMapping() {
+		return enumTable2DisplayColumnMapping;
+	}
+
+	@Override
+	public Properties getOracleTable2SequenceMapping() {
+		return oracleTable2SequenceMapping;
+	}
+
+	@Override
+	public Properties getOptimisticLockColumnMapping() {
+		return optimisticLockColumnMapping;
+	}
+
+	@Override
+	public Properties getViewName2PrimaryKeyMapping() {
+		return viewName2PrimaryKeyMapping;
+	}
+
+	@Override
+	public String getPackageFilterRegex() {
+		return packageFilterRegex;
+	}
+
+	@Override
+	public String getSingleRowFinderRegex() {
+		return singleRowFinderRegex;
+	}
+
+	@Override
+	public String getPageableProcedureNameRegex() {
+		return pageableProcedureNameRegex;
+	}
+
+	@Override
+	public String getServiceInterfacePackageName() {
+		return serviceInterfacePackageName;
+	}
+
+	@Override
+	public Properties getExtendedBeans() {
+		return extendedBeans;
 	}
 }

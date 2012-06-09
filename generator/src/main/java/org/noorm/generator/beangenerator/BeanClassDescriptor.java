@@ -16,6 +16,8 @@ public class BeanClassDescriptor {
 
 	private long serialVersionUID;
 	private String name;
+	private String shortName;
+	private String extendedName;
 	private String tableName;
 	private String[] primaryKeyColumnNames;
 	private String sequenceName;
@@ -37,6 +39,22 @@ public class BeanClassDescriptor {
 
 	public String getName() {
 		return name;
+	}
+
+	public void setShortName(final String pShortName) {
+		shortName = pShortName;
+	}
+
+	public String getShortName() {
+		return shortName;
+	}
+
+	public String getExtendedName() {
+		return extendedName;
+	}
+
+	public void setExtendedName(final String pExtendedName) {
+		extendedName = pExtendedName;
 	}
 
 	public String getTableName() {
@@ -93,6 +111,13 @@ public class BeanClassDescriptor {
 
 	public void setPackageName(final String pPackageName) {
 		packageName = pPackageName;
+	}
+
+	public String getDMLName() {
+		if (extendedName != null && !extendedName.isEmpty()) {
+			return extendedName;
+		}
+		return name;
 	}
 
 	public boolean isUpdatable() {

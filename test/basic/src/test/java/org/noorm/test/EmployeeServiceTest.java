@@ -6,6 +6,8 @@ import org.noorm.test.hr.beans.EmpDetailsViewBean;
 import org.noorm.test.hr.beans.EmployeesBean;
 import org.noorm.test.hr.beans.JobHistoryBean;
 import org.noorm.test.hr.beans.JobsBean;
+import org.noorm.test.hr.beans.SalaryGroupRecordBean;
+import org.noorm.test.hr.services.BeanDML;
 import org.noorm.test.hr.services.EmployeeService;
 
 import java.util.List;
@@ -18,6 +20,8 @@ import static org.junit.Assert.*;
  *         Time: 20:21
  */
 public class EmployeeServiceTest {
+
+	private BeanDML beanDML = BeanDML.getInstance();
 
 	@Test
 	public void testFindEmployees() {
@@ -70,14 +74,14 @@ public class EmployeeServiceTest {
 		employeesBean.setCommissionPct(0.28D);
 		employeesBean.setManagerId(108L);
 		employeesBean.setDepartmentId(60L);
-		final EmployeesBean newEmployeesBean = employeeService.insertEmployees(employeesBean);
+		final EmployeesBean newEmployeesBean = beanDML.insertEmployees(employeesBean);
 		final List<EmployeesBean> employeesBeanList1 = employeeService.findEmployeesByLastname("Doe");
 		assertEquals(employeesBeanList1.size(), 1);
 		assertEquals(employeesBeanList1.get(0), newEmployeesBean);
 
 		// Modify the just inserted record
 		newEmployeesBean.setLastName("Public");
-		employeeService.updateEmployees(newEmployeesBean);
+		beanDML.updateEmployees(newEmployeesBean);
 		final List<EmployeesBean> employeesBeanList2 = employeeService.findEmployeesByLastname("Doe");
 		assertEquals(employeesBeanList2.size(), 0);
 		final List<EmployeesBean> employeesBeanList3 = employeeService.findEmployeesByLastname("Public");
@@ -87,8 +91,8 @@ public class EmployeeServiceTest {
 		// Delete the just inserted record. We have to delete the job history record inserted by the trigger, too
 		final List<JobHistoryBean> jobHistoryBeanList =
 				employeeService.findJobHistoryByEmpId(newEmployeesBean.getEmployeeId());
-		employeeService.deleteJobHistoryList(jobHistoryBeanList);
-		employeeService.deleteEmployees(newEmployeesBean);
+		beanDML.deleteJobHistoryList(jobHistoryBeanList);
+		beanDML.deleteEmployees(newEmployeesBean);
 		final List<EmployeesBean> employeesBeanList4 = employeeService.findEmployeesByLastname("Public");
 		assertEquals(employeesBeanList4.size(), 0);
 
@@ -113,6 +117,19 @@ public class EmployeeServiceTest {
 		DataSourceProvider.commit();
 	}
 
+	@Test
+	public void testSalaryGroups() {
+
+		final EmployeeService employeeService = EmployeeService.getInstance();
+		final List<SalaryGroupRecordBean> salaryGroupBeanList = employeeService.findSalaryGroups();
+		assertEquals(15, salaryGroupBeanList.size());
+		SalaryGroupRecordBean lowestSalaryGroup = salaryGroupBeanList.get(0);
+		Long salaryGroupUpperLimit = lowestSalaryGroup.getSalaryGroup();
+		assertEquals(2000L, salaryGroupUpperLimit.longValue());
+		Long count = lowestSalaryGroup.getCnt();
+		assertEquals(5L, count.longValue());
+	}
+
 	/**
 	 * This test focuses on a table with non-numeric primary key without sequence and version column
 	 */
@@ -128,20 +145,20 @@ public class EmployeeServiceTest {
 		jobsBean.setJobTitle("Controller");
 		jobsBean.setMinSalary(8000L);
 		jobsBean.setMaxSalary(12000L);
-		final JobsBean newJobsBean =  employeeService.insertJobs(jobsBean);
+		final JobsBean newJobsBean =  beanDML.insertJobs(jobsBean);
 		final List<JobsBean> jobsBeanList = employeeService.findJobById("CT_MGR");
 		assertEquals(jobsBeanList.size(), 1);
 		assertEquals(jobsBeanList.get(0), newJobsBean);
 
 		// Modify the just inserted record
 		newJobsBean.setJobTitle("Controlling");
-		employeeService.updateJobs(newJobsBean);
+		beanDML.updateJobs(newJobsBean);
 		final List<JobsBean> jobsBeanList2 = employeeService.findJobById("CT_MGR");
 		assertEquals(jobsBeanList2.size(), 1);
 		assertEquals(jobsBeanList2.get(0).getJobTitle(), "Controlling");
 
 		// Delete the just inserted record.
-		employeeService.deleteJobs(newJobsBean);
+		beanDML.deleteJobs(newJobsBean);
 		final List<JobsBean> jobsBeanList3 = employeeService.findJobById("CT_MGR");
 		assertEquals(jobsBeanList3.size(), 0);
 

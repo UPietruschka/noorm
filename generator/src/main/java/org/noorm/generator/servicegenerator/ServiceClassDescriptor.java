@@ -22,7 +22,6 @@ public class ServiceClassDescriptor {
 	private String interfacePackageName;
 	private String beanPackageName;
 	private final List<ProcedureDescriptor> procedures = new ArrayList<ProcedureDescriptor>();
-	private final Map<String, String> returnTypeNames = new HashMap<String, String>();
 	private boolean isInterface = false;
 
 	public int getCodeHashValue() {
@@ -76,18 +75,6 @@ public class ServiceClassDescriptor {
 
 	public List<ProcedureDescriptor> getProcedures() {
 		return procedures;
-	}
-
-	public void addReturnTypeName(final String pReturnTypeShortName, final String pReturnTypeBeanName) {
-		returnTypeNames.put(pReturnTypeShortName, pReturnTypeBeanName);
-	}
-
-	public Set<String> getReturnTypeShortNames() {
-		return returnTypeNames.keySet();
-	}
-
-	public String getReturnTypeBeanName(final String pReturnTypeShortName) {
-		return returnTypeNames.get(pReturnTypeShortName);
 	}
 
 	public String getFirstLowerName() {

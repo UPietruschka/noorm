@@ -5,7 +5,7 @@
     <parent>
         <artifactId>test</artifactId>
         <groupId>org.noorm</groupId>
-        <version>0.9.12</version>
+        <version>0.9.13</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
@@ -43,7 +43,7 @@
                     <username>${jdbc.username}</username>
                     <password>${jdbc.password}</password>
                     <beanPackageName>org.noorm.test.hr.beans</beanPackageName>
-                    <beanTableFilterRegex>(C.*|D.*|E.*|G.*|H.*|J.*|L.*|V.*)</beanTableFilterRegex>
+                    <beanTableFilterRegex>(C.*|D.*|E.*|G.*|H.*|J.*|L.*|V.*|.*RECORD)</beanTableFilterRegex>
                     <ignoreTableNamePrefixes>
                         <prefix>JOB_</prefix>
                     </ignoreTableNamePrefixes>

@@ -6,11 +6,7 @@ import org.noorm.jdbc.DataSourceProvider;
 import org.noorm.jdbc.JDBCStatementProcessor;
 import org.noorm.test.hr.beans.OptLockLongBean;
 
-import java.util.List;
-
 import static junit.framework.Assert.fail;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
 
 /**
  * @author Ulf Pietruschka / ulf.pietruschka@etenso.com

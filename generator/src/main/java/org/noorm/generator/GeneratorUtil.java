@@ -45,4 +45,16 @@ public class GeneratorUtil {
 			throw new GeneratorException("Writing Java source file failed.", e);
 		}
 	}
+
+	public static File createPackageDir(final File pDestinationDirectory,
+										final String pPackageName) throws GeneratorException {
+
+		final File packageDir =	new File(pDestinationDirectory, pPackageName.replace(".", File.separator));
+		if (!packageDir.exists()) {
+			if (!packageDir.mkdirs()) {
+				throw new GeneratorException("Could not create directory ".concat(packageDir.toString()));
+			}
+		}
+		return packageDir;
+	}
 }

@@ -3,6 +3,7 @@ package org.noorm.generator.enumgenerator;
 import org.noorm.generator.GeneratorException;
 import org.noorm.generator.GeneratorUtil;
 import org.noorm.generator.ValidatorClassDescriptor;
+import org.noorm.generator.m2plugin.IParameters;
 import org.noorm.metadata.MetadataService;
 import org.noorm.jdbc.Utils;
 import org.noorm.metadata.beans.TableMetadataBean;
@@ -28,108 +29,53 @@ public class EnumGenerator {
 	private static final String ENUM_VM_TEMPLATE_FILE = "/enum.vm";
 	private static final String ENUM_VALIDATOR_VM_TEMPLATE_FILE = "/enum_validator.vm";
 	private static final String ENUM_VALIDATOR_CLASS_NAME = "GenericEnumValidator";
-	private static EnumGenerator enumGenerator = new EnumGenerator();
 
-	/**
-	 * Destination directory for generated source files.
-	 */
-	private File destinationDirectory;
+	private IParameters parameters;
 
-	/**
-	 * Package name for generated Enum source files.
-	 */
-	private String enumPackageName;
-
-	/**
-	 * List of table name prefixes to be ignored for java class name construction.
-	 * Some data modelers use a common table name prefix to identify tables of a
-	 * given schema or group. When those prefixes are not desired in the constructed
-	 * java class name, they should be listed here.
-	 */
-	private List<String> ignoreTableNamePrefixes;
-
-	/**
-	 * Regular expression to filter tables and views for Enum generation.
-	 */
-	private String enumTableFilterRegex;
-
-	/**
-	 * To generate Enums from database tables, NoORM must now, which table column should be used
-	 * for the enums constant type generation. Typically, a table with constant content has a column
-	 * with a code or denominator in uppercase letters, which uniquely identifies the row.
-	 */
-	private Properties enumTable2DisplayColumnMapping;
-
-	protected EnumGenerator() {
-	}
-
-	public void setDestinationDirectory(final File pDestinationDirectory) {
-		destinationDirectory = pDestinationDirectory;
-	}
-
-	public void setEnumPackageName(final String pEnumPackageName) {
-		enumPackageName = pEnumPackageName;
-	}
-
-	public void setIgnoreTableNamePrefixes(final List<String> pIgnoreTableNamePrefixes) {
-		ignoreTableNamePrefixes = pIgnoreTableNamePrefixes;
-	}
-
-	public void setEnumTableFilterRegex(final String pEnumTableFilterRegex) {
-		enumTableFilterRegex = pEnumTableFilterRegex;
-	}
-
-	public void setEnumTable2DisplayColumnMapping(final Properties pEnumTable2DisplayColumnMapping) {
-		enumTable2DisplayColumnMapping = pEnumTable2DisplayColumnMapping;
-	}
-
-	public static EnumGenerator getInstance() {
-
-		return enumGenerator;
+	public EnumGenerator(final IParameters pParameters) {
+		parameters = pParameters;
 	}
 
 	public void execute() throws GeneratorException {
 
-		if (enumPackageName == null || enumPackageName.isEmpty()) {
+		if (parameters.getEnumPackageName() == null || parameters.getEnumPackageName().isEmpty()) {
 			throw new IllegalArgumentException("Parameter [enumPackageName] is null.");
 		}
-		if (destinationDirectory == null || !destinationDirectory.exists()) {
+		if (parameters.getDestinationDirectory() == null || !parameters.getDestinationDirectory().exists()) {
 			throw new IllegalArgumentException("Parameter [destinationDirectory] is null or mis-configured.");
 		}
 
 		ValidatorClassDescriptor validatorClassDescriptor = new ValidatorClassDescriptor();
-		validatorClassDescriptor.setPackageName(enumPackageName);
+		validatorClassDescriptor.setPackageName(parameters.getEnumPackageName());
 
 		log.info("Retrieving table metadata from Oracle database.");
 		final MetadataService metadataService = MetadataService.getInstance();
 		final Map<String, List<TableMetadataBean>> tableColumnMap = metadataService.findTableMetadata();
 
 		log.info("Generating NoORM Enum classes.");
-		final File enumPackageDir = new File(destinationDirectory, enumPackageName.replace(".", File.separator));
-		if (!enumPackageDir.exists()) {
-			if (!enumPackageDir.mkdirs()) {
-				throw new GeneratorException("Could not create directory ".concat(enumPackageDir.toString()));
-			}
-		}
+		final File enumPackageDir =
+				GeneratorUtil.createPackageDir(parameters.getDestinationDirectory(), parameters.getEnumPackageName());
 
 		for (final String tableName0 : tableColumnMap.keySet()) {
-			if (enumTableFilterRegex != null && !tableName0.matches(enumTableFilterRegex)) {
+			if (parameters.getEnumTableFilterRegex() != null &&
+					!tableName0.matches(parameters.getEnumTableFilterRegex())) {
 				log.info("Exclude table ".concat(tableName0)
 						.concat(", table name does not match regex '")
-						.concat(enumTableFilterRegex)
+						.concat(parameters.getEnumTableFilterRegex())
 						.concat("'"));
 				continue;
 			}
-			final String javaEnumName = Utils.convertTableName2JavaName(tableName0, ignoreTableNamePrefixes);
+			final String javaEnumName =
+					Utils.convertTableName2JavaName(tableName0, parameters.getIgnoreTableNamePrefixes());
 			final List<TableMetadataBean> tableMetadataBeanList1 = tableColumnMap.get(tableName0);
 			final EnumClassDescriptor enumClassDescriptor = new EnumClassDescriptor();
 			enumClassDescriptor.setName(javaEnumName);
 			validatorClassDescriptor.getClassNames().add(javaEnumName);
 			enumClassDescriptor.setTableName(tableName0);
-			enumClassDescriptor.setPackageName(enumPackageName);
+			enumClassDescriptor.setPackageName(parameters.getEnumPackageName());
 			String displayColumnName;
-			if (enumTable2DisplayColumnMapping != null) {
-				displayColumnName = Utils.getPropertyString(tableName0, enumTable2DisplayColumnMapping);
+			if (parameters.getEnumTable2DisplayColumnMapping() != null) {
+				displayColumnName = Utils.getPropertyString(tableName0, parameters.getEnumTable2DisplayColumnMapping());
 			} else {
 				throw new GeneratorException
 						("Parameter [enumTable2DisplayColumnMapping] must be set to enable enum generation.");

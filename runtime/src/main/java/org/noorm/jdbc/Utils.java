@@ -50,6 +50,12 @@ public class Utils {
 		return javaName.toString();
 	}
 
+	public static String convertTableName2ShortName(final String pTableName,
+												    final List<String> pIgnoreTableNamePrefixes) {
+
+		return convertTableName2JavaName(pTableName, pIgnoreTableNamePrefixes);
+	}
+
 	public static String convertTableName2BeanName(final String pTableName,
 												   final List<String> pIgnoreTableNamePrefixes) {
 
