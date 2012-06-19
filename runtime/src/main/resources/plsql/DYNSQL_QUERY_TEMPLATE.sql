@@ -11,7 +11,7 @@ CREATE TABLE dynsql_query_template
 
 ALTER TABLE dynsql_query_template ADD CONSTRAINT dynsql_query_template_pk PRIMARY KEY (template_name, line_index);
 
-COMMENT ON TABLE dynsql_query_template IS 'Table utilized by package dynamic_sql. This table contains SQL query fragments for dynamic SQL generation';
+COMMENT ON TABLE dynsql_query_template IS 'Table utilized by package noorm_dynamic_sql. This table contains SQL query fragments for dynamic SQL generation';
 COMMENT ON COLUMN dynsql_query_template.template_name IS 'Each query template is associated with one and only one dynamic SQL query and uniquely identified by its template name';
 COMMENT ON COLUMN dynsql_query_template.line_index IS 'The line number of the query fragment defined with this record';
 COMMENT ON COLUMN dynsql_query_template.parameter_name IS 'The name of the bind variable for this fragment, without colon';

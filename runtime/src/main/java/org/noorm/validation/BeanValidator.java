@@ -49,7 +49,7 @@ public class BeanValidator {
 		log.info("Validating Java Bean ".concat(javaBeanName).concat(" against database table ".concat(tableName)));
 		final List<TableMetadataBean> tableMetadataBeanList = tableColumnMap.get(tableName);
 		if (tableMetadataBeanList == null || tableMetadataBeanList.isEmpty()) {
-			throw new ValidationException("Cannot find table ".concat(tableName).concat(" in connected DB schema."));
+			validationError("Cannot find table ".concat(tableName).concat(" in connected DB schema."));
 		}
 		final Map<String, JDBCColumn> beanMetadata = BeanMetaDataUtil.getColumnMetaData(pBean.getClass());
 		for (final TableMetadataBean tableMetadataBean : tableMetadataBeanList) {
@@ -70,7 +70,7 @@ public class BeanValidator {
 				if (jdbcColumn.name().equals(columnName)) {
 					// Validating annotated data-type against database metadata.
 					if (!jdbcColumn.dataType().equals(tableMetadataBean.getDataType())) {
-						throw new ValidationException(exceptionPrefix.concat("Data-type mismatch: [")
+						validationError(exceptionPrefix.concat("Data-type mismatch: [")
 								.concat(tableMetadataBean.getDataType()).concat(" / ")
 								.concat(jdbcColumn.dataType().concat("].")));
 					}
@@ -80,7 +80,7 @@ public class BeanValidator {
 						isNullable = false;
 					}
 					if (jdbcColumn.nullable() != isNullable) {
-						throw new ValidationException(exceptionPrefix.concat("Nullable indicator mismatch"));
+						validationError(exceptionPrefix.concat("Nullable indicator mismatch"));
 					}
 					// Validating annotated updatable-attribute against database metadata.
 					boolean isUpdatable = true;
@@ -88,11 +88,11 @@ public class BeanValidator {
 						isUpdatable = false;
 					}
 					if (jdbcColumn.updatable() != isUpdatable) {
-						throw new ValidationException(exceptionPrefix.concat("Updatable indicator mismatch"));
+						validationError(exceptionPrefix.concat("Updatable indicator mismatch"));
 					}
 					// Validating annotated max-length against database metadata.
 					if (jdbcColumn.maxLength() > 0 && (jdbcColumn.maxLength() != tableMetadataBean.getCharLength())) {
-						throw new ValidationException(exceptionPrefix.concat("Data length mismatch"));
+						validationError(exceptionPrefix.concat("Data length mismatch"));
 					}
 					log.debug("Table column ".concat(tableName).concat(".")
 							.concat(columnName).concat(" successfully validated against bean specification."));
@@ -103,7 +103,7 @@ public class BeanValidator {
 			if (beanColumnValidated) {
 				beanMetadata.remove(javaAttributeName);
 			} else {
-				throw new ValidationException("Table column ".concat(tableName).concat(".").concat(columnName)
+				validationError("Table column ".concat(tableName).concat(".").concat(columnName)
 						.concat(" not found in Java Bean ").concat(javaBeanName));
 			}
 		}
@@ -120,7 +120,7 @@ public class BeanValidator {
 				message.append(tableName);
 				delimiter = "\n";
 			}
-			throw new ValidationException(message.toString());
+			validationError(message.toString());
 		}
 
 		final List<String> beanPKColumnList = Arrays.asList(pBean.getPrimaryKeyColumnNames());
@@ -129,7 +129,7 @@ public class BeanValidator {
 			if (tableName.equals(primaryKeyColumnBean.getTableName())) {
 				databasePKColumnList.add(primaryKeyColumnBean.getColumnName());
 				if (!beanPKColumnList.contains(primaryKeyColumnBean.getColumnName())) {
-					throw new ValidationException("Primary key column ".concat(primaryKeyColumnBean.getColumnName())
+					validationError("Primary key column ".concat(primaryKeyColumnBean.getColumnName())
 							.concat(" of database table ".concat(tableName)
 									.concat(" is not configured in Java Bean ").concat(javaBeanName)));
 				}
@@ -147,7 +147,7 @@ public class BeanValidator {
 		//		pkColumnNames = pkColumnNames.concat(delimiter).concat(pkColumnName);
 		//		delimiter = ",";
 		//	}
-		//	throw new ValidationException("Primary key column(s) ".concat(pkColumnNames)
+		//	validationError("Primary key column(s) ".concat(pkColumnNames)
 		//			.concat(" of Java Bean ".concat(javaBeanName)
 		//					.concat(" is/are not defined for database table ").concat(tableName)));
 		//}
@@ -160,11 +160,21 @@ public class BeanValidator {
 				}
 			}
 			if (!sequenceFound) {
-				throw new ValidationException("Sequence "
-						.concat(pBean.getSequenceName()).concat(" not found in database."));
+				validationError("Sequence ".concat(pBean.getSequenceName()).concat(" not found in database."));
 			}
 		}
 
 		log.info("Validation of Java Bean ".concat(javaBeanName).concat(" successful."));
+	}
+
+	/*
+	 Validation errors result in a validation exception.
+	 For a web application, the validators may get called from inside of a ServletContextListener implementation,
+	 which does not write to the NoORM logger or application logger. Thus, validation errors are explicitly logged.
+	 */
+	private void validationError(final String pErrorMessage) {
+
+		log.error(pErrorMessage);
+		throw new ValidationException(pErrorMessage);
 	}
 }

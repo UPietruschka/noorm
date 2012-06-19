@@ -22,7 +22,7 @@ public class ServiceValidator {
 		log.debug("Retrieving PL/SQL package code checksum (hash) from database.");
 		final int codeHashValue = metadataService.getPackageHashValue(databasePackageName);
 		if (codeHashValue == -1) {
-			throw new ValidationException("Service ".concat(pService.getClass().getName())
+			validationError("Service ".concat(pService.getClass().getName())
 					.concat(" could not be validated against PL/SQL package code for ")
 					.concat(databasePackageName).concat(" (No database package found with this name)."));
 		}
@@ -31,9 +31,20 @@ public class ServiceValidator {
 					.concat(" successfully validated against PL/SQL database code for package ")
 					.concat(databasePackageName));
 		} else {
-			throw new ValidationException("Service ".concat(pService.getClass().getName())
+			validationError("Service ".concat(pService.getClass().getName())
 					.concat(" could not be validated against PL/SQL database code for package ")
 					.concat(databasePackageName).concat(" (Checksum (hash) for package code has changed)."));
 		}
+	}
+
+	/*
+	 Validation errors result in a validation exception.
+	 For a web application, the validators may get called from inside of a ServletContextListener implementation,
+	 which does not write to the NoORM logger or application logger. Thus, validation errors are explicitly logged.
+	 */
+	private void validationError(final String pErrorMessage) {
+
+		log.error(pErrorMessage);
+		throw new ValidationException(pErrorMessage);
 	}
 }

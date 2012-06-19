@@ -9,8 +9,8 @@ spool install_noorm.log
 -- Generic Packages
 
 @@DYNSQL_QUERY_TEMPLATE
-@@DYNAMIC_SQL
-@@DYNAMIC_SQL_body
+@@NOORM_DYNAMIC_SQL
+@@NOORM_DYNAMIC_SQL_body
 @@NOORM_METADATA
 @@NOORM_METADATA_body
 

@@ -1,5 +1,5 @@
 CREATE OR REPLACE
-PACKAGE BODY dynamic_sql AS
+PACKAGE BODY noorm_dynamic_sql AS
 
   TYPE query_parameters IS TABLE OF ANYDATA INDEX BY VARCHAR2(32);
   l_parameters query_parameters;
@@ -133,5 +133,5 @@ PACKAGE BODY dynamic_sql AS
     RAISE_APPLICATION_ERROR(-20163, 'Could not bind parameter: ' || param_name);
   END execute;
 
-END dynamic_sql;
+END noorm_dynamic_sql;
 /

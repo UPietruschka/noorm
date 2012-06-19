@@ -47,7 +47,7 @@ public class EnumValidator {
 		final String displayColumnName = enumArray[0].getDisplayColumnName();
 		final List<TableMetadataBean> tableMetadataBeanList = tableColumnMap.get(tableName);
 		if (tableMetadataBeanList == null || tableMetadataBeanList.isEmpty()) {
-			throw new ValidationException(exceptionPrefix.concat(" Cannot find database table."));
+			validationError(exceptionPrefix.concat(" Cannot find database table."));
 		}
 		// We omit direct meta-data validation here (like we do in BeanValidator), since we do access
 		// the contained data, which would fail with non-validating meta-data anyway.
@@ -55,18 +55,18 @@ public class EnumValidator {
 		final String query = "SELECT * FROM ".concat(tableName);
 		final List<Map<String, Object>> recordList = jdbcStatementProcessor.executeGenericSelect(query);
 		if (recordList.isEmpty()) {
-			throw new ValidationException(exceptionPrefix.concat(" Database table does not contain any data."));
+			validationError(exceptionPrefix.concat(" Database table does not contain any data."));
 		}
 		final Map<String, Map<String, Object>> displayColumnValue2Record = new HashMap<String, Map<String, Object>>();
 		for (Map<String, Object> record : recordList) {
 			final Object displayColumnValue = record.get(displayColumnName);
 			if (displayColumnValue == null) {
-				throw new ValidationException(exceptionPrefix
+				validationError(exceptionPrefix
 						.concat(" Database table does not contain the enum display column "
 						.concat(displayColumnName).concat(".")));
 			}
 			if (!(displayColumnValue instanceof String)) {
-				throw new ValidationException(exceptionPrefix
+				validationError(exceptionPrefix
 						.concat(" Display columns other than type String are not yet supported."));
 			}
 			final String displayColumnStringValue = Utils.getNormalizedDisplayColumnValue((String) displayColumnValue);
@@ -77,7 +77,7 @@ public class EnumValidator {
 		for (T enum0 : enumArray) {
 			final Map<String, Object> record = displayColumnValue2Record.get(enum0.toString());
 			if (record == null) {
-				throw new ValidationException(exceptionPrefix
+				validationError(exceptionPrefix
 						.concat(" No matching table row found for display column value "
 						.concat(enum0.toString())).concat("."));
 			}
@@ -93,12 +93,23 @@ public class EnumValidator {
 					// Using "toString" provides a suitable normalization for the data subject to comparison,
 					// at least for the data-types supported for enums so far (Long, String)
 					if (!enumValue.toString().equals(columnValue.toString())) {
-						throw new ValidationException(exceptionPrefix
+						validationError(exceptionPrefix
 								.concat(" Content mismatch for column ").concat(columnName).concat("."));
 					}
 				}
 			}
 		}
 		log.info("Enum ".concat(pEnumClass.getName()).concat(" validated."));
+	}
+
+	/*
+	 Validation errors result in a validation exception.
+	 For a web application, the validators may get called from inside of a ServletContextListener implementation,
+	 which does not write to the NoORM logger or application logger. Thus, validation errors are explicitly logged.
+	 */
+	private void validationError(final String pErrorMessage) {
+
+		log.error(pErrorMessage);
+		throw new ValidationException(pErrorMessage);
 	}
 }

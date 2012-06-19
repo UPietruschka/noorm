@@ -25,14 +25,14 @@ PACKAGE BODY employee_search AS
                                      p_employee_set OUT employee_refcur) AS
 
   BEGIN
-    dynamic_sql.init;
-    dynamic_sql.add_parameter('p_job_title', p_job_title);
-    dynamic_sql.add_parameter('p_last_name', p_last_name);
-    dynamic_sql.add_parameter('p_hire_date_from', p_hire_date_from);
-    dynamic_sql.add_parameter('p_hire_date_to', p_hire_date_to);
-    dynamic_sql.add_parameter('p_salary_from', p_salary_from);
-    dynamic_sql.add_parameter('p_salary_to', p_salary_to);
-    dynamic_sql.execute('EMPLOYEE_QUERY', p_employee_set);
+    noorm_dynamic_sql.init;
+    noorm_dynamic_sql.add_parameter('p_job_title', p_job_title);
+    noorm_dynamic_sql.add_parameter('p_last_name', p_last_name);
+    noorm_dynamic_sql.add_parameter('p_hire_date_from', p_hire_date_from);
+    noorm_dynamic_sql.add_parameter('p_hire_date_to', p_hire_date_to);
+    noorm_dynamic_sql.add_parameter('p_salary_from', p_salary_from);
+    noorm_dynamic_sql.add_parameter('p_salary_to', p_salary_to);
+    noorm_dynamic_sql.execute('EMPLOYEE_QUERY', p_employee_set);
   END;
 
 END employee_search;

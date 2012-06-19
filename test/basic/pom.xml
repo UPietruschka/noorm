@@ -6,7 +6,7 @@
     <parent>
         <groupId>org.noorm</groupId>
         <artifactId>test</artifactId>
-        <version>0.9.13</version>
+        <version>0.9.14</version>
     </parent>
 
     <modelVersion>4.0.0</modelVersion>
@@ -97,8 +97,8 @@
                             <srcFiles>
                                 <srcFile>target/noorm/plsql/NOORM_METADATA.sql</srcFile>
                                 <srcFile>target/noorm/plsql/NOORM_METADATA_body.sql</srcFile>
-                                <srcFile>target/noorm/plsql/DYNAMIC_SQL.sql</srcFile>
-                                <srcFile>target/noorm/plsql/DYNAMIC_SQL_body.sql</srcFile>
+                                <srcFile>target/noorm/plsql/NOORM_DYNAMIC_SQL.sql</srcFile>
+                                <srcFile>target/noorm/plsql/NOORM_DYNAMIC_SQL_body.sql</srcFile>
                                 <srcFile>src/main/resources/sql/EMPLOYEE_SEARCH.sql</srcFile>
                                 <srcFile>src/main/resources/sql/EMPLOYEE_SERVICE.sql</srcFile>
                                 <srcFile>src/main/resources/sql/JOB_SERVICE.sql</srcFile>

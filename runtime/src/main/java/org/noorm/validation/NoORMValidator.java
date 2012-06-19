@@ -25,7 +25,7 @@ public class NoORMValidator {
 	private static final Properties pomProperties = new Properties();
 
 	/**
-	 * Validates the NoORM PL/SQL packages NOORM_METADATA and DYNAMIC_SQL against the Java software version
+	 * Validates the NoORM PL/SQL packages NOORM_METADATA and NOORM_DYNAMIC_SQL against the Java software version
 	 * of the NoORM runtime.
 	 * Validation is done using a version string infiltrated into the PL/SQL creation scripts.
 	 */
@@ -35,21 +35,22 @@ public class NoORMValidator {
 		try {
 			pomProperties.load(resourceStream);
 		} catch (IOException e) {
+			log.error(e.getMessage());
 			throw new ValidationException("Could not read POM property file ".concat(POM_PROPERTIES_PATH), e);
 		}
 		final String noormJavaVersion = pomProperties.getProperty("version");
-		// There is no explicit Java wrapper for the DYNAMIC_SQL package, since this package is not to
+		// There is no explicit Java wrapper for the NOORM_DYNAMIC_SQL package, since this package is not to
 		// be used from Java directly. To retrieve the NoORM version, we use the JDBCStatementProcessor API.
 		log.info("Validating NoORM runtime version [".concat(noormJavaVersion)
-				.concat("] against PL/SQL package DYNAMIC_SQL."));
+				.concat("] against PL/SQL package NOORM_DYNAMIC_SQL."));
 		final JDBCStatementProcessor<String> statementProcessor = JDBCStatementProcessor.getInstance();
 		final Map<String, Object> filterParameters = new HashMap<String, Object>();
 		final String dynamicSQLNoORMVersion = statementProcessor.callPLSQL
-				("dynamic_sql.get_version", "p_version", filterParameters, String.class);
+				("noorm_dynamic_sql.get_version", "p_version", filterParameters, String.class);
 		if (!dynamicSQLNoORMVersion.equals(noormJavaVersion)) {
 			final String errMsg = "NoORM Java runtime version ".concat(noormJavaVersion)
 					.concat(" does not match version ").concat(dynamicSQLNoORMVersion)
-					.concat(" of PL/SQL package DYNAMIC_SQL.");
+					.concat(" of PL/SQL package NOORM_DYNAMIC_SQL.");
 			log.error(errMsg);
 			throw new ValidationException(errMsg);
 		}

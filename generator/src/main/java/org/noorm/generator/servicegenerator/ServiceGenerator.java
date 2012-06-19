@@ -34,7 +34,7 @@ public class ServiceGenerator {
 	private static final String SERVICE_VALIDATOR_VM_TEMPLATE_FILE = "/service_validator.vm";
 	private static final String SERVICE_VALIDATOR_CLASS_NAME = "GenericServiceValidator";
 	private static final String DEFAULT_PACKAGE_FILTER_REGEX = ".*";
-	private static final String IGNORE_PACKAGE_FILTER_REGEX = "(NOORM_METADATA|DYNAMIC_SQL)";
+	private static final String IGNORE_PACKAGE_FILTER_REGEX = "(NOORM_METADATA|NOORM_DYNAMIC_SQL)";
 	private static final String DEFAULT_PAGEABLE_PROC_NAME_REGEX = "(find_pageable.*)";
 
 	private IParameters parameters;

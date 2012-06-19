@@ -1,5 +1,5 @@
 CREATE OR REPLACE
-PACKAGE dynamic_sql AS 
+PACKAGE noorm_dynamic_sql AS
 
   noorm_unknown_query_template EXCEPTION;
   noorm_invalid_sorting EXCEPTION;
@@ -23,5 +23,5 @@ PACKAGE dynamic_sql AS
   PROCEDURE set_sorting_column(p_sorting_column IN CHAR, p_sorting_direction IN CHAR DEFAULT 'ASC');
   PROCEDURE execute(p_query_template_name IN CHAR, p_refcursor OUT sys_refcursor);
 
-END dynamic_sql;
+END noorm_dynamic_sql;
 /
