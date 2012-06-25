@@ -129,8 +129,6 @@ PACKAGE BODY noorm_dynamic_sql AS
     END LOOP;
     l_return := dbms_sql.EXECUTE(l_cursor);
     p_refcursor := dbms_sql.to_refcursor(l_cursor);
-  EXCEPTION WHEN OTHERS THEN
-    RAISE_APPLICATION_ERROR(-20163, 'Could not bind parameter: ' || param_name);
   END execute;
 
 END noorm_dynamic_sql;
