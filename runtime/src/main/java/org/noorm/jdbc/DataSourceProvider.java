@@ -118,17 +118,17 @@ public class DataSourceProvider {
 			//	validationInfo.append(";Username: ");
 			//	validationInfo.append(((PoolDataSource) dataSourceFactory.dataSource).getUser());
 			//} else {
-				if (dataSourceFactory.dataSource instanceof OracleDataSource) {
-					validationInfo.append("Connection parameters: ");
-					validationInfo.append(";URL: ");
-					validationInfo.append(((OracleDataSource) dataSourceFactory.dataSource).getURL());
-					validationInfo.append(";Username: ");
-					validationInfo.append(((OracleDataSource) dataSourceFactory.dataSource).getUser());
-				} else {
-					validationInfo.append("Unable to retrieve connection parameters from data source. [");
-					validationInfo.append(dataSourceFactory.dataSource.getClass().getName());
-					validationInfo.append("]");
-				}
+			if (dataSourceFactory.dataSource instanceof OracleDataSource) {
+				validationInfo.append("Connection parameters: ");
+				validationInfo.append(";URL: ");
+				validationInfo.append(((OracleDataSource) dataSourceFactory.dataSource).getURL());
+				validationInfo.append(";Username: ");
+				validationInfo.append(((OracleDataSource) dataSourceFactory.dataSource).getUser());
+			} else {
+				validationInfo.append("Unable to retrieve connection parameters from data source. [");
+				validationInfo.append(dataSourceFactory.dataSource.getClass().getName());
+				validationInfo.append("]");
+			}
 			//}
 			log.info(validationInfo.toString());
 			dataSourceFactory.dataSource.getConnection();
@@ -219,7 +219,7 @@ public class DataSourceProvider {
 	}
 
 	/*
-	 * The data source parameters in the NoORM properties can either be specified using JNDI or directly
+     * The data source parameters in the NoORM properties can either be specified using JNDI or directly
 	 * by providing the required parameters for setting up an OracleDataSource. When both types of
 	 * configuration settings are available, the JNDI configuration has precedence.
 	 */
@@ -308,6 +308,7 @@ public class DataSourceProvider {
 	 * directly by this method has the sole purpose to support additional Oracle Java client software, which
 	 * requires access to the connection (e.g. Oracle Streams Advanced Queueing, which requires the Oracle
 	 * connection to create an AQSession).
+	 *
 	 * @return the Oracle database connection currently managed by the DataSourceProvider.
 	 * @throws SQLException
 	 */
@@ -338,7 +339,18 @@ public class DataSourceProvider {
 					log.debug("Acquiring new connection from connection pool.");
 				}
 			}
-			con = (OracleConnection) getDataSource().getConnection();
+
+			// JDBC resources provided by an application server may wrap the native connection with some
+			// proprietary connection implementation. This prevents the usage of vendor specific features,
+			// in particular Oracle specific features used here. Thus, the provided connection is checked
+			// for a wrapped native connection and this connection is then unwrapped and used instead.
+			java.sql.Connection dataSourceConn = getDataSource().getConnection();
+			if (dataSourceConn.isWrapperFor(oracle.jdbc.OracleConnection.class)) {
+				con = dataSourceConn.unwrap(oracle.jdbc.OracleConnection.class);
+			} else {
+				con = (OracleConnection) dataSourceConn;
+			}
+
 			con.setAutoCommit(false);
 			if (dataSourceFactory.debugMode) {
 				enableDebugMode(con);
