@@ -6,7 +6,7 @@
     <parent>
         <groupId>org.noorm</groupId>
         <artifactId>test</artifactId>
-        <version>0.9.14</version>
+        <version>0.9.15-SNAPSHOT</version>
     </parent>
 
     <modelVersion>4.0.0</modelVersion>
@@ -32,7 +32,7 @@
                                 <artifactItem>
                                     <groupId>org.noorm</groupId>
                                     <artifactId>runtime</artifactId>
-                                    <version>${parent.version}</version>
+                                    <version>${project.parent.version}</version>
                                     <type>jar</type>
                                     <overWrite>true</overWrite>
                                     <outputDirectory>target/noorm</outputDirectory>
@@ -113,7 +113,7 @@
             <plugin>
                 <groupId>org.noorm</groupId>
                 <artifactId>generator</artifactId>
-                <version>${parent.version}</version>
+                <version>${project.parent.version}</version>
                 <dependencies>
                     <dependency>
                         <groupId>${oracle.groupId}</groupId>

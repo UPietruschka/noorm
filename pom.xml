@@ -6,7 +6,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>org.noorm</groupId>
 	<artifactId>noorm</artifactId>
-	<version>0.9.14</version>
+	<version>0.9.15-SNAPSHOT</version>
 	<name>NoORM</name>
 	<packaging>pom</packaging>
 
@@ -38,7 +38,7 @@
 
 	<build>
 
-		<finalName>noorm-${artifactId}-${version}</finalName>
+		<finalName>noorm-${project.artifactId}-${project.version}</finalName>
 
         <plugins>
 
