@@ -6,11 +6,11 @@
     <parent>
         <groupId>org.noorm</groupId>
         <artifactId>noorm</artifactId>
-        <version>0.9.15-SNAPSHOT</version>
+        <version>0.9.15</version>
     </parent>
 
 	<modelVersion>4.0.0</modelVersion>
-	<artifactId>generator</artifactId>
+	<artifactId>noorm-generator</artifactId>
 	<packaging>maven-plugin</packaging>
 	<name>NoORM Java Code Generator</name>
 
@@ -18,7 +18,7 @@
 
 		<dependency>
             <groupId>org.noorm</groupId>
-            <artifactId>runtime</artifactId>
+            <artifactId>noorm-runtime</artifactId>
             <version>${project.parent.version}</version>
         </dependency>
 

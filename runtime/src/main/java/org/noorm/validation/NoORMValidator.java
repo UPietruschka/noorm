@@ -20,7 +20,7 @@ public class NoORMValidator {
 
 	private static final Logger log = LoggerFactory.getLogger(NoORMValidator.class);
 
-	private static final String POM_PROPERTIES_PATH = "/META-INF/maven/org.noorm/runtime/pom.properties";
+	private static final String POM_PROPERTIES_PATH = "/META-INF/maven/org.noorm/noorm-runtime/pom.properties";
 
 	private static final Properties pomProperties = new Properties();
 

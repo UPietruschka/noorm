@@ -6,7 +6,7 @@
     <parent>
         <groupId>org.noorm</groupId>
         <artifactId>noorm</artifactId>
-        <version>0.9.15-SNAPSHOT</version>
+        <version>0.9.15</version>
     </parent>
 
     <modelVersion>4.0.0</modelVersion>
@@ -19,7 +19,7 @@
     </modules>
 
     <properties>
-        <oracle.version>11.2.0.2.0</oracle.version>
+        <oracle.version>11.2.0.3.0</oracle.version>
         <jdbc.driver.artifactId>ojdbc6</jdbc.driver.artifactId>
         <jdbc.driver.name>oracle.jdbc.OracleDriver</jdbc.driver.name>
         <jdbc.url>jdbc:oracle:thin:@localhost:1521:XE</jdbc.url>
@@ -31,7 +31,7 @@
 
         <dependency>
             <groupId>org.noorm</groupId>
-            <artifactId>runtime</artifactId>
+            <artifactId>noorm-runtime</artifactId>
             <version>${project.parent.version}</version>
         </dependency>
 
