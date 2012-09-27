@@ -51,7 +51,7 @@
                 <dependencies>
                     <dependency>
                         <groupId>${oracle.groupId}</groupId>
-                        <artifactId>${jdbc.driver.artifactId}</artifactId>
+                        <artifactId>${oracle.driver.artifactId}</artifactId>
                         <version>${oracle.version}</version>
                     </dependency>
                 </dependencies>

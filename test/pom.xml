@@ -19,8 +19,6 @@
     </modules>
 
     <properties>
-        <oracle.version>11.2.0.3.0</oracle.version>
-        <jdbc.driver.artifactId>ojdbc6</jdbc.driver.artifactId>
         <jdbc.driver.name>oracle.jdbc.OracleDriver</jdbc.driver.name>
         <jdbc.url>jdbc:oracle:thin:@localhost:1521:XE</jdbc.url>
         <jdbc.username>hr</jdbc.username>

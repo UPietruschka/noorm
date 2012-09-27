@@ -20,7 +20,7 @@
     </licenses>
     <scm>
         <url>http://java.net/projects/noorm/sources/src/show</url>
-        <connection>scm:git:git://java.net/noorm~src </connection>
+        <connection>scm:git:git://java.net/noorm~src</connection>
     </scm>
 
     <modules>
@@ -54,6 +54,29 @@
             <modules>
                 <module>test</module>
             </modules>
+        </profile>
+        <profile>
+            <id>sign</id>
+            <build>
+                <plugins>
+
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-gpg-plugin</artifactId>
+                        <version>1.4</version>
+                        <executions>
+                            <execution>
+                                <id>sign-artifacts</id>
+                                <phase>verify</phase>
+                                <goals>
+                                    <goal>sign</goal>
+                                </goals>
+                            </execution>
+                        </executions>
+                    </plugin>
+
+                </plugins>
+            </build>
         </profile>
     </profiles>
 
