@@ -35,17 +35,30 @@ public class Utils {
 		return dbNameBuilder.toString();
 	}
 
+    /**
+     * Converts a database object name into a java name. Database names (table names, column names, etc.) are
+     * typically stored in the Oracle data dictionary in upper case. Most database modellers follow the convention
+     * to separate parts of the name by underscores, e.g. "FIRST_NAME", "ORDER_NUMBER", etc. In Java, a widely
+     * used convention is to separate parts of the name by capitalizing the first name of the new part, e.g.
+     * "firstName", "orderNumber".
+     * @param pDBName a database object name
+     * @param pCapitalizeFirst indicator, whether the first letter in the converted name is to be capitalized
+     * @return the converted name
+     */
 	public static String convertDBName2JavaName(final String pDBName, final boolean pCapitalizeFirst) {
 
 		final String[] dbNameTokens = pDBName.split(DB_NAME_TOKEN_SPLIT);
 		final StringBuilder javaName = new StringBuilder();
 		for (int i = 0; i < dbNameTokens.length; i++) {
-			if (!pCapitalizeFirst && i == 0) {
-				javaName.append(dbNameTokens[i].toLowerCase().charAt(0));
-			} else {
-				javaName.append(dbNameTokens[i].toUpperCase().charAt(0));
-			}
-			javaName.append(dbNameTokens[i].substring(1).toLowerCase());
+            // Two consecutive underscores produce a single empty token, which is ignored
+            if (dbNameTokens[i].length() > 0) {
+                if (!pCapitalizeFirst && i == 0) {
+                    javaName.append(dbNameTokens[i].toLowerCase().charAt(0));
+                } else {
+                    javaName.append(dbNameTokens[i].toUpperCase().charAt(0));
+                }
+                javaName.append(dbNameTokens[i].substring(1).toLowerCase());
+            }
 		}
 		return javaName.toString();
 	}
