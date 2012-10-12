@@ -85,15 +85,17 @@ public class DataSourceProvider {
 	 */
 	public static void setDataSource(final DataSource pDataSource) {
 
-		if (dataSourceFactory == null) {
-			log.debug("Instantiating DataSourceProvider.");
-			dataSourceFactory = new DataSourceProvider();
-			dataSourceFactory.loadNoormProperties();
-			dataSourceFactory.dataSource = pDataSource;
-			dataSourceFactory.initNoormProperties();
-			validateDataSource();
-		}
-	}
+        if (dataSourceFactory != null) {
+            // Invalidate thread local connection
+            conThreadLocal.remove();
+        }
+        log.debug("Instantiating DataSourceProvider.");
+        dataSourceFactory = new DataSourceProvider();
+        dataSourceFactory.loadNoormProperties();
+        dataSourceFactory.dataSource = pDataSource;
+        dataSourceFactory.initNoormProperties();
+        validateDataSource();
+    }
 
 	/**
 	 * Validate the data source. Either for the data source submitted using setDataSource or for the
@@ -140,13 +142,13 @@ public class DataSourceProvider {
 	private static DataSource getDataSource() throws SQLException {
 
 		if (dataSourceFactory == null) {
-			log.debug("Instantiating DataSourceProvider.");
-			dataSourceFactory = new DataSourceProvider();
-			dataSourceFactory.loadNoormProperties();
-			dataSourceFactory.initDataSource();
-			dataSourceFactory.initNoormProperties();
-		}
-		return dataSourceFactory.dataSource;
+            log.debug("Instantiating DataSourceProvider.");
+            dataSourceFactory = new DataSourceProvider();
+            dataSourceFactory.loadNoormProperties();
+            dataSourceFactory.initDataSource();
+            dataSourceFactory.initNoormProperties();
+        }
+        return dataSourceFactory.dataSource;
 	}
 
 	private void loadNoormProperties() {
