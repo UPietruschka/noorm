@@ -816,8 +816,12 @@ public class JDBCStatementProcessor<T> {
 				String parameterToString;
 				Object parameter = pInParameters.get(paramName);
 				if (parameter instanceof byte[]) {
-					HexBinaryAdapter hexBinaryAdapter = new HexBinaryAdapter();
-					parameterToString = hexBinaryAdapter.marshal((byte[]) parameter);
+                    if (((byte[]) parameter).length < 4096) {
+                        HexBinaryAdapter hexBinaryAdapter = new HexBinaryAdapter();
+                        parameterToString = hexBinaryAdapter.marshal((byte[]) parameter);
+                    } else {
+                        parameterToString = "Binary content too large for debug output.";
+                    }
 				} else {
 					if (parameter instanceof Long[]) {
 						StringBuilder formattedIDList = new StringBuilder();

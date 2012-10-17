@@ -97,7 +97,10 @@ public class Utils {
 		if (pOracleType.equals("RAW")) {
 			javaType = "byte[]";
 		}
-		if (pOracleType.equals("NUMBER")) {
+        if (pOracleType.equals("BLOB")) {
+            javaType = "byte[]";
+        }
+        if (pOracleType.equals("NUMBER")) {
 			if (pDataPrecision != null && pDataPrecision > 0L && pDataScale != 0 && pDataScale > 0L) {
 				javaType = "Double";
 			} else {

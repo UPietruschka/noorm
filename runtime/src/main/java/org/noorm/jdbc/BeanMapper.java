@@ -4,12 +4,11 @@ import org.noorm.metadata.BeanMetaDataUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.*;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
 import java.math.BigDecimal;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.Timestamp;
+import java.sql.*;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -157,6 +156,7 @@ public class BeanMapper<T> {
 			throws IllegalAccessException, SQLException {
 
 		String fieldName = null;
+        String dataType = null;
 		for (final Field field : pFields) {
 			// Ignore serialVersionUID
 			if (BeanMetaDataUtil.SERIAL_VERSION_UID.equals(field.getName())) {
@@ -169,6 +169,7 @@ public class BeanMapper<T> {
 				if (annotations[0].annotationType() == JDBCColumn.class) {
 					final JDBCColumn colAnn = (JDBCColumn) annotations[0];
 					fieldName = colAnn.name();
+                    dataType = colAnn.dataType();
 				}
 			} else {
 				// Ignore pFields without JDBCColumn annotation (interpreted transient)
@@ -201,10 +202,27 @@ public class BeanMapper<T> {
 			}
 
 			if (fieldType == String.class) {
-				final String value = pResultSet.getString(fieldName);
-				if (value != null) {
-					field.set(pBean, value.trim());
-				}
+                if (dataType.equals("CLOB")) {
+                    final Clob clob = pResultSet.getClob(fieldName);
+                    if (clob != null) {
+                        final StringWriter stringWriter = new StringWriter();
+                        final Reader reader = clob.getCharacterStream();
+                        final char[] buffer = new char[1];
+                        try {
+                            while (reader.read(buffer) > 0) {
+                                stringWriter.write(buffer);
+                            }
+                            field.set(pBean, stringWriter.toString());
+                        } catch (IOException ex) {
+                            throw new DataAccessException(ex);
+                        }
+                    }
+                } else { // All other characters based types (CHAR, VARCHAR2, etc.)
+                    final String value = pResultSet.getString(fieldName);
+                    if (value != null) {
+                        field.set(pBean, value.trim());
+                    }
+                }
 			}
 
 			if (fieldType == Integer.class) {
@@ -252,7 +270,24 @@ public class BeanMapper<T> {
 			}
 
 			if (fieldType == byte[].class) {
-				field.set(pBean, pResultSet.getBytes(fieldName));
+                if (dataType.equals("BLOB")) {
+                    final Blob blob = pResultSet.getBlob(fieldName);
+                    if (blob != null) {
+                        final ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
+                        final InputStream inputStream = blob.getBinaryStream();
+                        final byte[] buffer = new byte[1];
+                        try {
+                            while (inputStream.read(buffer) > 0) {
+                                byteArrayOutputStream.write(buffer);
+                            }
+                            field.set(pBean, byteArrayOutputStream.toByteArray());
+                        } catch (IOException ex) {
+                            throw new DataAccessException(ex);
+                        }
+                    }
+                } else { // RAW
+                    field.set(pBean, pResultSet.getBytes(fieldName));
+                }
 			}
 		}
 	}

@@ -6,6 +6,7 @@ import org.noorm.jdbc.DataSourceProvider;
 import org.noorm.jdbc.JDBCStatementProcessor;
 import org.noorm.test.hr.beans.OptLockLongBean;
 
+import static org.junit.Assert.*;
 import static junit.framework.Assert.fail;
 
 /**
@@ -26,7 +27,8 @@ public class OptLockLongTest {
 		newOptLockLongBean.setText(SOME_TEXT);
 		JDBCStatementProcessor<OptLockLongBean> jdbcStatementProcessor = JDBCStatementProcessor.getInstance();
 		OptLockLongBean insertedOptLockLongBean =  jdbcStatementProcessor.insert(newOptLockLongBean);
-		insertedOptLockLongBean.setText(SOME_NEW_TEXT);
+        assertEquals(SOME_TEXT, insertedOptLockLongBean.getText());
+        insertedOptLockLongBean.setText(SOME_NEW_TEXT);
 		jdbcStatementProcessor.update(insertedOptLockLongBean);
 		jdbcStatementProcessor.delete(insertedOptLockLongBean);
 		DataSourceProvider.commit();

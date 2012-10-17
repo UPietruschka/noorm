@@ -33,6 +33,7 @@
                 </dependencies>
                 <executions>
                     <execution>
+                        <phase>generate-resources</phase>
                         <goals>
                             <goal>generate-noorm</goal>
                         </goals>

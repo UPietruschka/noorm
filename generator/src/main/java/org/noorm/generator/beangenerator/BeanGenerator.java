@@ -52,10 +52,10 @@ public class BeanGenerator {
 			throw new IllegalArgumentException("Parameter [destinationDirectory] is null or mis-configured.");
 		}
 
-		ValidatorClassDescriptor validatorClassDescriptor = new ValidatorClassDescriptor();
+		final ValidatorClassDescriptor validatorClassDescriptor = new ValidatorClassDescriptor();
 		validatorClassDescriptor.setPackageName(parameters.getBeanPackageName());
 
-		BeanDMLClassDescriptor beanDMLClassDescriptor = new BeanDMLClassDescriptor();
+		final BeanDMLClassDescriptor beanDMLClassDescriptor = new BeanDMLClassDescriptor();
 		beanDMLClassDescriptor.setBeanPackageName(parameters.getBeanPackageName());
 		beanDMLClassDescriptor.setInterfacePackageName(parameters.getServiceInterfacePackageName());
 		beanDMLClassDescriptor.setPackageName(parameters.getServicePackageName());
@@ -119,7 +119,7 @@ public class BeanGenerator {
 				validatorClassDescriptor.getClassNames().add(javaBeanName);
 			}
 			beanClassDescriptor.setTableName(tableName0);
-			String[] primaryKeyColumnNames = getPrimaryKeyColumnNames(tableName0, pkColumnNameList);
+			final String[] primaryKeyColumnNames = getPrimaryKeyColumnNames(tableName0, pkColumnNameList);
 			beanClassDescriptor.setPrimaryKeyColumnNames(primaryKeyColumnNames);
 			final String sequenceName = getSequenceName(tableName0, sequenceDBNameList);
 			beanClassDescriptor.setSequenceName(sequenceName);
@@ -131,7 +131,7 @@ public class BeanGenerator {
 			final Random random = new Random(javaBeanName.hashCode());
 			final long serialVersionUID = random.nextLong();
 			beanClassDescriptor.setSerialVersionUID(serialVersionUID);
-			for (TableMetadataBean tableMetadataBean : tableMetadataBeanList1) {
+			for (final TableMetadataBean tableMetadataBean : tableMetadataBeanList1) {
 				final BeanAttributeDescriptor beanAttributeDescriptor = new BeanAttributeDescriptor();
 				final String javaColumnName = Utils.convertDBName2JavaName(tableMetadataBean.getColumnName(), false);
 				beanAttributeDescriptor.setName(javaColumnName);
@@ -169,13 +169,13 @@ public class BeanGenerator {
 	private String getSequenceName(final String pTableName,
 								   final List<NameBean> pSequenceDBNameList) {
 
-		String sequenceName = Utils.getPropertyString(pTableName, parameters.getOracleTable2SequenceMapping());
+		final String sequenceName = Utils.getPropertyString(pTableName, parameters.getOracleTable2SequenceMapping());
 		if (sequenceName.isEmpty()) {
 			log.info("No matching sequence-name has been found for table-name ".concat(pTableName));
 			return sequenceName;
 		}
 		// Check the matched sequence name against the sequence names retrieved from the database
-		for (NameBean sequenceDBName : pSequenceDBNameList) {
+		for (final NameBean sequenceDBName : pSequenceDBNameList) {
 			if (sequenceName.equals(sequenceDBName.getName())) {
 				return sequenceName;
 			}
@@ -189,7 +189,7 @@ public class BeanGenerator {
 										      final List<PrimaryKeyColumnBean> pPrimaryKeyColumnList) {
 
 		final List<String> pkColumnNames = new ArrayList<String>();
-		for (PrimaryKeyColumnBean primaryKeyBean : pPrimaryKeyColumnList) {
+		for (final PrimaryKeyColumnBean primaryKeyBean : pPrimaryKeyColumnList) {
 			if (pTableName.equals(primaryKeyBean.getTableName())) {
 				log.info("Primary key column ".concat(primaryKeyBean.getColumnName())
 						.concat(" found for table ").concat(pTableName));
@@ -225,7 +225,7 @@ public class BeanGenerator {
 			return versionColumnName;
 		}
 		// Check the matched version column name against the column names of this table
-		for (TableMetadataBean tableMetadataBean : pTableMetadataBeanList) {
+		for (final TableMetadataBean tableMetadataBean : pTableMetadataBeanList) {
 			if (versionColumnName.equals(tableMetadataBean.getColumnName())) {
 				return versionColumnName;
 			}

@@ -35,9 +35,8 @@ public class EmployeeServiceTest {
 		for (final EmployeesBean employeesBean : employeesBeanList) {
 
 			final Long employeeId = employeesBean.getEmployeeId();
-			final List<EmployeesBean> employeesBeanList1 = employeeService.findUniqueEmployeeById(employeeId);
-			assertEquals(employeesBeanList1.size(), 1);
-			assertEquals(employeesBeanList1.get(0), employeesBean);
+			final EmployeesBean employeesBean0 = employeeService.findUniqueEmployeeById(employeeId);
+			assertEquals(employeesBean0, employeesBean);
 
 			final String employeeLastName = employeesBean.getLastName();
 			final List<EmployeesBean> employeesBeanList2 = employeeService.findEmployeesByLastname(employeeLastName);
@@ -111,8 +110,8 @@ public class EmployeeServiceTest {
 		for (final EmpDetailsViewBean empDetailsBean : empDetailsBeanList) {
 
 			final Long employeeId = empDetailsBean.getEmployeeId();
-			final List<EmployeesBean> employeesBeanList1 = employeeService.findUniqueEmployeeById(employeeId);
-			assertEquals(employeesBeanList1.size(), 1);
+			final EmployeesBean employeesBean0 = employeeService.findUniqueEmployeeById(employeeId);
+			assertNotNull(employeesBean0);
 		}
 		DataSourceProvider.commit();
 	}

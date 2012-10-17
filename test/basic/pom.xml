@@ -23,7 +23,7 @@
                 <executions>
                     <execution>
                         <id>unpack</id>
-                        <phase>initialize</phase>
+                        <phase>generate-resources</phase>
                         <goals>
                             <goal>unpack</goal>
                         </goals>
@@ -71,7 +71,7 @@
                         <goals>
                             <goal>execute</goal>
                         </goals>
-                        <phase>initialize</phase>
+                        <phase>generate-resources</phase>
                         <configuration>
                             <delimiter>;</delimiter>
                             <delimiterType>normal</delimiterType>
@@ -81,6 +81,7 @@
                                 <srcFile>target/noorm/plsql/DYNSQL_QUERY_TEMPLATE.sql</srcFile>
                                 <srcFile>src/main/resources/sql/QUERY_TEMPLATES.sql</srcFile>
                                 <srcFile>src/main/resources/sql/OPT_LOCK_TABLES.sql</srcFile>
+                                <srcFile>src/main/resources/sql/COMPLEX_DATA_TYPES_TABLE.sql</srcFile>
                             </srcFiles>
                         </configuration>
                     </execution>
@@ -89,7 +90,7 @@
                         <goals>
                             <goal>execute</goal>
                         </goals>
-                        <phase>initialize</phase>
+                        <phase>generate-resources</phase>
                         <configuration>
                             <delimiter>/</delimiter>
                             <delimiterType>row</delimiterType>
@@ -104,6 +105,7 @@
                                 <srcFile>src/main/resources/sql/JOB_SERVICE.sql</srcFile>
                                 <srcFile>src/main/resources/sql/V_DEPARTMENTS.sql</srcFile>
                                 <srcFile>src/main/resources/sql/DEPARTMENT_SERVICE.sql</srcFile>
+                                <srcFile>src/main/resources/sql/COMPLEX_DATA_SERVICE.sql</srcFile>
                             </srcFiles>
                         </configuration>
                     </execution>
@@ -128,6 +130,7 @@
                 </dependencies>
                 <executions>
                     <execution>
+                        <phase>generate-resources</phase>
                         <goals>
                             <goal>generate-noorm</goal>
                         </goals>
@@ -150,7 +153,7 @@
                     </enumTable2DisplayColumnMapping>
                     <oracleTable2SequenceMapping>
                         <property>
-                            <name>(EMPLOYEES|DEPARTMENTS|LOCATIONS|OPT_LOCK_.*)</name>
+                            <name>(EMPLOYEES|DEPARTMENTS|LOCATIONS|OPT_LOCK_.*|COMPLEX.*)</name>
                             <value>$1_SEQ</value>
                         </property>
                         <property>
@@ -166,10 +169,15 @@
                     </viewName2PrimaryKeyMapping>
                     <optimisticLockColumnMapping>
                         <property>
-                            <name>OPT_LOCK_(.*)</name>
+                            <name>OPT_LOCK_.*</name>
+                            <value>VERSION</value>
+                        </property>
+                        <property>
+                            <name>COMPLEX_.*</name>
                             <value>VERSION</value>
                         </property>
                     </optimisticLockColumnMapping>
+                    <singleRowFinderRegex>(.*_unique.*)</singleRowFinderRegex>
                 </configuration>
             </plugin>
         </plugins>
