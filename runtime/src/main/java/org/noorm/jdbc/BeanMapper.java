@@ -30,6 +30,7 @@ public class BeanMapper<T> {
 
 	private static BeanMapper mapper = new BeanMapper();
 	private static final Logger log = LoggerFactory.getLogger(BeanMapper.class);
+    private static int DEFAULT_BUFFER_SIZE = 4096;
 
 	public static <T> BeanMapper<T> getInstance() {
 
@@ -205,12 +206,13 @@ public class BeanMapper<T> {
                 if (dataType.equals("CLOB")) {
                     final Clob clob = pResultSet.getClob(fieldName);
                     if (clob != null) {
-                        final StringWriter stringWriter = new StringWriter();
                         final Reader reader = clob.getCharacterStream();
-                        final char[] buffer = new char[1];
+                        final StringWriter stringWriter = new StringWriter();
                         try {
-                            while (reader.read(buffer) > 0) {
-                                stringWriter.write(buffer);
+                            final char[] buffer = new char[DEFAULT_BUFFER_SIZE];
+                            int n;
+                            while (-1 != (n = reader.read(buffer))) {
+                                stringWriter.write(buffer, 0, n);
                             }
                             field.set(pBean, stringWriter.toString());
                         } catch (IOException ex) {
@@ -273,12 +275,13 @@ public class BeanMapper<T> {
                 if (dataType.equals("BLOB")) {
                     final Blob blob = pResultSet.getBlob(fieldName);
                     if (blob != null) {
-                        final ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
                         final InputStream inputStream = blob.getBinaryStream();
-                        final byte[] buffer = new byte[1];
+                        final ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
                         try {
-                            while (inputStream.read(buffer) > 0) {
-                                byteArrayOutputStream.write(buffer);
+                            final byte[] buffer = new byte[DEFAULT_BUFFER_SIZE];
+                            int n;
+                            while (-1 != (n = inputStream.read(buffer))) {
+                                byteArrayOutputStream.write(buffer, 0, n);
                             }
                             field.set(pBean, byteArrayOutputStream.toByteArray());
                         } catch (IOException ex) {
