@@ -1,16 +1,8 @@
 package org.noorm.jdbc;
 
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.io.InputStream;
-import java.sql.SQLException;
-import java.util.Properties;
-
 import oracle.jdbc.OracleCallableStatement;
 import oracle.jdbc.OracleConnection;
 import oracle.jdbc.pool.OracleDataSource;
-//import oracle.ucp.jdbc.PoolDataSource;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -18,6 +10,9 @@ import javax.naming.Context;
 import javax.naming.InitialContext;
 import javax.naming.NamingException;
 import javax.sql.DataSource;
+import java.sql.SQLException;
+
+//import oracle.ucp.jdbc.PoolDataSource;
 
 /**
  * The DataSourceProvider organizes  data source access and transaction control for NoORM.
@@ -47,32 +42,18 @@ public class DataSourceProvider {
 	private static final Logger log = LoggerFactory.getLogger(DataSourceProvider.class);
 
 	private static DataSourceProvider dataSourceFactory;
-	private DataSource dataSource;
-
-	private static final String NOORM_PROPERTIES_FILENAME = "/META-INF/noorm.properties";
-	private static final String NOORM_XML_FILENAME = "/META-INF/noorm.xml";
-	private static final String DATABASE_JNDINAME = "database.jndiname";
-	private static final String DATABASE_PASSWORD = "database.password";
-	private static final String DATABASE_URL = "database.url";
-	private static final String DATABASE_USERNAME = "database.username";
-	private static final String DATABASE_BATCH_UPDATE_SIZE = "database.batch_update_size";
-	private static final String DEBUG_MODE = "debug.mode";
-	private static final String DEBUG_JDWP_HOST = "debug.host";
-	private static final String DEBUG_JDWP_PORT = "debug.port";
+    private DataSourceConfiguration dataSourceConfiguration;
+    private DataSource dataSource;
 
 	private static final ThreadLocal<OracleConnection> conThreadLocal = new ThreadLocal<OracleConnection>();
 	private static final ThreadLocal<Long> tsStackThreadLocal = new ThreadLocal<Long>();
 
-	private int batchUpdateSize = 100;
-
-	private boolean debugMode = false;
-	private String debugJDWPPort = "4000";
-	private String debugJDWPHost = "localhost";
-
-	private final Properties noormProperties = new Properties();
+	private final ConfigurationInitializer configurationInitializer = new ConfigurationInitializer();
 
 	private DataSourceProvider() {
-	}
+
+        dataSourceConfiguration = configurationInitializer.init();
+    }
 
 	/**
 	 * Initializes and instantiates the DataSourceProvider with the given, pre-configured DataSource.
@@ -91,9 +72,7 @@ public class DataSourceProvider {
         }
         log.debug("Instantiating DataSourceProvider.");
         dataSourceFactory = new DataSourceProvider();
-        dataSourceFactory.loadNoormProperties();
         dataSourceFactory.dataSource = pDataSource;
-        dataSourceFactory.initNoormProperties();
         validateDataSource();
     }
 
@@ -144,80 +123,9 @@ public class DataSourceProvider {
 		if (dataSourceFactory == null) {
             log.debug("Instantiating DataSourceProvider.");
             dataSourceFactory = new DataSourceProvider();
-            dataSourceFactory.loadNoormProperties();
             dataSourceFactory.initDataSource();
-            dataSourceFactory.initNoormProperties();
         }
         return dataSourceFactory.dataSource;
-	}
-
-	private void loadNoormProperties() {
-
-		log.info("Trying to load configuration file ".concat(NOORM_XML_FILENAME));
-		InputStream is = dataSourceFactory.getClass().getResourceAsStream(NOORM_XML_FILENAME);
-		try {
-			if (is != null) {
-				noormProperties.loadFromXML(is);
-				log.info("Configuration file ".concat(NOORM_XML_FILENAME).concat(" loaded."));
-			} else {
-				log.info("Configuration file ".concat(NOORM_XML_FILENAME).concat(" not found."));
-				log.info("Trying to load configuration file ".concat(NOORM_PROPERTIES_FILENAME));
-				is = dataSourceFactory.getClass().getResourceAsStream(NOORM_PROPERTIES_FILENAME);
-				if (is != null) {
-					noormProperties.load(is);
-					log.info("Configuration file ".concat(NOORM_PROPERTIES_FILENAME).concat(" loaded."));
-				} else {
-					log.info("Configuration file ".concat(NOORM_PROPERTIES_FILENAME).concat(" not found."));
-					throw new FileNotFoundException();
-				}
-			}
-		} catch (FileNotFoundException ex) {
-			// File noorm.properties is optional, failing to load the properties is considered to be
-			// an exception only when the reason for the failure is not a missing file.
-		} catch (IOException ex) {
-			throw new DataAccessException(DataAccessException.Type.INITIALIZATION_FAILURE,
-					"Loading of noorm.properties failed.");
-		}
-	}
-
-	private void initNoormProperties() {
-
-		final String batchUpdateSizeProp = noormProperties.getProperty(DATABASE_BATCH_UPDATE_SIZE);
-		if (batchUpdateSizeProp != null && !batchUpdateSizeProp.isEmpty()) {
-			try {
-				batchUpdateSize = Integer.parseInt(batchUpdateSizeProp);
-				log.info("Setting ".concat(DATABASE_BATCH_UPDATE_SIZE).concat(" = ").concat(batchUpdateSizeProp));
-			} catch (NumberFormatException ex) {
-				throw new DataAccessException(DataAccessException.Type.INITIALIZATION_FAILURE, ex);
-			}
-		} else {
-			final String batchUpdateSizeS = (new Integer(batchUpdateSize).toString());
-			log.info("Setting (default) ".concat(DATABASE_BATCH_UPDATE_SIZE).concat(" = ").concat(batchUpdateSizeS));
-		}
-
-		final String debugModeProp = noormProperties.getProperty(DEBUG_MODE);
-		if (debugModeProp != null && debugModeProp.toLowerCase().equals("true")) {
-			debugMode = true;
-			log.info("Setting ".concat(DEBUG_MODE).concat(" = true"));
-		} else {
-			log.info("Setting (default) ".concat(DEBUG_MODE).concat(" = false"));
-		}
-
-		final String debugHostProp = noormProperties.getProperty(DEBUG_JDWP_HOST);
-		if (debugHostProp != null && !debugHostProp.isEmpty()) {
-			debugJDWPHost = debugHostProp;
-			log.info("Setting ".concat(DEBUG_JDWP_HOST).concat(" = ").concat(debugHostProp));
-		} else {
-			log.info("Setting (default) ".concat(DEBUG_JDWP_HOST).concat(" = ").concat(debugJDWPHost));
-		}
-
-		final String debugPortProp = noormProperties.getProperty(DEBUG_JDWP_PORT);
-		if (debugPortProp != null && !debugPortProp.isEmpty()) {
-			debugJDWPPort = debugPortProp;
-			log.info("Setting ".concat(DEBUG_JDWP_PORT).concat(" = ").concat(debugPortProp));
-		} else {
-			log.info("Setting (default) ".concat(DEBUG_JDWP_PORT).concat(" = ").concat(debugJDWPPort));
-		}
 	}
 
 	/*
@@ -227,7 +135,7 @@ public class DataSourceProvider {
 	 */
 	private void initDataSource() throws SQLException {
 
-		final String jndiName = noormProperties.getProperty(DATABASE_JNDINAME);
+		final String jndiName = dataSourceConfiguration.getDatabaseJNDIName();
 
 		if (jndiName != null) {
 
@@ -242,26 +150,20 @@ public class DataSourceProvider {
 
 		} else {
 
-			final String url = noormProperties.getProperty(DATABASE_URL);
+			final String url = dataSourceConfiguration.getDatabaseURL();
 			if (url == null) {
 				throw new DataAccessException(DataAccessException.Type.INITIALIZATION_FAILURE,
-						"Data source parameter 'database.url' not properly configured.");
-			} else {
-				log.info("Setting ".concat(DATABASE_URL).concat(" = ").concat(url));
+						"JDBC data source URL not properly configured.");
 			}
-			final String username = noormProperties.getProperty(DATABASE_USERNAME);
+			final String username = dataSourceConfiguration.getDatabaseUsername();
 			if (username == null) {
 				throw new DataAccessException(DataAccessException.Type.INITIALIZATION_FAILURE,
-						"Data source parameter 'database.username' not properly configured.");
-			} else {
-				log.info("Setting ".concat(DATABASE_USERNAME).concat(" = ").concat(username));
+						"JDBC data source username not properly configured.");
 			}
-			final String password = noormProperties.getProperty(DATABASE_PASSWORD);
+			final String password = dataSourceConfiguration.getDatabasePassword();
 			if (password == null) {
 				throw new DataAccessException(DataAccessException.Type.INITIALIZATION_FAILURE,
-						"Data source parameter 'database.password' not properly configured.");
-			} else {
-				log.info("Setting ".concat(DATABASE_PASSWORD).concat(" = ").concat(password));
+						"JDBC data source password not properly configured.");
 			}
 
 			OracleDataSource oracleDataSource = new OracleDataSource();
@@ -354,7 +256,7 @@ public class DataSourceProvider {
 			}
 
 			con.setAutoCommit(false);
-			if (dataSourceFactory.debugMode) {
+			if (dataSourceFactory.dataSourceConfiguration.isDebugMode()) {
 				enableDebugMode(con);
 			}
 			if (pRetain) {
@@ -514,7 +416,7 @@ public class DataSourceProvider {
 	 */
 	public static int getBatchUpdateSize() {
 
-		return dataSourceFactory.batchUpdateSize;
+		return dataSourceFactory.dataSourceConfiguration.getDatabaseBatchUpdateSize();
 	}
 
 	/**
@@ -524,7 +426,7 @@ public class DataSourceProvider {
 	 */
 	public static void setBatchUpdateSize(final int pBatchUpdateSize) {
 
-		dataSourceFactory.batchUpdateSize = pBatchUpdateSize;
+		dataSourceFactory.dataSourceConfiguration.setDatabaseBatchUpdateSize(pBatchUpdateSize);
 	}
 
 	/**
@@ -534,7 +436,7 @@ public class DataSourceProvider {
 	 */
 	public boolean isDebugOn() {
 
-		return debugMode;
+		return dataSourceFactory.dataSourceConfiguration.isDebugMode();
 	}
 
 	/**
@@ -546,7 +448,7 @@ public class DataSourceProvider {
 	 */
 	public static void setDebugMode(final boolean pDebugMode) {
 
-		dataSourceFactory.debugMode = pDebugMode;
+		dataSourceFactory.dataSourceConfiguration.setDebugMode(pDebugMode);
 	}
 
 	// There is no easy configurable way to control a clean disconnect for the established debug
@@ -555,14 +457,14 @@ public class DataSourceProvider {
 
 		StringBuilder logMessage = new StringBuilder();
 		logMessage.append("Enabling PL/SQL debugging. Connecting to host : ");
-		logMessage.append(dataSourceFactory.debugJDWPHost);
+		logMessage.append(dataSourceFactory.dataSourceConfiguration.getDebugJDWPHost());
 		logMessage.append(", port : ");
-		logMessage.append(dataSourceFactory.debugJDWPPort);
+		logMessage.append(dataSourceFactory.dataSourceConfiguration.getDebugJDWPPort());
 		log.debug(logMessage.toString());
 		final String plSQLCall = "{ call dbms_debug_jdwp.connect_tcp(host => :host, port => :port)";
 		final OracleCallableStatement cstmt = (OracleCallableStatement) pCon.prepareCall(plSQLCall);
-		cstmt.setString("host", dataSourceFactory.debugJDWPHost);
-		cstmt.setString("port", dataSourceFactory.debugJDWPPort);
+		cstmt.setString("host", dataSourceFactory.dataSourceConfiguration.getDebugJDWPHost());
+		cstmt.setString("port", dataSourceFactory.dataSourceConfiguration.getDebugJDWPPort());
 		cstmt.execute();
 	}
 }
