@@ -9,6 +9,7 @@ import java.io.InputStream;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Properties;
+import java.util.Set;
 
 /**
  * This class reads the NoORM configuration file (noorm.xml or noorm.properties), if it exists and initializes the
@@ -22,6 +23,7 @@ public class ConfigurationInitializer {
 
     public static final String NOORM_PROPERTIES_FILENAME = "/META-INF/noorm.properties";
     public static final String NOORM_XML_FILENAME = "/META-INF/noorm.xml";
+    public static final String DATASOURCE_NAMES = "datasource.names";
     public static final String DATABASE_JNDINAME = "database.jndiname";
     public static final String DATABASE_PASSWORD = "database.password";
     public static final String DATABASE_URL = "database.url";
@@ -31,82 +33,113 @@ public class ConfigurationInitializer {
     public static final String DEBUG_JDWP_HOST = "debug.host";
     public static final String DEBUG_JDWP_PORT = "debug.port";
 
-    private static final String DEFAULT_DATA_SOURCE_NAME = "_DEFAULT_";
+    public static final String DEFAULT_DATA_SOURCE_NAME = "";
 
-    private final Map noormProperties = new HashMap();
+    /**
+     * Reads the NoORM configuration file and maps the configuration values to a map with data source
+     * configurations. Configuration parameter "datasource.names" indicates, whether more than a single
+     * data source configuration is available (for single data sources, this parameter is not required).
+     * When multiple data sources are configured, the data source names must be used as prefix for all
+     * other configuration parameters.
+     *
+     * @return configured data source configurations
+     */
+    public Map<String, DataSourceConfiguration> init() {
 
-    public DataSourceConfiguration init() {
-
+        final Map<String, DataSourceConfiguration> dataSources = new HashMap<String, DataSourceConfiguration>();
         final Properties noormFileProperties = loadNoormProperties();
-        return initNoormProperties(noormFileProperties);
+        final String dataSourceNameList = noormFileProperties.getProperty(DATASOURCE_NAMES);
+        if (dataSourceNameList != null && !dataSourceNameList.isEmpty()) {
+            // Multiple data source names have been configured.
+            final String[] dataSourceNames = dataSourceNameList.split(",");
+            for (final String dataSourceName : dataSourceNames) {
+                final DataSourceConfiguration dataSourceConfiguration =
+                        initNoormProperties(noormFileProperties, dataSourceName);
+                dataSources.put(dataSourceName, dataSourceConfiguration);
+            }
+        } else {
+            final DataSourceConfiguration dataSourceConfiguration =
+                    initNoormProperties(noormFileProperties, DEFAULT_DATA_SOURCE_NAME);
+            dataSources.put(DEFAULT_DATA_SOURCE_NAME, dataSourceConfiguration);
+        }
+        return dataSources;
     }
 
-    private DataSourceConfiguration initNoormProperties(final Properties pNoORMFileProperties) {
+    private DataSourceConfiguration initNoormProperties(final Properties pNoORMFileProperties,
+                                                        final String pDataSourceName) {
 
         final DataSourceConfiguration dataSourceConfiguration = new DataSourceConfiguration();
 
-        final String batchUpdateSizeProp = pNoORMFileProperties.getProperty(DATABASE_BATCH_UPDATE_SIZE);
+        String key = pDataSourceName.concat(DATABASE_BATCH_UPDATE_SIZE);
+        final String batchUpdateSizeProp = pNoORMFileProperties.getProperty(key);
         if (batchUpdateSizeProp != null && !batchUpdateSizeProp.isEmpty()) {
             try {
                 dataSourceConfiguration.setDatabaseBatchUpdateSize(Integer.parseInt(batchUpdateSizeProp));
-                log.info("Setting ".concat(DATABASE_BATCH_UPDATE_SIZE).concat(" = ").concat(batchUpdateSizeProp));
+                log.info("Setting ".concat(key).concat(" = ").concat(batchUpdateSizeProp));
             } catch (NumberFormatException ex) {
                 throw new DataAccessException(DataAccessException.Type.INITIALIZATION_FAILURE, ex);
             }
         } else {
             final String batchUpdateSizeS =
                     (new Integer(dataSourceConfiguration.getDatabaseBatchUpdateSize()).toString());
-            log.info("Setting (default) ".concat(DATABASE_BATCH_UPDATE_SIZE).concat(" = ").concat(batchUpdateSizeS));
+            log.info("Setting (default) ".concat(key).concat(" = ").concat(batchUpdateSizeS));
         }
 
-        final String debugModeProp = pNoORMFileProperties.getProperty(DEBUG_MODE);
+        key = pDataSourceName.concat(DEBUG_MODE);
+        final String debugModeProp = pNoORMFileProperties.getProperty(key);
         if (debugModeProp != null && debugModeProp.toLowerCase().equals("true")) {
             dataSourceConfiguration.setDebugMode(true);
-            log.info("Setting ".concat(DEBUG_MODE).concat(" = true"));
+            log.info("Setting ".concat(key).concat(" = true"));
         } else {
-            log.info("Setting (default) ".concat(DEBUG_MODE).concat(" = false"));
+            log.info("Setting (default) ".concat(key).concat(" = false"));
         }
 
-        final String debugHostProp = pNoORMFileProperties.getProperty(DEBUG_JDWP_HOST);
+        key = pDataSourceName.concat(DEBUG_JDWP_HOST);
+        final String debugHostProp = pNoORMFileProperties.getProperty(key);
         if (debugHostProp != null && !debugHostProp.isEmpty()) {
             dataSourceConfiguration.setDebugJDWPHost(debugHostProp);
-            log.info("Setting ".concat(DEBUG_JDWP_HOST).concat(" = ").concat(debugHostProp));
+            log.info("Setting ".concat(key).concat(" = ").concat(debugHostProp));
         } else {
-            log.info("Setting (default) ".concat(DEBUG_JDWP_HOST).concat(" = ")
+            log.info("Setting (default) ".concat(key).concat(" = ")
                     .concat(dataSourceConfiguration.getDebugJDWPHost()));
         }
 
-        final String debugPortProp = pNoORMFileProperties.getProperty(DEBUG_JDWP_PORT);
+        key = pDataSourceName.concat(DEBUG_JDWP_PORT);
+        final String debugPortProp = pNoORMFileProperties.getProperty(key);
         if (debugPortProp != null && !debugPortProp.isEmpty()) {
             dataSourceConfiguration.setDebugJDWPPort(debugPortProp);
-            log.info("Setting ".concat(DEBUG_JDWP_PORT).concat(" = ").concat(debugPortProp));
+            log.info("Setting ".concat(key).concat(" = ").concat(debugPortProp));
         } else {
-            log.info("Setting (default) ".concat(DEBUG_JDWP_PORT).concat(" = ")
+            log.info("Setting (default) ".concat(key).concat(" = ")
                     .concat(dataSourceConfiguration.getDebugJDWPPort()));
         }
 
-        final String databaseJNDIName = pNoORMFileProperties.getProperty(DATABASE_JNDINAME);
+        key = pDataSourceName.concat(DATABASE_JNDINAME);
+        final String databaseJNDIName = pNoORMFileProperties.getProperty(key);
         if (databaseJNDIName != null && !databaseJNDIName.isEmpty()) {
             dataSourceConfiguration.setDatabaseJNDIName(databaseJNDIName);
-            log.info("Setting ".concat(DATABASE_JNDINAME).concat(" = ").concat(databaseJNDIName));
+            log.info("Setting ".concat(key).concat(" = ").concat(databaseJNDIName));
         }
 
-        final String databaseURL = pNoORMFileProperties.getProperty(DATABASE_URL);
+        key = pDataSourceName.concat(DATABASE_URL);
+        final String databaseURL = pNoORMFileProperties.getProperty(key);
         if (databaseURL != null && !databaseURL.isEmpty()) {
             dataSourceConfiguration.setDatabaseURL(databaseURL);
-            log.info("Setting ".concat(DATABASE_URL).concat(" = ").concat(databaseURL));
+            log.info("Setting ".concat(key).concat(" = ").concat(databaseURL));
         }
 
-        final String databaseUsername = pNoORMFileProperties.getProperty(DATABASE_USERNAME);
+        key = pDataSourceName.concat(DATABASE_USERNAME);
+        final String databaseUsername = pNoORMFileProperties.getProperty(key);
         if (databaseUsername != null && !databaseUsername.isEmpty()) {
             dataSourceConfiguration.setDatabaseUsername(databaseUsername);
-            log.info("Setting ".concat(DATABASE_USERNAME).concat(" = ").concat(databaseUsername));
+            log.info("Setting ".concat(key).concat(" = ").concat(databaseUsername));
         }
 
-        final String databasePassword = pNoORMFileProperties.getProperty(DATABASE_PASSWORD);
+        key = pDataSourceName.concat(DATABASE_PASSWORD);
+        final String databasePassword = pNoORMFileProperties.getProperty(key);
         if (databasePassword != null && !databasePassword.isEmpty()) {
             dataSourceConfiguration.setDatabasePassword(databasePassword);
-            log.info("Setting ".concat(DATABASE_PASSWORD).concat(" = ").concat(databasePassword));
+            log.info("Setting ".concat(key).concat(" = ").concat(databasePassword));
         }
 
         return dataSourceConfiguration;

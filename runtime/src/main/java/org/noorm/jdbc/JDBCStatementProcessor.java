@@ -43,13 +43,13 @@ public class JDBCStatementProcessor<T> {
 	private static final Long VERSION_COLUMN_LONG_DEFAULT = 1L;
 	/*
 	 * Using named parameters for callable statements does not work consistently over the various supported
-	 * combinations of JDBC driver versions and database version. In addition, a bug in Oracle 11.2.0.1.0
+	 * combinations of JDBC driver versions and database versions. In addition, a bug in Oracle 11.2.0.1.0
 	 * (9147506 Named parameter in callable statement not working from JDBC), prevents the usage of named
 	 * parameters for callable statements when using Oracle JDBC 11.2.0.2.0). Although the release notes for
-	  * Oracle database patch 11.2.0.2.0 state that bug 9147506 is fixed with this patch, there are still
-	  * problems with Oracle XE 11.2.0.2.0 beta, which should have the same code base.
-	  * The following parameters disabled the usage of named parameters for callable statements (instead,
-	  * indexed parameters are used. This does not apply to prepared statements).
+	 * Oracle database patch 11.2.0.2.0 state that bug 9147506 is fixed with this patch, there are still
+	 * problems with Oracle XE 11.2.0.2.0 beta, which should have the same code base.
+	 * The following parameters disabled the usage of named parameters for callable statements (instead,
+	 * indexed parameters are used. This does not apply to prepared statements).
 	 */
 	private static final boolean USE_NAMED_PARAMETERS = false;
 

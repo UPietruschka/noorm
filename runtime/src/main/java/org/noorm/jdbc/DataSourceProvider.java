@@ -52,7 +52,7 @@ public class DataSourceProvider {
 
 	private DataSourceProvider() {
 
-        dataSourceConfiguration = configurationInitializer.init();
+        dataSourceConfiguration = configurationInitializer.init().get("");
     }
 
 	/**
