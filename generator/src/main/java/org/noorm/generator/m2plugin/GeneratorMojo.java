@@ -235,7 +235,11 @@ public class GeneratorMojo extends AbstractMojo implements IParameters {
 	public void execute() throws MojoExecutionException, MojoFailureException {
 
 		try {
-			DataSourceProvider.setDataSource(initializePoolDataSource());
+            // Generate an arbitrary data source name. Since the generator can be called more than once within
+            // a single Maven build, we should at least generate a unique name, since DataSourceProvider does
+            // not allow to replace an already added data source (with the same name).
+            final String dataSourceName = Long.toString(System.currentTimeMillis());
+			DataSourceProvider.addDataSource(initializePoolDataSource(), dataSourceName, true);
 		} catch (SQLException e) {
 			throw new MojoExecutionException("Initializing Oracle PoolDataSource failed.", e);
 		}

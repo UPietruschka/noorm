@@ -11,29 +11,32 @@ import javax.naming.InitialContext;
 import javax.naming.NamingException;
 import javax.sql.DataSource;
 import java.sql.SQLException;
+import java.util.HashMap;
+import java.util.Map;
 
 //import oracle.ucp.jdbc.PoolDataSource;
 
 /**
- * The DataSourceProvider organizes  data source access and transaction control for NoORM.
- * Access to the JDBC connection objects is discouraged outside of NoORM. The only reason
- * to use DataSourceProvider directly in an application is for fine grained transaction
- * control. DataSourceProvider provides the required methods begin(), commit() and rollback()
- * to control a transaction in an application (direct access to the underlying JDBC
- * connection is possible for special purposes like integration with Oracle AQ).
- * When these methods for explicit transaction control are not used, DataSourceProvider will
- * manage transactions automatically by issuing an auto-commit for every database access.
- * Issuing a commit even for read-only database access imposes a little performance overhead.
- * For most usage scenarios, this overhead is not significant. However, when an application
- * performs a large number of read only operation it it worth comparing performance with
- * explicit transaction handling.
- * Explicit transaction handling (using begin(), commit(), rollback()) is managed by
- * maintaining the JDBC connection in a ThreadLocal variable. This removes the burden of
- * connection control from the application programmer, since DataSourceProvider will keep
- * track of the current transaction beyond class and method boundaries in the application.
- * However, using explicit transaction control requires the application programmer to control
- * transaction termination properly, i.e., the application must guarantee that a transaction
- * started with begin() will always be terminated with commit() or rollback().
+ * DataSourceProvider manages data sources and controls transactions in the NoORM runtime engine.
+ * Data sources are typically configured in the NoORM configuration file ("noorm.xml" or "noorm.properties").
+ * Alternatively, data sources can be added using static method addDataSource. Due to the complex nature of
+ * database resource handling in a running system, data sources, which have been added to the system cannot
+ * be removed.
+ * DataSourceProvider is a Java singleton, which takes over full control over the database connections. Direct
+ * usage of database connections is possible for dedicated purposes (e.g. integration with Oracle AQ), but
+ * discouraged for typical database access operations. The public API for DataSourceProvider is simple to use
+ * and primarily provides the required functionality for explicit transaction handling using the methods begin(),
+ * commit() and rollback(). Without explicit transaction handling, DataSourceProvider manages transactions
+ * automatically by issuing an auto-commit after every database call. Issuing a commit even for read-only
+ * database access imposes a little performance overhead. However, for most usage scenarios, this overhead is
+ * not significant.
+ * Explicit transaction handling (using begin(), commit(), rollback()) is managed by maintaining the JDBC
+ * connection in a ThreadLocal variable. This removes the burden of connection control from the application
+ * programmer, since DataSourceProvider will keep track of the current transaction beyond class and method
+ * boundaries in the application.
+ * Using explicit transaction control requires the application programmer to control transaction termination
+ * properly, i.e., the application must guarantee that a transaction started with begin() will always be
+ * terminated with commit() or rollback().
  *
  * @author Ulf Pietruschka / ulf.pietruschka@etenso.com
  */
@@ -41,39 +44,109 @@ public class DataSourceProvider {
 
 	private static final Logger log = LoggerFactory.getLogger(DataSourceProvider.class);
 
-	private static DataSourceProvider dataSourceFactory;
-    private DataSourceConfiguration dataSourceConfiguration;
-    private DataSource dataSource;
-
-	private static final ThreadLocal<OracleConnection> conThreadLocal = new ThreadLocal<OracleConnection>();
-	private static final ThreadLocal<Long> tsStackThreadLocal = new ThreadLocal<Long>();
-
-	private final ConfigurationInitializer configurationInitializer = new ConfigurationInitializer();
+    private static final Map<String, ActiveDataSource> activeDataSourceMap = new HashMap<String, ActiveDataSource>();
+    private static final ThreadLocal<ActiveConnectionData> activeConThreadDta = new ThreadLocal<ActiveConnectionData>();
+    private static final DataSourceProvider dataSourceProvider = new DataSourceProvider();
 
 	private DataSourceProvider() {
 
-        dataSourceConfiguration = configurationInitializer.init().get("");
+        log.info("Instantiating NoORM DataSourceProvider.");
+        final ConfigurationInitializer configurationInitializer = new ConfigurationInitializer();
+        final Map<String, DataSourceConfiguration> dataSourceConfigurations = configurationInitializer.init();
+        for (final String dataSourceName : dataSourceConfigurations.keySet()) {
+            final DataSourceConfiguration dataSourceConfiguration = dataSourceConfigurations.get(dataSourceName);
+            final ActiveDataSource activeDataSource = new ActiveDataSource();
+            activeDataSource.setConfiguration(dataSourceConfiguration);
+            activeDataSourceMap.put(dataSourceName, activeDataSource);
+        }
     }
 
-	/**
-	 * Initializes and instantiates the DataSourceProvider with the given, pre-configured DataSource.
-	 * This step is optionally but strictly recommend for production usage. Alternatively, the datasource
-	 * could be configured using the noorm.properties file, but the latter is only suitable for a simple
-	 * setup with username, password and URL. To apply advanced settings to the DataSource, this
-	 * pre-configuration method should be used.
-	 *
-	 * @param pDataSource the pre-configured Oracle datasource.
-	 */
-	public static void setDataSource(final DataSource pDataSource) {
+    private static DataSourceConfiguration getActiveConfiguration() {
 
-        if (dataSourceFactory != null) {
-            // Invalidate thread local connection
-            conThreadLocal.remove();
+        return getActiveConnectionData().getActiveDataSource().getConfiguration();
+    }
+
+    private static ActiveConnectionData getActiveConnectionData() {
+
+        return getActiveConnectionData(null);
+    }
+
+    /**
+     * The active connection data contains the currently active data source and the database connection, if the
+     * connection is retained for an explicitly managed transaction. The active connection data is stored in a
+     * ThreadLocal variable. When a new thread acquires a database connection, a new ActiveConnectionData object
+     * is instantiated. The active data source is automatically assigned, when only one data source has been
+     * configured or when the associated ActiveDataSource object is provided.
+     *
+     * @param pActiveDataSource optional parameter to explicitly set the active data source
+     * @return the currently active connection data
+     */
+    private static ActiveConnectionData getActiveConnectionData(final ActiveDataSource pActiveDataSource) {
+
+        ActiveConnectionData activeConnectionData = activeConThreadDta.get();
+        if (activeConnectionData == null) {
+            activeConnectionData = new ActiveConnectionData();
+            if (pActiveDataSource != null) {
+                activeConnectionData.setActiveDataSource(pActiveDataSource);
+            } else {
+                // In case of a single configured data source, we activate this data source as default data source.
+                if (activeDataSourceMap.size() == 1) {
+                    log.info("Activating default data source.");
+                    ActiveDataSource activeDataSource = activeDataSourceMap.values().iterator().next();
+                    activeConnectionData.setActiveDataSource(activeDataSource);
+                } else {
+                    // In case of multiple configured data sources (or none), the caller must activate the
+                    // data source to decide, which one to use.
+                    throw new DataAccessException(DataAccessException.Type.NO_ACTIVE_DATA_SOURCE);
+                }
+            }
+            activeConThreadDta.set(activeConnectionData);
         }
-        log.debug("Instantiating DataSourceProvider.");
-        dataSourceFactory = new DataSourceProvider();
-        dataSourceFactory.dataSource = pDataSource;
-        validateDataSource();
+        return activeConnectionData;
+    }
+
+    /**
+     * Activates the data source with the given name.
+     * The name of the data source is either the name provided for the data source in the NoORM configuration
+     * file (noorm.xml or noorm.properties) or the name provided, when the data source been added using method
+     * addDataSource.
+     *
+     * @param pDataSourceName the name of the data source to be activated.
+     */
+    public static void setActiveDataSource(final String pDataSourceName) {
+
+        final ActiveDataSource activeDataSource = activeDataSourceMap.get(pDataSourceName);
+        if (activeDataSource == null) {
+            throw new DataAccessException(DataAccessException.Type.UNKNOWN_DATA_SOURCE);
+        }
+        final ActiveConnectionData activeConnectionData = getActiveConnectionData(activeDataSource);
+        activeConnectionData.setActiveDataSource(activeDataSource);
+    }
+
+    /**
+     * Adds and optionally activates a new data source to be controlled by the DataSourceProvider.
+     *
+     * @param pDataSource the pre-configured data source.
+     * @param pDataSourceName the name of the data source. Used by method setActiveDataSource.
+     * @param pActivate determines, whether the data source should be activated right after it has been added.
+     */
+	public static void addDataSource(final DataSource pDataSource,
+                                     final String pDataSourceName,
+                                     final boolean pActivate) {
+
+        ActiveDataSource activeDataSource = activeDataSourceMap.get(pDataSourceName);
+        if (activeDataSource != null) {
+            throw new DataAccessException(DataAccessException.Type.DATA_SOURCE_ALREADY_ADDED);
+        }
+        validateDataSource(pDataSource);
+        activeDataSource = new ActiveDataSource();
+        final DataSourceConfiguration configuration = new DataSourceConfiguration();
+        activeDataSource.setDataSource(pDataSource);
+        activeDataSource.setConfiguration(configuration);
+        activeDataSourceMap.put(pDataSourceName, activeDataSource);
+        if (pActivate) {
+            setActiveDataSource(pDataSourceName);
+        }
     }
 
 	/**
@@ -81,7 +154,7 @@ public class DataSourceProvider {
 	 * data source constructed using the NoORM properties, a connection is established to validate
 	 * the data source.
 	 */
-	private static void validateDataSource() {
+	private static void validateDataSource(final DataSource dataSource) {
 
 		final StringBuilder validationInfo = new StringBuilder();
 		validationInfo.append("Validating data source. ");
@@ -92,27 +165,27 @@ public class DataSourceProvider {
 			//		The typically undesired dependency for a specific connection pool implementation
 			//		outweighs the advantage of a proper reporting for a mis-configured data source.
 			//		Thus, UCP is no longer considered within NoORM.
-			//if (dataSourceFactory.dataSource instanceof PoolDataSource) {
+			//if (dataSourceProvider.activeDataSource instanceof PoolDataSource) {
 			//	validationInfo.append("Connection parameters: ");
 			//	validationInfo.append(";URL: ");
-			//	validationInfo.append(((PoolDataSource) dataSourceFactory.dataSource).getURL());
+			//	validationInfo.append(((PoolDataSource) dataSourceProvider.activeDataSource).getURL());
 			//	validationInfo.append(";Username: ");
-			//	validationInfo.append(((PoolDataSource) dataSourceFactory.dataSource).getUser());
+			//	validationInfo.append(((PoolDataSource) dataSourceProvider.activeDataSource).getUser());
 			//} else {
-			if (dataSourceFactory.dataSource instanceof OracleDataSource) {
+			if (dataSource instanceof OracleDataSource) {
 				validationInfo.append("Connection parameters: ");
 				validationInfo.append(";URL: ");
-				validationInfo.append(((OracleDataSource) dataSourceFactory.dataSource).getURL());
+				validationInfo.append(((OracleDataSource) dataSource).getURL());
 				validationInfo.append(";Username: ");
-				validationInfo.append(((OracleDataSource) dataSourceFactory.dataSource).getUser());
+				validationInfo.append(((OracleDataSource) dataSource).getUser());
 			} else {
 				validationInfo.append("Unable to retrieve connection parameters from data source. [");
-				validationInfo.append(dataSourceFactory.dataSource.getClass().getName());
+				validationInfo.append(dataSource.getClass().getName());
 				validationInfo.append("]");
 			}
 			//}
 			log.info(validationInfo.toString());
-			dataSourceFactory.dataSource.getConnection();
+            dataSource.getConnection();
 		} catch (Exception e) {
 			throw new DataAccessException(DataAccessException.Type.COULD_NOT_ESTABLISH_CONNECTION, e);
 		}
@@ -120,12 +193,14 @@ public class DataSourceProvider {
 
 	private static DataSource getDataSource() throws SQLException {
 
-		if (dataSourceFactory == null) {
-            log.debug("Instantiating DataSourceProvider.");
-            dataSourceFactory = new DataSourceProvider();
-            dataSourceFactory.initDataSource();
+        final ActiveConnectionData activeConnectionData = getActiveConnectionData();
+        final ActiveDataSource activeDataSource = activeConnectionData.getActiveDataSource();
+		if (activeDataSource.getDataSource() == null) {
+            log.debug("Initializing data source.");
+            final DataSource dataSource = dataSourceProvider.initDataSource(activeDataSource.getConfiguration());
+            activeDataSource.setDataSource(dataSource);
         }
-        return dataSourceFactory.dataSource;
+        return activeDataSource.getDataSource();
 	}
 
 	/*
@@ -133,16 +208,18 @@ public class DataSourceProvider {
 	 * by providing the required parameters for setting up an OracleDataSource. When both types of
 	 * configuration settings are available, the JNDI configuration has precedence.
 	 */
-	private void initDataSource() throws SQLException {
+	private DataSource initDataSource(final DataSourceConfiguration pDataSourceConfiguration) throws SQLException {
 
-		final String jndiName = dataSourceConfiguration.getDatabaseJNDIName();
+        DataSource dataSource;
+        pDataSourceConfiguration.validate();
+		final String jndiName = pDataSourceConfiguration.getDatabaseJNDIName();
 
 		if (jndiName != null) {
 
 			try {
 				log.info("Trying to establish data source using JDNI name ".concat(jndiName));
 				final Context initCtx = new InitialContext();
-				dataSource = (DataSource) initCtx.lookup(jndiName);
+                dataSource = (DataSource) initCtx.lookup(jndiName);
 				log.info("JNDI data source lookup successful.");
 			} catch (NamingException e) {
 				throw new DataAccessException("JNDI data source lookup failed.", e);
@@ -150,35 +227,20 @@ public class DataSourceProvider {
 
 		} else {
 
-			final String url = dataSourceConfiguration.getDatabaseURL();
-			if (url == null) {
-				throw new DataAccessException(DataAccessException.Type.INITIALIZATION_FAILURE,
-						"JDBC data source URL not properly configured.");
-			}
-			final String username = dataSourceConfiguration.getDatabaseUsername();
-			if (username == null) {
-				throw new DataAccessException(DataAccessException.Type.INITIALIZATION_FAILURE,
-						"JDBC data source username not properly configured.");
-			}
-			final String password = dataSourceConfiguration.getDatabasePassword();
-			if (password == null) {
-				throw new DataAccessException(DataAccessException.Type.INITIALIZATION_FAILURE,
-						"JDBC data source password not properly configured.");
-			}
-
 			OracleDataSource oracleDataSource = new OracleDataSource();
-			oracleDataSource.setURL(url);
-			oracleDataSource.setUser(username);
-			oracleDataSource.setPassword(password);
-			dataSource = oracleDataSource;
+			oracleDataSource.setURL(pDataSourceConfiguration.getDatabaseURL());
+			oracleDataSource.setUser(pDataSourceConfiguration.getDatabaseUsername());
+			oracleDataSource.setPassword(pDataSourceConfiguration.getDatabasePassword());
+            dataSource = oracleDataSource;
 		}
 
-		validateDataSource();
+		validateDataSource(dataSource);
+        return dataSource;
 	}
 
 	static void returnConnection(final OracleConnection pCon, final boolean pSuccess) {
 
-		OracleConnection con = conThreadLocal.get();
+		OracleConnection con = getActiveConnectionData().getConnection();
 		try {
 			if (con == null || con.isClosed()) {
 				if (log.isDebugEnabled()) {
@@ -234,7 +296,7 @@ public class DataSourceProvider {
 	 */
 	private static OracleConnection getConnection(final boolean pRetain) throws SQLException {
 
-		OracleConnection con = conThreadLocal.get();
+		OracleConnection con = getActiveConnectionData().getConnection();
 		if (con == null || con.isClosed()) {
 			if (log.isDebugEnabled()) {
 				if (pRetain) {
@@ -256,22 +318,23 @@ public class DataSourceProvider {
 			}
 
 			con.setAutoCommit(false);
-			if (dataSourceFactory.dataSourceConfiguration.isDebugMode()) {
+            if (getActiveConfiguration().isDebugMode()) {
 				enableDebugMode(con);
 			}
 			if (pRetain) {
-				conThreadLocal.set(con);
+                getActiveConnectionData().setConnection(con);
 			}
 		}
 		if (pRetain) {
-			Long tsStackThreadLocal0 = tsStackThreadLocal.get();
+			Long tsStackThreadLocal0 = getActiveConnectionData().getTsStack();
 			if (tsStackThreadLocal0 == null) {
-				tsStackThreadLocal.set(1L);
+                getActiveConnectionData().setTsStack(1L);
 			} else {
-				tsStackThreadLocal.set(tsStackThreadLocal0 + 1L);
+                getActiveConnectionData().setTsStack(tsStackThreadLocal0 + 1L);
 			}
 			if (log.isDebugEnabled()) {
-				log.debug("Setting transaction call stack level to ".concat(tsStackThreadLocal.get().toString()));
+				log.debug("Setting transaction call stack level to "
+                        .concat(getActiveConnectionData().getTsStack().toString()));
 			}
 		}
 		return con;
@@ -298,9 +361,6 @@ public class DataSourceProvider {
 	/**
 	 * Commits a user managed transaction.
 	 * Connections are maintained in the connection pool.
-	 * The connection object itself is not exploited to accessing classes outside of the package, but
-	 * for controlling transactions from outside, using methods commit() and rollback() provides the
-	 * required functionality.
 	 * Note that using this method requires that a user managed transaction has been started using
 	 * method begin(), other a DataAccessException is thrown.
 	 * Transactions, which are not user managed are always committed automatically, when the connection
@@ -311,22 +371,23 @@ public class DataSourceProvider {
 
 		OracleConnection con = null;
 		try {
-			con = conThreadLocal.get();
+			con = getActiveConnectionData().getConnection();
 			if (con == null || con.isClosed()) {
 				throw new DataAccessException(DataAccessException.Type.STALE_TRANSACTION);
 			}
 			// When the transaction stack counter indicates that the transaction is beyond the scope of
 			// the caller, reduce the transactions stack counter and remain the connection open.
-			Long tsStackThreadLocal0 = tsStackThreadLocal.get();
+			Long tsStackThreadLocal0 = getActiveConnectionData().getTsStack();
 			if (tsStackThreadLocal0 == null) {
 				throw new DataAccessException(DataAccessException.Type.STALE_TRANSACTION);
 			} else {
-				tsStackThreadLocal.set(tsStackThreadLocal0 - 1L);
+                getActiveConnectionData().setTsStack(tsStackThreadLocal0 - 1L);
 			}
 			if (log.isDebugEnabled()) {
-				log.debug("Setting transaction call stack level to ".concat(tsStackThreadLocal.get().toString()));
+				log.debug("Setting transaction call stack level to "
+                        .concat(getActiveConnectionData().getTsStack().toString()));
 			}
-			if (tsStackThreadLocal.get() == 0L) {
+			if (getActiveConnectionData().getTsStack() == 0L) {
 				if (log.isDebugEnabled()) {
 					log.debug("Committing transaction");
 				}
@@ -344,7 +405,7 @@ public class DataSourceProvider {
 					// Although the connection may get reused in the current thread, we do not know
 					// here, if the thread will be closed. In the latter case we cannot influence,
 					// when the connection is returned to the pool, so we do it here.
-					if (tsStackThreadLocal.get() == 0L) {
+					if (getActiveConnectionData().getTsStack() == 0L) {
 						if (log.isDebugEnabled()) {
 							log.debug("Returning retained connection to connection pool.");
 						}
@@ -364,22 +425,23 @@ public class DataSourceProvider {
 
 		OracleConnection con = null;
 		try {
-			con = conThreadLocal.get();
+			con = getActiveConnectionData().getConnection();
 			if (con == null || con.isClosed()) {
 				throw new DataAccessException(DataAccessException.Type.STALE_TRANSACTION);
 			}
 			// When the transaction stack counter indicates that the transaction is beyond the scope of
 			// the caller, reduce the transactions stack counter and remain the connection open.
-			Long tsStackThreadLocal0 = tsStackThreadLocal.get();
+			Long tsStackThreadLocal0 = getActiveConnectionData().getTsStack();
 			if (tsStackThreadLocal0 == null) {
 				throw new DataAccessException(DataAccessException.Type.STALE_TRANSACTION);
 			} else {
-				tsStackThreadLocal.set(tsStackThreadLocal0 - 1L);
+                getActiveConnectionData().setTsStack(tsStackThreadLocal0 - 1L);
 			}
 			if (log.isDebugEnabled()) {
-				log.debug("Setting transaction call stack level to ".concat(tsStackThreadLocal.get().toString()));
+				log.debug("Setting transaction call stack level to "
+                        .concat(getActiveConnectionData().getTsStack().toString()));
 			}
-			if (tsStackThreadLocal.get() == 0L) {
+			if (getActiveConnectionData().getTsStack() == 0L) {
 				if (log.isDebugEnabled()) {
 					log.debug("Rolling back transaction");
 				}
@@ -397,7 +459,7 @@ public class DataSourceProvider {
 					// Although the connection may get reused in the current thread, we do not know
 					// here, if the thread will be closed. In the latter case we cannot influence,
 					// when the connection is returned to the pool, so we do it here.
-					if (tsStackThreadLocal.get() == 0L) {
+					if (getActiveConnectionData().getTsStack() == 0L) {
 						if (log.isDebugEnabled()) {
 							log.debug("Returning retained connection to connection pool.");
 						}
@@ -416,7 +478,7 @@ public class DataSourceProvider {
 	 */
 	public static int getBatchUpdateSize() {
 
-		return dataSourceFactory.dataSourceConfiguration.getDatabaseBatchUpdateSize();
+        return getActiveConfiguration().getDatabaseBatchUpdateSize();
 	}
 
 	/**
@@ -426,7 +488,7 @@ public class DataSourceProvider {
 	 */
 	public static void setBatchUpdateSize(final int pBatchUpdateSize) {
 
-		dataSourceFactory.dataSourceConfiguration.setDatabaseBatchUpdateSize(pBatchUpdateSize);
+        getActiveConfiguration().setDatabaseBatchUpdateSize(pBatchUpdateSize);
 	}
 
 	/**
@@ -436,7 +498,7 @@ public class DataSourceProvider {
 	 */
 	public boolean isDebugOn() {
 
-		return dataSourceFactory.dataSourceConfiguration.isDebugMode();
+        return getActiveConfiguration().isDebugMode();
 	}
 
 	/**
@@ -448,7 +510,7 @@ public class DataSourceProvider {
 	 */
 	public static void setDebugMode(final boolean pDebugMode) {
 
-		dataSourceFactory.dataSourceConfiguration.setDebugMode(pDebugMode);
+        getActiveConfiguration().setDebugMode(pDebugMode);
 	}
 
 	// There is no easy configurable way to control a clean disconnect for the established debug
@@ -457,14 +519,67 @@ public class DataSourceProvider {
 
 		StringBuilder logMessage = new StringBuilder();
 		logMessage.append("Enabling PL/SQL debugging. Connecting to host : ");
-		logMessage.append(dataSourceFactory.dataSourceConfiguration.getDebugJDWPHost());
+		logMessage.append(getActiveConfiguration().getDebugJDWPHost());
 		logMessage.append(", port : ");
-		logMessage.append(dataSourceFactory.dataSourceConfiguration.getDebugJDWPPort());
+		logMessage.append(getActiveConfiguration().getDebugJDWPPort());
 		log.debug(logMessage.toString());
 		final String plSQLCall = "{ call dbms_debug_jdwp.connect_tcp(host => :host, port => :port)";
 		final OracleCallableStatement cstmt = (OracleCallableStatement) pCon.prepareCall(plSQLCall);
-		cstmt.setString("host", dataSourceFactory.dataSourceConfiguration.getDebugJDWPHost());
-		cstmt.setString("port", dataSourceFactory.dataSourceConfiguration.getDebugJDWPPort());
+		cstmt.setString("host", getActiveConfiguration().getDebugJDWPHost());
+		cstmt.setString("port", getActiveConfiguration().getDebugJDWPPort());
 		cstmt.execute();
 	}
+
+    static class ActiveDataSource {
+
+        private DataSourceConfiguration configuration;
+        private DataSource dataSource;
+
+        public DataSourceConfiguration getConfiguration() {
+            return configuration;
+        }
+
+        public void setConfiguration(final DataSourceConfiguration pConfiguration) {
+            configuration = pConfiguration;
+        }
+
+        public DataSource getDataSource() {
+            return dataSource;
+        }
+
+        public void setDataSource(final DataSource pDataSource) {
+            dataSource = pDataSource;
+        }
+    }
+
+    static class ActiveConnectionData {
+
+        private ActiveDataSource activeDataSource;
+        private OracleConnection connection;
+        private Long tsStack;
+
+        public ActiveDataSource getActiveDataSource() {
+            return activeDataSource;
+        }
+
+        public void setActiveDataSource(ActiveDataSource pActiveDataSource) {
+            activeDataSource = pActiveDataSource;
+        }
+
+        public OracleConnection getConnection() {
+            return connection;
+        }
+
+        public void setConnection(final OracleConnection pConnection) {
+            connection = pConnection;
+        }
+
+        public Long getTsStack() {
+            return tsStack;
+        }
+
+        public void setTsStack(final Long pTSStack) {
+            tsStack = pTSStack;
+        }
+    }
 }

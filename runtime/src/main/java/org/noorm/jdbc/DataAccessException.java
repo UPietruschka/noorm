@@ -48,7 +48,10 @@ public final class DataAccessException extends RuntimeException {
 	public static enum Type {
 
 		COULD_NOT_ESTABLISH_CONNECTION(1000L, "COULD_NOT_ESTABLISH_CONNECTION", "Could not establish database connection."),
-		COULD_NOT_ACCESS_DATA(1100L, "COULD_NOT_ACCESS_DATA", "Could not access data from database."),
+        NO_ACTIVE_DATA_SOURCE(1030L, "NO_ACTIVE_DATA_SOURCE", "No active data source. Use DataSourceProvider.setActiveDataSource to set the active data source."),
+        UNKNOWN_DATA_SOURCE(1040L, "UNKNOWN_DATA_SOURCE", "Unknown data source. Cannot activate data source. Data source name unknown."),
+        DATA_SOURCE_ALREADY_ADDED(1060L, "DATA_SOURCE_ALREADY_ADDED", "Unable to add new data source. A data source with the given name already exists."),
+        COULD_NOT_ACCESS_DATA(1100L, "COULD_NOT_ACCESS_DATA", "Could not access data from database."),
 		MULTIPLE_RECORDS_FOUND(1200L, "MULTIPLE_RECORDS_FOUND", "Multiple records found for single record query."),
 		PARAMETERS_MUST_NOT_BE_NULL(1300L, "PARAMETERS_MUST_NOT_BE_NULL", "Parameters for JDBC call must not be null."),
 		UNSUPPORTED_DATATYPE(1400L, "UNSUPPORTED_DATATYPE", "Database / JDBC datatype is not supported."),
@@ -65,7 +68,7 @@ public final class DataAccessException extends RuntimeException {
 		COULD_NOT_UPDATE_NON_UPDATABLE_BEAN(2300L, "COULD_NOT_UPDATE_NON_UPDATABLE_BEAN", "Could not update bean without any updatable fields."),
 		OPERATION_NOT_SUPPORTED_WITH_COMPOSITE_PK(2400L, "OPERATION_NOT_SUPPORTED_WITH_COMPOSITE_PK", "Operation not supported with composite primary key.");
 
-		private final Long id;
+        private final Long id;
 		private final String code;
 		private final String description;
 
