@@ -13,6 +13,7 @@ import javax.sql.DataSource;
 import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Properties;
 
 //import oracle.ucp.jdbc.PoolDataSource;
 
@@ -227,10 +228,27 @@ public class DataSourceProvider {
 
 		} else {
 
-			OracleDataSource oracleDataSource = new OracleDataSource();
+			final OracleDataSource oracleDataSource = new OracleDataSource();
 			oracleDataSource.setURL(pDataSourceConfiguration.getDatabaseURL());
 			oracleDataSource.setUser(pDataSourceConfiguration.getDatabaseUsername());
 			oracleDataSource.setPassword(pDataSourceConfiguration.getDatabasePassword());
+            // We enable the Oracle connection cache integrated with the Oracle JDBC driver.
+            // Even for single-threaded stand-alone applications using a connection pool/cache makes sense.
+            // Like any other ORM tool, NoORM does not manage data sources, but simply uses the JDBC API.
+            // When transactions are not handled explicitly by the calling application, the implicit
+            // auto-commit mode will cause connections to be closed with every single database call. Though
+            // DataSourceProvider could retain connections for some time, its primary function is not the
+            // maintenance of a connection cache or pool, so this job is delegated to the used data source,
+            // which should provide some caching functionality for any usage scenario.
+            // Unfortunately, Oracle stopped development of the build-in connection cache, so, starting with
+            // Oracle 11.2, the build-in cache is deprecated. We still use it here, since explicit data source
+            // initialization as performed here is not to be used in production systems anyway.
+            oracleDataSource.setConnectionCachingEnabled(true);
+            Properties cacheProps = new Properties();
+            cacheProps.setProperty("MinLimit", "1");
+            cacheProps.setProperty("MaxLimit", "4");
+            cacheProps.setProperty("InitialLimit", "1");
+            oracleDataSource.setConnectionCacheProperties(cacheProps);
             dataSource = oracleDataSource;
 		}
 
