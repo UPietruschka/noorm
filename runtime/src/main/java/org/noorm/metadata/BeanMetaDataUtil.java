@@ -43,7 +43,9 @@ public class BeanMetaDataUtil {
 	 */
 	public static Field[] getDeclaredFieldsInclParent(final Class pClass) {
 
-		log.debug("Retrieving declared fields by reflection for class ".concat(pClass.getName()));
+        if (log.isTraceEnabled()) {
+            log.trace("Retrieving declared fields by reflection for class ".concat(pClass.getName()));
+        }
 		final Field[] fields = pClass.getDeclaredFields();
 		Field[] sFields = new Field[0];
 		final Class superClass = pClass.getSuperclass();

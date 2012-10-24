@@ -51,7 +51,9 @@ public class BeanMapper<T> {
 	public T toBean(final ResultSet pResultSet, final Class<T> pBeanClass) throws SQLException {
 
 		T bean = null;
-		log.debug("Converting database results to single Bean class ".concat(pBeanClass.getName()));
+        if (log.isTraceEnabled()) {
+            log.trace("Converting database results to single Bean class ".concat(pBeanClass.getName()));
+        }
 		final Field[] fields = BeanMetaDataUtil.getDeclaredFieldsInclParent(pBeanClass);
 		if (pResultSet.next() && fields != null && fields.length > 0) {
 			try {
@@ -77,7 +79,9 @@ public class BeanMapper<T> {
 	 */
 	public List<T> toBeanList(final ResultSet pResultSet, final Class<T> pBeanClass) throws SQLException {
 
-		log.debug("Converting database results to list of Bean class ".concat(pBeanClass.getName()));
+        if (log.isTraceEnabled()) {
+            log.trace("Converting database results to list of Bean class ".concat(pBeanClass.getName()));
+        }
 		final List<T> beanList = new ArrayList<T>();
 		T bean;
 		final Field[] fields = BeanMetaDataUtil.getDeclaredFieldsInclParent(pBeanClass);
@@ -113,7 +117,9 @@ public class BeanMapper<T> {
 	 */
 	public Map<String, Object> toMap(final T pBean) {
 
-		log.debug("Converting Bean to parameter map.");
+        if (log.isTraceEnabled()) {
+            log.trace("Converting Bean to parameter map.");
+        }
 		final Map<String, Object> fieldMap = new LinkedHashMap<String, Object>();
 		final Field[] fields = BeanMetaDataUtil.getDeclaredFieldsInclParent(pBean.getClass());
 		if (fields == null || fields.length == 0) {

@@ -584,6 +584,11 @@ public class JDBCStatementProcessor<T> {
 				int batchCount0 = pstmt.executeUpdate();
 				batchCount += batchCount0;
 			}
+            if (log.isDebugEnabled()) {
+                log.debug(("Bean data has been attached to JDBC prepared statement. " +
+                        "Executing DML statement for table/entity ")
+                        .concat(tableName).concat(" [").concat(batch).concat("]"));
+            }
 			batchCount += pstmt.sendBatch();
 			if (batchCount != pBeanList.size()) {
 				if (pBatchType.equals(BatchType.INSERT)) {

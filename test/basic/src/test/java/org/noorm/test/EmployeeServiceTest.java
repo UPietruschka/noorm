@@ -32,6 +32,8 @@ public class EmployeeServiceTest {
 		DataSourceProvider.begin();
 		final EmployeeService employeeService = EmployeeService.getInstance();
 		final List<EmployeesBean> employeesBeanList = employeeService.findAllEmployees();
+        // For brevity and readability of the log, we do not iterate over the whole list
+        int i = 0;
 		for (final EmployeesBean employeesBean : employeesBeanList) {
 
 			final Long employeeId = employeesBean.getEmployeeId();
@@ -48,6 +50,7 @@ public class EmployeeServiceTest {
 				}
 			}
 			assertEquals(employeeFound, true);
+            if (i++ >= 20) { break; }
 		}
 		DataSourceProvider.commit();
 	}
@@ -107,12 +110,15 @@ public class EmployeeServiceTest {
 		DataSourceProvider.begin();
 		final EmployeeService employeeService = EmployeeService.getInstance();
 		final List<EmpDetailsViewBean> empDetailsBeanList = employeeService.findAllEmployeeDetails();
-		for (final EmpDetailsViewBean empDetailsBean : empDetailsBeanList) {
+        // For brevity and readability of the log, we do not iterate over the whole list
+        int i = 0;
+        for (final EmpDetailsViewBean empDetailsBean : empDetailsBeanList) {
 
 			final Long employeeId = empDetailsBean.getEmployeeId();
 			final EmployeesBean employeesBean0 = employeeService.findUniqueEmployeeById(employeeId);
 			assertNotNull(employeesBean0);
-		}
+            if (i++ >= 20) { break; }
+        }
 		DataSourceProvider.commit();
 	}
 
