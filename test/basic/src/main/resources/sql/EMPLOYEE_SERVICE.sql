@@ -25,6 +25,8 @@ PACKAGE employee_service AS
 
   PROCEDURE find_job_history_by_emp_id(p_id IN NUMBER, p_job_history_set OUT job_history_refcur);
 
+  PROCEDURE find_job_history_by_date(p_date IN TIMESTAMP, p_job_history_set OUT job_history_refcur);
+
   PROCEDURE find_salary_groups(p_salary_group_set OUT salary_group_refcur);
 
 END employee_service;
@@ -64,6 +66,13 @@ PACKAGE BODY employee_service AS
     OPEN p_job_history_set FOR
     SELECT * FROM job_history
     WHERE  employee_id = p_id;
+  END;
+
+  PROCEDURE find_job_history_by_date(p_date IN TIMESTAMP, p_job_history_set OUT job_history_refcur) AS
+  BEGIN
+    OPEN p_job_history_set FOR
+    SELECT * FROM job_history
+    WHERE  p_date BETWEEN start_date AND end_date;
   END;
 
   PROCEDURE find_job_by_id(p_id IN VARCHAR2, p_job_set OUT job_refcur) AS

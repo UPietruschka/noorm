@@ -1,6 +1,6 @@
 package org.noorm.test;
 
-import org.noorm.test.hr.beans.JobsBean;
+import org.noorm.test.hr1.beans.JobsBean;
 
 /**
  * @author Ulf Pietruschka / ulf.pietruschka@etenso.com

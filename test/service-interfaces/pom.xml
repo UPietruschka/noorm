@@ -33,45 +33,69 @@
                 </dependencies>
                 <executions>
                     <execution>
+                        <id>Schema HR 1</id>
                         <phase>generate-resources</phase>
                         <goals>
                             <goal>generate-noorm</goal>
                         </goals>
+                        <configuration>
+                            <url>${jdbc.url}</url>
+                            <username>${jdbc.username}</username>
+                            <password>${jdbc.password}</password>
+                            <beanPackageName>org.noorm.test.hr1.beans</beanPackageName>
+                            <beanTableFilterRegex>(C.*|E.*|G.*|H.*|J.*|L.*|V.*|.*RECORD)</beanTableFilterRegex>
+                            <ignoreTableNamePrefixes>
+                                <prefix>JOB_</prefix>
+                            </ignoreTableNamePrefixes>
+                            <extendedBeans>
+                                <property>
+                                    <name>JobsBean</name>
+                                    <value>org.noorm.test.JobsBeanExt</value>
+                                </property>
+                            </extendedBeans>
+                            <serviceInterfacePackageName>org.noorm.test.hr1.services</serviceInterfacePackageName>
+                            <servicePackageName>org.noorm.test.hr1.services.impl</servicePackageName>
+                            <singleRowFinderRegex>(find_unique.*)</singleRowFinderRegex>
+                            <enumPackageName>org.noorm.test.hr1.enums</enumPackageName>
+                            <enumTableFilterRegex>REGIONS</enumTableFilterRegex>
+                            <enumTable2DisplayColumnMapping>
+                                <property>
+                                    <name>REGIONS</name>
+                                    <value>REGION_NAME</value>
+                                </property>
+                            </enumTable2DisplayColumnMapping>
+                            <oracleTable2SequenceMapping>
+                                <property>
+                                    <name>(EMPLOYEES|LOCATIONS)</name>
+                                    <value>$1_SEQ</value>
+                                </property>
+                            </oracleTable2SequenceMapping>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <id>Schema HR 2</id>
+                        <phase>generate-resources</phase>
+                        <goals>
+                            <goal>generate-noorm</goal>
+                        </goals>
+                        <configuration>
+                            <url>${jdbc.url}</url>
+                            <username>${jdbc.username}</username>
+                            <password>${jdbc.password}</password>
+                            <beanPackageName>org.noorm.test.hr2.beans</beanPackageName>
+                            <beanTableFilterRegex>DEPARTMENTS</beanTableFilterRegex>
+                            <packageFilterRegex>--NO_MATCH_DESIRED--</packageFilterRegex>
+                            <serviceInterfacePackageName>org.noorm.test.hr2.services</serviceInterfacePackageName>
+                            <servicePackageName>org.noorm.test.hr2.services.impl</servicePackageName>
+                            <oracleTable2SequenceMapping>
+                                <property>
+                                    <name>DEPARTMENTS</name>
+                                    <value>DEPARTMENTS_SEQ</value>
+                                </property>
+                            </oracleTable2SequenceMapping>
+                        </configuration>
                     </execution>
                 </executions>
-                <configuration>
-                    <url>${jdbc.url}</url>
-                    <username>${jdbc.username}</username>
-                    <password>${jdbc.password}</password>
-                    <beanPackageName>org.noorm.test.hr.beans</beanPackageName>
-                    <beanTableFilterRegex>(C.*|D.*|E.*|G.*|H.*|J.*|L.*|V.*|.*RECORD)</beanTableFilterRegex>
-                    <ignoreTableNamePrefixes>
-                        <prefix>JOB_</prefix>
-                    </ignoreTableNamePrefixes>
-                    <extendedBeans>
-                        <property>
-                            <name>JobsBean</name>
-                            <value>org.noorm.test.JobsBeanExt</value>
-                        </property>
-                    </extendedBeans>
-                    <serviceInterfacePackageName>org.noorm.test.hr.services</serviceInterfacePackageName>
-                    <servicePackageName>org.noorm.test.hr.services.impl</servicePackageName>
-                    <singleRowFinderRegex>(find_unique.*)</singleRowFinderRegex>
-                    <enumPackageName>org.noorm.test.hr.enums</enumPackageName>
-                    <enumTableFilterRegex>REGIONS</enumTableFilterRegex>
-                    <enumTable2DisplayColumnMapping>
-                        <property>
-                            <name>REGIONS</name>
-                            <value>REGION_NAME</value>
-                        </property>
-                    </enumTable2DisplayColumnMapping>
-                    <oracleTable2SequenceMapping>
-                        <property>
-                            <name>(EMPLOYEES|DEPARTMENTS|LOCATIONS)</name>
-                            <value>$1_SEQ</value>
-                        </property>
-                    </oracleTable2SequenceMapping>
-                </configuration>
             </plugin>
         </plugins>
 

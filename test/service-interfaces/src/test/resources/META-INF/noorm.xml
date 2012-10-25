@@ -2,17 +2,26 @@
 <!DOCTYPE properties SYSTEM "http://java.sun.com/dtd/properties.dtd">
 <properties>
     <comment>NoORM property file</comment>
-    <entry key="datasource.names">TEST_DS</entry>
-    <entry key="TEST_DS.database.url">jdbc:oracle:thin:@
+    <entry key="datasource.names">HR1, HR2</entry>
+    <entry key="HR1.database.url">jdbc:oracle:thin:@
         (DESCRIPTION =
         (ADDRESS_LIST = (ADDRESS = (PROTOCOL = TCP)(HOST = localhost)(PORT = 1521)))
         (CONNECT_DATA = (SERVER = DEDICATED)(SERVICE_NAME = XE))
         )
     </entry>
-    <entry key="TEST_DS.database.username">hr</entry>
-    <entry key="TEST_DS.database.password">hr</entry>
-    <entry key="TEST_DS.database.batch_update_size">20</entry>
-    <entry key="TEST_DS.debug.mode">false</entry>
-    <entry key="TEST_DS.debug.host">localhost</entry>
-    <entry key="TEST_DS.debug.port">4000</entry>
+    <entry key="HR1.database.username">hr</entry>
+    <entry key="HR1.database.password">hr</entry>
+    <entry key="HR1.database.batch_update_size">20</entry>
+    <entry key="HR1.debug.mode">false</entry>
+    <entry key="HR1.debug.host">localhost</entry>
+    <entry key="HR1.debug.port">4000</entry>
+    <entry key="HR2.database.url">jdbc:oracle:thin:@
+        (DESCRIPTION =
+        (ADDRESS_LIST = (ADDRESS = (PROTOCOL = TCP)(HOST = localhost)(PORT = 1521)))
+        (CONNECT_DATA = (SERVER = DEDICATED)(SERVICE_NAME = XE))
+        )
+    </entry>
+    <entry key="HR2.database.username">hr</entry>
+    <entry key="HR2.database.password">hr</entry>
+    <entry key="HR2.database.batch_update_size">20</entry>
 </properties>
