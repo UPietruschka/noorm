@@ -196,10 +196,11 @@ public class DataSourceProvider {
 
         final ActiveConnectionData activeConnectionData = getActiveConnectionData();
         final ActiveDataSource activeDataSource = activeConnectionData.getActiveDataSource();
-		if (activeDataSource.getDataSource() == null) {
-            log.debug("Initializing data source.");
-            final DataSource dataSource = dataSourceProvider.initDataSource(activeDataSource.getConfiguration());
-            activeDataSource.setDataSource(dataSource);
+        synchronized (activeDataSource) {
+            if (activeDataSource.getDataSource() == null) {
+                final DataSource dataSource = dataSourceProvider.initDataSource(activeDataSource.getConfiguration());
+                activeDataSource.setDataSource(dataSource);
+            }
         }
         return activeDataSource.getDataSource();
 	}
@@ -211,6 +212,7 @@ public class DataSourceProvider {
 	 */
 	private DataSource initDataSource(final DataSourceConfiguration pDataSourceConfiguration) throws SQLException {
 
+        log.debug("Initializing data source.");
         DataSource dataSource;
         pDataSourceConfiguration.validate();
 		final String jndiName = pDataSourceConfiguration.getDatabaseJNDIName();
@@ -228,7 +230,8 @@ public class DataSourceProvider {
 
 		} else {
 
-			final OracleDataSource oracleDataSource = new OracleDataSource();
+            log.info("Trying to establish data source using NoORM configuration.");
+            final OracleDataSource oracleDataSource = new OracleDataSource();
 			oracleDataSource.setURL(pDataSourceConfiguration.getDatabaseURL());
 			oracleDataSource.setUser(pDataSourceConfiguration.getDatabaseUsername());
 			oracleDataSource.setPassword(pDataSourceConfiguration.getDatabasePassword());
@@ -246,7 +249,7 @@ public class DataSourceProvider {
             oracleDataSource.setConnectionCachingEnabled(true);
             Properties cacheProps = new Properties();
             cacheProps.setProperty("MinLimit", "1");
-            cacheProps.setProperty("MaxLimit", "4");
+            cacheProps.setProperty("MaxLimit", "8");
             cacheProps.setProperty("InitialLimit", "1");
             oracleDataSource.setConnectionCacheProperties(cacheProps);
             dataSource = oracleDataSource;
@@ -334,6 +337,9 @@ public class DataSourceProvider {
 			} else {
 				con = (OracleConnection) dataSourceConn;
 			}
+            if (log.isDebugEnabled()) {
+                log.debug("Acquired connection : ".concat(con.toString()));
+            }
 
 			con.setAutoCommit(false);
             if (getActiveConfiguration().isDebugMode()) {
