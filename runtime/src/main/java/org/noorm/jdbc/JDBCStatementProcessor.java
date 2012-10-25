@@ -112,7 +112,8 @@ public class JDBCStatementProcessor<T> {
 			final String plSQLCall = statementBuilder.buildPLSQLCall
 					(pPLSQLCallable, pOutParamName, pInParameters, USE_NAMED_PARAMETERS);
 			if (log.isDebugEnabled()) {
-				log.debug("PL/SQL Call: ".concat(plSQLCall));
+				log.debug("Preparing and executing PL/SQL Call: ".concat(plSQLCall)
+                        .concat("; using connection : ".concat(con.toString())));
 			}
 			cstmt = (OracleCallableStatement) con.prepareCall(plSQLCall);
 
@@ -314,7 +315,8 @@ public class JDBCStatementProcessor<T> {
 			final String plSQLCall = statementBuilder.buildPLSQLCall
 					(pPLSQLCallable, pRefCursorName, pInParameters, USE_NAMED_PARAMETERS);
 			if (log.isDebugEnabled()) {
-				log.debug("PL/SQL Call: ".concat(plSQLCall));
+                log.debug("Preparing and executing PL/SQL Call: ".concat(plSQLCall)
+                        .concat("; using connection : ".concat(con.toString())));
 			}
 			cstmt = (OracleCallableStatement) con.prepareCall(plSQLCall);
 
@@ -586,8 +588,8 @@ public class JDBCStatementProcessor<T> {
 			}
             if (log.isDebugEnabled()) {
                 log.debug(("Bean data has been attached to JDBC prepared statement. " +
-                        "Executing DML statement for table/entity ")
-                        .concat(tableName).concat(" [").concat(batch).concat("]"));
+                        "Executing DML statement for table/entity ".concat(tableName)
+                                .concat(" [").concat(batch).concat("] using connection : ".concat(con.toString()))));
             }
 			batchCount += pstmt.sendBatch();
 			if (batchCount != pBeanList.size()) {
