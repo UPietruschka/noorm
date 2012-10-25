@@ -54,9 +54,9 @@ public class ConfigurationInitializer {
                 final String[] dataSourceNames = dataSourceNameList.split(",");
                 for (final String dataSourceName : dataSourceNames) {
                     final DataSourceConfiguration dataSourceConfiguration =
-                            initNoormProperties(noormFileProperties, dataSourceName);
+                            initNoormProperties(noormFileProperties, dataSourceName.trim());
                     dataSourceConfiguration.validate();
-                    dataSources.put(dataSourceName, dataSourceConfiguration);
+                    dataSources.put(dataSourceName.trim(), dataSourceConfiguration);
                 }
             } else {
                 final DataSourceConfiguration dataSourceConfiguration =
