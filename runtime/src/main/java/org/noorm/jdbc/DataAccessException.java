@@ -48,8 +48,10 @@ public final class DataAccessException extends RuntimeException {
 	public static enum Type {
 
 		COULD_NOT_ESTABLISH_CONNECTION(1000L, "COULD_NOT_ESTABLISH_CONNECTION", "Could not establish database connection."),
+        NESTED_TRANSACTION_ROLLBACK(1020L, "NESTED_TRANSACTION_ROLLBACK", "Nested transaction rolled back."),
         NO_ACTIVE_DATA_SOURCE(1030L, "NO_ACTIVE_DATA_SOURCE", "No active data source. Use DataSourceProvider.setActiveDataSource to set the active data source."),
         UNKNOWN_DATA_SOURCE(1040L, "UNKNOWN_DATA_SOURCE", "Unknown data source. Cannot activate data source. Data source name unknown."),
+        INVALID_DATA_SOURCE_SWITCH(1045L, "INVALID_DATA_SOURCE_SWITCH", "Invalid data source switch. Changing the data source during a user-managed transaction is not supported."),
         DATA_SOURCE_ALREADY_ADDED(1060L, "DATA_SOURCE_ALREADY_ADDED", "Unable to add new data source. A data source with the given name already exists."),
         COULD_NOT_ACCESS_DATA(1100L, "COULD_NOT_ACCESS_DATA", "Could not access data from database."),
 		MULTIPLE_RECORDS_FOUND(1200L, "MULTIPLE_RECORDS_FOUND", "Multiple records found for single record query."),

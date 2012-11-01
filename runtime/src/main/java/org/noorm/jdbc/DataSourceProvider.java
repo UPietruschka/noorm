@@ -57,6 +57,7 @@ public class DataSourceProvider {
         for (final String dataSourceName : dataSourceConfigurations.keySet()) {
             final DataSourceConfiguration dataSourceConfiguration = dataSourceConfigurations.get(dataSourceName);
             final ActiveDataSource activeDataSource = new ActiveDataSource();
+            activeDataSource.setName(dataSourceName);
             activeDataSource.setConfiguration(dataSourceConfiguration);
             activeDataSourceMap.put(dataSourceName, activeDataSource);
         }
@@ -67,11 +68,6 @@ public class DataSourceProvider {
         return getActiveConnectionData().getActiveDataSource().getConfiguration();
     }
 
-    private static ActiveConnectionData getActiveConnectionData() {
-
-        return getActiveConnectionData(null);
-    }
-
     /**
      * The active connection data contains the currently active data source and the database connection, if the
      * connection is retained for an explicitly managed transaction. The active connection data is stored in a
@@ -79,27 +75,22 @@ public class DataSourceProvider {
      * is instantiated. The active data source is automatically assigned, when only one data source has been
      * configured or when the associated ActiveDataSource object is provided.
      *
-     * @param pActiveDataSource optional parameter to explicitly set the active data source
      * @return the currently active connection data
      */
-    private static ActiveConnectionData getActiveConnectionData(final ActiveDataSource pActiveDataSource) {
+    private static ActiveConnectionData getActiveConnectionData() {
 
         ActiveConnectionData activeConnectionData = activeConThreadDta.get();
         if (activeConnectionData == null) {
             activeConnectionData = new ActiveConnectionData();
-            if (pActiveDataSource != null) {
-                activeConnectionData.setActiveDataSource(pActiveDataSource);
+            // In case of a single configured data source, we activate this data source as default data source.
+            if (activeDataSourceMap.size() == 1) {
+                log.info("Activating default data source.");
+                ActiveDataSource activeDataSource = activeDataSourceMap.values().iterator().next();
+                activeConnectionData.setActiveDataSource(activeDataSource);
             } else {
-                // In case of a single configured data source, we activate this data source as default data source.
-                if (activeDataSourceMap.size() == 1) {
-                    log.info("Activating default data source.");
-                    ActiveDataSource activeDataSource = activeDataSourceMap.values().iterator().next();
-                    activeConnectionData.setActiveDataSource(activeDataSource);
-                } else {
-                    // In case of multiple configured data sources (or none), the caller must activate the
-                    // data source to decide, which one to use.
-                    throw new DataAccessException(DataAccessException.Type.NO_ACTIVE_DATA_SOURCE);
-                }
+                // In case of multiple configured data sources (or none), the caller must activate the
+                // data source to decide, which one to use.
+                throw new DataAccessException(DataAccessException.Type.NO_ACTIVE_DATA_SOURCE);
             }
             activeConThreadDta.set(activeConnectionData);
         }
@@ -120,7 +111,21 @@ public class DataSourceProvider {
         if (activeDataSource == null) {
             throw new DataAccessException(DataAccessException.Type.UNKNOWN_DATA_SOURCE);
         }
-        final ActiveConnectionData activeConnectionData = getActiveConnectionData(activeDataSource);
+        ActiveConnectionData activeConnectionData = activeConThreadDta.get();
+        if (activeConnectionData != null) {
+            // Switching the data source in the middle of user-managed transaction may lead to
+            // unpredictable results and is not supported.
+            final String oldDataSourceName = activeConnectionData.getActiveDataSource().getName();
+            if (!oldDataSourceName.equals(pDataSourceName)) {
+                final Long tsStackThreadLocal = activeConnectionData.getTsStack();
+                if (tsStackThreadLocal != null && tsStackThreadLocal > 0L) {
+                    throw new DataAccessException(DataAccessException.Type.INVALID_DATA_SOURCE_SWITCH);
+                }
+            }
+        } else {
+            activeConnectionData = new ActiveConnectionData();
+            activeConThreadDta.set(activeConnectionData);
+        }
         activeConnectionData.setActiveDataSource(activeDataSource);
     }
 
@@ -142,6 +147,7 @@ public class DataSourceProvider {
         validateDataSource(pDataSource);
         activeDataSource = new ActiveDataSource();
         final DataSourceConfiguration configuration = new DataSourceConfiguration();
+        activeDataSource.setName(pDataSourceName);
         activeDataSource.setDataSource(pDataSource);
         activeDataSource.setConfiguration(configuration);
         activeDataSourceMap.put(pDataSourceName, activeDataSource);
@@ -351,7 +357,7 @@ public class DataSourceProvider {
 		}
 		if (pRetain) {
 			Long tsStackThreadLocal0 = getActiveConnectionData().getTsStack();
-			if (tsStackThreadLocal0 == null) {
+			if (tsStackThreadLocal0 == null || tsStackThreadLocal0 == 0L) {
                 getActiveConnectionData().setTsStack(1L);
 			} else {
                 getActiveConnectionData().setTsStack(tsStackThreadLocal0 + 1L);
@@ -474,7 +480,8 @@ public class DataSourceProvider {
 				if (log.isDebugEnabled()) {
 					log.debug("Delegating transaction termination to caller.");
 				}
-			}
+                throw new DataAccessException(DataAccessException.Type.NESTED_TRANSACTION_ROLLBACK);
+            }
 		} catch (SQLException e) {
 			throw new DataAccessException(DataAccessException.Type.CONNECTION_ACCESS_FAILURE, e);
 		} finally {
@@ -556,8 +563,17 @@ public class DataSourceProvider {
 
     static class ActiveDataSource {
 
+        private String name;
         private DataSourceConfiguration configuration;
         private DataSource dataSource;
+
+        public String getName() {
+            return name;
+        }
+
+        public void setName(String name) {
+            this.name = name;
+        }
 
         public DataSourceConfiguration getConfiguration() {
             return configuration;
