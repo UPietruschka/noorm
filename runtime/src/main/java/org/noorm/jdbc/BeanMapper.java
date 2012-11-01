@@ -209,27 +209,13 @@ public class BeanMapper<T> {
 			}
 
 			if (fieldType == String.class) {
-                if (dataType.equals("CLOB")) {
-                    final Clob clob = pResultSet.getClob(fieldName);
-                    if (clob != null) {
-                        final Reader reader = clob.getCharacterStream();
-                        final StringWriter stringWriter = new StringWriter();
-                        try {
-                            final char[] buffer = new char[DEFAULT_BUFFER_SIZE];
-                            int n;
-                            while (-1 != (n = reader.read(buffer))) {
-                                stringWriter.write(buffer, 0, n);
-                            }
-                            field.set(pBean, stringWriter.toString());
-                        } catch (IOException ex) {
-                            throw new DataAccessException(ex);
-                        }
-                    }
-                } else { // All other characters based types (CHAR, VARCHAR2, etc.)
-                    final String value = pResultSet.getString(fieldName);
-                    if (value != null) {
-                        field.set(pBean, value.trim());
-                    }
+                // Handling includes CHAR, VARCHAR2, NCHAR and NVHARCHAR2, but also for complex data-types
+                // like CLOB and XMLTYPE, which are mapped to Strings. For large CLOBs or XMLTYPEs, using
+                // the stream-based getters in the ResultSet API may be suitable (getCharacterStream),
+                // but the driver uses streaming behind the scenes anyway, so we do not need to use it here.
+                final String value = pResultSet.getString(fieldName);
+                if (value != null) {
+                    field.set(pBean, value.trim());
                 }
 			}
 
@@ -278,25 +264,30 @@ public class BeanMapper<T> {
 			}
 
 			if (fieldType == byte[].class) {
-                if (dataType.equals("BLOB")) {
-                    final Blob blob = pResultSet.getBlob(fieldName);
-                    if (blob != null) {
-                        final InputStream inputStream = blob.getBinaryStream();
-                        final ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
-                        try {
-                            final byte[] buffer = new byte[DEFAULT_BUFFER_SIZE];
-                            int n;
-                            while (-1 != (n = inputStream.read(buffer))) {
-                                byteArrayOutputStream.write(buffer, 0, n);
-                            }
-                            field.set(pBean, byteArrayOutputStream.toByteArray());
-                        } catch (IOException ex) {
-                            throw new DataAccessException(ex);
-                        }
-                    }
-                } else { // RAW
-                    field.set(pBean, pResultSet.getBytes(fieldName));
-                }
+                // Handling for the Oracle RAW type, but also for complex data-type BLOB, which are mapped
+                // to byte arrays. For large BLOBs, using the stream-based getters in the ResultSet API may
+                // be suitable (getBinaryStream), but the driver uses streaming behind the scenes anyway,
+                // so we do not need to use it here. An alternative explicit usage of streaming has been
+                // commented out and is similar in performance.
+                field.set(pBean, pResultSet.getBytes(fieldName));
+                // if (dataType.equals("BLOB")) {
+                //     final Blob blob = pResultSet.getBlob(fieldName);
+                //     if (blob != null) {
+                //         field.set(pBean, pResultSet.getBytes(fieldName));
+                //         final InputStream inputStream = blob.getBinaryStream();
+                //         final ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
+                //         try {
+                //             final byte[] buffer = new byte[DEFAULT_BUFFER_SIZE];
+                //             int n;
+                //             while (-1 != (n = inputStream.read(buffer))) {
+                //                 byteArrayOutputStream.write(buffer, 0, n);
+                //             }
+                //             field.set(pBean, byteArrayOutputStream.toByteArray());
+                //         } catch (IOException ex) {
+                //             throw new DataAccessException(ex);
+                //         }
+                //     }
+                // }
 			}
 		}
 	}

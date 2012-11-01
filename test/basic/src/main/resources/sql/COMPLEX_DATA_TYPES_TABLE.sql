@@ -6,6 +6,7 @@ CREATE TABLE complex_data_types
  raw_type_column RAW(1024),
  blob_column BLOB,
  clob_column CLOB,
+ xml_column XMLTYPE,
  version NUMBER DEFAULT 1
 );
 ALTER TABLE complex_data_types ADD CONSTRAINT complex_data_types_pk PRIMARY KEY (id);

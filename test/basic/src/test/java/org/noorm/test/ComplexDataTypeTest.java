@@ -6,8 +6,6 @@ import org.noorm.jdbc.JDBCStatementProcessor;
 import org.noorm.test.hr.beans.ComplexDataTypesBean;
 import org.noorm.test.hr.services.ComplexDataService;
 
-import javax.management.MBeanAttributeInfo;
-
 import java.util.ArrayList;
 import java.util.List;
 
@@ -24,11 +22,13 @@ public class ComplexDataTypeTest {
     private static final byte[] SOME_NEW_BYTE_ARRAY = new byte[] { 0, 9, 8, 7, 6, 5, 4, 3, 2, 1 };
     private static final String SOME_TEXT = "SOME_TEXT";
     private static final String SOME_NEW_TEXT = "SOME_NEW_TEXT";
+    private static final String SOME_XML = "<root type=\"INSERT\"><e1>TEST1</e1><e2>TEST2</e2></root>";
+    private static final String SOME_NEW_XML = "<root type=\"UPDATE\"><e1>TEST3</e1><e2>TEST4</e2></root>";
     /*
      Test large BLOBs with 50MB. Larger test BLOB sizes may be suitable, but 50MB should run out of the
      box for fresh IDE setups without the need to increase heap size.
      */
-    private static final int FIFTY_MB = 52428800;
+    private static final int TWENTY_MB = 20971520;
 
     private ComplexDataService complexDataService = ComplexDataService.getInstance();
 
@@ -113,7 +113,7 @@ public class ComplexDataTypeTest {
 
         DataSourceProvider.begin();
         final ComplexDataTypesBean complexDataTypesBean = new ComplexDataTypesBean();
-        final byte[] largeByteArray = new byte[FIFTY_MB];
+        final byte[] largeByteArray = new byte[TWENTY_MB];
         complexDataTypesBean.setBlobColumn(largeByteArray);
         final JDBCStatementProcessor<ComplexDataTypesBean> jdbcStmtProcessor = JDBCStatementProcessor.getInstance();
         final ComplexDataTypesBean insertedBean = jdbcStmtProcessor.insert(complexDataTypesBean);
@@ -121,5 +121,45 @@ public class ComplexDataTypeTest {
         assertEquals(insertedBean, insertedBean0);
         jdbcStmtProcessor.delete(insertedBean);
         DataSourceProvider.commit();
+    }
+
+    @Test
+    public void testLargeClob() {
+
+        DataSourceProvider.begin();
+        final ComplexDataTypesBean complexDataTypesBean = new ComplexDataTypesBean();
+        final String largeString = createLargeString(TWENTY_MB);
+        complexDataTypesBean.setClobColumn(largeString);
+        final JDBCStatementProcessor<ComplexDataTypesBean> jdbcStmtProcessor = JDBCStatementProcessor.getInstance();
+        final ComplexDataTypesBean insertedBean = jdbcStmtProcessor.insert(complexDataTypesBean);
+        final ComplexDataTypesBean insertedBean0 = complexDataService.findUniqueCdtById(insertedBean.getId());
+        assertEquals(insertedBean, insertedBean0);
+        jdbcStmtProcessor.delete(insertedBean);
+        DataSourceProvider.commit();
+    }
+
+    @Test
+    public void testXMLTypeCRUD() {
+
+        DataSourceProvider.begin();
+        final ComplexDataTypesBean complexDataTypesBean = new ComplexDataTypesBean();
+        complexDataTypesBean.setXmlColumn(SOME_XML);
+        final JDBCStatementProcessor<ComplexDataTypesBean> jdbcStmtProcessor = JDBCStatementProcessor.getInstance();
+        final ComplexDataTypesBean insertedBean = jdbcStmtProcessor.insert(complexDataTypesBean);
+        final ComplexDataTypesBean insertedBean0 = complexDataService.findUniqueCdtById(insertedBean.getId());
+        assertEquals(insertedBean, insertedBean0);
+        assertEquals(SOME_XML, insertedBean.getXmlColumn());
+        insertedBean.setXmlColumn(SOME_NEW_XML);
+        jdbcStmtProcessor.update(insertedBean);
+        jdbcStmtProcessor.delete(insertedBean);
+        DataSourceProvider.commit();
+    }
+
+    private static String createLargeString(final int pSize) {
+        final StringBuilder sb = new StringBuilder(pSize);
+        for (int i=0; i < pSize; i++) {
+            sb.append('a');
+        }
+        return sb.toString();
     }
 }
