@@ -50,12 +50,10 @@ public class $class.Name<T> implements IBean<T>, Serializable {
 	public $att.Type get$att.getFirstUpperName()() {
 		return $att.Name;
 	}
-#if ($att.isUpdatable())
 
 	public void set$att.getFirstUpperName()(final $att.Type p$att.getFirstUpperName()) {
 		$att.Name = p$att.getFirstUpperName();
 	}
-#end
 #end
 #if ($class.hasPrimaryKey())
 
