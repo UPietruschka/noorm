@@ -614,7 +614,12 @@ public class JDBCStatementProcessor<T> {
 				}
 			}
 			return (T) firstBean;
-		} catch (Exception e) {
+        } catch (DataAccessException e) {
+            // Avoid that a DataAccessException is wrapped into another (generic COULD_NOT_ACCESS_DATA) one.
+            log.error("DML execution failed.", e);
+            success = false;
+            throw e;
+        } catch (Exception e) {
 			log.error(DataAccessException.Type.COULD_NOT_ACCESS_DATA.getDescription(), e);
 			success = false;
 			throw new DataAccessException(DataAccessException.Type.COULD_NOT_ACCESS_DATA, e);
