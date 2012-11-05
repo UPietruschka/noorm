@@ -596,7 +596,28 @@ public class JDBCStatementProcessor<T> {
 				if (pBatchType.equals(BatchType.INSERT)) {
 					issueUpdateCountException(batchCount, pBeanList.size());
 				} else {
-					throw new DataAccessException(DataAccessException.Type.OPTIMISTIC_LOCK_CONFLICT);
+                    // When the number of affected records does not match the number of provided records,
+                    // we can either have an optimistic lock conflict, or the record(s) have not been provided
+                    // with a valid primary key. This can happen, when the beans initially prepared with a null
+                    // primary key are reused for an update or delete
+                    // We only investigate the first bean here, though it is actually possible that we do not
+                    // have an optimistic lock conflict, but null values in the PK for another bean, though this
+                    // scenario is considered unlikely.
+                    boolean firstBeanHasNullPK = false;
+                    for (final String pkColumn : primaryKeyColumnNames) {
+                        if (BeanMetaDataUtil.getBeanPropertyByName(firstBean, pkColumn) == null) {
+                            firstBeanHasNullPK = true;
+                        }
+                    }
+                    if (firstBeanHasNullPK) {
+                        if (pBatchType.equals(BatchType.UPDATE)) {
+                            throw new DataAccessException(DataAccessException.Type.GENERIC_UPDATE_FAILED_WITH_NULL_PK);
+                        } else { // DELETE
+                            throw new DataAccessException(DataAccessException.Type.GENERIC_DELETE_FAILED_WITH_NULL_PK);
+                        }
+                    } else {
+                        throw new DataAccessException(DataAccessException.Type.OPTIMISTIC_LOCK_CONFLICT);
+                    }
 				}
 			}
 			if (returnModifiedBean) {

@@ -66,8 +66,10 @@ public final class DataAccessException extends RuntimeException {
 				+ "modified or deleted by another process atfer it has been loaded for this operation."),
 		COULD_NOT_ACCESS_PROPERTY_BY_REFLECTION(2000L, "COULD_NOT_ACCESS_PROPERTY_BY_REFLECTION", "Could not access method of bean by reflection."),
 		GENERIC_UPDATE_NOT_SUPPORTED_WITHOUT_PK(2100L, "GENERIC_UPDATE_NOT_SUPPORTED_WITHOUT_PK", "Generic update not supported without primary key definition."),
-		GENERIC_DELETE_NOT_SUPPORTED_WITHOUT_PK(2200L, "GENERIC_DELETE_NOT_SUPPORTED_WITHOUT_PK", "Generic delete not supported without primary key definition."),
-		COULD_NOT_UPDATE_NON_UPDATABLE_BEAN(2300L, "COULD_NOT_UPDATE_NON_UPDATABLE_BEAN", "Could not update bean without any updatable fields."),
+        GENERIC_UPDATE_FAILED_WITH_NULL_PK(2110L, "GENERIC_UPDATE_FAILED_WITH_NULL_PK", "Generic update not supported with null values in the primary key."),
+        GENERIC_DELETE_NOT_SUPPORTED_WITHOUT_PK(2200L, "GENERIC_DELETE_NOT_SUPPORTED_WITHOUT_PK", "Generic delete not supported without primary key definition."),
+        GENERIC_DELETE_FAILED_WITH_NULL_PK(2210L, "GENERIC_DELETE_FAILED_WITH_NULL_PK", "Generic delete not supported with null values in the primary key."),
+        COULD_NOT_UPDATE_NON_UPDATABLE_BEAN(2300L, "COULD_NOT_UPDATE_NON_UPDATABLE_BEAN", "Could not update bean without any updatable fields."),
 		OPERATION_NOT_SUPPORTED_WITH_COMPOSITE_PK(2400L, "OPERATION_NOT_SUPPORTED_WITH_COMPOSITE_PK", "Operation not supported with composite primary key.");
 
         private final Long id;
