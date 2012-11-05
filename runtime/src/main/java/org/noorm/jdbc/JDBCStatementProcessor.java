@@ -543,7 +543,7 @@ public class JDBCStatementProcessor<T> {
 							if (fieldName.equals(versionColumnName)) {
 								// When the version column has not been initialized by the caller,
 								// we set it here, otherwise NULL in the version column will result
-								// in an OPTIMISTIC_LOCK_CONFLICT with the next update.
+								// in an VERSION_COLUMN_NULL exception with the next update.
 								if (value == null) {
 									value = VERSION_COLUMN_LONG_DEFAULT;
 								}
