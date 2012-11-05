@@ -3,7 +3,7 @@ CREATE TABLE opt_lock_long
 (
  id NUMBER  NOT NULL,
  text NVARCHAR2(32),
- version NUMBER DEFAULT 1
+ version NUMBER
 );
 ALTER TABLE opt_lock_long ADD CONSTRAINT opt_lock_long_pk PRIMARY KEY (id);
 
