@@ -99,8 +99,10 @@ public class EnumGenerator {
 			final String query = "SELECT * FROM ".concat(tableName0);
 			final List<Map<String, Object>> recordList = jdbcStatementProcessor.executeGenericSelect(query);
 			if (recordList.isEmpty()) {
-				log.info("Cannot generate enum: specified enum database table does not contain any data.");
-				continue;
+                String errMsg =
+                        "Cannot generate enum: specified enum database table does not contain any data."
+                        .concat(" [".concat(tableName0).concat("]"));
+                throw new GeneratorException(errMsg);
 			}
 			for (Map<String, Object> record : recordList) {
 				final EnumRecordDescriptor enumRecordDescriptor = new EnumRecordDescriptor();
