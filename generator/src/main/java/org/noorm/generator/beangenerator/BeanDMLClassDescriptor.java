@@ -17,8 +17,9 @@ public class BeanDMLClassDescriptor {
 	private String beanPackageName;
 	private final List<BeanClassDescriptor> beans = new ArrayList<BeanClassDescriptor>();
 	private boolean isInterface = false;
+    private String dataSourceName;
 
-	public String getPackageName() {
+    public String getPackageName() {
 		return packageName;
 	}
 
@@ -65,4 +66,16 @@ public class BeanDMLClassDescriptor {
 	public String getJavaInterfaceName() {
 		return BEAN_DML_INTERFACE_NAME;
 	}
+
+    public String getDataSourceName() {
+        return dataSourceName;
+    }
+
+    public void setDataSourceName(final String pDataSourceName) {
+        dataSourceName = pDataSourceName;
+    }
+
+    public boolean hasDataSourceName() {
+        return dataSourceName != null && !dataSourceName.isEmpty();
+    }
 }

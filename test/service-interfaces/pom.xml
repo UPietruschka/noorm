@@ -39,6 +39,7 @@
                             <goal>generate-noorm</goal>
                         </goals>
                         <configuration>
+                            <dataSourceName>HR1</dataSourceName>
                             <url>${jdbc.url}</url>
                             <username>${jdbc.username}</username>
                             <password>${jdbc.password}</password>
@@ -79,6 +80,7 @@
                             <goal>generate-noorm</goal>
                         </goals>
                         <configuration>
+                            <dataSourceName>HR2</dataSourceName>
                             <url>${jdbc.url}</url>
                             <username>${jdbc.username}</username>
                             <password>${jdbc.password}</password>

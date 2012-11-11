@@ -12,6 +12,7 @@ public class ValidatorClassDescriptor {
 
 	private String packageName;
 	private List<String> classNames = new ArrayList<String>();
+    private String dataSourceName;
 
 	public String getPackageName() {
 		return packageName;
@@ -28,4 +29,16 @@ public class ValidatorClassDescriptor {
 	public void setClassNames(final List<String> pClassNames) {
 		classNames = pClassNames;
 	}
+
+    public String getDataSourceName() {
+        return dataSourceName;
+    }
+
+    public void setDataSourceName(final String pDataSourceName) {
+        dataSourceName = pDataSourceName;
+    }
+
+    public boolean hasDataSourceName() {
+        return dataSourceName != null && !dataSourceName.isEmpty();
+    }
 }

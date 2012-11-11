@@ -43,7 +43,18 @@ public interface IParameters {
 	 */
 	String getServicePackageName();
 
-	/**
+    /**
+     * When multiple data sources are used, the data source name as configured in the NoORM configuration file is
+     * used to identify different data sources. To specify the data source used for the following statements, one
+     * can either set the data source explicitly using DataSourceProvider.setActiveDataSource, or one can specify
+     * the data source name here. Note that for explicit transaction handling, one still have to specify the data
+     * source name.
+     *
+     * @parameter
+     */
+    String getDataSourceName();
+
+    /**
 	 * JDBC connection URL for the Oracle schema containing the tables, views and stored procedures
 	 * subject to Java code generation.
 	 *

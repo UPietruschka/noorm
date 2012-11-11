@@ -1,6 +1,9 @@
 ## Velocity template to generate the validator for all generated Java Service classes
 package $class.PackageName;
 
+#if ($class.hasDataSourceName())
+import org.noorm.jdbc.DataSourceProvider;
+#end
 import org.noorm.validation.ServiceValidator;
 
 /**
@@ -9,10 +12,16 @@ import org.noorm.validation.ServiceValidator;
  */
 public class GenericServiceValidator {
 
-    private ServiceValidator serviceValidator = new ServiceValidator();
+#if ($class.hasDataSourceName())
+	private static final String DATA_SOURCE_NAME = "$class.getDataSourceName()";
+#end
+	private ServiceValidator serviceValidator = new ServiceValidator();
 
 	public void validateDatabase() {
 
+#if ($class.hasDataSourceName())
+		DataSourceProvider.setActiveDataSource(DATA_SOURCE_NAME);
+#end
 #foreach ($className in $class.ClassNames)
 		serviceValidator.validateService(new ${className}());
 #end

@@ -67,7 +67,18 @@ public class GeneratorMojo extends AbstractMojo implements IParameters {
 	 */
 	protected MavenProject project;
 
-	/**
+    /**
+     * When multiple data sources are used, the data source name as configured in the NoORM configuration file is
+     * used to identify different data sources. To specify the data source used for the following statements, one
+     * can either set the data source explicitly using DataSourceProvider.setActiveDataSource, or one can specify
+     * the data source name here. Note that for explicit transaction handling, one still have to specify the data
+     * source name.
+     *
+     * @parameter
+     */
+    protected String dataSourceName;
+
+    /**
 	 * JDBC connection URL for the Oracle schema containing the tables, views and stored procedures
 	 * subject to Java code generation.
 	 *
@@ -298,17 +309,6 @@ public class GeneratorMojo extends AbstractMojo implements IParameters {
 		DataSourceProvider.commit();
 	}
 
-	private void callServiceGeneration() {
-
-		log.info("Generating NoORM Service classes.");
-		final File servicePackageDir = new File(destinationDirectory, servicePackageName.replace(".", File.separator));
-		if (!servicePackageDir.exists()) {
-			if (!servicePackageDir.mkdirs()) {
-				throw new GeneratorException("Could not create directory ".concat(servicePackageDir.toString()));
-			}
-		}
-	}
-
 	@Override
 	public File getDestinationDirectory() {
 		return destinationDirectory;
@@ -328,6 +328,11 @@ public class GeneratorMojo extends AbstractMojo implements IParameters {
 	public String getServicePackageName() {
 		return servicePackageName;
 	}
+
+    @Override
+    public String getDataSourceName() {
+        return dataSourceName;
+    }
 
 	@Override
 	public String getURL() {

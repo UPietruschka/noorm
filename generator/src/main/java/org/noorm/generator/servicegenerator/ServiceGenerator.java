@@ -57,8 +57,11 @@ public class ServiceGenerator {
 
 		ValidatorClassDescriptor validatorClassDescriptor = new ValidatorClassDescriptor();
 		validatorClassDescriptor.setPackageName(parameters.getServicePackageName());
+        if (parameters.getDataSourceName() != null && !parameters.getDataSourceName().isEmpty()) {
+            validatorClassDescriptor.setDataSourceName(parameters.getDataSourceName());
+        }
 
-		log.info("Generating NoORM Service classes.");
+        log.info("Generating NoORM Service classes.");
 		final File servicePackageDir = GeneratorUtil.createPackageDir
 				(parameters.getDestinationDirectory(), parameters.getServicePackageName());
 		File serviceInterfacePackageDir = null;
@@ -81,7 +84,10 @@ public class ServiceGenerator {
 			}
 			final ServiceClassDescriptor serviceClassDescriptor = new ServiceClassDescriptor();
 			final String javaClassName = Utils.convertDBName2JavaName(packageName.getName(), true);
-			serviceClassDescriptor.setJavaName(javaClassName);
+            if (parameters.getDataSourceName() != null && !parameters.getDataSourceName().isEmpty()) {
+                serviceClassDescriptor.setDataSourceName(parameters.getDataSourceName());
+            }
+            serviceClassDescriptor.setJavaName(javaClassName);
 			serviceClassDescriptor.setDatabasePackageName(packageName.getName().toLowerCase());
 			serviceClassDescriptor.setInterfacePackageName(parameters.getServiceInterfacePackageName());
 			serviceClassDescriptor.setPackageName(parameters.getServicePackageName());

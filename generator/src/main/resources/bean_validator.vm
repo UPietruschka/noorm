@@ -1,6 +1,9 @@
 ## Velocity template to generate the validator for all generated Java Bean classes
 package $class.PackageName;
 
+#if ($class.hasDataSourceName())
+import org.noorm.jdbc.DataSourceProvider;
+#end
 import org.noorm.validation.BeanValidator;
 
 /**
@@ -9,10 +12,16 @@ import org.noorm.validation.BeanValidator;
  */
 public class GenericBeanValidator {
 
-    private BeanValidator beanValidator = new BeanValidator();
+#if ($class.hasDataSourceName())
+	private static final String DATA_SOURCE_NAME = "$class.getDataSourceName()";
+#end
+	private BeanValidator beanValidator = new BeanValidator();
 
 	public void validateDatabase() {
 
+#if ($class.hasDataSourceName())
+		DataSourceProvider.setActiveDataSource(DATA_SOURCE_NAME);
+#end
 		beanValidator.loadMetadata();
 #foreach ($className in $class.ClassNames)
 		beanValidator.validateBean(new ${className}());

@@ -60,7 +60,12 @@ public class BeanGenerator {
 		beanDMLClassDescriptor.setInterfacePackageName(parameters.getServiceInterfacePackageName());
 		beanDMLClassDescriptor.setPackageName(parameters.getServicePackageName());
 
-		final MetadataService metadataService = MetadataService.getInstance();
+        if (parameters.getDataSourceName() != null && !parameters.getDataSourceName().isEmpty()) {
+            validatorClassDescriptor.setDataSourceName(parameters.getDataSourceName());
+            beanDMLClassDescriptor.setDataSourceName(parameters.getDataSourceName());
+        }
+
+        final MetadataService metadataService = MetadataService.getInstance();
 
 		log.info("Retrieving table metadata from Oracle database.");
 		final Map<String, List<TableMetadataBean>> tableColumnMap = metadataService.findTableMetadata();

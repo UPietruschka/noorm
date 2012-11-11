@@ -1,6 +1,9 @@
 ## Velocity template to generate the validator for all generated Java Enum classes
 package $class.PackageName;
 
+#if ($class.hasDataSourceName())
+import org.noorm.jdbc.DataSourceProvider;
+#end
 import org.noorm.validation.EnumValidator;
 
 /**
@@ -9,10 +12,16 @@ import org.noorm.validation.EnumValidator;
  */
 public class GenericEnumValidator {
 
-    private EnumValidator enumValidator = new EnumValidator();
+#if ($class.hasDataSourceName())
+	private static final String DATA_SOURCE_NAME = "$class.getDataSourceName()";
+#end
+	private EnumValidator enumValidator = new EnumValidator();
 
 	public void validateDatabase() {
 
+#if ($class.hasDataSourceName())
+		DataSourceProvider.setActiveDataSource(DATA_SOURCE_NAME);
+#end
 		enumValidator.loadMetadata();
 #foreach ($className in $class.ClassNames)
 		enumValidator.validateEnum(${className}.class);

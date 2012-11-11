@@ -23,8 +23,9 @@ public class ServiceClassDescriptor {
 	private String beanPackageName;
 	private final List<ProcedureDescriptor> procedures = new ArrayList<ProcedureDescriptor>();
 	private boolean isInterface = false;
+    private String dataSourceName;
 
-	public int getCodeHashValue() {
+    public int getCodeHashValue() {
 		return codeHashValue;
 	}
 
@@ -100,4 +101,16 @@ public class ServiceClassDescriptor {
 	public boolean hasInterface() {
 		return interfacePackageName != null && !interfacePackageName.isEmpty();
 	}
+
+    public String getDataSourceName() {
+        return dataSourceName;
+    }
+
+    public void setDataSourceName(final String pDataSourceName) {
+        dataSourceName = pDataSourceName;
+    }
+
+    public boolean hasDataSourceName() {
+        return dataSourceName != null && !dataSourceName.isEmpty();
+    }
 }

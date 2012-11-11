@@ -32,6 +32,9 @@ public class BeanDML {
 #end
 #if(!$class.isInterface())
 
+#if ($class.hasDataSourceName())
+	private static final String DATA_SOURCE_NAME = "$class.getDataSourceName()";
+#end
 	private final JDBCStatementProcessor typelessStatementProcessor = JDBCStatementProcessor.getInstance();
 #end
 #if(!$class.isInterface() && !$class.hasInterface())
@@ -61,28 +64,46 @@ public class BeanDML {
 	void delete$bean.getShortName()List(final List<$bean.getDMLName()> p$bean.getShortName()List);
 #else
 	public $bean.getDMLName() insert$bean.getShortName()(final $bean.getDMLName() p$bean.getShortName()) {
+#if ($class.hasDataSourceName())
+		DataSourceProvider.setActiveDataSource(DATA_SOURCE_NAME);
+#end
 		final JDBCStatementProcessor<$bean.getDMLName()> statementProcessor = JDBCStatementProcessor.getInstance();
 		return statementProcessor.insert(p$bean.getShortName());
 	}
 
 	public void insert$bean.getShortName()List(final List<$bean.getDMLName()> p$bean.getShortName()List) {
+#if ($class.hasDataSourceName())
+		DataSourceProvider.setActiveDataSource(DATA_SOURCE_NAME);
+#end
 		typelessStatementProcessor.insert(p$bean.getShortName()List);
 	}
 
 	public $bean.getDMLName() update$bean.getShortName()(final $bean.getDMLName() p$bean.getShortName()) {
+#if ($class.hasDataSourceName())
+		DataSourceProvider.setActiveDataSource(DATA_SOURCE_NAME);
+#end
 		final JDBCStatementProcessor<$bean.getDMLName()> statementProcessor = JDBCStatementProcessor.getInstance();
 		return statementProcessor.update(p$bean.getShortName());
 	}
 
 	public void update$bean.getShortName()List(final List<$bean.getDMLName()> p$bean.getShortName()List) {
+#if ($class.hasDataSourceName())
+		DataSourceProvider.setActiveDataSource(DATA_SOURCE_NAME);
+#end
 		typelessStatementProcessor.update(p$bean.getShortName()List);
 	}
 
 	public void delete$bean.getShortName()(final $bean.getDMLName() p$bean.getShortName()) {
+#if ($class.hasDataSourceName())
+		DataSourceProvider.setActiveDataSource(DATA_SOURCE_NAME);
+#end
 		typelessStatementProcessor.delete(p$bean.getShortName());
 	}
 
 	public void delete$bean.getShortName()List(final List<$bean.getDMLName()> p$bean.getShortName()List) {
+#if ($class.hasDataSourceName())
+		DataSourceProvider.setActiveDataSource(DATA_SOURCE_NAME);
+#end
 		typelessStatementProcessor.delete(p$bean.getShortName()List);
 	}
 #end
