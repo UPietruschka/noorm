@@ -6,7 +6,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>org.noorm</groupId>
     <artifactId>noorm</artifactId>
-    <version>0.9.16</version>
+    <version>0.9.17-SNAPSHOT</version>
     <name>NoORM</name>
     <packaging>pom</packaging>
     <description>NoORM, database-centric code generation</description>
