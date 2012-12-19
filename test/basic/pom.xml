@@ -98,6 +98,7 @@
                             <srcFiles>
                                 <srcFile>target/noorm/plsql/NOORM_METADATA.sql</srcFile>
                                 <srcFile>target/noorm/plsql/NOORM_METADATA_body.sql</srcFile>
+                                <srcFile>target/noorm/plsql/NUM_ARRAY.sql</srcFile>
                                 <srcFile>target/noorm/plsql/NOORM_DYNAMIC_SQL.sql</srcFile>
                                 <srcFile>target/noorm/plsql/NOORM_DYNAMIC_SQL_body.sql</srcFile>
                                 <srcFile>src/main/resources/sql/EMPLOYEE_SEARCH.sql</srcFile>

@@ -1,6 +1,7 @@
 package org.noorm.test;
 
 import org.junit.Test;
+import org.noorm.jdbc.PageableBeanList;
 import org.noorm.test.hr.beans.EmployeesBean;
 import org.noorm.test.hr.services.EmployeeSearch;
 
@@ -64,6 +65,19 @@ public class EmployeeSearchTest {
 				(jobTitle, lastName, hireDateFrom, hireDateTo, salaryFrom, salaryTo);
 		assertEquals(6, employeesBeanList.size());
 	}
+
+    @Test
+    public void testPageableSearch() {
+
+        final EmployeeSearch employeeSearch = EmployeeSearch.getInstance();
+        final List<Long> idBeanList = employeeSearch.findEmployeeIds(50L);
+        Long[] dataIdArray = idBeanList.toArray(new Long[idBeanList.size()]);
+        final PageableBeanList<EmployeesBean> empBeanList =
+                (PageableBeanList<EmployeesBean>) employeeSearch.findPageableEmpsByIdlist(dataIdArray);
+        assertEquals(45, empBeanList.size());
+        List<EmployeesBean> subList = empBeanList.subList(10, 20);
+        assertEquals(10, subList.size());
+    }
 
 	private Date getDate(final int pYear, final int pMonth, final int pDay) {
 

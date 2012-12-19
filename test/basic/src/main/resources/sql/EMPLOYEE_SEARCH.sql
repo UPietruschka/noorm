@@ -10,6 +10,11 @@ PACKAGE employee_search AS
                                      p_salary_from NUMBER DEFAULT NULL,
                                      p_salary_to NUMBER DEFAULT NULL,
                                      p_employee_set OUT employee_refcur);
+
+  PROCEDURE find_employee_ids(p_department_id IN NUMBER, p_employee_id_set OUT noorm_metadata.id_refcur);
+
+  PROCEDURE find_pageable_emps_by_idlist(p_idlist IN num_array, p_employee_set OUT employee_refcur);
+
 END employee_search;
 /
 
@@ -33,6 +38,22 @@ PACKAGE BODY employee_search AS
     noorm_dynamic_sql.add_parameter('p_salary_from', p_salary_from);
     noorm_dynamic_sql.add_parameter('p_salary_to', p_salary_to);
     noorm_dynamic_sql.execute('EMPLOYEE_QUERY', p_employee_set);
+  END;
+
+  PROCEDURE find_employee_ids(p_department_id IN NUMBER, p_employee_id_set OUT noorm_metadata.id_refcur) AS
+  BEGIN
+    OPEN   p_employee_id_set FOR
+    SELECT employee_id id
+    FROM   employees
+    WHERE  department_id = p_department_id;
+  END;
+
+  PROCEDURE find_pageable_emps_by_idlist(p_idlist IN num_array, p_employee_set OUT employee_refcur) AS
+  BEGIN
+    OPEN   p_employee_set FOR
+    SELECT *
+    FROM   employees
+    WHERE  employee_id IN (SELECT * FROM TABLE(CAST(p_idlist AS num_array)));
   END;
 
 END employee_search;
