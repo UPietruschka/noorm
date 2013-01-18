@@ -70,7 +70,8 @@ public final class DataAccessException extends RuntimeException {
         GENERIC_DELETE_NOT_SUPPORTED_WITHOUT_PK(2200L, "GENERIC_DELETE_NOT_SUPPORTED_WITHOUT_PK", "Generic delete not supported without primary key definition."),
         GENERIC_DELETE_FAILED_WITH_NULL_PK(2210L, "GENERIC_DELETE_FAILED_WITH_NULL_PK", "Generic delete not supported with null values in the primary key."),
         COULD_NOT_UPDATE_NON_UPDATABLE_BEAN(2300L, "COULD_NOT_UPDATE_NON_UPDATABLE_BEAN", "Could not update bean without any updatable fields."),
-		OPERATION_NOT_SUPPORTED_WITH_COMPOSITE_PK(2400L, "OPERATION_NOT_SUPPORTED_WITH_COMPOSITE_PK", "Operation not supported with composite primary key.");
+		OPERATION_NOT_SUPPORTED_WITH_COMPOSITE_PK(2400L, "OPERATION_NOT_SUPPORTED_WITH_COMPOSITE_PK", "Operation not supported with composite primary key."),
+        COULD_NOT_ACCESS_JDBC_METADATA(3000L, "COULD_NOT_ACCESS_JDBC_METADATA", "Could not access JDBC metadata.");
 
         private final Long id;
 		private final String code;
