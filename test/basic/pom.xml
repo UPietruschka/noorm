@@ -179,6 +179,19 @@
                         </property>
                     </optimisticLockColumnMapping>
                     <singleRowFinderRegex>(.*_unique.*)</singleRowFinderRegex>
+                    <queryDeclarations>
+                        <queryDeclaration>
+                            <tableName>employees</tableName>
+                            <queryColumns>
+                                <queryColumn>
+                                    <columnName>employee_id</columnName>
+                                    <operator>
+                                        <operatorName>equal-to</operatorName>
+                                    </operator>
+                                </queryColumn>
+                            </queryColumns>
+                        </queryDeclaration>
+                    </queryDeclarations>
                 </configuration>
             </plugin>
         </plugins>

@@ -4,9 +4,11 @@ import oracle.jdbc.pool.OracleDataSource;
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
+import org.apache.maven.plugins.annotations.LifecyclePhase;
+import org.apache.maven.plugins.annotations.Mojo;
+import org.apache.maven.plugins.annotations.Parameter;
 import org.apache.maven.project.MavenProject;
 import org.apache.velocity.app.Velocity;
-import org.noorm.generator.GeneratorException;
 import org.noorm.generator.beangenerator.BeanGenerator;
 import org.noorm.generator.enumgenerator.EnumGenerator;
 import org.noorm.generator.servicegenerator.ServiceGenerator;
@@ -22,49 +24,40 @@ import java.util.*;
  * Maven plugin base class for the NoORM class generator.
  *
  * @author Ulf Pietruschka / ulf.pietruschka@etenso.com
- * @goal generate-noorm
- * @phase generate-sources
  */
+@Mojo(name = "generate-noorm", defaultPhase = LifecyclePhase.PROCESS_SOURCES)
 public class GeneratorMojo extends AbstractMojo implements IParameters {
 
 	private static final Logger log = LoggerFactory.getLogger(GeneratorMojo.class);
 
 	/**
 	 * Destination directory for generated source files.
-	 *
-	 * @parameter expression="${project.build.directory}/generated-sources/noorm"
 	 */
+    @Parameter(defaultValue = "${project.build.directory}/generated-sources/noorm")
 	protected File destinationDirectory;
 
 	/**
 	 * Package name for generated Bean source files.
-	 *
-	 * @parameter
-	 * @required
 	 */
+    @Parameter(required = true)
 	protected String beanPackageName;
 
 	/**
 	 * Package name for generated Enum source files.
-	 *
-	 * @parameter
 	 */
+    @Parameter
 	protected String enumPackageName;
 
 	/**
 	 * Package name for generated Service / DAO source files.
-	 *
-	 * @parameter
-	 * @required
 	 */
+    @Parameter(required = true)
 	protected String servicePackageName;
 
 	/**
 	 * Maven project name.
-	 *
-	 * @parameter expression="${project}"
-	 * @required
 	 */
+    @Parameter(defaultValue = "${project}")
 	protected MavenProject project;
 
     /**
@@ -73,34 +66,27 @@ public class GeneratorMojo extends AbstractMojo implements IParameters {
      * can either set the data source explicitly using DataSourceProvider.setActiveDataSource, or one can specify
      * the data source name here. Note that for explicit transaction handling, one still have to specify the data
      * source name.
-     *
-     * @parameter
      */
+    @Parameter
     protected String dataSourceName;
 
     /**
 	 * JDBC connection URL for the Oracle schema containing the tables, views and stored procedures
 	 * subject to Java code generation.
-	 *
-	 * @parameter
-	 * @required
 	 */
+    @Parameter(required = true)
 	protected String url;
 
 	/**
 	 * Username for the Oracle schema.
-	 *
-	 * @parameter
-	 * @required
 	 */
+    @Parameter(required = true)
 	protected String username;
 
 	/**
 	 * Password for the Oracle schema.
-	 *
-	 * @parameter
-	 * @required
 	 */
+    @Parameter(required = true)
 	protected String password;
 
 	/**
@@ -109,33 +95,28 @@ public class GeneratorMojo extends AbstractMojo implements IParameters {
 	 * given schema or group. When those prefixes are not desired in the constructed
 	 * java class name, they should be listed here.
 	 * This setting applies to the bean generator and the enum generator.
-	 *
-	 * @parameter
 	 */
+    @Parameter
 	protected List<String> ignoreTableNamePrefixes;
 
 	/**
 	 * Regular expression to filter tables and views for Bean generation.
-	 *
-	 * @parameter
 	 */
+    @Parameter
 	protected String beanTableFilterRegex;
 
 	/**
 	 * Regular expression to filter tables and views for Enum generation.
-	 *
-	 * @parameter
 	 */
-
+    @Parameter
 	protected String enumTableFilterRegex;
 
 	/**
 	 * To generate Enums from database tables, NoORM must now, which table column should be used
 	 * for the enums constant type generation. Typically, a table with constant content has a column
 	 * with a code or denominator in uppercase letters, which uniquely identifies the row.
-	 *
-	 * @parameter
 	 */
+    @Parameter
 	protected Properties enumTable2DisplayColumnMapping;
 
 	/**
@@ -145,9 +126,8 @@ public class GeneratorMojo extends AbstractMojo implements IParameters {
 	 * list. Note that the association TABLE_NAME/SEQUENCE_NAME can either be done on a per
 	 * table basis, or using one or more regular expressions to specify a mapping rule like
 	 * "TBL_(.*)" -> "SEQ_$1" (This rule would map TBL_PRODUCT to SEQ_PRODUCT, for example).
-	 *
-	 * @parameter
 	 */
+    @Parameter
 	protected Properties oracleTable2SequenceMapping;
 
 	/**
@@ -156,9 +136,8 @@ public class GeneratorMojo extends AbstractMojo implements IParameters {
 	 * how specific the column-names are with respect to the table-names, one or more
 	 * mapping are required. In case of a unique name of the version column for all tables,
 	 * one simple rule like ".*" -> "VERSION" is sufficient.
-	 *
-	 * @parameter
 	 */
+    @Parameter
 	protected Properties optimisticLockColumnMapping;
 
 	/**
@@ -169,16 +148,14 @@ public class GeneratorMojo extends AbstractMojo implements IParameters {
 	 * the records of this view. Use this parameter to specify the column name of the key used
 	 * for a given view. Typically, this key is the primary key of the single key-preserved table
 	 * contained in the view definition.
-	 *
-	 * @parameter
 	 */
+    @Parameter
 	protected Properties viewName2PrimaryKeyMapping;
 
 	/**
 	 * Regular expression to filter packages for service generation.
-	 *
-	 * @parameter
 	 */
+    @Parameter
 	protected String packageFilterRegex;
 
 	/**
@@ -190,17 +167,15 @@ public class GeneratorMojo extends AbstractMojo implements IParameters {
 	 *
 	 * Use this parameter to specify a regular expression matching all procedure
 	 * names subject to single row retrieval.
-	 *
-	 * @parameter
 	 */
+    @Parameter
 	protected String singleRowFinderRegex;
 
 	/**
 	 * Large query results can be mapped into a PageableBeanList to provide efficient
 	 * access to the data by loading the full record only for the requested page.
-	 *
-	 * @parameter
 	 */
+    @Parameter
 	protected String pageableProcedureNameRegex;
 
 	/**
@@ -211,9 +186,8 @@ public class GeneratorMojo extends AbstractMojo implements IParameters {
 	 * like Spring. By specifying parameter serviceInterfacePackageName, the service generator
 	 * is directed to omit the in-class singleton implementation and generate appropriate
 	 * interfaces for every service, resp. DAO in the given package.
-	 *
-	 * @parameter
 	 */
+    @Parameter
 	protected String serviceInterfacePackageName;
 
 	/**
@@ -228,10 +202,21 @@ public class GeneratorMojo extends AbstractMojo implements IParameters {
 	 * generated class should use the subclass. This parameter allows for a mapping
 	 * of originally generated bean classes to data enriched subclasses. Note that
 	 * the subclass must be fully classified.
-	 *
-	 * @parameter
 	 */
+    @Parameter
 	protected Properties extendedBeans;
+
+    /**
+     * The NoORM query declaration is intentionally much simpler than most other approaches to specify alternatives
+     * to original SQL. While specifications like the JPA 2.0 criteria API aim to cover most of the capabilities of
+     * SQL, this approach consequently follows the paradigm to move database-centric functionality to the database.
+     * In particular, this means that the complexity of an SQL statement should be implemented inside the database
+     * using views. Following this approach, it is almost always possible to reduce the query declaration for
+     * automatic Java code generation to a single entity (table, view), the columns subject to the where-conditions
+     * and the operators used for the columns in the where-conditions.
+     */
+    @Parameter
+    protected List<QueryDeclaration> queryDeclarations;
 
 	private OracleDataSource initializePoolDataSource() throws SQLException {
 
@@ -408,4 +393,9 @@ public class GeneratorMojo extends AbstractMojo implements IParameters {
 	public Properties getExtendedBeans() {
 		return extendedBeans;
 	}
+
+    @Override
+    public List<QueryDeclaration> getQueryDeclarations() {
+        return queryDeclarations;
+    }
 }

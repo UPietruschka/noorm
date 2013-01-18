@@ -1,6 +1,6 @@
 package org.noorm.generator.m2plugin;
 
-import org.apache.maven.project.MavenProject;
+import org.apache.maven.plugins.annotations.Parameter;
 
 import java.io.File;
 import java.util.List;
@@ -15,31 +15,21 @@ public interface IParameters {
 
 	/**
 	 * Destination directory for generated source files.
-	 *
-	 * @parameter expression="${project.build.directory}/generated-sources/noorm"
 	 */
 	File getDestinationDirectory();
 
 	/**
 	 * Package name for generated Bean source files.
-	 *
-	 * @parameter
-	 * @required
 	 */
 	String getBeanPackageName();
 
 	/**
 	 * Package name for generated Enum source files.
-	 *
-	 * @parameter
 	 */
 	String getEnumPackageName();
 
 	/**
 	 * Package name for generated Service / DAO source files.
-	 *
-	 * @parameter
-	 * @required
 	 */
 	String getServicePackageName();
 
@@ -49,33 +39,22 @@ public interface IParameters {
      * can either set the data source explicitly using DataSourceProvider.setActiveDataSource, or one can specify
      * the data source name here. Note that for explicit transaction handling, one still have to specify the data
      * source name.
-     *
-     * @parameter
      */
     String getDataSourceName();
 
     /**
 	 * JDBC connection URL for the Oracle schema containing the tables, views and stored procedures
 	 * subject to Java code generation.
-	 *
-	 * @parameter
-	 * @required
 	 */
 	String getURL();
 
 	/**
 	 * Username for the Oracle schema.
-	 *
-	 * @parameter
-	 * @required
 	 */
 	String getUsername();
 
 	/**
 	 * Password for the Oracle schema.
-	 *
-	 * @parameter
-	 * @required
 	 */
 	String getPassword();
 
@@ -85,22 +64,16 @@ public interface IParameters {
 	 * given schema or group. When those prefixes are not desired in the constructed
 	 * java class name, they should be listed here.
 	 * This setting applies to the bean generator and the enum generator.
-	 *
-	 * @parameter
 	 */
 	List<String> getIgnoreTableNamePrefixes();
 
 	/**
 	 * Regular expression to filter tables and views for Bean generation.
-	 *
-	 * @parameter
 	 */
 	String getBeanTableFilterRegex();
 
 	/**
 	 * Regular expression to filter tables and views for Enum generation.
-	 *
-	 * @parameter
 	 */
 
 	String getEnumTableFilterRegex();
@@ -109,8 +82,6 @@ public interface IParameters {
 	 * To generate Enums from database tables, NoORM must now, which table column should be used
 	 * for the enums constant type generation. Typically, a table with constant content has a column
 	 * with a code or denominator in uppercase letters, which uniquely identifies the row.
-	 *
-	 * @parameter
 	 */
 	Properties getEnumTable2DisplayColumnMapping();
 
@@ -121,8 +92,6 @@ public interface IParameters {
 	 * list. Note that the association TABLE_NAME/SEQUENCE_NAME can either be done on a per
 	 * table basis, or using one or more regular expressions to specify a mapping rule like
 	 * "TBL_(.*)" -> "SEQ_$1" (This rule would map TBL_PRODUCT to SEQ_PRODUCT, for example).
-	 *
-	 * @parameter
 	 */
 	Properties getOracleTable2SequenceMapping();
 
@@ -132,8 +101,6 @@ public interface IParameters {
 	 * how specific the column-names are with respect to the table-names, one or more
 	 * mapping are required. In case of a unique name of the version column for all tables,
 	 * one simple rule like ".*" -> "VERSION" is sufficient.
-	 *
-	 * @parameter
 	 */
 	Properties getOptimisticLockColumnMapping();
 
@@ -145,15 +112,11 @@ public interface IParameters {
 	 * the records of this view. Use this parameter to specify the column name of the key used
 	 * for a given view. Typically, this key is the primary key of the single key-preserved table
 	 * contained in the view definition.
-	 *
-	 * @parameter
 	 */
 	Properties getViewName2PrimaryKeyMapping();
 
 	/**
 	 * Regular expression to filter packages for service generation.
-	 *
-	 * @parameter
 	 */
 	String getPackageFilterRegex();
 
@@ -166,16 +129,12 @@ public interface IParameters {
 	 *
 	 * Use this parameter to specify a regular expression matching all procedure
 	 * names subject to single row retrieval.
-	 *
-	 * @parameter
 	 */
 	String getSingleRowFinderRegex();
 
 	/**
 	 * Large query results can be mapped into a PageableBeanList to provide efficient
 	 * access to the data by loading the full record only for the requested page.
-	 *
-	 * @parameter
 	 */
 	String getPageableProcedureNameRegex();
 
@@ -187,8 +146,6 @@ public interface IParameters {
 	 * like Spring. By specifying parameter serviceInterfacePackageName, the service generator
 	 * is directed to omit the in-class singleton implementation and generate appropriate
 	 * interfaces for every service, resp. DAO in the given package.
-	 *
-	 * @parameter
 	 */
 	String getServiceInterfacePackageName();
 
@@ -204,8 +161,17 @@ public interface IParameters {
 	 * generated class should use the subclass. This parameter allows for a mapping
 	 * of originally generated bean classes to data enriched subclasses. Note that
 	 * the subclass must be fully classified.
-	 *
-	 * @parameter
 	 */
 	Properties getExtendedBeans();
+
+    /**
+     * The NoORM query declaration is intentionally much simpler than most other approaches to specify alternatives
+     * to original SQL. While specifications like the JPA 2.0 criteria API aim to cover most of the capabilities of
+     * SQL, this approach consequently follows the paradigm to move database-centric functionality to the database.
+     * In particular, this means that the complexity of an SQL statement should be implemented inside the database
+     * using views. Following this approach, it is almost always possible to reduce the query declaration for
+     * automatic Java code generation to a single entity (table, view), the columns subject to the where-conditions
+     * and the operators used for the columns in the where-conditions.
+     */
+    List<QueryDeclaration> getQueryDeclarations();
 }
