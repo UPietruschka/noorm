@@ -181,7 +181,9 @@
                     <singleRowFinderRegex>(.*_unique.*)</singleRowFinderRegex>
                     <queryDeclarations>
                         <queryDeclaration>
-                            <tableName>employees</tableName>
+                            <tableName>v_employees</tableName>
+                            <baseTable>employees</baseTable>
+                            <methodName>getEmpsById</methodName>
                             <queryColumns>
                                 <queryColumn>
                                     <columnName>employee_id</columnName>
