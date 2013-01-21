@@ -3,7 +3,7 @@ package org.noorm.test;
 import org.junit.Test;
 import org.noorm.jdbc.DataAccessException;
 import org.noorm.jdbc.DataSourceProvider;
-import org.noorm.jdbc.JDBCStatementProcessor;
+import org.noorm.jdbc.JDBCDMLProcessor;
 import org.noorm.test.hr.beans.OptLockLongBean;
 
 import static org.junit.Assert.*;
@@ -25,12 +25,12 @@ public class OptLockLongTest {
 		DataSourceProvider.begin();
 		final OptLockLongBean newOptLockLongBean = new OptLockLongBean();
 		newOptLockLongBean.setText(SOME_TEXT);
-		JDBCStatementProcessor<OptLockLongBean> jdbcStatementProcessor = JDBCStatementProcessor.getInstance();
-		OptLockLongBean insertedOptLockLongBean =  jdbcStatementProcessor.insert(newOptLockLongBean);
+        JDBCDMLProcessor<OptLockLongBean> dmlProcessor = JDBCDMLProcessor.getInstance();
+		OptLockLongBean insertedOptLockLongBean =  dmlProcessor.insert(newOptLockLongBean);
         assertEquals(SOME_TEXT, insertedOptLockLongBean.getText());
         insertedOptLockLongBean.setText(SOME_NEW_TEXT);
-		jdbcStatementProcessor.update(insertedOptLockLongBean);
-		jdbcStatementProcessor.delete(insertedOptLockLongBean);
+        dmlProcessor.update(insertedOptLockLongBean);
+        dmlProcessor.delete(insertedOptLockLongBean);
 		DataSourceProvider.commit();
 	}
 
@@ -40,11 +40,11 @@ public class OptLockLongTest {
 		DataSourceProvider.begin();
 		final OptLockLongBean newOptLockLongBean = new OptLockLongBean();
 		newOptLockLongBean.setText(SOME_TEXT);
-		JDBCStatementProcessor<OptLockLongBean> jdbcStatementProcessor = JDBCStatementProcessor.getInstance();
-		jdbcStatementProcessor.insert(newOptLockLongBean);
+        JDBCDMLProcessor<OptLockLongBean> dmlProcessor = JDBCDMLProcessor.getInstance();
+        dmlProcessor.insert(newOptLockLongBean);
 		try {
 			newOptLockLongBean.setVersion(0L);
-			jdbcStatementProcessor.update(newOptLockLongBean);
+            dmlProcessor.update(newOptLockLongBean);
 			fail();
 		} catch (DataAccessException e) {
 			DataSourceProvider.rollback();

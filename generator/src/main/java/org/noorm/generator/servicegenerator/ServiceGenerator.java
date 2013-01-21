@@ -1,6 +1,5 @@
 package org.noorm.generator.servicegenerator;
 
-import org.noorm.generator.GeneratorException;
 import org.noorm.generator.GeneratorUtil;
 import org.noorm.generator.ValidatorClassDescriptor;
 import org.noorm.generator.m2plugin.IParameters;
@@ -14,7 +13,6 @@ import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.util.List;
-import java.util.Properties;
 
 /**
  * Generator for database related service source files based on Velocity templates.

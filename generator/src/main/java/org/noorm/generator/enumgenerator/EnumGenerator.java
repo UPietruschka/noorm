@@ -14,7 +14,6 @@ import org.slf4j.LoggerFactory;
 import java.io.File;
 import java.util.List;
 import java.util.Map;
-import java.util.Properties;
 
 /**
  * Generator for database related Enum source files based on Velocity templates.
