@@ -39,9 +39,9 @@ class StatementBuilder {
 			delim = CALL_DELIM_2;
 		}
 		if (pInParameters != null) {
-			Map<String, Object> orderedParameters = new TreeMap<String, Object>(pInParameters);
-			for (String paramName : orderedParameters.keySet()) {
-				Object value = orderedParameters.get(paramName);
+			final Map<String, Object> orderedParameters = new TreeMap<String, Object>(pInParameters);
+			for (final String paramName : orderedParameters.keySet()) {
+				final Object value = orderedParameters.get(paramName);
 				if (value == null) {
 					continue;
 				}
@@ -71,6 +71,36 @@ class StatementBuilder {
 		plSQLCall.append(CALL_POSTFIX);
 		return plSQLCall.toString();
 	}
+
+    private static final String SELECT_PREFIX = "SELECT * FROM ";
+    private static final String SELECT_WHERE = " WHERE ";
+    private static final String SELECT_AND = " AND ";
+    private static final String SELECT_ASG = ":";
+    private static final String SELECT_ASG2 = "?";
+
+    public String buildSQLStatement(final String pTableName,
+                                    final Map<QueryColumn, Object> pInParameters,
+                                    final boolean useNamedParameters) {
+
+        final StringBuilder pSQLStatement = new StringBuilder();
+        pSQLStatement.append(SELECT_PREFIX).append(pTableName);
+        if (pInParameters.size() > 0) {
+            String delim = SELECT_WHERE;
+            final Map<QueryColumn, Object> orderedParameters = new TreeMap<QueryColumn, Object>(pInParameters);
+            for (final QueryColumn queryColumn : orderedParameters.keySet()) {
+                pSQLStatement.append(delim);
+                pSQLStatement.append(queryColumn.getColumnName());
+                pSQLStatement.append(queryColumn.getOperator().getOperatorSyntax());
+                if (useNamedParameters) {
+                    pSQLStatement.append(SELECT_ASG).append(queryColumn.getColumnName());
+                } else {
+                    pSQLStatement.append(SELECT_ASG2);
+                }
+                delim = SELECT_AND;
+            }
+        }
+        return pSQLStatement.toString();
+    }
 
 	private static final String INSERT_PREFIX = "INSERT INTO ";
 	private static final String INSERT_DELIM_1 = " (";

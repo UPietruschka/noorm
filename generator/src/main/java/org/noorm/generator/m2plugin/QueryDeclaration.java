@@ -1,5 +1,7 @@
 package org.noorm.generator.m2plugin;
 
+import org.noorm.jdbc.QueryColumn;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -20,7 +22,7 @@ import java.util.List;
 public class QueryDeclaration {
 
     private String tableName;
-    private List<QueryColumns> queryColumns = new ArrayList<QueryColumns>();
+    private List<QueryColumn> queryColumns = new ArrayList<QueryColumn>();
 
     public String getTableName() {
         return tableName;
@@ -30,80 +32,11 @@ public class QueryDeclaration {
         tableName = pTableName;
     }
 
-    public List<QueryColumns> getQueryColumns() {
+    public List<QueryColumn> getQueryColumns() {
         return queryColumns;
     }
 
-    public void setQueryColumns(List<QueryColumns> queryColumns) {
+    public void setQueryColumns(List<QueryColumn> queryColumns) {
         this.queryColumns = queryColumns;
-    }
-
-    public static class QueryColumns {
-
-        private String columnName;
-        private Operator operator;
-
-        public String getColumnName() {
-            return columnName;
-        }
-
-        public void setColumnName(final String pColumnName) {
-            columnName = pColumnName;
-        }
-
-        public Operator getOperator() {
-            return operator;
-        }
-
-        public void setOperator(final Operator pOperator) {
-            operator = pOperator;
-        }
-    }
-
-    public static class Operator {
-
-        private OperatorName operatorName;
-        private String operatorSyntax;
-
-        public OperatorName getOperatorName() {
-            return operatorName;
-        }
-
-        public void setOperatorName(final String pOperatorName) {
-
-            String normalizedName = pOperatorName.toUpperCase();
-            normalizedName = normalizedName.replace('-', '_');
-            operatorName = OperatorName.valueOf(normalizedName);
-            if (operatorName.equals(OperatorName.EQUAL_TO)) { operatorSyntax = " = "; }
-            if (operatorName.equals(OperatorName.NOT_EQUAL_TO)) { operatorSyntax = " != "; }
-            if (operatorName.equals(OperatorName.GREATER_THAN)) { operatorSyntax = " > "; }
-            if (operatorName.equals(OperatorName.GREATER_THAN_OR_EQUAL_TO)) { operatorSyntax = " >= "; }
-            if (operatorName.equals(OperatorName.LESS_THAN)) { operatorSyntax = " < "; }
-            if (operatorName.equals(OperatorName.LESS_THAN_OR_EQUAL_TO)) { operatorSyntax = " =< "; }
-        }
-
-        public String getOperatorSyntax() {
-            return operatorSyntax;
-        }
-    }
-
-    enum OperatorName {
-
-        EQUAL_TO("equal-to"),
-        NOT_EQUAL_TO("not-equal-to"),
-        GREATER_THAN("greater-than"),
-        GREATER_THAN_OR_EQUAL_TO("greater-than-or-equal-to"),
-        LESS_THAN("less-than"),
-        LESS_THAN_OR_EQUAL_TO("less-than-or-equal-to");
-
-        private OperatorName(final String pOperatorName) {
-            operatorName = pOperatorName;
-        }
-
-        private String operatorName;
-
-        public String getOperatorName() {
-            return operatorName;
-        }
     }
 }
