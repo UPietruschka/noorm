@@ -1,5 +1,7 @@
 package org.noorm.generator.servicegenerator;
 
+import org.noorm.generator.ParameterDescriptor;
+
 import java.util.ArrayList;
 import java.util.List;
 

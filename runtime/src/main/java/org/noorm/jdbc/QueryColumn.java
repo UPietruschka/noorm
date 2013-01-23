@@ -12,6 +12,15 @@ public class QueryColumn implements Comparable {
     private String columnName;
     private Operator operator;
 
+    public QueryColumn () {
+        operator = new Operator();
+    }
+
+    public QueryColumn(final String pColumnName, final Operator pOperator) {
+        columnName = pColumnName;
+        operator = pOperator;
+    }
+
     public String getColumnName() {
         return columnName;
     }

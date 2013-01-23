@@ -11,6 +11,7 @@ import org.apache.maven.project.MavenProject;
 import org.apache.velocity.app.Velocity;
 import org.noorm.generator.beangenerator.BeanGenerator;
 import org.noorm.generator.enumgenerator.EnumGenerator;
+import org.noorm.generator.querygenerator.QueryGenerator;
 import org.noorm.generator.servicegenerator.ServiceGenerator;
 import org.noorm.jdbc.DataSourceProvider;
 import org.slf4j.Logger;
@@ -290,6 +291,12 @@ public class GeneratorMojo extends AbstractMojo implements IParameters {
 			final ServiceGenerator serviceGenerator = new ServiceGenerator(this);
 			serviceGenerator.execute();
 		}
+
+        // Generate Declared Queries
+        if (queryDeclarations !=null && !queryDeclarations.isEmpty()) {
+            final QueryGenerator queryGenerator = new QueryGenerator(this);
+            queryGenerator.execute();
+        }
 
 		DataSourceProvider.commit();
 	}

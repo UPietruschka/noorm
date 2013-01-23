@@ -15,10 +15,15 @@ public class Operator {
     private OperatorName operatorName;
     private String operatorSyntax;
 
+    public Operator() {
+        operatorName = OperatorName.EQUAL_TO;
+    }
+
+    public Operator(final String pOperatorName) {
+        setOperatorName(pOperatorName);
+    }
+
     public OperatorName getOperatorName() {
-        if (operatorName == null) {
-            return OperatorName.EQUAL_TO;
-        }
         return operatorName;
     }
 
@@ -33,6 +38,7 @@ public class Operator {
         if (operatorName.equals(OperatorName.GREATER_THAN_OR_EQUAL_TO)) { operatorSyntax = " >= "; }
         if (operatorName.equals(OperatorName.LESS_THAN)) { operatorSyntax = " < "; }
         if (operatorName.equals(OperatorName.LESS_THAN_OR_EQUAL_TO)) { operatorSyntax = " =< "; }
+        if (operatorName.equals(OperatorName.LIKE)) { operatorSyntax = " LIKE "; }
     }
 
     public String getOperatorSyntax() {
@@ -46,7 +52,8 @@ public class Operator {
         GREATER_THAN("greater-than"),
         GREATER_THAN_OR_EQUAL_TO("greater-than-or-equal-to"),
         LESS_THAN("less-than"),
-        LESS_THAN_OR_EQUAL_TO("less-than-or-equal-to");
+        LESS_THAN_OR_EQUAL_TO("less-than-or-equal-to"),
+        LIKE("like");
 
         private OperatorName(final String pOperatorName) {
             operatorName = pOperatorName;

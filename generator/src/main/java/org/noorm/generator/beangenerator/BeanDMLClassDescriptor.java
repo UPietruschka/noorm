@@ -11,6 +11,7 @@ import java.util.List;
 public class BeanDMLClassDescriptor {
 
 	private static String BEAN_DML_INTERFACE_NAME = "IBeanDML";
+    private static final String BEAN_DML_CLASS_NAME = "BeanDML";
 
 	private String packageName;
 	private String interfacePackageName;
@@ -62,6 +63,10 @@ public class BeanDMLClassDescriptor {
 	public boolean hasInterface() {
 		return interfacePackageName != null && !interfacePackageName.isEmpty();
 	}
+
+    public String getJavaName() {
+        return BEAN_DML_CLASS_NAME;
+    }
 
 	public String getJavaInterfaceName() {
 		return BEAN_DML_INTERFACE_NAME;

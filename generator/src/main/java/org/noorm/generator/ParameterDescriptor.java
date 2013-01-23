@@ -1,4 +1,4 @@
-package org.noorm.generator.servicegenerator;
+package org.noorm.generator;
 
 /**
  * @author Ulf Pietruschka / ulf.pietruschka@etenso.com

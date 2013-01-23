@@ -1,6 +1,7 @@
 package org.noorm.generator.servicegenerator;
 
 import org.noorm.generator.GeneratorUtil;
+import org.noorm.generator.ParameterDescriptor;
 import org.noorm.generator.ValidatorClassDescriptor;
 import org.noorm.generator.m2plugin.IParameters;
 import org.noorm.metadata.MetadataService;

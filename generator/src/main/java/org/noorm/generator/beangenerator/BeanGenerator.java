@@ -34,7 +34,6 @@ public class BeanGenerator {
 	private static final String BEAN_VALIDATOR_VM_TEMPLATE_FILE = "/bean_validator.vm";
 	private static final String BEAN_VALIDATOR_CLASS_NAME = "GenericBeanValidator";
 	private static final String BEAN_DML_VM_TEMPLATE_FILE = "/bean_dml.vm";
-	private static final String BEAN_DML_CLASS_NAME = "BeanDML";
 	private static final String IGNORE_BEAN_FILTER_REGEX = "(DYNSQL_QUERY_TEMPLATE)";
 
 	private IParameters parameters;
@@ -162,7 +161,7 @@ public class BeanGenerator {
 		GeneratorUtil.generateFile(beanPackageDir, BEAN_VALIDATOR_VM_TEMPLATE_FILE,
 				BEAN_VALIDATOR_CLASS_NAME, validatorClassDescriptor);
 		GeneratorUtil.generateFile(servicePackageDir, BEAN_DML_VM_TEMPLATE_FILE,
-				BEAN_DML_CLASS_NAME, beanDMLClassDescriptor);
+                beanDMLClassDescriptor.getJavaName(), beanDMLClassDescriptor);
 		if (parameters.getServiceInterfacePackageName() != null &&
 				!parameters.getServiceInterfacePackageName().isEmpty()) {
 			beanDMLClassDescriptor.setInterface(true);

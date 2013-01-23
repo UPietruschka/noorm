@@ -1,10 +1,7 @@
 package org.noorm.generator.servicegenerator;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
-import java.util.Set;
 
 /**
  * @author Ulf Pietruschka / ulf.pietruschka@etenso.com

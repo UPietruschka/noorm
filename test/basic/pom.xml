@@ -104,6 +104,7 @@
                                 <srcFile>src/main/resources/sql/EMPLOYEE_SEARCH.sql</srcFile>
                                 <srcFile>src/main/resources/sql/EMPLOYEE_SERVICE.sql</srcFile>
                                 <srcFile>src/main/resources/sql/JOB_SERVICE.sql</srcFile>
+                                <srcFile>src/main/resources/sql/V_EMPLOYEES.sql</srcFile>
                                 <srcFile>src/main/resources/sql/V_DEPARTMENTS.sql</srcFile>
                                 <srcFile>src/main/resources/sql/DEPARTMENT_SERVICE.sql</srcFile>
                                 <srcFile>src/main/resources/sql/COMPLEX_DATA_SERVICE.sql</srcFile>
@@ -181,15 +182,26 @@
                     <singleRowFinderRegex>(.*_unique.*)</singleRowFinderRegex>
                     <queryDeclarations>
                         <queryDeclaration>
-                            <tableName>v_employees</tableName>
-                            <baseTable>employees</baseTable>
-                            <methodName>getEmpsById</methodName>
+                            <tableName>departments</tableName>
                             <queryColumns>
                                 <queryColumn>
-                                    <columnName>employee_id</columnName>
+                                    <columnName>department_id</columnName>
                                     <operator>
                                         <operatorName>equal-to</operatorName>
                                     </operator>
+                                </queryColumn>
+                            </queryColumns>
+                        </queryDeclaration>
+                        <queryDeclaration>
+                            <tableName>v_employees</tableName>
+                            <baseTable>employees</baseTable>
+                            <methodName>getEmployeesByDepartmentCity</methodName>
+                            <queryColumns>
+                                <queryColumn>
+                                    <columnName>department_name</columnName>
+                                </queryColumn>
+                                <queryColumn>
+                                    <columnName>city</columnName>
                                 </queryColumn>
                             </queryColumns>
                         </queryDeclaration>
