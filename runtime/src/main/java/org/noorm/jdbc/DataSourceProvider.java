@@ -192,7 +192,8 @@ public class DataSourceProvider {
 			}
 			//}
 			log.info(validationInfo.toString());
-            dataSource.getConnection();
+            java.sql.Connection con = dataSource.getConnection();
+            con.close();
 		} catch (Exception e) {
 			throw new DataAccessException(DataAccessException.Type.COULD_NOT_ESTABLISH_CONNECTION, e);
 		}
