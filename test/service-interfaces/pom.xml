@@ -85,7 +85,7 @@
                             <username>${jdbc.username}</username>
                             <password>${jdbc.password}</password>
                             <beanPackageName>org.noorm.test.hr2.beans</beanPackageName>
-                            <beanTableFilterRegex>DEPARTMENTS</beanTableFilterRegex>
+                            <beanTableFilterRegex>DEPARTMENTS|EMPLOYEES</beanTableFilterRegex>
                             <packageFilterRegex>--NO_MATCH_DESIRED--</packageFilterRegex>
                             <serviceInterfacePackageName>org.noorm.test.hr2.services</serviceInterfacePackageName>
                             <servicePackageName>org.noorm.test.hr2.services.impl</servicePackageName>
@@ -95,6 +95,27 @@
                                     <value>DEPARTMENTS_SEQ</value>
                                 </property>
                             </oracleTable2SequenceMapping>
+                            <queryDeclarations>
+                                <queryDeclaration>
+                                    <tableName>v_employees</tableName>
+                                    <baseTable>employees</baseTable>
+                                    <methodName>findEmployees</methodName>
+                                    <queryColumns>
+                                        <queryColumn>
+                                            <columnName>salary</columnName>
+                                            <operator>
+                                                <operatorName>greater-than-or-equal-to</operatorName>
+                                            </operator>
+                                        </queryColumn>
+                                        <queryColumn>
+                                            <columnName>commission_pct</columnName>
+                                            <operator>
+                                                <operatorName>less-than</operatorName>
+                                            </operator>
+                                        </queryColumn>
+                                    </queryColumns>
+                                </queryDeclaration>
+                            </queryDeclarations>
                         </configuration>
                     </execution>
                 </executions>

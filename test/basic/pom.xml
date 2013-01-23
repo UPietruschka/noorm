@@ -127,7 +127,7 @@
                     <dependency>
                         <groupId>ch.qos.logback</groupId>
                         <artifactId>logback-classic</artifactId>
-                        <version>1.0.6</version>
+                        <version>1.0.9</version>
                     </dependency>
                 </dependencies>
                 <executions>
@@ -183,6 +183,7 @@
                     <queryDeclarations>
                         <queryDeclaration>
                             <tableName>departments</tableName>
+                            <singleRowQuery>true</singleRowQuery>
                             <queryColumns>
                                 <queryColumn>
                                     <columnName>department_id</columnName>
@@ -195,13 +196,25 @@
                         <queryDeclaration>
                             <tableName>v_employees</tableName>
                             <baseTable>employees</baseTable>
-                            <methodName>getEmployeesByDepartmentCity</methodName>
+                            <methodName>findEmployeesByDepartmentCity</methodName>
                             <queryColumns>
                                 <queryColumn>
                                     <columnName>department_name</columnName>
                                 </queryColumn>
                                 <queryColumn>
                                     <columnName>city</columnName>
+                                </queryColumn>
+                            </queryColumns>
+                        </queryDeclaration>
+                        <queryDeclaration>
+                            <tableName>v_employees</tableName>
+                            <baseTable>employees</baseTable>
+                            <queryColumns>
+                                <queryColumn>
+                                    <columnName>department_name</columnName>
+                                    <operator>
+                                        <operatorName>like</operatorName>
+                                    </operator>
                                 </queryColumn>
                             </queryColumns>
                         </queryDeclaration>

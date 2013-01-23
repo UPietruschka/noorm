@@ -1,5 +1,6 @@
 package org.noorm.generator.querygenerator;
 
+import org.noorm.generator.GeneratorException;
 import org.noorm.generator.GeneratorUtil;
 import org.noorm.generator.ParameterDescriptor;
 import org.noorm.generator.m2plugin.IParameters;
@@ -78,8 +79,7 @@ public class QueryGenerator {
                 t0 = queryDeclaration.getBaseTable();
             }
             if (tableMetadataBeanList == null) {
-                log.info("Ignoring query declaration: no metadata found for table ".concat(t0));
-                continue;
+                throw new GeneratorException("Illegal query declaration: no metadata found for table ".concat(t0));
             }
             queryDescriptor.setQueryDeclaration(queryDeclaration);
             queryDescriptor.setBeanName(Utils.convertTableName2BeanName
@@ -98,9 +98,8 @@ public class QueryGenerator {
                             tableMetadataBean.getDataPrecision(), tableMetadataBean.getDataScale());
                 }
                 if (javaType == null) {
-                    log.info("Ignoring query declaration: no metadata found for table ".concat(t0)
+                    throw new GeneratorException("Illegal query declaration: no metadata found for table ".concat(t0)
                             .concat(" and column ").concat(columnName));
-                    continue;
                 }
                 parameterDescriptor.setJavaType(javaType);
                 queryDescriptor.addParameter(parameterDescriptor);
