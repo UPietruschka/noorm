@@ -4,6 +4,7 @@ import org.junit.Test;
 import org.noorm.test.hr.beans.DepartmentsBean;
 import org.noorm.test.hr.beans.EmployeesBean;
 import org.noorm.test.hr.services.DeclaredQueries;
+import org.noorm.test.hr.services.EmployeeFinder;
 
 import java.util.List;
 
@@ -32,8 +33,8 @@ public class DeclaredQueriesTest {
 
         final String departmentName = "Sales";
         final String city = "Oxford";
-        final DeclaredQueries declaredQueries = DeclaredQueries.getInstance();
-        List<EmployeesBean> employees = declaredQueries.findEmployeesByDepartmentCity(departmentName, city);
+        final EmployeeFinder employeeFinder = EmployeeFinder.getInstance();
+        List<EmployeesBean> employees = employeeFinder.findEmployeesByDepartmentCity(departmentName, city);
         assertEquals(34, employees.size());
     }
 
@@ -41,8 +42,8 @@ public class DeclaredQueriesTest {
     public void testFindEmployees2() {
 
         final String departmentName = "S%"; // Shipping, Sales
-        final DeclaredQueries declaredQueries = DeclaredQueries.getInstance();
-        List<EmployeesBean> employees = declaredQueries.findEmployeesByDepartmentName(departmentName);
+        final EmployeeFinder employeeFinder = EmployeeFinder.getInstance();
+        List<EmployeesBean> employees = employeeFinder.findEmployeesByDepartmentName(departmentName);
         assertEquals(79, employees.size());
     }
 }

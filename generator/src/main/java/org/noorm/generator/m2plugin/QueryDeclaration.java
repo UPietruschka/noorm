@@ -35,6 +35,7 @@ public class QueryDeclaration {
     private String tableName;
     private String baseTable;
     private String methodName;
+    private String className;
     private boolean singleRowQuery = false;
     private List<QueryColumn> queryColumns = new ArrayList<QueryColumn>();
 
@@ -60,6 +61,14 @@ public class QueryDeclaration {
 
     public void setMethodName(final String pMethodName) {
         methodName = pMethodName;
+    }
+
+    public String getClassName() {
+        return className;
+    }
+
+    public void setClassName(final String pClassName) {
+        className = pClassName;
     }
 
     public boolean isSingleRowQuery() {

@@ -197,6 +197,7 @@
                             <tableName>v_employees</tableName>
                             <baseTable>employees</baseTable>
                             <methodName>findEmployeesByDepartmentCity</methodName>
+                            <className>EmployeeFinder</className>
                             <queryColumns>
                                 <queryColumn>
                                     <columnName>department_name</columnName>
@@ -209,6 +210,7 @@
                         <queryDeclaration>
                             <tableName>v_employees</tableName>
                             <baseTable>employees</baseTable>
+                            <className>EmployeeFinder</className>
                             <queryColumns>
                                 <queryColumn>
                                     <columnName>department_name</columnName>

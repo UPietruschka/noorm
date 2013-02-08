@@ -13,6 +13,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.File;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -24,6 +25,7 @@ import java.util.Map;
 public class QueryGenerator {
 
     private static final Logger log = LoggerFactory.getLogger(QueryGenerator.class);
+    private static final String DECLARED_QUERIES_DEFAULT_CLASS_NAME = "DeclaredQueries";
     private static final String PARAMETER_PREFIX = "p";
     private static final String DEFAULT_METHOD_NAME_PREFIX = "find";
     private static final String DEFAULT_METHOD_NAME_PART3 = "By";
@@ -63,13 +65,7 @@ public class QueryGenerator {
         log.info("Retrieving table metadata from Oracle database.");
         final Map<String, List<TableMetadataBean>> tableColumnMap = metadataService.findTableMetadata();
 
-        final QueryClassDescriptor queryClassDescriptor = new QueryClassDescriptor();
-        if (parameters.getDataSourceName() != null && !parameters.getDataSourceName().isEmpty()) {
-            queryClassDescriptor.setDataSourceName(parameters.getDataSourceName());
-        }
-        queryClassDescriptor.setInterfacePackageName(parameters.getServiceInterfacePackageName());
-        queryClassDescriptor.setPackageName(parameters.getServicePackageName());
-        queryClassDescriptor.setBeanPackageName(parameters.getBeanPackageName());
+        final Map<String, QueryClassDescriptor> queryClasses = new HashMap<String, QueryClassDescriptor>();
         for (final QueryDeclaration queryDeclaration : parameters.getQueryDeclarations()) {
             generateMethodName(queryDeclaration);
             final QueryDescriptor queryDescriptor = new QueryDescriptor();
@@ -104,15 +100,33 @@ public class QueryGenerator {
                 parameterDescriptor.setJavaType(javaType);
                 queryDescriptor.addParameter(parameterDescriptor);
             }
+            String javaName = queryDeclaration.getClassName();
+            if (javaName == null || javaName.isEmpty()) {
+                javaName = DECLARED_QUERIES_DEFAULT_CLASS_NAME;
+            }
+            QueryClassDescriptor queryClassDescriptor = queryClasses.get(javaName);
+            if (queryClassDescriptor == null) {
+                queryClassDescriptor = new QueryClassDescriptor();
+                if (parameters.getDataSourceName() != null && !parameters.getDataSourceName().isEmpty()) {
+                    queryClassDescriptor.setDataSourceName(parameters.getDataSourceName());
+                }
+                queryClassDescriptor.setInterfacePackageName(parameters.getServiceInterfacePackageName());
+                queryClassDescriptor.setPackageName(parameters.getServicePackageName());
+                queryClassDescriptor.setBeanPackageName(parameters.getBeanPackageName());
+                queryClassDescriptor.setJavaName(javaName);
+                queryClasses.put(javaName, queryClassDescriptor);
+            }
             queryClassDescriptor.addQuery(queryDescriptor);
         }
-        GeneratorUtil.generateFile(servicePackageDir, QUERY_VM_TEMPLATE_FILE,
-                queryClassDescriptor.getJavaName(), queryClassDescriptor);
-        if (parameters.getServiceInterfacePackageName() != null &&
-                !parameters.getServiceInterfacePackageName().isEmpty()) {
-            queryClassDescriptor.setInterface(true);
-            GeneratorUtil.generateFile(serviceInterfacePackageDir, QUERY_VM_TEMPLATE_FILE,
-                    queryClassDescriptor.getJavaInterfaceName(), queryClassDescriptor);
+        for (final QueryClassDescriptor queryClassDescriptor : queryClasses.values()) {
+            GeneratorUtil.generateFile(servicePackageDir, QUERY_VM_TEMPLATE_FILE,
+                    queryClassDescriptor.getJavaName(), queryClassDescriptor);
+            if (parameters.getServiceInterfacePackageName() != null &&
+                    !parameters.getServiceInterfacePackageName().isEmpty()) {
+                queryClassDescriptor.setInterface(true);
+                GeneratorUtil.generateFile(serviceInterfacePackageDir,
+                        QUERY_VM_TEMPLATE_FILE, queryClassDescriptor.getJavaInterfaceName(), queryClassDescriptor);
+            }
         }
     }
 

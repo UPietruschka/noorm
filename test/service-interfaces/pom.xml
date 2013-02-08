@@ -100,6 +100,7 @@
                                     <tableName>v_employees</tableName>
                                     <baseTable>employees</baseTable>
                                     <methodName>findEmployees</methodName>
+                                    <className>EmployeeDAO</className>
                                     <queryColumns>
                                         <queryColumn>
                                             <columnName>salary</columnName>

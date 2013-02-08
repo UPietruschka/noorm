@@ -7,6 +7,6 @@
     <bean id="beanDML_HR1" class="org.noorm.test.hr1.services.impl.BeanDML"/>
     <bean id="beanDML_HR2" class="org.noorm.test.hr2.services.impl.BeanDML"/>
     <bean id="employeeService" class="org.noorm.test.hr1.services.impl.EmployeeService"/>
-    <bean id="declaredQueries" class="org.noorm.test.hr2.services.impl.DeclaredQueries"/>
+    <bean id="employeeDAO" class="org.noorm.test.hr2.services.impl.EmployeeDAO"/>
 
 </beans>

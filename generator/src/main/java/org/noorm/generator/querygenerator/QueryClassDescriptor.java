@@ -10,12 +10,12 @@ import java.util.List;
  */
 public class QueryClassDescriptor {
 
-    private static String DECLARED_QUERIES_INTERFACE_NAME = "IDeclaredQueries";
-    private static final String DECLARED_QUERIES_CLASS_NAME = "DeclaredQueries";
+    private static final String DECLARED_QUERIES_INTERFACE_PREFIX = "I";
 
     private String packageName;
     private String interfacePackageName;
     private String beanPackageName;
+    private String javaName;
     private final List<QueryDescriptor> queries = new ArrayList<QueryDescriptor>();
     private boolean isInterface = false;
     private String dataSourceName;
@@ -44,6 +44,18 @@ public class QueryClassDescriptor {
         beanPackageName = pBeanPackageName;
     }
 
+    public String getJavaName() {
+        return javaName;
+    }
+
+    public void setJavaName(String javaName) {
+        this.javaName = javaName;
+    }
+
+    public String getJavaInterfaceName() {
+        return DECLARED_QUERIES_INTERFACE_PREFIX.concat(javaName);
+    }
+
     public void addQuery(final QueryDescriptor pQuery) {
         queries.add(pQuery);
     }
@@ -62,14 +74,6 @@ public class QueryClassDescriptor {
 
     public boolean hasInterface() {
         return interfacePackageName != null && !interfacePackageName.isEmpty();
-    }
-
-    public String getJavaName() {
-        return DECLARED_QUERIES_CLASS_NAME;
-    }
-
-    public String getJavaInterfaceName() {
-        return DECLARED_QUERIES_INTERFACE_NAME;
     }
 
     public String getDataSourceName() {
