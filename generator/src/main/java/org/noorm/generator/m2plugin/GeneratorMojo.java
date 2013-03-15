@@ -219,6 +219,19 @@ public class GeneratorMojo extends AbstractMojo implements IParameters {
     @Parameter
     protected List<QueryDeclaration> queryDeclarations;
 
+    /**
+     * The implementation of methods "equals" and "hashCode" for the generated beans raises the same questions
+     * intensively discussed for JPA entities. In particular, three options are available: do not implement these
+     * methods at all, implement them based on the technical ID, i.e. the primary key, or implement them based on
+     * some business-id. The latter is not applicable for generated code, since we do not have the required
+     * insight into the semantics of the bean/table to decide on a business-id.
+     * Thus, options one and two remain and this option can be used to choose one. Note that this option is set
+     * to true by default (i.e. methods equals and hashCode are automatically implemented based on the primary
+     * key).
+     */
+    @Parameter(defaultValue = "true")
+    protected boolean generatePKBasedEqualsAndHashCode;
+
 	private OracleDataSource initializePoolDataSource() throws SQLException {
 
 		final OracleDataSource oracleDataSource = new OracleDataSource();
@@ -404,5 +417,10 @@ public class GeneratorMojo extends AbstractMojo implements IParameters {
     @Override
     public List<QueryDeclaration> getQueryDeclarations() {
         return queryDeclarations;
+    }
+
+    @Override
+    public boolean generatePKBasedEqualsAndHashCode() {
+        return generatePKBasedEqualsAndHashCode;
     }
 }

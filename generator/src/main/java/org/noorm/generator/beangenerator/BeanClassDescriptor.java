@@ -24,8 +24,9 @@ public class BeanClassDescriptor {
 	private String versionColumnName;
 	private String packageName;
 	private final List<BeanAttributeDescriptor> attributes = new ArrayList<BeanAttributeDescriptor>();
+    private boolean generatePKBasedEqualsAndHashCode;
 
-	public long getSerialVersionUID() {
+    public long getSerialVersionUID() {
 		return serialVersionUID;
 	}
 
@@ -129,4 +130,12 @@ public class BeanClassDescriptor {
 		}
 		return isUpdatable;
 	}
+
+    public boolean generatePKBasedEqualsAndHashCode() {
+        return generatePKBasedEqualsAndHashCode;
+    }
+
+    public void setGeneratePKBasedEqualsAndHashCode(final boolean pGeneratePKBasedEqualsAndHashCode) {
+        generatePKBasedEqualsAndHashCode = pGeneratePKBasedEqualsAndHashCode;
+    }
 }

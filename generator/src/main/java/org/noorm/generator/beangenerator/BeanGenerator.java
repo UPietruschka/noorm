@@ -125,6 +125,7 @@ public class BeanGenerator {
 			beanClassDescriptor.setTableName(tableName0);
 			final String[] primaryKeyColumnNames = getPrimaryKeyColumnNames(tableName0, pkColumnNameList);
 			beanClassDescriptor.setPrimaryKeyColumnNames(primaryKeyColumnNames);
+            beanClassDescriptor.setGeneratePKBasedEqualsAndHashCode(parameters.generatePKBasedEqualsAndHashCode());
 			final String sequenceName = getSequenceName(tableName0, sequenceDBNameList);
 			beanClassDescriptor.setSequenceName(sequenceName);
 			final String versionColumnName = getVersionColumnName(tableName0, tableMetadataBeanList1);

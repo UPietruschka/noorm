@@ -56,18 +56,22 @@ public class $class.Name<T> implements IBean<T>, Serializable {
 	}
 #end
 #if ($class.hasPrimaryKey())
+#if ($class.generatePKBasedEqualsAndHashCode())
 
 	@Override
-	public boolean equals(Object pObject) {
+	public boolean equals(final Object pObject) {
 		if (this == pObject) return true;
-		if (!(pObject instanceof $class.Name)) return false;
-		$class.Name other = ($class.Name) pObject;
+		if (pObject == null || !(pObject instanceof $class.Name)) return false;
+		if (#foreach ($param in $class.PrimaryKeyColumnNames)get${class.getFirstUpperColumnName($param)}() == null#if($velocityCount<$class.PrimaryKeyColumnNames.size()) || #end#end) return false;
+		final $class.Name other = ($class.Name) pObject;
 		return #foreach ($param in $class.PrimaryKeyColumnNames)get${class.getFirstUpperColumnName($param)}().equals(other.get${class.getFirstUpperColumnName($param)}())#if($velocityCount<$class.PrimaryKeyColumnNames.size()) && #end#end;
 	}
 
 	@Override
 	public int hashCode() {
+		if (#foreach ($param in $class.PrimaryKeyColumnNames)get${class.getFirstUpperColumnName($param)}() == null#if($velocityCount<$class.PrimaryKeyColumnNames.size()) || #end#end) return super.hashCode();
 		return #foreach ($param in $class.PrimaryKeyColumnNames)get${class.getFirstUpperColumnName($param)}().hashCode()#if($velocityCount<$class.PrimaryKeyColumnNames.size()) + #end#end;
 	}
+#end
 #end
 }

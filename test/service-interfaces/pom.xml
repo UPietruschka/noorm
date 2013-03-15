@@ -117,6 +117,7 @@
                                     </queryColumns>
                                 </queryDeclaration>
                             </queryDeclarations>
+                            <generatePKBasedEqualsAndHashCode>false</generatePKBasedEqualsAndHashCode>
                         </configuration>
                     </execution>
                 </executions>
