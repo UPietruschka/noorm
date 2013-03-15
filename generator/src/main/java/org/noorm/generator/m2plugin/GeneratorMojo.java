@@ -100,6 +100,16 @@ public class GeneratorMojo extends AbstractMojo implements IParameters {
     @Parameter
 	protected List<String> ignoreTableNamePrefixes;
 
+    /**
+     * List of column name prefixes to be ignored for java method name construction.
+     * Some data modelers use a common column name prefix to identify columns uniquely
+     * for a given table. When those prefixes are not desired in the constructed
+     * java method name, they should be listed here.
+     * This setting applies to the bean generator and the enum generator.
+     */
+    @Parameter
+    protected List<String> ignoreColumnNamePrefixes;
+
 	/**
 	 * Regular expression to filter tables and views for Bean generation.
 	 */
@@ -358,6 +368,11 @@ public class GeneratorMojo extends AbstractMojo implements IParameters {
 	public List<String> getIgnoreTableNamePrefixes() {
 		return ignoreTableNamePrefixes;
 	}
+
+    @Override
+    public List<String> getIgnoreColumnNamePrefixes() {
+        return ignoreColumnNamePrefixes;
+    }
 
 	@Override
 	public String getBeanTableFilterRegex() {

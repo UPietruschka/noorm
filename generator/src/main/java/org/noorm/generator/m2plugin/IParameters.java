@@ -67,6 +67,15 @@ public interface IParameters {
 	 */
 	List<String> getIgnoreTableNamePrefixes();
 
+    /**
+     * List of column name prefixes to be ignored for java method name construction.
+     * Some data modelers use a common column name prefix to identify columns uniquely
+     * for a given table. When those prefixes are not desired in the constructed
+     * java method name, they should be listed here.
+     * This setting applies to the bean generator and the enum generator.
+     */
+    List<String> getIgnoreColumnNamePrefixes();
+
 	/**
 	 * Regular expression to filter tables and views for Bean generation.
 	 */
