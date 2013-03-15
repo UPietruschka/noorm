@@ -23,9 +23,33 @@ public class DeclaredQueriesTest {
         final Long departmentId = 10L;
         final String departmentName = "Administration";
         final DeclaredQueries declaredQueries = DeclaredQueries.getInstance();
-        DepartmentsBean department = declaredQueries.findDepartmentsByDepartmentId(departmentId);
+        final DepartmentsBean department = declaredQueries.findDepartmentsByDepartmentId(departmentId);
         assertNotNull(department);
         assertEquals(department.getDepartmentName(), departmentName);
+    }
+
+    @Test
+    public void testFindDoubleEqual() {
+
+        final DeclaredQueries declaredQueries = DeclaredQueries.getInstance();
+        final List<EmployeesBean> employees = declaredQueries.findEmployeesByCommissionPct(0.25d);
+        assertEquals(6, employees.size());
+    }
+
+    @Test
+    public void testFindIsNull() {
+
+        final DeclaredQueries declaredQueries = DeclaredQueries.getInstance();
+        final List<EmployeesBean> employees = declaredQueries.findEmployeesWithoutCommission();
+        assertEquals(72, employees.size());
+    }
+
+    @Test
+    public void testFindIsNotNull() {
+
+        final DeclaredQueries declaredQueries = DeclaredQueries.getInstance();
+        final List<EmployeesBean> employees = declaredQueries.findEmployeesWithCommission();
+        assertEquals(35, employees.size());
     }
 
     @Test
@@ -34,7 +58,7 @@ public class DeclaredQueriesTest {
         final String departmentName = "Sales";
         final String city = "Oxford";
         final EmployeeFinder employeeFinder = EmployeeFinder.getInstance();
-        List<EmployeesBean> employees = employeeFinder.findEmployeesByDepartmentCity(departmentName, city);
+        final List<EmployeesBean> employees = employeeFinder.findEmployeesByDepartmentCity(departmentName, city);
         assertEquals(34, employees.size());
     }
 
@@ -43,7 +67,7 @@ public class DeclaredQueriesTest {
 
         final String departmentName = "S%"; // Shipping, Sales
         final EmployeeFinder employeeFinder = EmployeeFinder.getInstance();
-        List<EmployeesBean> employees = employeeFinder.findEmployeesByDepartmentName(departmentName);
+        final List<EmployeesBean> employees = employeeFinder.findEmployeesByDepartmentName(departmentName);
         assertEquals(79, employees.size());
     }
 }

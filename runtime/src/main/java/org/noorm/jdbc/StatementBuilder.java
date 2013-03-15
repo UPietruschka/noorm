@@ -91,10 +91,12 @@ class StatementBuilder {
                 pSQLStatement.append(delim);
                 pSQLStatement.append(queryColumn.getColumnName());
                 pSQLStatement.append(queryColumn.getOperator().getOperatorSyntax());
-                if (useNamedParameters) {
-                    pSQLStatement.append(SELECT_ASG).append(queryColumn.getColumnName());
-                } else {
-                    pSQLStatement.append(SELECT_ASG2);
+                if (!queryColumn.getOperator().isUnary()) {
+                    if (useNamedParameters) {
+                        pSQLStatement.append(SELECT_ASG).append(queryColumn.getColumnName());
+                    } else {
+                        pSQLStatement.append(SELECT_ASG2);
+                    }
                 }
                 delim = SELECT_AND;
             }

@@ -14,6 +14,7 @@ public class Operator {
 
     private OperatorName operatorName;
     private String operatorSyntax;
+    private boolean unary = false;
 
     public Operator() {
         operatorName = OperatorName.EQUAL_TO;
@@ -37,12 +38,28 @@ public class Operator {
         if (operatorName.equals(OperatorName.GREATER_THAN)) { operatorSyntax = " > "; }
         if (operatorName.equals(OperatorName.GREATER_THAN_OR_EQUAL_TO)) { operatorSyntax = " >= "; }
         if (operatorName.equals(OperatorName.LESS_THAN)) { operatorSyntax = " < "; }
-        if (operatorName.equals(OperatorName.LESS_THAN_OR_EQUAL_TO)) { operatorSyntax = " =< "; }
+        if (operatorName.equals(OperatorName.LESS_THAN_OR_EQUAL_TO)) { operatorSyntax = " <= "; }
         if (operatorName.equals(OperatorName.LIKE)) { operatorSyntax = " LIKE "; }
+        if (operatorName.equals(OperatorName.IS_NULL)) {
+            operatorSyntax = " IS NULL ";
+            unary = true;
+        }
+        if (operatorName.equals(OperatorName.IS_NOT_NULL)) {
+            operatorSyntax = " IS NOT NULL ";
+            unary = true;
+        }
     }
 
     public String getOperatorSyntax() {
         return operatorSyntax;
+    }
+
+    public boolean isUnary() {
+        return unary;
+    }
+
+    public void setUnary(final boolean pUnary) {
+        unary = pUnary;
     }
 
     enum OperatorName {
@@ -53,7 +70,9 @@ public class Operator {
         GREATER_THAN_OR_EQUAL_TO("greater-than-or-equal-to"),
         LESS_THAN("less-than"),
         LESS_THAN_OR_EQUAL_TO("less-than-or-equal-to"),
-        LIKE("like");
+        LIKE("like"),
+        IS_NULL("is-null"),
+        IS_NOT_NULL("is-not-null");
 
         private OperatorName(final String pOperatorName) {
             operatorName = pOperatorName;

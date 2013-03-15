@@ -38,8 +38,10 @@ PACKAGE BODY noorm_metadata AS
            all_updatable_columns uc,
            user_synonyms us
     WHERE  tc.table_name  = uc.table_name
+    AND    tc.owner       = uc.owner
     AND    tc.column_name = uc.column_name
     AND    tc.table_name  = us.table_name
+    AND    tc.owner       = us.table_owner
     ORDER  BY table_name, column_id;
   END find_table_metadata;
 
@@ -78,7 +80,20 @@ PACKAGE BODY noorm_metadata AS
            user_cons_columns cc
     WHERE  uc.table_name      = cc.table_name
     AND    uc.constraint_name = cc.constraint_name
-    AND    uc.constraint_type = 'P';
+    AND    uc.constraint_type = 'P'
+    UNION
+    SELECT us.synonym_name table_name,
+           cc.column_name,
+           cc.position
+    FROM   all_constraints ac,
+           all_cons_columns cc,
+           user_synonyms us
+    WHERE  ac.table_name      = cc.table_name
+    AND    ac.constraint_name = cc.constraint_name
+    AND    ac.owner           = cc.owner
+    AND    ac.table_name      = us.table_name
+    AND    ac.owner           = us.table_owner
+    AND    ac.constraint_type = 'P';
   END find_pk_columns;
 
   /*

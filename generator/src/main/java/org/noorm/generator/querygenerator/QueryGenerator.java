@@ -30,8 +30,6 @@ public class QueryGenerator {
     private static final String DEFAULT_METHOD_NAME_PREFIX = "find";
     private static final String DEFAULT_METHOD_NAME_PART3 = "By";
     private static final String QUERY_VM_TEMPLATE_FILE = "/declared_queries.vm";
-    private static final String QUERY_VALIDATOR_VM_TEMPLATE_FILE = "/declared_queries_validator.vm";
-    private static final String QUERY_VALIDATOR_CLASS_NAME = "GenericQueryValidator";
 
     private IParameters parameters;
 
@@ -98,6 +96,7 @@ public class QueryGenerator {
                             .concat(" and column ").concat(columnName));
                 }
                 parameterDescriptor.setJavaType(javaType);
+                parameterDescriptor.setOperator(queryColumn.getOperator());
                 queryDescriptor.addParameter(parameterDescriptor);
             }
             String javaName = queryDeclaration.getClassName();

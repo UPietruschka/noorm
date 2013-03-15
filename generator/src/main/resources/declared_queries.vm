@@ -31,8 +31,8 @@ public class ${class.JavaName} {
 	private static ${class.JavaName} ourInstance = new ${class.JavaName}();
 #end
 #if(!$class.isInterface())
-
 #if ($class.hasDataSourceName())
+
 	private static final String DATA_SOURCE_NAME = "$class.getDataSourceName()";
 #end
 #end
@@ -46,22 +46,22 @@ public class ${class.JavaName} {
 		return ourInstance;
 	}
 #end
-#foreach ($query in $class.queries)
+#foreach($query in $class.queries)
 
 #if($class.isInterface())
-	#if(!$query.isSingleRowQuery())List<#end$query.getBeanName()#if(!$query.isSingleRowQuery())>#end $query.getMethodName()(#foreach ($param in $query.Parameters)final $param.JavaType ${param.JavaName}#if($velocityCount<$query.Parameters.size()),${nl}${subindent}#end#end);
+	#if(!$query.isSingleRowQuery())List<#end$query.getBeanName()#if(!$query.isSingleRowQuery())>#end $query.getMethodName()(#foreach($param in $query.Parameters)#if(!$param.getOperator().isUnary())final $param.JavaType ${param.JavaName}#if($velocityCount<$query.Parameters.size()),${nl}${subindent}#end#end#end);
 #else
-	public #if(!$query.isSingleRowQuery())List<#end$query.getBeanName()#if(!$query.isSingleRowQuery())>#end $query.getMethodName()(#foreach ($param in $query.Parameters)final $param.JavaType ${param.JavaName}#if($velocityCount<$query.Parameters.size()),${nl}${subindent}#end#end) {
+	public #if(!$query.isSingleRowQuery())List<#end$query.getBeanName()#if(!$query.isSingleRowQuery())>#end $query.getMethodName()(#foreach($param in $query.Parameters)#if(!$param.getOperator().isUnary())final $param.JavaType ${param.JavaName}#if($velocityCount<$query.Parameters.size()),${nl}${subindent}#end#end#end) {
 
-#if ($class.hasDataSourceName())
+#if($class.hasDataSourceName())
 		DataSourceProvider.setActiveDataSource(DATA_SOURCE_NAME);
 #end
 		final Map<QueryColumn, Object> parameters = new HashMap<QueryColumn, Object>();
 #foreach ($param in $query.Parameters)
-#foreach ($column in $query.QueryColumns)
-#if($param.getOracleName().toUpperCase().equals($column.getColumnName().toUpperCase()))
-		parameters.put(new QueryColumn("$column.getColumnName()", new Operator("$column.getOperator().getOperatorName()")), $param.JavaName);
-#end
+#if($param.getOperator().isUnary())
+		parameters.put(new QueryColumn("$param.getOracleName().toLowerCase()", new Operator("$param.getOperator().getOperatorName()")), null);
+#else
+		parameters.put(new QueryColumn("$param.getOracleName().toLowerCase()", new Operator("$param.getOperator().getOperatorName()")), $param.JavaName);
 #end
 #end
 		final JDBCStatementProcessor<$query.getBeanName()> stmtProcessor = JDBCStatementProcessor.getInstance();

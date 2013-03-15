@@ -39,10 +39,6 @@ public class QueryDescriptor {
         return queryDeclaration.isSingleRowQuery();
     }
 
-    public List<QueryColumn> getQueryColumns() {
-        return queryDeclaration.getQueryColumns();
-    }
-
     public List<ParameterDescriptor> getParameters() {
         return parameters;
     }

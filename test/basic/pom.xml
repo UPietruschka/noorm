@@ -82,6 +82,7 @@
                                 <srcFile>src/main/resources/sql/QUERY_TEMPLATES.sql</srcFile>
                                 <srcFile>src/main/resources/sql/OPT_LOCK_TABLES.sql</srcFile>
                                 <srcFile>src/main/resources/sql/COMPLEX_DATA_TYPES_TABLE.sql</srcFile>
+                                <srcFile>src/main/resources/sql/JOBS_SYNONYM.sql</srcFile>
                             </srcFiles>
                         </configuration>
                     </execution>
@@ -182,6 +183,41 @@
                     <singleRowFinderRegex>(.*_unique.*)</singleRowFinderRegex>
                     <queryDeclarations>
                         <queryDeclaration>
+                            <tableName>employees</tableName>
+                            <queryColumns>
+                                <queryColumn>
+                                    <columnName>commission_pct</columnName>
+                                    <operator>
+                                        <operatorName>equal-to</operatorName>
+                                    </operator>
+                                </queryColumn>
+                            </queryColumns>
+                        </queryDeclaration>
+                        <queryDeclaration>
+                            <tableName>employees</tableName>
+                            <methodName>findEmployeesWithCommission</methodName>
+                            <queryColumns>
+                                <queryColumn>
+                                    <columnName>commission_pct</columnName>
+                                    <operator>
+                                        <operatorName>is-not-null</operatorName>
+                                    </operator>
+                                </queryColumn>
+                            </queryColumns>
+                        </queryDeclaration>
+                        <queryDeclaration>
+                            <tableName>employees</tableName>
+                            <methodName>findEmployeesWithoutCommission</methodName>
+                            <queryColumns>
+                                <queryColumn>
+                                    <columnName>commission_pct</columnName>
+                                    <operator>
+                                        <operatorName>is-null</operatorName>
+                                    </operator>
+                                </queryColumn>
+                            </queryColumns>
+                        </queryDeclaration>
+                        <queryDeclaration>
                             <tableName>departments</tableName>
                             <singleRowQuery>true</singleRowQuery>
                             <queryColumns>
@@ -189,6 +225,24 @@
                                     <columnName>department_id</columnName>
                                     <operator>
                                         <operatorName>equal-to</operatorName>
+                                    </operator>
+                                </queryColumn>
+                            </queryColumns>
+                        </queryDeclaration>
+                        <queryDeclaration>
+                            <tableName>jobs_synonym</tableName>
+                            <methodName>findJobsSynonymsBySalary</methodName>
+                            <queryColumns>
+                                <queryColumn>
+                                    <columnName>min_salary</columnName>
+                                    <operator>
+                                        <operatorName>greater-than-or-equal-to</operatorName>
+                                    </operator>
+                                </queryColumn>
+                                <queryColumn>
+                                    <columnName>max_salary</columnName>
+                                    <operator>
+                                        <operatorName>less-than-or-equal-to</operatorName>
                                     </operator>
                                 </queryColumn>
                             </queryColumns>

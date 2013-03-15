@@ -325,7 +325,9 @@ public class JDBCStatementProcessor<T> {
             int parameterIndex = 1;
             final Map<QueryColumn, Object> orderedParameters = new TreeMap<QueryColumn, Object>(pInParameters);
             for (final QueryColumn queryColumn : orderedParameters.keySet()) {
-                pstmt.setObject(parameterIndex++, orderedParameters.get(queryColumn));
+                if (!queryColumn.getOperator().isUnary()) {
+                    pstmt.setObject(parameterIndex++, orderedParameters.get(queryColumn));
+                }
             }
             ResultSet rs = pstmt.executeQuery();
 
