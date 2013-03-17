@@ -138,7 +138,8 @@ public class BeanGenerator {
 			beanClassDescriptor.setSerialVersionUID(serialVersionUID);
 			for (final TableMetadataBean tableMetadataBean : tableMetadataBeanList1) {
 				final BeanAttributeDescriptor beanAttributeDescriptor = new BeanAttributeDescriptor();
-				final String javaColumnName = Utils.convertDBName2JavaName(tableMetadataBean.getColumnName(), false);
+				final String javaColumnName = Utils.convertDBName2JavaName
+                        (tableMetadataBean.getColumnName(), false, parameters.getIgnoreColumnNamePrefixes());
 				beanAttributeDescriptor.setName(javaColumnName);
 				final String javaType = Utils.convertOracleType2JavaType(tableMetadataBean.getDataType(),
 						tableMetadataBean.getDataPrecision(), tableMetadataBean.getDataScale());

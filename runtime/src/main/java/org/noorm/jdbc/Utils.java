@@ -41,6 +41,20 @@ public class Utils {
 		return dbNameBuilder.toString();
 	}
 
+    public static String convertDBName2JavaName(final String pDBName,
+                                                final boolean pCapitalizeFirst,
+                                                final List<String> pIgnoreColumnNamePrefixes) {
+        String nameBaseColumnName = pDBName;
+        if (pIgnoreColumnNamePrefixes != null) {
+            for (final String ignoredPrefix : pIgnoreColumnNamePrefixes) {
+                if (pDBName.startsWith(ignoredPrefix)) {
+                    nameBaseColumnName = pDBName.substring(ignoredPrefix.length());
+                }
+            }
+        }
+        return convertDBName2JavaName(nameBaseColumnName, pCapitalizeFirst);
+    }
+
     /**
      * Converts a database object name into a java name. Database names (table names, column names, etc.) are
      * typically stored in the Oracle data dictionary in upper case. Most database modellers follow the convention

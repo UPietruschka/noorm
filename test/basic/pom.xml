@@ -148,6 +148,9 @@
                     <servicePackageName>org.noorm.test.hr.services</servicePackageName>
                     <enumPackageName>org.noorm.test.hr.enums</enumPackageName>
                     <enumTableFilterRegex>REGIONS</enumTableFilterRegex>
+                    <ignoreColumnNamePrefixes>
+                        <prefix>OPT_</prefix>
+                    </ignoreColumnNamePrefixes>
                     <enumTable2DisplayColumnMapping>
                         <property>
                             <name>REGIONS</name>
