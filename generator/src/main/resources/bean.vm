@@ -47,12 +47,12 @@ public class $class.Name<T> implements IBean<T>, Serializable {
 	}
 #foreach ($att in $class.Attributes)
 
-	public $att.Type get$att.getFirstUpperName()() {
+	public $att.Type get$att.getMethodNamePostfix()() {
 		return $att.Name;
 	}
 
-	public void set$att.getFirstUpperName()(final $att.Type p$att.getFirstUpperName()) {
-		$att.Name = p$att.getFirstUpperName();
+	public void set$att.getMethodNamePostfix()(final $att.Type p$att.getMethodNamePostfix()) {
+		$att.Name = p$att.getMethodNamePostfix();
 	}
 #end
 #if ($class.hasPrimaryKey())
@@ -62,15 +62,15 @@ public class $class.Name<T> implements IBean<T>, Serializable {
 	public boolean equals(final Object pObject) {
 		if (this == pObject) return true;
 		if (pObject == null || !(pObject instanceof $class.Name)) return false;
-		if (#foreach ($param in $class.PrimaryKeyColumnNames)get${class.getFirstUpperColumnName($param)}() == null#if($velocityCount<$class.PrimaryKeyColumnNames.size()) || #end#end) return false;
+		if (#foreach ($param in $class.PrimaryKeyJavaNames)get$param() == null#if($velocityCount<$class.PrimaryKeyJavaNames.size()) || #end#end) return false;
 		final $class.Name other = ($class.Name) pObject;
-		return #foreach ($param in $class.PrimaryKeyColumnNames)get${class.getFirstUpperColumnName($param)}().equals(other.get${class.getFirstUpperColumnName($param)}())#if($velocityCount<$class.PrimaryKeyColumnNames.size()) && #end#end;
+		return #foreach ($param in $class.PrimaryKeyJavaNames)get$param().equals(other.get$param())#if($velocityCount<$class.PrimaryKeyJavaNames.size()) && #end#end;
 	}
 
 	@Override
 	public int hashCode() {
-		if (#foreach ($param in $class.PrimaryKeyColumnNames)get${class.getFirstUpperColumnName($param)}() == null#if($velocityCount<$class.PrimaryKeyColumnNames.size()) || #end#end) return super.hashCode();
-		return #foreach ($param in $class.PrimaryKeyColumnNames)get${class.getFirstUpperColumnName($param)}().hashCode()#if($velocityCount<$class.PrimaryKeyColumnNames.size()) + #end#end;
+		if (#foreach ($param in $class.PrimaryKeyJavaNames)get$param() == null#if($velocityCount<$class.PrimaryKeyJavaNames.size()) || #end#end) return super.hashCode();
+		return #foreach ($param in $class.PrimaryKeyJavaNames)get$param().hashCode()#if($velocityCount<$class.PrimaryKeyJavaNames.size()) + #end#end;
 	}
 #end
 #end

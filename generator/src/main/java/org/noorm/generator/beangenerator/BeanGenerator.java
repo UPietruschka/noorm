@@ -125,6 +125,12 @@ public class BeanGenerator {
 			beanClassDescriptor.setTableName(tableName0);
 			final String[] primaryKeyColumnNames = getPrimaryKeyColumnNames(tableName0, pkColumnNameList);
 			beanClassDescriptor.setPrimaryKeyColumnNames(primaryKeyColumnNames);
+            final String[] primaryKeyJavaNames = new String[primaryKeyColumnNames.length];
+            for (int i = 0; i < primaryKeyColumnNames.length; i++) {
+                primaryKeyJavaNames[i] = Utils.convertDBName2JavaName(primaryKeyColumnNames[i],
+                        true, parameters.getIgnoreColumnNamePrefixes());
+            }
+            beanClassDescriptor.setPrimaryKeyJavaNames(primaryKeyJavaNames);
             beanClassDescriptor.setGeneratePKBasedEqualsAndHashCode(parameters.generatePKBasedEqualsAndHashCode());
 			final String sequenceName = getSequenceName(tableName0, sequenceDBNameList);
 			beanClassDescriptor.setSequenceName(sequenceName);
@@ -138,9 +144,11 @@ public class BeanGenerator {
 			beanClassDescriptor.setSerialVersionUID(serialVersionUID);
 			for (final TableMetadataBean tableMetadataBean : tableMetadataBeanList1) {
 				final BeanAttributeDescriptor beanAttributeDescriptor = new BeanAttributeDescriptor();
-				final String javaColumnName = Utils.convertDBName2JavaName
-                        (tableMetadataBean.getColumnName(), false, parameters.getIgnoreColumnNamePrefixes());
-				beanAttributeDescriptor.setName(javaColumnName);
+				final String javaName = Utils.convertDBName2JavaName(tableMetadataBean.getColumnName(), false);
+				beanAttributeDescriptor.setName(javaName);
+                final String methodNamePostfix = Utils.convertDBName2JavaName
+                        (tableMetadataBean.getColumnName(), true, parameters.getIgnoreColumnNamePrefixes());
+                beanAttributeDescriptor.setMethodNamePostfix(methodNamePostfix);
 				final String javaType = Utils.convertOracleType2JavaType(tableMetadataBean.getDataType(),
 						tableMetadataBean.getDataPrecision(), tableMetadataBean.getDataScale());
 				if (tableMetadataBean.getUpdatable().equals(BeanMetaDataUtil.NOT_UPDATABLE) ||

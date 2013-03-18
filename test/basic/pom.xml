@@ -176,7 +176,7 @@
                     <optimisticLockColumnMapping>
                         <property>
                             <name>OPT_LOCK_.*</name>
-                            <value>VERSION</value>
+                            <value>OPT_VERSION</value>
                         </property>
                         <property>
                             <name>COMPLEX_.*</name>

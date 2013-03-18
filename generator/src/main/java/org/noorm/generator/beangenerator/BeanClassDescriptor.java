@@ -1,7 +1,5 @@
 package org.noorm.generator.beangenerator;
 
-import org.noorm.jdbc.Utils;
-
 import java.util.ArrayList;
 import java.util.List;
 
@@ -20,6 +18,7 @@ public class BeanClassDescriptor {
 	private String extendedName;
 	private String tableName;
 	private String[] primaryKeyColumnNames;
+    private String[] primaryKeyJavaNames;
 	private String sequenceName;
 	private String versionColumnName;
 	private String packageName;
@@ -74,12 +73,16 @@ public class BeanClassDescriptor {
 		primaryKeyColumnNames = pPrimaryKeyColumnNames;
 	}
 
+    public String[] getPrimaryKeyJavaNames() {
+        return primaryKeyJavaNames;
+    }
+
+    public void setPrimaryKeyJavaNames(final String[] pPrimaryKeyJavaNames) {
+        primaryKeyJavaNames = pPrimaryKeyJavaNames;
+    }
+
 	public boolean hasPrimaryKey() {
 		return primaryKeyColumnNames.length > 0;
-	}
-
-	public String getFirstUpperColumnName(final String pColumnName) {
-		return Utils.convertDBName2JavaName(pColumnName, true);
 	}
 
 	public String getSequenceName() {

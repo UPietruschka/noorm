@@ -9,8 +9,6 @@ import org.slf4j.LoggerFactory;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
@@ -27,8 +25,6 @@ import java.util.Map;
 public class BeanMetaDataUtil {
 
 	private static final Logger log = LoggerFactory.getLogger(BeanMetaDataUtil.class);
-	private static final String BEAN_GETTER_METHOD_NAME_PREFIX = "get";
-	private static final String BEAN_SETTER_METHOD_NAME_PREFIX = "set";
 
 	public static final String NOT_UPDATABLE = "NO";
 	public static final String NOT_NULLABLE = "N";
@@ -137,32 +133,15 @@ public class BeanMetaDataUtil {
 
 	public static Class getBeanPropertyType(final Object pObject, final String pPropertyName) {
 
-		Method propertyGetter;
-		try {
-			final String propertyGetterMethodName = BEAN_GETTER_METHOD_NAME_PREFIX
-					.concat(Utils.convertDBName2JavaName(pPropertyName, true));
-			propertyGetter = pObject.getClass().getMethod(propertyGetterMethodName);
-			return propertyGetter.getReturnType();
-		} catch (NoSuchMethodException e) {
-			throw new DataAccessException(DataAccessException.Type.COULD_NOT_ACCESS_PROPERTY_BY_REFLECTION, e);
-		}
+        Field property = getDeclaredFieldInclParent(pObject, pPropertyName);
+        return property.getType();
 	}
 
 	public static Object getBeanPropertyByName(final Object pObject, final String pPropertyName) {
 
-		Method propertyGetter;
+        Field property = getDeclaredFieldInclParent(pObject, pPropertyName);
 		try {
-			final String propertyGetterMethodName = BEAN_GETTER_METHOD_NAME_PREFIX
-					.concat(Utils.convertDBName2JavaName(pPropertyName, true));
-			propertyGetter = pObject.getClass().getMethod(propertyGetterMethodName);
-		} catch (NoSuchMethodException e) {
-			throw new DataAccessException(DataAccessException.Type.COULD_NOT_ACCESS_PROPERTY_BY_REFLECTION, e);
-		}
-
-		try {
-			return propertyGetter.invoke(pObject);
-		} catch (InvocationTargetException e) {
-			throw new DataAccessException(DataAccessException.Type.COULD_NOT_ACCESS_PROPERTY_BY_REFLECTION, e);
+			return property.get(pObject);
 		} catch (IllegalAccessException e) {
 			throw new DataAccessException(DataAccessException.Type.COULD_NOT_ACCESS_PROPERTY_BY_REFLECTION, e);
 		}
@@ -197,21 +176,29 @@ public class BeanMetaDataUtil {
 
 	private static void setBeanPropertyByName(final IBean pBean, final String pPropertyName, final Long pPKValue) {
 
-		Method propertySetter;
+        Field property = getDeclaredFieldInclParent(pBean, pPropertyName);
 		try {
-			final String propertySetterMethodName = BEAN_SETTER_METHOD_NAME_PREFIX
-					.concat(Utils.convertDBName2JavaName(pPropertyName, true));
-			propertySetter = pBean.getClass().getMethod(propertySetterMethodName, Long.class);
-		} catch (NoSuchMethodException e) {
-			throw new DataAccessException(DataAccessException.Type.COULD_NOT_ACCESS_PROPERTY_BY_REFLECTION, e);
-		}
-
-		try {
-			propertySetter.invoke(pBean, pPKValue);
-		} catch (InvocationTargetException e) {
-			throw new DataAccessException(DataAccessException.Type.COULD_NOT_ACCESS_PROPERTY_BY_REFLECTION, e);
+			property.set(pBean, pPKValue);
 		} catch (IllegalAccessException e) {
 			throw new DataAccessException(DataAccessException.Type.COULD_NOT_ACCESS_PROPERTY_BY_REFLECTION, e);
 		}
 	}
+
+    private static Field getDeclaredFieldInclParent(final Object pObject, final String pPropertyName) {
+
+        final Field[] fields = getDeclaredFieldsInclParent(pObject.getClass());
+        final String javaPropertyName = Utils.convertDBName2JavaName(pPropertyName, false);
+        Field property = null;
+        for (final Field field : fields) {
+            if (field.getName().equals(javaPropertyName)) {
+                property = field;
+            }
+        }
+        if (property == null) {
+            throw new DataAccessException(DataAccessException.Type.COULD_NOT_ACCESS_PROPERTY_BY_REFLECTION,
+                    pObject.getClass().getName().concat(".").concat(javaPropertyName));
+        }
+        property.setAccessible(true);
+        return property;
+    }
 }

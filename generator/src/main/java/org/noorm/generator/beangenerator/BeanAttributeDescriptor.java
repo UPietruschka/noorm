@@ -10,6 +10,7 @@ package org.noorm.generator.beangenerator;
 public class BeanAttributeDescriptor {
 
 	private String name;
+    private String methodNamePostfix;
 	private String columnName;
 	private String type;
 	private String dataType;
@@ -25,6 +26,14 @@ public class BeanAttributeDescriptor {
 	public String getName() {
 		return name;
 	}
+
+    public String getMethodNamePostfix() {
+        return methodNamePostfix;
+    }
+
+    public void setMethodNamePostfix(final String pMethodNamePostfix) {
+        methodNamePostfix = pMethodNamePostfix;
+    }
 
 	public String getColumnName() {
 		return columnName;
@@ -48,10 +57,6 @@ public class BeanAttributeDescriptor {
 
 	public void setDataType(final String pDataType) {
 		dataType = pDataType;
-	}
-
-	public String getFirstUpperName() {
-		return name.toUpperCase().substring(0, 1).concat(name.substring(1));
 	}
 
 	public boolean isUpdatable() {
