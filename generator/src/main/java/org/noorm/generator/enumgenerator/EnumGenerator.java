@@ -89,8 +89,11 @@ public class EnumGenerator {
 			enumClassDescriptor.setDisplayColumnName(displayColumnName);
 			for (TableMetadataBean tableMetadataBean : tableMetadataBeanList1) {
 				final EnumAttributeDescriptor enumAttributeDescriptor = new EnumAttributeDescriptor();
-				final String javaColumnName = Utils.convertDBName2JavaName(tableMetadataBean.getColumnName(), false);
-				enumAttributeDescriptor.setName(javaColumnName);
+                final String javaName = Utils.convertDBName2JavaName(tableMetadataBean.getColumnName(), false);
+                enumAttributeDescriptor.setName(javaName);
+                final String methodNamePostfix = Utils.convertDBName2JavaName
+                        (tableMetadataBean.getColumnName(), true, parameters.getIgnoreColumnNamePrefixes());
+                enumAttributeDescriptor.setMethodNamePostfix(methodNamePostfix);
 				final String javaType = Utils.convertOracleType2JavaType(tableMetadataBean.getDataType(),
 						tableMetadataBean.getDataPrecision(), tableMetadataBean.getDataScale());
 				enumAttributeDescriptor.setType(javaType);

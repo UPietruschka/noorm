@@ -147,7 +147,7 @@
                     <packageFilterRegex>(.*SERVICE|.*SEARCH)</packageFilterRegex>
                     <servicePackageName>org.noorm.test.hr.services</servicePackageName>
                     <enumPackageName>org.noorm.test.hr.enums</enumPackageName>
-                    <enumTableFilterRegex>REGIONS</enumTableFilterRegex>
+                    <enumTableFilterRegex>REGIONS|OPT_VARIANTS</enumTableFilterRegex>
                     <ignoreColumnNamePrefixes>
                         <prefix>OPT_</prefix>
                     </ignoreColumnNamePrefixes>
@@ -155,6 +155,10 @@
                         <property>
                             <name>REGIONS</name>
                             <value>REGION_NAME</value>
+                        </property>
+                        <property>
+                            <name>OPT_VARIANTS</name>
+                            <value>OPT_VARIANT_NAME</value>
                         </property>
                     </enumTable2DisplayColumnMapping>
                     <oracleTable2SequenceMapping>

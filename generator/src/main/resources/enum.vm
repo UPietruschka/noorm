@@ -19,9 +19,9 @@ public enum $class.Name implements IEnum {
 	private $att.Type $att.Name;
 #end
 
-	private $class.getName()(#foreach ($att in $class.Attributes)final $att.Type p$att.getFirstUpperName()#if($velocityCount<$class.Attributes.size()), #end#end) {
+	private $class.getName()(#foreach ($att in $class.Attributes)final $att.Type p$att.getMethodNamePostfix()#if($velocityCount<$class.Attributes.size()), #end#end) {
 #foreach ($att in $class.Attributes)
-		$att.Name = p$att.getFirstUpperName();
+		$att.Name = p$att.getMethodNamePostfix();
 #end
 	}
 
@@ -34,7 +34,7 @@ public enum $class.Name implements IEnum {
 	}
 #foreach ($att in $class.Attributes)
 
-	public $att.Type get$att.getFirstUpperName()() {
+	public $att.Type get$att.getMethodNamePostfix()() {
 		return $att.Name;
 	}
 #end

@@ -19,7 +19,6 @@ public class BeanAttributeDescriptor {
 	private int maxLength = 0;
 
 	public void setName(final String pName) {
-
 		name = pName;
 	}
 

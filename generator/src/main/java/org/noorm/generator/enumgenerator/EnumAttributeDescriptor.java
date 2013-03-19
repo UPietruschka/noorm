@@ -10,6 +10,7 @@ package org.noorm.generator.enumgenerator;
 public class EnumAttributeDescriptor {
 
 	private String name;
+    private String methodNamePostfix;
 	private String columnName;
 	private String type;
 
@@ -20,6 +21,14 @@ public class EnumAttributeDescriptor {
 	public String getName() {
 		return name;
 	}
+
+    public String getMethodNamePostfix() {
+        return methodNamePostfix;
+    }
+
+    public void setMethodNamePostfix(final String pMethodNamePostfix) {
+        methodNamePostfix = pMethodNamePostfix;
+    }
 
 	public String getColumnName() {
 		return columnName;
@@ -35,9 +44,5 @@ public class EnumAttributeDescriptor {
 
 	public String getType() {
 		return type;
-	}
-
-	public String getFirstUpperName() {
-		return name.toUpperCase().substring(0, 1).concat(name.substring(1));
 	}
 }
