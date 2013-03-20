@@ -28,7 +28,7 @@ CREATE TABLE opt_variants
  opt_var_id NUMBER NOT NULL,
  opt_variant_name CHAR(32) NOT NULL
 );
-ALTER TABLE opt_variants ADD CONSTRAINT opt_variants_pk PRIMARY KEY (opt_id);
+ALTER TABLE opt_variants ADD CONSTRAINT opt_variants_pk PRIMARY KEY (opt_var_id);
 
 INSERT INTO opt_variants VALUES (1, 'Version column');
 INSERT INTO opt_variants VALUES (2, 'Checksum');
