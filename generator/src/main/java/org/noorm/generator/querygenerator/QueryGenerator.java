@@ -76,8 +76,15 @@ public class QueryGenerator {
                 throw new GeneratorException("Illegal query declaration: no metadata found for table ".concat(t0));
             }
             queryDescriptor.setQueryDeclaration(queryDeclaration);
-            queryDescriptor.setBeanName(Utils.convertTableName2BeanName
-                    (t0, parameters.getIgnoreTableNamePrefixes()));
+            String beanName = Utils.convertTableName2BeanName(t0, parameters.getIgnoreTableNamePrefixes());
+            if (parameters.getExtendedBeans() != null) {
+                final String extBeanName =
+                        Utils.getPropertyString(beanName, parameters.getExtendedBeans());
+                if (!extBeanName.isEmpty()) {
+                    beanName = extBeanName;
+                }
+            }
+            queryDescriptor.setBeanName(beanName);
             queryDescriptor.setBeanShortName(Utils.convertTableName2ShortName
                     (t0, parameters.getIgnoreTableNamePrefixes()));
             for (final QueryColumn queryColumn : queryDeclaration.getQueryColumns()) {
