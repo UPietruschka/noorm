@@ -102,16 +102,16 @@
                                     <methodName>findEmployees</methodName>
                                     <className>EmployeeDAO</className>
                                     <queryColumns>
-                                        <queryColumn>
+                                        <queryColumn implementation="org.noorm.jdbc.QueryColumn">
                                             <columnName>salary</columnName>
                                             <operator>
-                                                <operatorName>greater-than-or-equal-to</operatorName>
+                                                <operatorName>GREATER_THAN_OR_EQUAL_TO</operatorName>
                                             </operator>
                                         </queryColumn>
-                                        <queryColumn>
+                                        <queryColumn implementation="org.noorm.jdbc.QueryColumn">
                                             <columnName>commission_pct</columnName>
                                             <operator>
-                                                <operatorName>less-than</operatorName>
+                                                <operatorName>LESS_THAN</operatorName>
                                             </operator>
                                         </queryColumn>
                                     </queryColumns>

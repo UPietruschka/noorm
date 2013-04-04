@@ -192,10 +192,10 @@
                         <queryDeclaration>
                             <tableName>employees</tableName>
                             <queryColumns>
-                                <queryColumn>
+                                <queryColumn implementation="org.noorm.jdbc.QueryColumn">
                                     <columnName>commission_pct</columnName>
                                     <operator>
-                                        <operatorName>equal-to</operatorName>
+                                        <operatorName>EQUAL_TO</operatorName>
                                     </operator>
                                 </queryColumn>
                             </queryColumns>
@@ -204,10 +204,10 @@
                             <tableName>employees</tableName>
                             <methodName>findEmployeesWithCommission</methodName>
                             <queryColumns>
-                                <queryColumn>
+                                <queryColumn implementation="org.noorm.jdbc.QueryColumn">
                                     <columnName>commission_pct</columnName>
                                     <operator>
-                                        <operatorName>is-not-null</operatorName>
+                                        <operatorName>IS_NOT_NULL</operatorName>
                                     </operator>
                                 </queryColumn>
                             </queryColumns>
@@ -216,10 +216,10 @@
                             <tableName>employees</tableName>
                             <methodName>findEmployeesWithoutCommission</methodName>
                             <queryColumns>
-                                <queryColumn>
+                                <queryColumn implementation="org.noorm.jdbc.QueryColumn">
                                     <columnName>commission_pct</columnName>
                                     <operator>
-                                        <operatorName>is-null</operatorName>
+                                        <operatorName>IS_NULL</operatorName>
                                     </operator>
                                 </queryColumn>
                             </queryColumns>
@@ -228,10 +228,10 @@
                             <tableName>departments</tableName>
                             <singleRowQuery>true</singleRowQuery>
                             <queryColumns>
-                                <queryColumn>
+                                <queryColumn implementation="org.noorm.jdbc.QueryColumn">
                                     <columnName>department_id</columnName>
                                     <operator>
-                                        <operatorName>equal-to</operatorName>
+                                        <operatorName>EQUAL_TO</operatorName>
                                     </operator>
                                 </queryColumn>
                             </queryColumns>
@@ -240,16 +240,16 @@
                             <tableName>jobs_synonym</tableName>
                             <methodName>findJobsSynonymsBySalary</methodName>
                             <queryColumns>
-                                <queryColumn>
+                                <queryColumn implementation="org.noorm.jdbc.QueryColumn">
                                     <columnName>min_salary</columnName>
                                     <operator>
-                                        <operatorName>greater-than-or-equal-to</operatorName>
+                                        <operatorName>GREATER_THAN_OR_EQUAL_TO</operatorName>
                                     </operator>
                                 </queryColumn>
-                                <queryColumn>
+                                <queryColumn implementation="org.noorm.jdbc.QueryColumn">
                                     <columnName>max_salary</columnName>
                                     <operator>
-                                        <operatorName>less-than-or-equal-to</operatorName>
+                                        <operatorName>LESS_THAN_OR_EQUAL_TO</operatorName>
                                     </operator>
                                 </queryColumn>
                             </queryColumns>
@@ -260,10 +260,10 @@
                             <methodName>findEmployeesByDepartmentCity</methodName>
                             <className>EmployeeFinder</className>
                             <queryColumns>
-                                <queryColumn>
+                                <queryColumn implementation="org.noorm.jdbc.QueryColumn">
                                     <columnName>department_name</columnName>
                                 </queryColumn>
-                                <queryColumn>
+                                <queryColumn implementation="org.noorm.jdbc.QueryColumn">
                                     <columnName>city</columnName>
                                 </queryColumn>
                             </queryColumns>
@@ -273,10 +273,10 @@
                             <baseTable>employees</baseTable>
                             <className>EmployeeFinder</className>
                             <queryColumns>
-                                <queryColumn>
+                                <queryColumn implementation="org.noorm.jdbc.QueryColumn">
                                     <columnName>department_name</columnName>
                                     <operator>
-                                        <operatorName>like</operatorName>
+                                        <operatorName>LIKE</operatorName>
                                     </operator>
                                 </queryColumn>
                             </queryColumns>
