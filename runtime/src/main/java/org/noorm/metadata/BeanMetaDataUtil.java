@@ -18,6 +18,9 @@ import java.util.Map;
  * like the BeanMapper require metadata information about the Bean, in particular information
  * about the non-transient fields, which are annotated with the JDBCColumn annotation.
  *
+ * Since declared fields and annotations are determined at compile time, they are cached here to
+ * improve performance.
+ *
  * @author Ulf Pietruschka / ulf.pietruschka@etenso.com
  *         Date: 26.07.11
  *         Time: 11:37
@@ -29,6 +32,9 @@ public class BeanMetaDataUtil {
 	public static final String NOT_UPDATABLE = "NO";
 	public static final String NOT_NULLABLE = "N";
 	public static final String SERIAL_VERSION_UID = "serialVersionUID";
+
+    private static Map<Field, Annotation[]> declaredAnnotationsCache = new HashMap<Field, Annotation[]>();
+    private static Map<Class, Field[]> declaredFieldInclParentCache = new HashMap<Class, Field[]>();
 
 	/**
 	 * Using Class.getDeclaredFields does not return fields declared in a potentially existing super-class.
@@ -42,31 +48,54 @@ public class BeanMetaDataUtil {
         if (log.isTraceEnabled()) {
             log.trace("Retrieving declared fields by reflection for class ".concat(pClass.getName()));
         }
-		final Field[] fields = pClass.getDeclaredFields();
-		Field[] sFields = new Field[0];
-		final Class superClass = pClass.getSuperclass();
-		if (superClass != null) {
-			sFields = superClass.getDeclaredFields();
-		}
-		final Field[] allFields = Arrays.copyOf(fields, fields.length + sFields.length);
-		System.arraycopy(sFields, 0, allFields, fields.length, sFields.length);
 
-		if (log.isTraceEnabled()) {
-			int i = 0;
-			for (final Field field : allFields) {
-				final StringBuilder logMessage = new StringBuilder();
-				logMessage.append("Field ");
-				logMessage.append(i++);
-				logMessage.append(" : ");
-				logMessage.append(field.getName());
-				logMessage.append(":");
-				logMessage.append(field.getType().getName());
-				log.trace(logMessage.toString());
-			}
-		}
+        Field[] allFields = declaredFieldInclParentCache.get(pClass);
+        if (allFields == null) {
+            final Field[] fields = pClass.getDeclaredFields();
+            Field[] sFields = new Field[0];
+            final Class superClass = pClass.getSuperclass();
+            if (superClass != null) {
+                sFields = superClass.getDeclaredFields();
+            }
+            allFields = Arrays.copyOf(fields, fields.length + sFields.length);
+            System.arraycopy(sFields, 0, allFields, fields.length, sFields.length);
+
+            if (log.isTraceEnabled()) {
+                int i = 0;
+                for (final Field field : allFields) {
+                    final StringBuilder logMessage = new StringBuilder();
+                    logMessage.append("Field ");
+                    logMessage.append(i++);
+                    logMessage.append(" : ");
+                    logMessage.append(field.getName());
+                    logMessage.append(":");
+                    logMessage.append(field.getType().getName());
+                    log.trace(logMessage.toString());
+                }
+            }
+            declaredFieldInclParentCache.put(pClass, allFields);
+        }
 
 		return allFields;
 	}
+
+    /**
+     * Returns the annotations for a given field.
+     * The results are stored in a local cache, since method Field.getDeclaredAnnotations has a VERY BAD
+     * performance.
+     *
+     * @param pField the field
+     * @return the annotations for the given field
+     */
+    public static Annotation[] getDeclaredAnnotations(final Field pField) {
+
+        Annotation[] annotations = declaredAnnotationsCache.get(pField);
+        if (annotations == null) {
+            annotations = pField.getDeclaredAnnotations();
+            declaredAnnotationsCache.put(pField, annotations);
+        }
+        return annotations;
+    }
 
 	/**
 	 * Returns a Map containing a mapping from the Bean attribute names to their JDBCColumn

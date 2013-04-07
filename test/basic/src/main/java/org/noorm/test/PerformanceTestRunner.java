@@ -35,7 +35,9 @@ public class PerformanceTestRunner {
         }
         final long startTime = System.currentTimeMillis();
         testEmployeeInsert(true);
-        testEmployeeSearch();
+        final List<EmployeesBean> employeesBeanList = testEmployeeSearch();
+        testEmployeeUpdate(employeesBeanList);
+        testEmployeeDelete(employeesBeanList);
         final long endTime = System.currentTimeMillis();
         final double totalSeconds = (endTime - startTime) / 1000d;
         System.out.println("Elapsed time (seconds total) : " + totalSeconds);
@@ -47,7 +49,7 @@ public class PerformanceTestRunner {
         final List<EmployeesBean> employeeList = new ArrayList<EmployeesBean>();
         try {
             for (int i = 0; i < TEST_LOOP; i++) {
-                final String lastName = "Doe" + i;
+                final String lastName = "Doe";
                 final String email = "JDOE" + i;
                 final String jobId = JOB_IDS[i % JOB_IDS.length];
                 final Double salary = 1000D + i / 4;
@@ -59,7 +61,7 @@ public class PerformanceTestRunner {
                 beanDML.insertEmployeesList(employeeList);
             } else {
                 for (int i = 0; i < TEST_LOOP; i++) {
-                    final EmployeesBean newEmployeesBean = beanDML.insertEmployees(employeeList.get(i));
+                    beanDML.insertEmployees(employeeList.get(i));
                 }
             }
             DataSourceProvider.commit();
@@ -70,10 +72,24 @@ public class PerformanceTestRunner {
         }
     }
 
-    private static void testEmployeeSearch() {
+    private static List<EmployeesBean> testEmployeeSearch() {
 
         final EmployeeService employeeService = EmployeeService.getInstance();
-        final List<EmployeesBean> employeesBeanList = employeeService.findAllEmployees();
+        final List<EmployeesBean> employeesBeanList = employeeService.findEmployeesByLastname("Doe");
+        return employeesBeanList;
+    }
+
+    private static void testEmployeeUpdate(List<EmployeesBean> pEmployeesBeanList) {
+
+        for (final EmployeesBean employee : pEmployeesBeanList) {
+            employee.setCommissionPct(0.22D);
+        }
+        beanDML.updateEmployeesList(pEmployeesBeanList);
+    }
+
+    private static void testEmployeeDelete(List<EmployeesBean> pEmployeesBeanList) {
+
+        beanDML.deleteEmployeesList(pEmployeesBeanList);
     }
 
     private static EmployeesBean assembleEmployee(final String pLastName,

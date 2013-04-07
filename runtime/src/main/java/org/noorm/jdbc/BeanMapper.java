@@ -9,7 +9,7 @@ import java.lang.reflect.Field;
 import java.math.BigDecimal;
 import java.sql.*;
 import java.util.ArrayList;
-import java.util.LinkedHashMap;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -119,7 +119,7 @@ public class BeanMapper<T> {
         if (log.isTraceEnabled()) {
             log.trace("Converting Bean to parameter map.");
         }
-		final Map<String, Object> fieldMap = new LinkedHashMap<String, Object>();
+		final Map<String, Object> fieldMap = new HashMap<String, Object>();
 		final Field[] fields = BeanMetaDataUtil.getDeclaredFieldsInclParent(pBean.getClass());
 		if (fields == null || fields.length == 0) {
 			return fieldMap;
@@ -132,7 +132,7 @@ public class BeanMapper<T> {
 				continue;
 			}
 			field.setAccessible(true);
-			final Annotation[] annotations = field.getDeclaredAnnotations();
+			final Annotation[] annotations = BeanMetaDataUtil.getDeclaredAnnotations(field);
 			if (annotations != null && annotations.length > 0) {
 				if (annotations[0].annotationType() == JDBCColumn.class) {
 					final JDBCColumn colAnn = (JDBCColumn) annotations[0];
@@ -148,8 +148,6 @@ public class BeanMapper<T> {
 
 			try {
 				fieldMap.put(fieldName, field.get(pBean));
-			} catch (IllegalArgumentException ex) {
-				throw new DataAccessException(ex);
 			} catch (IllegalAccessException ex) {
 				throw new DataAccessException(ex);
 			}
@@ -162,7 +160,6 @@ public class BeanMapper<T> {
 			throws IllegalAccessException, SQLException {
 
 		String fieldName = null;
-        String dataType = null;
 		for (final Field field : pFields) {
 			// Ignore serialVersionUID
 			if (BeanMetaDataUtil.SERIAL_VERSION_UID.equals(field.getName())) {
@@ -170,12 +167,11 @@ public class BeanMapper<T> {
 			}
 			field.setAccessible(true);
 			final Class fieldType = field.getType();
-			final Annotation[] annotations = field.getDeclaredAnnotations();
+			final Annotation[] annotations = BeanMetaDataUtil.getDeclaredAnnotations(field);
 			if (annotations != null && annotations.length > 0) {
 				if (annotations[0].annotationType() == JDBCColumn.class) {
 					final JDBCColumn colAnn = (JDBCColumn) annotations[0];
 					fieldName = colAnn.name();
-                    dataType = colAnn.dataType();
 				}
 			} else {
 				// Ignore pFields without JDBCColumn annotation (interpreted transient)
@@ -196,16 +192,9 @@ public class BeanMapper<T> {
 			// Principally, for matching types, using "field.set(beans, pResultSet.getObject(fieldName))" would
 			// work. However, for non-matching types subject to automatic conversion by means of the
 			// JDBC driver, we would run into problems.
-			// The explicit casting based on the types of the Bean as flows is the most flexible approach
+			// The explicit casting based on the types of the Bean as follows is the most flexible approach
 			// in providing a zero-configuration way to choose custom (but compatible!) types in the
 			// Bean specification.
-
-			if (fieldType == Long.class) {
-				final Long value = pResultSet.getLong(fieldName);
-				if (!pResultSet.wasNull()) {
-					field.set(pBean, value);
-				}
-			}
 
 			if (fieldType == String.class) {
                 // Handling includes CHAR, VARCHAR2, NCHAR and NVHARCHAR2, but also for complex data-types
@@ -216,13 +205,23 @@ public class BeanMapper<T> {
                 if (value != null) {
                     field.set(pBean, value.trim());
                 }
+                continue;
 			}
+
+            if (fieldType == Long.class) {
+                final Long value = pResultSet.getLong(fieldName);
+                if (!pResultSet.wasNull()) {
+                    field.set(pBean, value);
+                }
+                continue;
+            }
 
 			if (fieldType == Integer.class) {
 				final Integer value = pResultSet.getInt(fieldName);
 				if (!pResultSet.wasNull()) {
 					field.set(pBean, value);
 				}
+                continue;
 			}
 
 			if (fieldType == Double.class) {
@@ -230,6 +229,7 @@ public class BeanMapper<T> {
 				if (!pResultSet.wasNull()) {
 					field.set(pBean, value);
 				}
+                continue;
 			}
 
 			// Oracle has no data-type representing a date only (without time). Oracle data-types DATE and
@@ -238,14 +238,17 @@ public class BeanMapper<T> {
 			// make use of JDBC method getDate, which omits the time part, but use always getTimestamp.
 			if (fieldType == java.util.Date.class || fieldType == java.sql.Date.class || fieldType == Timestamp.class) {
 				field.set(pBean, pResultSet.getTimestamp(fieldName));
+                continue;
 			}
 
 			if (fieldType == BigDecimal.class) {
 				field.set(pBean, pResultSet.getBigDecimal(fieldName));
+                continue;
 			}
 
 			if (fieldType == Boolean.class) {
 				field.set(pBean, pResultSet.getBoolean(fieldName));
+                continue;
 			}
 
 			if (fieldType == Float.class) {
@@ -253,6 +256,7 @@ public class BeanMapper<T> {
 				if (!pResultSet.wasNull()) {
 					field.set(pBean, value);
 				}
+                continue;
 			}
 
 			if (fieldType == Short.class) {
@@ -260,6 +264,7 @@ public class BeanMapper<T> {
 				if (!pResultSet.wasNull()) {
 					field.set(pBean, value);
 				}
+                continue;
 			}
 
 			if (fieldType == byte[].class) {
