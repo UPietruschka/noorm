@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<persistence version="2.0"
+             xmlns="http://java.sun.com/xml/ns/persistence"
+             xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+             xsi:schemaLocation="http://java.sun.com/xml/ns/persistence http://java.sun.com/xml/ns/persistence/persistence_2_0.xsd">
+
+    <persistence-unit name="hr" transaction-type="RESOURCE_LOCAL">
+        <provider>org.eclipse.persistence.jpa.PersistenceProvider</provider>
+        <class>org.noorm.test.jpa.EmployeesEntity</class>
+        <properties>
+            <property name="javax.persistence.jdbc.driver" value="oracle.jdbc.OracleDriver" />
+            <property name="javax.persistence.jdbc.url" value="jdbc:oracle:thin:@
+                (DESCRIPTION =
+                 (ADDRESS_LIST = (ADDRESS = (PROTOCOL = TCP)(HOST = localhost)(PORT = 1521)))
+                 (CONNECT_DATA = (SERVER = DEDICATED)(SERVICE_NAME = XE))
+                )" />
+            <property name="javax.persistence.jdbc.user" value="hr" />
+            <property name="javax.persistence.jdbc.password" value="hr" />
+            <!-- Optimizations as described under
+                 http://java-persistence-performance.blogspot.de/2011/06/how-to-improve-jpa-performance-by-1825.html -->
+            <property name="eclipselink.jdbc.cache-statements" value="true" />
+            <property name="eclipselink.jdbc.batch-writing" value="JDBC" />
+            <property name="eclipselink.jdbc.batch-writing.size" value="1000" />
+            <property name="eclipselink.cache.shared.default" value="false" />
+            <property name="eclipselink.logging.level" value="off" />
+            <property name="eclipselink.persistence-context.close-on-commit" value="true" />
+            <!-- The following optimization is not applicable for the test case as well as for many real world
+                 scenarios, since data modified in a transaction is not visible in the database until
+                 the end of the transaction -->
+            <!--property name="eclipselink.persistence-context.flush-mode" value="commit" /-->
+            <property name="eclipselink.persistence-context.persist-on-commit" value="false" />
+        </properties>
+    </persistence-unit>
+</persistence>

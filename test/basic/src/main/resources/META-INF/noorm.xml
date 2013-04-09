@@ -10,7 +10,7 @@
     </entry>
     <entry key="database.username">hr</entry>
     <entry key="database.password">hr</entry>
-    <entry key="database.batch_update_size">200</entry>
+    <entry key="database.batch_update_size">1000</entry>
     <entry key="debug.mode">false</entry>
     <entry key="debug.host">localhost</entry>
     <entry key="debug.port">4000</entry>

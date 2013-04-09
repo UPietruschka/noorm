@@ -1,25 +1,24 @@
-package org.noorm.test;
+package org.noorm.test.jpa;
 
-import org.noorm.jdbc.DataSourceProvider;
-import org.noorm.test.hr.beans.EmployeesBean;
-import org.noorm.test.hr.services.BeanDML;
-import org.noorm.test.hr.services.EmployeeService;
-
+import javax.persistence.EntityManager;
+import javax.persistence.EntityManagerFactory;
+import javax.persistence.Persistence;
+import javax.persistence.Query;
 import java.io.IOException;
+import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.List;
 
 /**
  * @author Ulf Pietruschka / ulf.pietruschka@etenso.com
- *         Date: 05.04.13
- *         Time: 15:09
+ *         Date: 09.04.13
+ *         Time: 14:43
  *         <p/>
- * Performance tests.
- * Stand-alone test to simplify profiling load- and performance metrics.
+ * Runner for the NoORM/JPA performance comparison
  */
-public class PerformanceTestRunner {
+public class JPAPerformanceTestRunner {
 
-    private static BeanDML beanDML = BeanDML.getInstance();
+    private static EntityManager em;
     private static int TEST_LOOP = 50000;
     private static String[] JOB_IDS = new String[] {"AC_ACCOUNT", "AC_MGR", "AD_ASST", "AD_PRES", "AD_VP",
             "FI_ACCOUNT", "FI_MGR", "HR_REP", "IT_PROG", "MK_MAN", "MK_REP", "PR_REP", "PU_CLERK", "PU_MAN",
@@ -34,76 +33,80 @@ public class PerformanceTestRunner {
             // Do nothing
         }
         final long startTime = System.currentTimeMillis();
-        DataSourceProvider.begin();
+        final EntityManagerFactory emf = Persistence.createEntityManagerFactory("hr");
+        em = emf.createEntityManager();
+        em.getTransaction().begin();
         try {
-            testEmployeeInsert(true);
-            final List<EmployeesBean> employeesBeanList = testEmployeeSearch();
+            testEmployeeInsert();
+            final List<EmployeesEntity> employeesBeanList = testEmployeeSearch();
             testEmployeeUpdate(employeesBeanList);
             testEmployeeDelete(employeesBeanList);
-            DataSourceProvider.commit();
+            em.getTransaction().commit();
             final long endTime = System.currentTimeMillis();
             final double totalSeconds = (endTime - startTime) / 1000d;
             System.out.println("Elapsed time (seconds total) : " + totalSeconds);
         } catch (Exception e) {
             e.printStackTrace();
-            DataSourceProvider.rollback();
+            em.getTransaction().rollback();
             System.exit(1);
         }
     }
 
-    private static void testEmployeeInsert(final boolean pUseBatchMode) {
+    private static void testEmployeeInsert() {
 
-        final List<EmployeesBean> employeeList = new ArrayList<EmployeesBean>();
+        final List<EmployeesEntity> employeeList = new ArrayList<EmployeesEntity>();
         for (int i = 0; i < TEST_LOOP; i++) {
             final String lastName = "Doe";
             final String email = "JDOE" + i;
             final String jobId = JOB_IDS[i % JOB_IDS.length];
             final Double salary = 1000D + i / 4;
             final Long departmentId = ((i % 27) + 1) * 10L;
-            final EmployeesBean employeesBean = assembleEmployee(lastName, email, jobId, salary, departmentId);
+            final EmployeesEntity employeesBean = assembleEmployee(lastName, email, jobId, salary, departmentId);
             employeeList.add(employeesBean);
         }
-        if (pUseBatchMode) {
-            beanDML.insertEmployeesList(employeeList);
-        } else {
-            for (int i = 0; i < TEST_LOOP; i++) {
-                beanDML.insertEmployees(employeeList.get(i));
-            }
+        for (int i = 0; i < TEST_LOOP; i++) {
+            em.persist(employeeList.get(i));
         }
     }
 
-    private static List<EmployeesBean> testEmployeeSearch() {
+    private static List<EmployeesEntity> testEmployeeSearch() {
 
-        final EmployeeService employeeService = EmployeeService.getInstance();
-        final List<EmployeesBean> employeesBeanList = employeeService.findEmployeesByLastname("Doe");
+        final Query query = em.createNativeQuery("SELECT * FROM employees WHERE last_name = ?", EmployeesEntity.class);
+        query.setParameter(1, "Doe");
+        final List<EmployeesEntity> employeesBeanList = query.getResultList();
+        System.out.println(">>>>>>>>>>>>>>>> "+employeesBeanList.size());
         return employeesBeanList;
     }
 
-    private static void testEmployeeUpdate(List<EmployeesBean> pEmployeesBeanList) {
+    private static void testEmployeeUpdate(List<EmployeesEntity> pEmployeesBeanList) {
 
-        for (final EmployeesBean employee : pEmployeesBeanList) {
+        for (final EmployeesEntity employee : pEmployeesBeanList) {
             employee.setCommissionPct(0.22D);
         }
-        beanDML.updateEmployeesList(pEmployeesBeanList);
+        for (final EmployeesEntity employee : pEmployeesBeanList) {
+            em.merge(employee);
+        }
     }
 
-    private static void testEmployeeDelete(List<EmployeesBean> pEmployeesBeanList) {
+    private static void testEmployeeDelete(List<EmployeesEntity> pEmployeesBeanList) {
 
-        beanDML.deleteEmployeesList(pEmployeesBeanList);
+        for (final EmployeesEntity employee : pEmployeesBeanList) {
+            em.remove(employee);
+        }
     }
 
-    private static EmployeesBean assembleEmployee(final String pLastName,
+    private static EmployeesEntity assembleEmployee(final String pLastName,
                                                   final String pEmail,
                                                   final String pJobId,
                                                   final Double pSalary,
                                                   final Long pDepartmentId) {
 
-        final EmployeesBean employeesBean = new EmployeesBean();
+        final EmployeesEntity employeesBean = new EmployeesEntity();
         employeesBean.setFirstName("John");
         employeesBean.setLastName(pLastName);
         employeesBean.setEmail(pEmail);
         employeesBean.setPhoneNumber("123.456.7890");
-        employeesBean.setHireDate(new java.util.Date(1200000000000L));  // January 10, 2008, 22:20
+        employeesBean.setHireDate(new Timestamp(new java.util.Date(1200000000000L).getTime()));  // January 10, 2008, 22:20
         employeesBean.setJobId(pJobId);
         employeesBean.setSalary(pSalary);
         employeesBean.setCommissionPct(0.21D);
