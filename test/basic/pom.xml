@@ -255,6 +255,18 @@
                             </queryColumns>
                         </queryDeclaration>
                         <queryDeclaration>
+                            <tableName>countries</tableName>
+                            <queryColumns>
+                                <queryColumn implementation="org.noorm.jdbc.QueryColumn">
+                                    <columnName>country_id</columnName>
+                                    <operator>
+                                        <operatorName>EQUAL_TO</operatorName>
+                                        <trimColumnValue>true</trimColumnValue>
+                                    </operator>
+                                </queryColumn>
+                            </queryColumns>
+                        </queryDeclaration>
+                        <queryDeclaration>
                             <tableName>v_employees</tableName>
                             <baseTable>employees</baseTable>
                             <methodName>findEmployeesByDepartmentCity</methodName>
@@ -310,7 +322,7 @@
         <dependency>
             <groupId>ch.qos.logback</groupId>
             <artifactId>logback-classic</artifactId>
-            <version>1.0.9</version>
+            <version>1.0.11</version>
         </dependency>
         <dependency>
             <groupId>org.eclipse.persistence</groupId>
