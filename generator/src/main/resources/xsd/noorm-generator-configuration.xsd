@@ -112,6 +112,7 @@
                 <xs:complexType>
                     <xs:sequence>
                         <xs:element name="operatorName" type="operatorName"/>
+                        <xs:element name="trimColumnValue" type="xs:boolean"/>
                     </xs:sequence>
                 </xs:complexType>
             </xs:element>
@@ -120,15 +121,15 @@
 
     <xs:simpleType name="operatorName">
         <xs:restriction base="xs:string">
-            <xs:enumeration value="equal-to"/>
-            <xs:enumeration value="not-equal-to"/>
-            <xs:enumeration value="greater-than"/>
-            <xs:enumeration value="greater-than-or-equal-to"/>
-            <xs:enumeration value="less-than"/>
-            <xs:enumeration value="less-than-or-equal-to"/>
-            <xs:enumeration value="like"/>
-            <xs:enumeration value="is-null"/>
-            <xs:enumeration value="is-not-null"/>
+            <xs:enumeration value="EQUAL_TO"/>
+            <xs:enumeration value="NOT_EQUAL_TO"/>
+            <xs:enumeration value="GREATER_THAN"/>
+            <xs:enumeration value="GREATER_THAN_OR_EQUAL_TO"/>
+            <xs:enumeration value="LESS_THAN"/>
+            <xs:enumeration value="LESS_THAN_OR_EQUAL_TO"/>
+            <xs:enumeration value="LIKE"/>
+            <xs:enumeration value="IS_NULL"/>
+            <xs:enumeration value="IS_NOT_NULL"/>
         </xs:restriction>
     </xs:simpleType>
 

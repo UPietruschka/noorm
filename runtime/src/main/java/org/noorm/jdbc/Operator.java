@@ -18,6 +18,7 @@ public class Operator {
     private Name operatorName;
     private String operatorSyntax;
     private boolean unary = false;
+    private boolean trimColumnValue = false;
 
     public Operator() {
         operatorName = Name.EQUAL_TO;
@@ -29,6 +30,16 @@ public class Operator {
 
     public Operator(final Name pOperatorName) {
         setOperatorName(pOperatorName);
+    }
+
+    public Operator(final String pOperatorName, final boolean pTrimColumnValue) {
+        setOperatorName(pOperatorName);
+        setTrimColumnValue(pTrimColumnValue);
+    }
+
+    public Operator(final Name pOperatorName, final boolean pTrimColumnValue) {
+        setOperatorName(pOperatorName);
+        setTrimColumnValue(pTrimColumnValue);
     }
 
     public Name getOperatorName() {
@@ -71,6 +82,14 @@ public class Operator {
 
     public void setUnary(final boolean pUnary) {
         unary = pUnary;
+    }
+
+    public boolean trimColumnValue() {
+        return trimColumnValue;
+    }
+
+    public void setTrimColumnValue(final boolean pTrimColumnValue) {
+        trimColumnValue = pTrimColumnValue;
     }
 
     public enum Name {
