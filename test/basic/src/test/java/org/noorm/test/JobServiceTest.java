@@ -31,18 +31,21 @@ public class JobServiceTest {
 	public void testIncreaseSalary() {
 
 		DataSourceProvider.begin();
-		JobService jobService = JobService.getInstance();
-		// Increase the salary for the given department by 8%
-		jobService.increaseSalary(90L, 0.08d);
-		EmployeeSearch employeeSearch = EmployeeSearch.getInstance();
-		// Search for an exact match of the first employee with increased salary
-		List<EmployeesBean> employeesBeanList0 =
-				employeeSearch.findEmployeesByFilter(null, null, null, null, 25920L, 25920L);
-		assertEquals(1, employeesBeanList0.size());
-		// Search for an exact match of the second and third employee with increased salary
-		List<EmployeesBean> employeesBeanList1 =
-				employeeSearch.findEmployeesByFilter(null, null, null, null, 18360L, 18360L);
-		assertEquals(2, employeesBeanList1.size());
-		DataSourceProvider.rollback();
+        try {
+            JobService jobService = JobService.getInstance();
+            // Increase the salary for the given department by 8%
+            jobService.increaseSalary(90L, 0.08d);
+            EmployeeSearch employeeSearch = EmployeeSearch.getInstance();
+            // Search for an exact match of the first employee with increased salary
+            List<EmployeesBean> employeesBeanList0 =
+                    employeeSearch.findEmployeesByFilter(null, null, null, null, 25920L, 25920L);
+            assertEquals(1, employeesBeanList0.size());
+            // Search for an exact match of the second and third employee with increased salary
+            List<EmployeesBean> employeesBeanList1 =
+                    employeeSearch.findEmployeesByFilter(null, null, null, null, 18360L, 18360L);
+            assertEquals(2, employeesBeanList1.size());
+        } finally {
+            DataSourceProvider.rollback();
+        }
 	}
 }

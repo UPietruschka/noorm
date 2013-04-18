@@ -47,22 +47,27 @@ public class DepartmentServiceTest {
     public void testVDepartmentCRUD() {
 
         DataSourceProvider.begin();
-        final DepartmentService departmentService = DepartmentService.getInstance();
-        final VDepartmentsBean newDepartmentsBean = new VDepartmentsBean();
-        newDepartmentsBean.setDepartmentName(NEW_DEPARTMENT_NAME);
-        newDepartmentsBean.setLocationId(NEW_DEPARTMENT_LOCATION_ID);
-        newDepartmentsBean.setManagerId(NEW_DEPARTMENT_MANAGER_ID);
-        final VDepartmentsBean newDepartmentsBean1 = beanDML.insertVDepartments(newDepartmentsBean);
-        assertNotNull(newDepartmentsBean1);
-        final List<VDepartmentsBean> vDepartmentsBeanList =
-                departmentService.findDepartmentsById(newDepartmentsBean1.getDepartmentId());
-        assertEquals(1L, vDepartmentsBeanList.size());
-        newDepartmentsBean1.setLocationId(NEW_DEPARTMENT_LOCATION_ID1);
-		beanDML.updateVDepartments(newDepartmentsBean1);
-		beanDML.deleteVDepartments(newDepartmentsBean1);
-        final List<VDepartmentsBean> vDepartmentsBeanList1 =
-                departmentService.findDepartmentsById(newDepartmentsBean1.getDepartmentId());
-        assertEquals(0L, vDepartmentsBeanList1.size());
-        DataSourceProvider.commit();
+        try {
+            final DepartmentService departmentService = DepartmentService.getInstance();
+            final VDepartmentsBean newDepartmentsBean = new VDepartmentsBean();
+            newDepartmentsBean.setDepartmentName(NEW_DEPARTMENT_NAME);
+            newDepartmentsBean.setLocationId(NEW_DEPARTMENT_LOCATION_ID);
+            newDepartmentsBean.setManagerId(NEW_DEPARTMENT_MANAGER_ID);
+            final VDepartmentsBean newDepartmentsBean1 = beanDML.insertVDepartments(newDepartmentsBean);
+            assertNotNull(newDepartmentsBean1);
+            final List<VDepartmentsBean> vDepartmentsBeanList =
+                    departmentService.findDepartmentsById(newDepartmentsBean1.getDepartmentId());
+            assertEquals(1L, vDepartmentsBeanList.size());
+            newDepartmentsBean1.setLocationId(NEW_DEPARTMENT_LOCATION_ID1);
+            beanDML.updateVDepartments(newDepartmentsBean1);
+            beanDML.deleteVDepartments(newDepartmentsBean1);
+            final List<VDepartmentsBean> vDepartmentsBeanList1 =
+                    departmentService.findDepartmentsById(newDepartmentsBean1.getDepartmentId());
+            assertEquals(0L, vDepartmentsBeanList1.size());
+            DataSourceProvider.commit();
+        } catch (Exception e) {
+            DataSourceProvider.rollback();
+            fail(e.getMessage());
+        }
     }
 }

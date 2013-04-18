@@ -36,34 +36,44 @@ public class ComplexDataTypeTest {
     public void testRawCRUD() {
 
         DataSourceProvider.begin();
-        final ComplexDataTypesBean complexDataTypesBean = new ComplexDataTypesBean();
-        complexDataTypesBean.setRawTypeColumn(SOME_BYTE_ARRAY);
-        final JDBCDMLProcessor<ComplexDataTypesBean> dmlProcessor = JDBCDMLProcessor.getInstance();
-        final ComplexDataTypesBean insertedBean = dmlProcessor.insert(complexDataTypesBean);
-        final ComplexDataTypesBean insertedBean0 = complexDataService.findUniqueCdtById(insertedBean.getId());
-        assertEquals(insertedBean, insertedBean0);
-        assertArrayEquals(SOME_BYTE_ARRAY, insertedBean.getRawTypeColumn());
-        insertedBean.setRawTypeColumn(SOME_NEW_BYTE_ARRAY);
-        dmlProcessor.update(insertedBean);
-        dmlProcessor.delete(insertedBean);
-        DataSourceProvider.commit();
+        try {
+            final ComplexDataTypesBean complexDataTypesBean = new ComplexDataTypesBean();
+            complexDataTypesBean.setRawTypeColumn(SOME_BYTE_ARRAY);
+            final JDBCDMLProcessor<ComplexDataTypesBean> dmlProcessor = JDBCDMLProcessor.getInstance();
+            final ComplexDataTypesBean insertedBean = dmlProcessor.insert(complexDataTypesBean);
+            final ComplexDataTypesBean insertedBean0 = complexDataService.findUniqueCdtById(insertedBean.getId());
+            assertEquals(insertedBean, insertedBean0);
+            assertArrayEquals(SOME_BYTE_ARRAY, insertedBean.getRawTypeColumn());
+            insertedBean.setRawTypeColumn(SOME_NEW_BYTE_ARRAY);
+            dmlProcessor.update(insertedBean);
+            dmlProcessor.delete(insertedBean);
+            DataSourceProvider.commit();
+        } catch (Exception e) {
+            DataSourceProvider.rollback();
+            fail(e.getMessage());
+        }
     }
 
     @Test
     public void testBlobCRUD() {
 
         DataSourceProvider.begin();
-        final ComplexDataTypesBean complexDataTypesBean = new ComplexDataTypesBean();
-        complexDataTypesBean.setBlobColumn(SOME_BYTE_ARRAY);
-        final JDBCDMLProcessor<ComplexDataTypesBean> dmlProcessor = JDBCDMLProcessor.getInstance();
-        final ComplexDataTypesBean insertedBean = dmlProcessor.insert(complexDataTypesBean);
-        final ComplexDataTypesBean insertedBean0 = complexDataService.findUniqueCdtById(insertedBean.getId());
-        assertEquals(insertedBean, insertedBean0);
-        assertArrayEquals(SOME_BYTE_ARRAY, insertedBean.getBlobColumn());
-        insertedBean.setBlobColumn(SOME_NEW_BYTE_ARRAY);
-        dmlProcessor.update(insertedBean);
-        dmlProcessor.delete(insertedBean);
-        DataSourceProvider.commit();
+        try {
+            final ComplexDataTypesBean complexDataTypesBean = new ComplexDataTypesBean();
+            complexDataTypesBean.setBlobColumn(SOME_BYTE_ARRAY);
+            final JDBCDMLProcessor<ComplexDataTypesBean> dmlProcessor = JDBCDMLProcessor.getInstance();
+            final ComplexDataTypesBean insertedBean = dmlProcessor.insert(complexDataTypesBean);
+            final ComplexDataTypesBean insertedBean0 = complexDataService.findUniqueCdtById(insertedBean.getId());
+            assertEquals(insertedBean, insertedBean0);
+            assertArrayEquals(SOME_BYTE_ARRAY, insertedBean.getBlobColumn());
+            insertedBean.setBlobColumn(SOME_NEW_BYTE_ARRAY);
+            dmlProcessor.update(insertedBean);
+            dmlProcessor.delete(insertedBean);
+            DataSourceProvider.commit();
+        } catch (Exception e) {
+            DataSourceProvider.rollback();
+            fail(e.getMessage());
+        }
     }
 
     /**
@@ -77,82 +87,107 @@ public class ComplexDataTypeTest {
     public void testBlobBatch() {
 
         DataSourceProvider.begin();
-        final List<ComplexDataTypesBean> beanList = new ArrayList<ComplexDataTypesBean>();
-        final ComplexDataTypesBean complexDataTypesBean = new ComplexDataTypesBean();
-        complexDataTypesBean.setGroupId(1L);
-        complexDataTypesBean.setBlobColumn(SOME_BYTE_ARRAY);
-        beanList.add(complexDataTypesBean);
-        beanList.add(complexDataTypesBean);
-        beanList.add(complexDataTypesBean);
-        final JDBCDMLProcessor<ComplexDataTypesBean> dmlProcessor = JDBCDMLProcessor.getInstance();
-        dmlProcessor.insert(beanList);
-        final List<ComplexDataTypesBean> beanList0 = complexDataService.findCdtByGroupId(1L);
-        dmlProcessor.delete(beanList0);
-        DataSourceProvider.commit();
+        try {
+            final List<ComplexDataTypesBean> beanList = new ArrayList<ComplexDataTypesBean>();
+            final ComplexDataTypesBean complexDataTypesBean = new ComplexDataTypesBean();
+            complexDataTypesBean.setGroupId(1L);
+            complexDataTypesBean.setBlobColumn(SOME_BYTE_ARRAY);
+            beanList.add(complexDataTypesBean);
+            beanList.add(complexDataTypesBean);
+            beanList.add(complexDataTypesBean);
+            final JDBCDMLProcessor<ComplexDataTypesBean> dmlProcessor = JDBCDMLProcessor.getInstance();
+            dmlProcessor.insert(beanList);
+            final List<ComplexDataTypesBean> beanList0 = complexDataService.findCdtByGroupId(1L);
+            dmlProcessor.delete(beanList0);
+            DataSourceProvider.commit();
+        } catch (Exception e) {
+            DataSourceProvider.rollback();
+            fail(e.getMessage());
+        }
     }
 
     @Test
     public void testClobCRUD() {
 
         DataSourceProvider.begin();
-        final ComplexDataTypesBean complexDataTypesBean = new ComplexDataTypesBean();
-        complexDataTypesBean.setClobColumn(SOME_TEXT);
-        final JDBCDMLProcessor<ComplexDataTypesBean> dmlProcessor = JDBCDMLProcessor.getInstance();
-        final ComplexDataTypesBean insertedBean = dmlProcessor.insert(complexDataTypesBean);
-        final ComplexDataTypesBean insertedBean0 = complexDataService.findUniqueCdtById(insertedBean.getId());
-        assertEquals(insertedBean, insertedBean0);
-        assertEquals(SOME_TEXT, insertedBean.getClobColumn());
-        insertedBean.setClobColumn(SOME_NEW_TEXT);
-        dmlProcessor.update(insertedBean);
-        dmlProcessor.delete(insertedBean);
-        DataSourceProvider.commit();
+        try {
+            final ComplexDataTypesBean complexDataTypesBean = new ComplexDataTypesBean();
+            complexDataTypesBean.setClobColumn(SOME_TEXT);
+            final JDBCDMLProcessor<ComplexDataTypesBean> dmlProcessor = JDBCDMLProcessor.getInstance();
+            final ComplexDataTypesBean insertedBean = dmlProcessor.insert(complexDataTypesBean);
+            final ComplexDataTypesBean insertedBean0 = complexDataService.findUniqueCdtById(insertedBean.getId());
+            assertEquals(insertedBean, insertedBean0);
+            assertEquals(SOME_TEXT, insertedBean.getClobColumn());
+            insertedBean.setClobColumn(SOME_NEW_TEXT);
+            dmlProcessor.update(insertedBean);
+            dmlProcessor.delete(insertedBean);
+            DataSourceProvider.commit();
+        } catch (Exception e) {
+            DataSourceProvider.rollback();
+            fail(e.getMessage());
+        }
     }
 
     @Test
     public void testLargeBlob() {
 
         DataSourceProvider.begin();
-        final ComplexDataTypesBean complexDataTypesBean = new ComplexDataTypesBean();
-        final byte[] largeByteArray = new byte[TWENTY_MB];
-        complexDataTypesBean.setBlobColumn(largeByteArray);
-        final JDBCDMLProcessor<ComplexDataTypesBean> dmlProcessor = JDBCDMLProcessor.getInstance();
-        final ComplexDataTypesBean insertedBean = dmlProcessor.insert(complexDataTypesBean);
-        final ComplexDataTypesBean insertedBean0 = complexDataService.findUniqueCdtById(insertedBean.getId());
-        assertEquals(insertedBean, insertedBean0);
-        dmlProcessor.delete(insertedBean);
-        DataSourceProvider.commit();
+        try {
+            final ComplexDataTypesBean complexDataTypesBean = new ComplexDataTypesBean();
+            final byte[] largeByteArray = new byte[TWENTY_MB];
+            complexDataTypesBean.setBlobColumn(largeByteArray);
+            final JDBCDMLProcessor<ComplexDataTypesBean> dmlProcessor = JDBCDMLProcessor.getInstance();
+            final ComplexDataTypesBean insertedBean = dmlProcessor.insert(complexDataTypesBean);
+            final ComplexDataTypesBean insertedBean0 = complexDataService.findUniqueCdtById(insertedBean.getId());
+            assertEquals(insertedBean, insertedBean0);
+            dmlProcessor.delete(insertedBean);
+            DataSourceProvider.commit();
+        } catch (Exception e) {
+            DataSourceProvider.rollback();
+            fail(e.getMessage());
+        }
     }
 
     @Test
     public void testLargeClob() {
 
         DataSourceProvider.begin();
-        final ComplexDataTypesBean complexDataTypesBean = new ComplexDataTypesBean();
-        final String largeString = createLargeString(TWENTY_MB);
-        complexDataTypesBean.setClobColumn(largeString);
-        final JDBCDMLProcessor<ComplexDataTypesBean> dmlProcessor = JDBCDMLProcessor.getInstance();
-        final ComplexDataTypesBean insertedBean = dmlProcessor.insert(complexDataTypesBean);
-        final ComplexDataTypesBean insertedBean0 = complexDataService.findUniqueCdtById(insertedBean.getId());
-        assertEquals(insertedBean, insertedBean0);
-        dmlProcessor.delete(insertedBean);
-        DataSourceProvider.commit();
+        try {
+            final ComplexDataTypesBean complexDataTypesBean = new ComplexDataTypesBean();
+            final String largeString = createLargeString(TWENTY_MB);
+            complexDataTypesBean.setClobColumn(largeString);
+            final JDBCDMLProcessor<ComplexDataTypesBean> dmlProcessor = JDBCDMLProcessor.getInstance();
+            final ComplexDataTypesBean insertedBean = dmlProcessor.insert(complexDataTypesBean);
+            final ComplexDataTypesBean insertedBean0 = complexDataService.findUniqueCdtById(insertedBean.getId());
+            assertEquals(insertedBean, insertedBean0);
+            dmlProcessor.delete(insertedBean);
+            DataSourceProvider.commit();
+        } catch (Exception e) {
+            DataSourceProvider.rollback();
+            fail(e.getMessage());
+        }
     }
 
     @Test
     public void testXMLTypeCRUD() {
 
         DataSourceProvider.begin();
-        final ComplexDataTypesBean complexDataTypesBean = new ComplexDataTypesBean();
-        complexDataTypesBean.setXmlColumn(SOME_XML);
-        final JDBCDMLProcessor<ComplexDataTypesBean> dmlProcessor = JDBCDMLProcessor.getInstance();
-        final ComplexDataTypesBean insertedBean = dmlProcessor.insert(complexDataTypesBean);
-        final ComplexDataTypesBean insertedBean0 = complexDataService.findUniqueCdtById(insertedBean.getId());
-        assertEquals(insertedBean, insertedBean0);
-        assertEquals(SOME_XML, insertedBean.getXmlColumn());
-        insertedBean.setXmlColumn(SOME_NEW_XML);
-        dmlProcessor.update(insertedBean);
-        dmlProcessor.delete(insertedBean);
-        DataSourceProvider.commit();
+        try {
+            final ComplexDataTypesBean complexDataTypesBean = new ComplexDataTypesBean();
+            complexDataTypesBean.setXmlColumn(SOME_XML);
+            final JDBCDMLProcessor<ComplexDataTypesBean> dmlProcessor = JDBCDMLProcessor.getInstance();
+            final ComplexDataTypesBean insertedBean = dmlProcessor.insert(complexDataTypesBean);
+            final ComplexDataTypesBean insertedBean0 = complexDataService.findUniqueCdtById(insertedBean.getId());
+            assertEquals(insertedBean, insertedBean0);
+            assertEquals(SOME_XML, insertedBean.getXmlColumn());
+            insertedBean.setXmlColumn(SOME_NEW_XML);
+            dmlProcessor.update(insertedBean);
+            dmlProcessor.delete(insertedBean);
+            DataSourceProvider.commit();
+        } catch (Exception e) {
+            DataSourceProvider.rollback();
+            fail(e.getMessage());
+        }
     }
 
     private static String createLargeString(final int pSize) {

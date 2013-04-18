@@ -65,7 +65,7 @@ public class EmployeeServiceInterfaceTest {
             DataSourceProvider.commit();
         } catch (Exception e) {
             DataSourceProvider.rollback();
-            throw new RuntimeException(e);
+            fail(e.getMessage());
         }
     }
 
@@ -117,7 +117,7 @@ public class EmployeeServiceInterfaceTest {
             DataSourceProvider.commit();
         } catch (Exception e) {
             DataSourceProvider.rollback();
-            throw new RuntimeException(e);
+            fail(e.getMessage());
         }
     }
 
@@ -139,7 +139,7 @@ public class EmployeeServiceInterfaceTest {
             DataSourceProvider.commit();
         } catch (Exception e) {
             DataSourceProvider.rollback();
-            throw new RuntimeException(e);
+            fail(e.getMessage());
         }
     }
 
@@ -162,7 +162,7 @@ public class EmployeeServiceInterfaceTest {
             DataSourceProvider.commit();
         } catch (Exception e) {
             DataSourceProvider.rollback();
-            throw new RuntimeException(e);
+            fail(e.getMessage());
         }
     }
 
@@ -202,7 +202,7 @@ public class EmployeeServiceInterfaceTest {
             DataSourceProvider.commit();
         } catch (Exception e) {
             DataSourceProvider.rollback();
-            throw new RuntimeException(e);
+            fail(e.getMessage());
         }
     }
 }

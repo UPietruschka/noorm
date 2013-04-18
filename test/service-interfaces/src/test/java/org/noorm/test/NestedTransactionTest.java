@@ -11,6 +11,7 @@ import javax.annotation.Resource;
 import java.util.List;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
 
 /**
  * @author Ulf Pietruschka / ulf.pietruschka@etenso.com
@@ -39,7 +40,7 @@ public class NestedTransactionTest {
             DataSourceProvider.commit();
         } catch (Exception e) {
             DataSourceProvider.rollback();
-            throw new RuntimeException(e);
+            fail(e.getMessage());
         }
     }
 
@@ -53,7 +54,7 @@ public class NestedTransactionTest {
             DataSourceProvider.commit();
         } catch (Exception e) {
             DataSourceProvider.rollback();
-            throw new RuntimeException(e);
+            fail(e.getMessage());
         }
     }
 
@@ -66,7 +67,7 @@ public class NestedTransactionTest {
             DataSourceProvider.commit();
         } catch (Exception e) {
             DataSourceProvider.rollback();
-            throw new RuntimeException(e);
+            fail(e.getMessage());
         }
     }
 

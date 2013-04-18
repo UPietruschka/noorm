@@ -9,6 +9,7 @@ import org.noorm.test.hr.services.DeclaredQueries;
 import java.util.List;
 
 import static junit.framework.Assert.assertEquals;
+import static org.junit.Assert.fail;
 
 /**
  * @author Ulf Pietruschka / ulf.pietruschka@etenso.com
@@ -31,16 +32,21 @@ public class JobSynonymTest {
     public void testJobSynonymCRUD() {
 
         DataSourceProvider.begin();
-        final JobsSynonymBean job = new JobsSynonymBean();
-        job.setJobId("TEST_ID");
-        job.setJobTitle("Test Title");
-        job.setMinSalary(0L);
-        job.setMaxSalary(1L);
-        BeanDML beanDML = BeanDML.getInstance();
-        final JobsSynonymBean job0 = beanDML.insertJobsSynonym(job);
-        job0.setMaxSalary(2L);
-        beanDML.updateJobsSynonym(job0);
-        beanDML.deleteJobsSynonym(job0);
-        DataSourceProvider.commit();
+        try {
+            final JobsSynonymBean job = new JobsSynonymBean();
+            job.setJobId("TEST_ID");
+            job.setJobTitle("Test Title");
+            job.setMinSalary(0L);
+            job.setMaxSalary(1L);
+            BeanDML beanDML = BeanDML.getInstance();
+            final JobsSynonymBean job0 = beanDML.insertJobsSynonym(job);
+            job0.setMaxSalary(2L);
+            beanDML.updateJobsSynonym(job0);
+            beanDML.deleteJobsSynonym(job0);
+            DataSourceProvider.commit();
+        } catch (Exception e) {
+            DataSourceProvider.rollback();
+            fail(e.getMessage());
+        }
     }
 }
