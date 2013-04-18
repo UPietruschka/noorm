@@ -240,12 +240,28 @@ public class JDBCDMLProcessor<T> {
                                 throw new DataAccessException(DataAccessException.Type.UNSUPPORTED_VERSION_COLUMN_TYPE);
                             }
                         } else {
-                            pstmt.setObjectAtName(fieldName, value);
+                            if (isPKColumn && value instanceof String) {
+                                // SQL CHAR comparison semantics by default uses padding, which causes some
+                                // confusion, since it does not even matter, whether the data has initially been
+                                // provided with or without padding. Using the following proprietary Oracle method
+                                // disabled this behaviour and turns off padding.
+                                pstmt.setFixedCHARAtName(fieldName, (String) value);
+                            } else {
+                                pstmt.setObjectAtName(fieldName, value);
+                            }
                         }
                     }
                     if (pBatchType.equals(BatchType.DELETE)) {
                         if (isPKColumn) {
-                            pstmt.setObjectAtName(fieldName, value);
+                            if (value instanceof String) {
+                                // SQL CHAR comparison semantics by default uses padding, which causes some
+                                // confusion, since it does not even matter, whether the data has initially been
+                                // provided with or without padding. Using the following proprietary Oracle method
+                                // disabled this behaviour and turns off padding.
+                                pstmt.setFixedCHARAtName(fieldName, (String) value);
+                            } else {
+                                pstmt.setObjectAtName(fieldName, value);
+                            }
                         }
                     }
                 }

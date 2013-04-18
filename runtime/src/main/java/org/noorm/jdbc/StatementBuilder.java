@@ -77,8 +77,6 @@ class StatementBuilder {
     private static final String SELECT_AND = " AND ";
     private static final String SELECT_ASG = ":";
     private static final String SELECT_ASG2 = "?";
-    private static final String SELECT_TRIM_OPEN = "TRIM(";
-    private static final String SELECT_TRIM_CLOSE = ")";
 
     public String buildSQLStatement(final String pTableName,
                                     final Map<QueryColumn, Object> pInParameters,
@@ -91,13 +89,7 @@ class StatementBuilder {
             final Map<QueryColumn, Object> orderedParameters = new TreeMap<QueryColumn, Object>(pInParameters);
             for (final QueryColumn queryColumn : orderedParameters.keySet()) {
                 pSQLStatement.append(delim);
-                if (!queryColumn.getOperator().trimColumnValue()) {
-                    pSQLStatement.append(queryColumn.getColumnName());
-                } else {
-                    pSQLStatement.append(SELECT_TRIM_OPEN);
-                    pSQLStatement.append(queryColumn.getColumnName());
-                    pSQLStatement.append(SELECT_TRIM_CLOSE);
-                }
+                pSQLStatement.append(queryColumn.getColumnName());
                 pSQLStatement.append(queryColumn.getOperator().getOperatorSyntax());
                 if (!queryColumn.getOperator().isUnary()) {
                     if (useNamedParameters) {

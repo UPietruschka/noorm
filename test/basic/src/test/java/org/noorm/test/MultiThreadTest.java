@@ -122,7 +122,7 @@ public class MultiThreadTest {
             try {
                 testCreateDeleteJobHistory(addMonth);
                 DataSourceProvider.commit();
-            } catch (Exception e) {
+            } catch (Error e) {
                 DataSourceProvider.rollback();
                 fail(e.getMessage());
             }

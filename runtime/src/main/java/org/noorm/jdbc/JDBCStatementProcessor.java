@@ -326,7 +326,16 @@ public class JDBCStatementProcessor<T> {
             final Map<QueryColumn, Object> orderedParameters = new TreeMap<QueryColumn, Object>(pInParameters);
             for (final QueryColumn queryColumn : orderedParameters.keySet()) {
                 if (!queryColumn.getOperator().isUnary()) {
-                    pstmt.setObject(parameterIndex++, orderedParameters.get(queryColumn));
+                    final Object value = orderedParameters.get(queryColumn);
+                    if (value instanceof String) {
+                        // SQL CHAR comparison semantics by default uses padding, which causes some
+                        // confusion, since it does not even matter, whether the data has initially been
+                        // provided with or without padding. Using the following proprietary Oracle method
+                        // disabled this behaviour and turns off padding.
+                        pstmt.setFixedCHAR(parameterIndex++, (String) value);
+                    } else {
+                        pstmt.setObject(parameterIndex++, value);
+                    }
                 }
             }
             ResultSet rs = pstmt.executeQuery();

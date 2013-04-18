@@ -261,7 +261,6 @@
                                     <columnName>country_id</columnName>
                                     <operator>
                                         <operatorName>EQUAL_TO</operatorName>
-                                        <trimColumnValue>true</trimColumnValue>
                                     </operator>
                                 </queryColumn>
                             </queryColumns>

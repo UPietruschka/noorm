@@ -63,7 +63,7 @@ public class EmployeeServiceInterfaceTest {
                 assertEquals(true, employeeFound);
             }
             DataSourceProvider.commit();
-        } catch (Exception e) {
+        } catch (Error e) {
             DataSourceProvider.rollback();
             fail(e.getMessage());
         }
@@ -115,7 +115,7 @@ public class EmployeeServiceInterfaceTest {
             assertEquals(0, employeesBeanList4.size());
 
             DataSourceProvider.commit();
-        } catch (Exception e) {
+        } catch (Error e) {
             DataSourceProvider.rollback();
             fail(e.getMessage());
         }
@@ -137,7 +137,7 @@ public class EmployeeServiceInterfaceTest {
             beanDML_HR2.updateDepartments(newDepartment);
             beanDML_HR2.deleteDepartments(newDepartment);
             DataSourceProvider.commit();
-        } catch (Exception e) {
+        } catch (Error e) {
             DataSourceProvider.rollback();
             fail(e.getMessage());
         }
@@ -160,7 +160,7 @@ public class EmployeeServiceInterfaceTest {
                 assertNotNull(employeesBean1);
             }
             DataSourceProvider.commit();
-        } catch (Exception e) {
+        } catch (Error e) {
             DataSourceProvider.rollback();
             fail(e.getMessage());
         }
@@ -200,7 +200,7 @@ public class EmployeeServiceInterfaceTest {
             assertEquals(0, jobsBeanList3.size());
 
             DataSourceProvider.commit();
-        } catch (Exception e) {
+        } catch (Error e) {
             DataSourceProvider.rollback();
             fail(e.getMessage());
         }

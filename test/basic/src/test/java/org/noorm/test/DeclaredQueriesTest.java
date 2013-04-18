@@ -1,6 +1,5 @@
 package org.noorm.test;
 
-import org.junit.Ignore;
 import org.junit.Test;
 import org.noorm.jdbc.DataSourceProvider;
 import org.noorm.test.hr.beans.CountriesBean;
@@ -77,7 +76,6 @@ public class DeclaredQueriesTest {
         assertEquals(79, employees.size());
     }
 
-    @Ignore
     @Test
     public void testTrimCHARColumn() {
 
@@ -88,11 +86,11 @@ public class DeclaredQueriesTest {
         try {
             DataSourceProvider.begin();
             beanDML.insertCountries(country);
-            final List<CountriesBean> countries = declaredQueries.findCountriesByCountryId(countryId);
+            final List<CountriesBean>countries = declaredQueries.findCountriesByCountryId(countryId);
             assertEquals(1, countries.size());
             beanDML.deleteCountries(country);
             DataSourceProvider.commit();
-        } catch (Exception e) {
+        } catch (Error e) {
             DataSourceProvider.rollback();
             fail(e.getMessage());
         }

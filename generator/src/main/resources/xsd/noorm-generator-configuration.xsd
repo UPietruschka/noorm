@@ -112,7 +112,6 @@
                 <xs:complexType>
                     <xs:sequence>
                         <xs:element name="operatorName" type="operatorName"/>
-                        <xs:element name="trimColumnValue" type="xs:boolean"/>
                     </xs:sequence>
                 </xs:complexType>
             </xs:element>

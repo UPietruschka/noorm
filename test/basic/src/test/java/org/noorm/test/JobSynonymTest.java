@@ -44,7 +44,7 @@ public class JobSynonymTest {
             beanDML.updateJobsSynonym(job0);
             beanDML.deleteJobsSynonym(job0);
             DataSourceProvider.commit();
-        } catch (Exception e) {
+        } catch (Error e) {
             DataSourceProvider.rollback();
             fail(e.getMessage());
         }
