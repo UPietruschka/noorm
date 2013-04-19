@@ -65,7 +65,7 @@ public class DepartmentServiceTest {
                     departmentService.findDepartmentsById(newDepartmentsBean1.getDepartmentId());
             assertEquals(0L, vDepartmentsBeanList1.size());
             DataSourceProvider.commit();
-        } catch (Error e) {
+        } catch (Throwable e) {
             DataSourceProvider.rollback();
             fail(e.getMessage());
         }

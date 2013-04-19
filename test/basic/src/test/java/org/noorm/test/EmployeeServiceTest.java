@@ -54,7 +54,7 @@ public class EmployeeServiceTest {
                 if (i++ >= 20) { break; }
             }
             DataSourceProvider.commit();
-        } catch (Error e) {
+        } catch (Throwable e) {
             DataSourceProvider.rollback();
             fail(e.getMessage());
         }
@@ -104,7 +104,7 @@ public class EmployeeServiceTest {
             assertEquals(employeesBeanList4.size(), 0);
 
             DataSourceProvider.commit();
-        } catch (Error e) {
+        } catch (Throwable e) {
             DataSourceProvider.rollback();
             fail(e.getMessage());
         }
@@ -130,7 +130,7 @@ public class EmployeeServiceTest {
                 if (i++ >= 20) { break; }
             }
             DataSourceProvider.commit();
-        } catch (Error e) {
+        } catch (Throwable e) {
             DataSourceProvider.rollback();
             fail(e.getMessage());
         }
@@ -182,7 +182,7 @@ public class EmployeeServiceTest {
             assertEquals(jobsBeanList3.size(), 0);
 
             DataSourceProvider.commit();
-        } catch (Error e) {
+        } catch (Throwable e) {
             DataSourceProvider.rollback();
             fail(e.getMessage());
         }

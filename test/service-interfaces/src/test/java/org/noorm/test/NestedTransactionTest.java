@@ -38,7 +38,7 @@ public class NestedTransactionTest {
             changeJob();
             tsLevel2();
             DataSourceProvider.commit();
-        } catch (Error e) {
+        } catch (Throwable e) {
             DataSourceProvider.rollback();
             fail(e.getMessage());
         }
@@ -52,7 +52,7 @@ public class NestedTransactionTest {
             changeJob();
             tsLevel3();
             DataSourceProvider.commit();
-        } catch (Error e) {
+        } catch (Throwable e) {
             DataSourceProvider.rollback();
             fail(e.getMessage());
         }
@@ -65,7 +65,7 @@ public class NestedTransactionTest {
             DataSourceProvider.begin();
             changeJob();
             DataSourceProvider.commit();
-        } catch (Error e) {
+        } catch (Throwable e) {
             DataSourceProvider.rollback();
             fail(e.getMessage());
         }

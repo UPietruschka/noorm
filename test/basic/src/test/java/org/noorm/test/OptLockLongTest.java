@@ -34,7 +34,7 @@ public class OptLockLongTest {
             dmlProcessor.update(insertedOptLockLongBean);
             dmlProcessor.delete(insertedOptLockLongBean);
             DataSourceProvider.commit();
-        } catch (Error e) {
+        } catch (Throwable e) {
             DataSourceProvider.rollback();
             Assert.fail(e.getMessage());
         }

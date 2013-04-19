@@ -90,7 +90,7 @@ public class DeclaredQueriesTest {
             assertEquals(1, countries.size());
             beanDML.deleteCountries(country);
             DataSourceProvider.commit();
-        } catch (Error e) {
+        } catch (Throwable e) {
             DataSourceProvider.rollback();
             fail(e.getMessage());
         }

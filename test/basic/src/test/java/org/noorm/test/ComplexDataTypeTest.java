@@ -48,7 +48,7 @@ public class ComplexDataTypeTest {
             dmlProcessor.update(insertedBean);
             dmlProcessor.delete(insertedBean);
             DataSourceProvider.commit();
-        } catch (Error e) {
+        } catch (Throwable e) {
             DataSourceProvider.rollback();
             fail(e.getMessage());
         }
@@ -70,7 +70,7 @@ public class ComplexDataTypeTest {
             dmlProcessor.update(insertedBean);
             dmlProcessor.delete(insertedBean);
             DataSourceProvider.commit();
-        } catch (Error e) {
+        } catch (Throwable e) {
             DataSourceProvider.rollback();
             fail(e.getMessage());
         }
@@ -100,7 +100,7 @@ public class ComplexDataTypeTest {
             final List<ComplexDataTypesBean> beanList0 = complexDataService.findCdtByGroupId(1L);
             dmlProcessor.delete(beanList0);
             DataSourceProvider.commit();
-        } catch (Error e) {
+        } catch (Throwable e) {
             DataSourceProvider.rollback();
             fail(e.getMessage());
         }
@@ -122,7 +122,7 @@ public class ComplexDataTypeTest {
             dmlProcessor.update(insertedBean);
             dmlProcessor.delete(insertedBean);
             DataSourceProvider.commit();
-        } catch (Error e) {
+        } catch (Throwable e) {
             DataSourceProvider.rollback();
             fail(e.getMessage());
         }
@@ -142,7 +142,7 @@ public class ComplexDataTypeTest {
             assertEquals(insertedBean, insertedBean0);
             dmlProcessor.delete(insertedBean);
             DataSourceProvider.commit();
-        } catch (Error e) {
+        } catch (Throwable e) {
             DataSourceProvider.rollback();
             fail(e.getMessage());
         }
@@ -162,7 +162,7 @@ public class ComplexDataTypeTest {
             assertEquals(insertedBean, insertedBean0);
             dmlProcessor.delete(insertedBean);
             DataSourceProvider.commit();
-        } catch (Error e) {
+        } catch (Throwable e) {
             DataSourceProvider.rollback();
             fail(e.getMessage());
         }
@@ -184,7 +184,7 @@ public class ComplexDataTypeTest {
             dmlProcessor.update(insertedBean);
             dmlProcessor.delete(insertedBean);
             DataSourceProvider.commit();
-        } catch (Error e) {
+        } catch (Throwable e) {
             DataSourceProvider.rollback();
             fail(e.getMessage());
         }
