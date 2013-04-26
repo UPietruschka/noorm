@@ -149,7 +149,17 @@ public class GeneratorMojo extends AbstractMojo implements IParameters {
 	 * one simple rule like ".*" -> "VERSION" is sufficient.
 	 */
     @Parameter
-	protected Properties optimisticLockColumnMapping;
+	protected Properties optLockVersionColumnMapping;
+
+    /**
+     * Concurrency control can be based on optimistic locking.
+     * When no version column is available for the tables subject to optimistic locking, the complete
+     * pre-change image of the row is used to determine database changes, which have occurred in between.
+     * The tables specified here are subject to this type of optimistic locking (Do not use both available
+     * types of optimistic locking simultaneously).
+     */
+    @Parameter
+    protected String optLockFullRowCompareTableRegex;
 
 	/**
 	 * The Oracle data dictionary does not provide unambiguous information for the primary key
@@ -395,11 +405,16 @@ public class GeneratorMojo extends AbstractMojo implements IParameters {
 	}
 
 	@Override
-	public Properties getOptimisticLockColumnMapping() {
-		return optimisticLockColumnMapping;
+	public Properties getOptLockVersionColumnMapping() {
+		return optLockVersionColumnMapping;
 	}
 
-	@Override
+    @Override
+    public String getOptLockFullRowCompareTableRegex() {
+        return optLockFullRowCompareTableRegex;
+    }
+
+    @Override
 	public Properties getViewName2PrimaryKeyMapping() {
 		return viewName2PrimaryKeyMapping;
 	}

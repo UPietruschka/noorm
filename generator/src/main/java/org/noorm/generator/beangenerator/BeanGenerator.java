@@ -142,6 +142,10 @@ public class BeanGenerator {
 			final Random random = new Random(javaBeanName.hashCode());
 			final long serialVersionUID = random.nextLong();
 			beanClassDescriptor.setSerialVersionUID(serialVersionUID);
+            if (parameters.getOptLockFullRowCompareTableRegex() != null &&
+                    !tableName0.matches(parameters.getOptLockFullRowCompareTableRegex())) {
+                beanClassDescriptor.setEnableOptLockFullRowCompare(true);
+            }
 			for (final TableMetadataBean tableMetadataBean : tableMetadataBeanList1) {
 				final BeanAttributeDescriptor beanAttributeDescriptor = new BeanAttributeDescriptor();
 				final String javaName = Utils.convertDBName2JavaName(tableMetadataBean.getColumnName(), false);
@@ -231,8 +235,8 @@ public class BeanGenerator {
 										final List<TableMetadataBean> pTableMetadataBeanList) {
 
 		String versionColumnName = "";
-		if (parameters.getOptimisticLockColumnMapping() != null) {
-			versionColumnName = Utils.getPropertyString(pTableName, parameters.getOptimisticLockColumnMapping());
+		if (parameters.getOptLockVersionColumnMapping() != null) {
+			versionColumnName = Utils.getPropertyString(pTableName, parameters.getOptLockVersionColumnMapping());
 		}
 		if (versionColumnName.isEmpty()) {
 			log.info("No matching version-column-name has been found for table-name ".concat(pTableName));

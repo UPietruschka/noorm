@@ -2,6 +2,7 @@
 package $class.PackageName;
 
 import java.io.Serializable;
+import java.util.HashMap;
 import org.noorm.jdbc.IBean;
 import org.noorm.jdbc.JDBCColumn;
 
@@ -21,6 +22,9 @@ public class $class.Name<T> implements IBean<T>, Serializable {
 	protected $att.Type $att.Name;
 #end
 	private T auxiliaryData;
+#if ($class.enableOptLockFullRowCompare())
+	private HashMap<String, Object> modifiedFieldsInitialValue = new HashMap<String, Object>();
+#end
 
 	public T getAuxiliaryData() {
 		return auxiliaryData;
@@ -28,6 +32,14 @@ public class $class.Name<T> implements IBean<T>, Serializable {
 
 	public void setAuxiliaryData(final T pAuxiliaryData) {
 		auxiliaryData = pAuxiliaryData;
+	}
+
+	public HashMap<String, Object> getModifiedFieldsInitialValue() {
+#if ($class.enableOptLockFullRowCompare())
+		return modifiedFieldsInitialValue;
+#else
+		return null;
+#end
 	}
 
 	public String getTableName() {
@@ -52,6 +64,11 @@ public class $class.Name<T> implements IBean<T>, Serializable {
 	}
 
 	public void set$att.getMethodNamePostfix()(final $att.Type p$att.getMethodNamePostfix()) {
+#if ($class.enableOptLockFullRowCompare())
+		if (!modifiedFieldsInitialValue.containsKey("$att.ColumnName")) {
+			modifiedFieldsInitialValue.put("$att.ColumnName", p$att.getMethodNamePostfix());
+		}
+#end
 		$att.Name = p$att.getMethodNamePostfix();
 	}
 #end

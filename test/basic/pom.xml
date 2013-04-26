@@ -177,7 +177,7 @@
                             <value>DEPARTMENT_ID</value>
                         </property>
                     </viewName2PrimaryKeyMapping>
-                    <optimisticLockColumnMapping>
+                    <optLockVersionColumnMapping>
                         <property>
                             <name>OPT_LOCK_.*</name>
                             <value>OPT_VERSION</value>
@@ -186,7 +186,7 @@
                             <name>COMPLEX_.*</name>
                             <value>VERSION</value>
                         </property>
-                    </optimisticLockColumnMapping>
+                    </optLockVersionColumnMapping>
                     <singleRowFinderRegex>(.*_unique.*)</singleRowFinderRegex>
                     <queryDeclarations>
                         <queryDeclaration>

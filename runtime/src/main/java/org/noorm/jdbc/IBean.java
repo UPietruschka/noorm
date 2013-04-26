@@ -1,5 +1,7 @@
 package org.noorm.jdbc;
 
+import java.util.HashMap;
+
 /**
  * @author Ulf Pietruschka / ulf.pietruschka@etenso.com
  *         Date: 20.05.11
@@ -18,6 +20,16 @@ public interface IBean<T> {
 	 * @param pAuxiliaryData
 	 */
 	void setAuxiliaryData(final T pAuxiliaryData);
+
+    /**
+     * Returns all fields and values, which have been changed after this bean has been loaded and populated.
+     * This method provides support for optimistic locking, when optimistic locking is realized by comparing
+     * the full pre-change image of the row against the current database row.
+     * Note that this method returns null, when this kind of optimistic locking is not enabled for the
+     * associated table.
+     * @return all fields and values, which have been changed
+     */
+    HashMap<String, Object> getModifiedFieldsInitialValue();
 
 	/**
 	 * The database name of this Bean. Can either be a table or an updateable view.

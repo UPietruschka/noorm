@@ -24,8 +24,10 @@ public class BeanClassDescriptor {
 	private String packageName;
 	private final List<BeanAttributeDescriptor> attributes = new ArrayList<BeanAttributeDescriptor>();
     private boolean generatePKBasedEqualsAndHashCode;
+    private boolean enableOptLockFullRowCompare = false;
 
     public long getSerialVersionUID() {
+
 		return serialVersionUID;
 	}
 
@@ -140,5 +142,13 @@ public class BeanClassDescriptor {
 
     public void setGeneratePKBasedEqualsAndHashCode(final boolean pGeneratePKBasedEqualsAndHashCode) {
         generatePKBasedEqualsAndHashCode = pGeneratePKBasedEqualsAndHashCode;
+    }
+
+    public boolean enableOptLockFullRowCompare() {
+        return enableOptLockFullRowCompare;
+    }
+
+    public void setEnableOptLockFullRowCompare(final boolean pEnableOptLockFullRowCompare) {
+        enableOptLockFullRowCompare = pEnableOptLockFullRowCompare;
     }
 }

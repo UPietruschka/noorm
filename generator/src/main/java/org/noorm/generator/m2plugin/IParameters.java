@@ -105,13 +105,22 @@ public interface IParameters {
 	Properties getOracleTable2SequenceMapping();
 
 	/**
-	 * Concurrency control is based on optimistic locking. To identify the version column,
+	 * Concurrency control can be based on optimistic locking. To identify the version column,
 	 * a mapping from the table-name to the version column should be specified. Dependent on
 	 * how specific the column-names are with respect to the table-names, one or more
 	 * mapping are required. In case of a unique name of the version column for all tables,
 	 * one simple rule like ".*" -> "VERSION" is sufficient.
 	 */
-	Properties getOptimisticLockColumnMapping();
+	Properties getOptLockVersionColumnMapping();
+
+    /**
+     * Concurrency control can be based on optimistic locking.
+     * When no version column is available for the tables subject to optimistic locking, the complete
+     * pre-change image of the row is used to determine database changes, which have occurred in between.
+     * The tables listed here are subject to this type of optimistic locking (Do not use both available
+     * types of optimistic locking simultaneously).
+     */
+    String getOptLockFullRowCompareTableRegex();
 
 	/**
 	 * The Oracle data dictionary does not provide unambiguous information for the primary key
