@@ -60,7 +60,7 @@ public final class DataAccessException extends RuntimeException {
 		INITIALIZATION_FAILURE(1500L, "INITIALIZATION_FAILURE", "Database initialization failed."),
 		STALE_TRANSACTION(1600L, "STALE_TRANSACTION", "Previous transaction in this thread has not been terminated properly."),
 		CONNECTION_ACCESS_FAILURE(1700L, "CONNECTION_ACCESS_FAILURE", "Failure accessing database connection."),
-		UNSUPPORTED_VERSION_COLUMN_TYPE(1800L, "UNSUPPORTED_VERSION_COLUMN_TYPE", "Unsupported version column type (Only 'Long' supported yet)."),
+		UNSUPPORTED_VERSION_COLUMN_TYPE(1800L, "UNSUPPORTED_VERSION_COLUMN_TYPE", "Unsupported version column type (Only numerical types and date/timestamp types are supported)."),
 		VERSION_COLUMN_NULL(1810L, "VERSION_COLUMN_NULL", "Version column is null. Record has not been initialized properly."),
 		OPTIMISTIC_LOCK_CONFLICT(1900L, "OPTIMISTIC_LOCK_CONFLICT", "Optimistic lock conflict. Record subject to modification has been "
 				+ "modified or deleted by another process atfer it has been loaded for this operation."),

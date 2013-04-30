@@ -23,7 +23,6 @@ import java.util.Map;
  * omitted from the mapping procedure.
  *
  * @author Ulf Pietruschka / ulf.pietruschka@etenso.com
- * @version 1.0.0
  */
 public class BeanMapper<T> {
 

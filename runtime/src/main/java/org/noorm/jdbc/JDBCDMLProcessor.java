@@ -319,7 +319,16 @@ public class JDBCDMLProcessor<T> {
                                 value = new Timestamp(((java.util.Date) value).getTime());
                             }
                             if (!isPKColumn && value != null) {
-                                pstmt.setObjectAtName(fieldName.concat(StatementBuilder.OLD_VERSION_APPENDIX), value);
+                                final String namedParameter = fieldName.concat(StatementBuilder.OLD_VERSION_APPENDIX);
+                                if (value instanceof String) {
+                                    // SQL CHAR comparison semantics by default uses padding, which causes some
+                                    // confusion, since it does not even matter, whether the data has initially been
+                                    // provided with or without padding. Using the following proprietary Oracle method
+                                    // disabled this behaviour and turns off padding.
+                                    pstmt.setFixedCHARAtName(namedParameter, (String) value);
+                                } else {
+                                    pstmt.setObjectAtName(namedParameter, value);
+                                }
                             }
                         }
                         if (pBatchType.equals(BatchType.UPDATE)) {
