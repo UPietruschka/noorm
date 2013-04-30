@@ -235,7 +235,7 @@ public class BeanMapper<T> {
 			// TIMESTAMP differ in precision, but both have a time included. Since the time part of the Java
 			// type is stored in the database unchanged, we should retrieve it unchanged, i.e., we do not
 			// make use of JDBC method getDate, which omits the time part, but use always getTimestamp.
-			if (fieldType == java.util.Date.class || fieldType == java.sql.Date.class || fieldType == Timestamp.class) {
+			if (fieldType == java.util.Date.class || fieldType == Timestamp.class) {
 				field.set(pBean, pResultSet.getTimestamp(fieldName));
                 continue;
 			}

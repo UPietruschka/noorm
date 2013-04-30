@@ -26,7 +26,6 @@ import java.util.Map;
 public class JDBCDMLProcessor<T> {
 
     private static final Logger log = LoggerFactory.getLogger(JDBCDMLProcessor.class);
-    private static final Long VERSION_COLUMN_LONG_DEFAULT = 1L;
 
     private static JDBCDMLProcessor dmlProcessor = new JDBCDMLProcessor();
     private JDBCStatementProcessor statementProcessor = JDBCStatementProcessor.getInstance();
@@ -245,9 +244,8 @@ public class JDBCDMLProcessor<T> {
                                 // we set it here, otherwise NULL in the version column will result
                                 // in an VERSION_COLUMN_NULL exception with the next update.
                                 if (value == null) {
-                                    value = VERSION_COLUMN_LONG_DEFAULT;
+                                    value = BeanMetaDataUtil.setInitialVersionColumnValue(bean);
                                 }
-                                BeanMetaDataUtil.setVersionColumnValue(bean, (Long) value);
                             }
                             pstmt.setObjectAtName(fieldName, value);
                         }
@@ -255,10 +253,15 @@ public class JDBCDMLProcessor<T> {
 
                     if (pBatchType.equals(BatchType.UPDATE)) {
                         if (fieldName.equals(versionColumnName)) {
-                            if (value instanceof Long) {
-                                final Long incVersion = ((Long) value) + 1L;
-                                BeanMetaDataUtil.setVersionColumnValue(bean, incVersion);
-                                pstmt.setObjectAtName(fieldName, incVersion);
+                            if (value instanceof Long || value instanceof Timestamp) {
+                                Object newVersion;
+                                if (value instanceof Long) {
+                                    newVersion = ((Long) value) + 1L;
+                                } else { // java.sql.Timestamp
+                                    newVersion = new Timestamp(new java.util.Date().getTime());
+                                }
+                                BeanMetaDataUtil.setVersionColumnValue(bean, newVersion);
+                                pstmt.setObjectAtName(fieldName, newVersion);
                             } else {
                                 if (value == null) {
                                     throw new DataAccessException(DataAccessException.Type.VERSION_COLUMN_NULL);

@@ -9,6 +9,7 @@ import org.slf4j.LoggerFactory;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
+import java.sql.Timestamp;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
@@ -32,6 +33,8 @@ public class BeanMetaDataUtil {
 	public static final String NOT_UPDATABLE = "NO";
 	public static final String NOT_NULLABLE = "N";
 	public static final String SERIAL_VERSION_UID = "serialVersionUID";
+
+    private static final Long VERSION_COLUMN_LONG_DEFAULT = 1L;
 
     private static Map<Field, Annotation[]> declaredAnnotationsCache = new HashMap<Field, Annotation[]>();
     private static Map<Class, Field[]> declaredFieldInclParentCache = new HashMap<Class, Field[]>();
@@ -144,22 +147,6 @@ public class BeanMetaDataUtil {
 		return (Long) property;
 	}
 
-	/**
-	 * Retrieves the value of the version column of the bean passed to this method. The data is retrieved
-	 * by reflection based on the bean metadata provided by the bean itself.
-	 * @param pBean the bean instance.
-	 * @return the version column value for the passed bean.
-	 */
-	public static Long getVersionColumnValue(final IBean pBean) {
-
-		final String versionColumnName = pBean.getVersionColumnName();
-		final Object property = getBeanPropertyByName(pBean, versionColumnName);
-		if (!(property instanceof Long)) {
-			throw new DataAccessException(DataAccessException.Type.UNSUPPORTED_VERSION_COLUMN_TYPE);
-		}
-		return (Long) property;
-	}
-
 	public static Class getBeanPropertyType(final Object pObject, final String pPropertyName) {
 
         Field property = getDeclaredFieldInclParent(pObject, pPropertyName);
@@ -197,17 +184,35 @@ public class BeanMetaDataUtil {
 	 * @param pBean the bean instance.
 	 * @param pVersionColumnValue the value of the version column.
 	 */
-	public static void setVersionColumnValue(final IBean pBean, final Long pVersionColumnValue) {
+	public static void setVersionColumnValue(final IBean pBean, final Object pVersionColumnValue) {
 
 		final String versionColumnName = pBean.getVersionColumnName();
 		setBeanPropertyByName(pBean, versionColumnName, pVersionColumnValue);
 	}
 
-	private static void setBeanPropertyByName(final IBean pBean, final String pPropertyName, final Long pPKValue) {
+    public static Object setInitialVersionColumnValue(final IBean pBean) {
 
-        Field property = getDeclaredFieldInclParent(pBean, pPropertyName);
+        final String versionColumnName = pBean.getVersionColumnName();
+        final Field property = getDeclaredFieldInclParent(pBean, versionColumnName);
+        Object initialVersionColumnValue;
+        if (property.getType().equals(Long.class)) {
+            initialVersionColumnValue = VERSION_COLUMN_LONG_DEFAULT;
+        } else { // java.sql.Timestamp
+            initialVersionColumnValue = new Timestamp(new java.util.Date().getTime());
+        }
+        try {
+            property.set(pBean, initialVersionColumnValue);
+            return initialVersionColumnValue;
+        } catch (IllegalAccessException e) {
+            throw new DataAccessException(DataAccessException.Type.COULD_NOT_ACCESS_PROPERTY_BY_REFLECTION, e);
+        }
+    }
+
+	private static void setBeanPropertyByName(final IBean pBean, final String pPropertyName, final Object pValue) {
+
+        final Field property = getDeclaredFieldInclParent(pBean, pPropertyName);
 		try {
-			property.set(pBean, pPKValue);
+			property.set(pBean, pValue);
 		} catch (IllegalAccessException e) {
 			throw new DataAccessException(DataAccessException.Type.COULD_NOT_ACCESS_PROPERTY_BY_REFLECTION, e);
 		}
