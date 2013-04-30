@@ -66,7 +66,7 @@ public class $class.Name<T> implements IBean<T>, Serializable {
 	public void set$att.getMethodNamePostfix()(final $att.Type p$att.getMethodNamePostfix()) {
 #if ($class.enableOptLockFullRowCompare())
 		if (!modifiedFieldsInitialValue.containsKey("$att.ColumnName")) {
-			modifiedFieldsInitialValue.put("$att.ColumnName", p$att.getMethodNamePostfix());
+			modifiedFieldsInitialValue.put("$att.ColumnName", $att.Name);
 		}
 #end
 		$att.Name = p$att.getMethodNamePostfix();

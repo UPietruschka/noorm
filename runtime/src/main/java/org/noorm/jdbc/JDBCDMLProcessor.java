@@ -89,6 +89,18 @@ public class JDBCDMLProcessor<T> {
      */
     public void update(final List<? extends IBean> pBeanList) {
 
+        if (pBeanList != null && pBeanList.size() > 1) {
+            if (pBeanList.get(0).getModifiedFieldsInitialValue() != null) {
+                // When optimistic locking based on pre-change image compare is used, the particular update
+                // statements may differ due to different NULL values (since checking against NULL requires
+                // a different SQL syntax).
+                // For that reason, batch mode is not supported here.
+                for (IBean bean : pBeanList) {
+                    update(bean);
+                }
+                return;
+            }
+        }
         batch(pBeanList, BatchType.UPDATE, null);
     }
 
@@ -113,6 +125,18 @@ public class JDBCDMLProcessor<T> {
      */
     public void delete(final List<? extends IBean> pBeanList) {
 
+        if (pBeanList != null && pBeanList.size() > 1) {
+            if (pBeanList.get(0).getModifiedFieldsInitialValue() != null) {
+                // When optimistic locking based on pre-change image compare is used, the particular delete
+                // statements may differ due to different NULL values (since checking against NULL requires
+                // a different SQL syntax).
+                // For that reason, batch mode is not supported here.
+                for (IBean bean : pBeanList) {
+                    delete(bean);
+                }
+                return;
+            }
+        }
         batch(pBeanList, BatchType.DELETE, null);
     }
 
@@ -268,6 +292,9 @@ public class JDBCDMLProcessor<T> {
                     }
                 }
 
+                if (pBatchType.equals(BatchType.INSERT) && useOptLockFullRowCompare) {
+                    bean.getModifiedFieldsInitialValue().clear();
+                }
                 if (pBatchType.equals(BatchType.UPDATE) || pBatchType.equals(BatchType.DELETE)) {
                     if (versionColumnName != null && !versionColumnName.isEmpty()) {
                         pstmt.setObjectAtName(versionColumnName.concat(StatementBuilder.OLD_VERSION_APPENDIX),
@@ -282,14 +309,16 @@ public class JDBCDMLProcessor<T> {
                                     isPKColumn = true;
                                 }
                             }
-                            Object value = modifiedFieldsInitialValue.get(fieldName);
-                            if (value == null) {
+                            Object value;
+                            if (modifiedFieldsInitialValue.containsKey(fieldName)) {
+                                value = modifiedFieldsInitialValue.get(fieldName);
+                            } else {
                                 value = fieldMap.get(fieldName);
                             }
                             if (value instanceof java.util.Date) {
                                 value = new Timestamp(((java.util.Date) value).getTime());
                             }
-                            if (!isPKColumn || sequenceName == null || sequenceName.isEmpty()) {
+                            if (!isPKColumn && value != null) {
                                 pstmt.setObjectAtName(fieldName.concat(StatementBuilder.OLD_VERSION_APPENDIX), value);
                             }
                         }

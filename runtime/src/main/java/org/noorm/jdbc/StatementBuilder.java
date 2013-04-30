@@ -73,10 +73,7 @@ class StatementBuilder {
 	}
 
     private static final String SELECT_PREFIX = "SELECT * FROM ";
-    private static final String SELECT_WHERE = " WHERE ";
-    private static final String SELECT_AND = " AND ";
-    private static final String SELECT_ASG = ":";
-    private static final String SELECT_ASG2 = "?";
+    private static final String SELECT_ASG = "?";
 
     public String buildSQLStatement(final String pTableName,
                                     final Map<QueryColumn, Object> pInParameters,
@@ -85,7 +82,7 @@ class StatementBuilder {
         final StringBuilder pSQLStatement = new StringBuilder();
         pSQLStatement.append(SELECT_PREFIX).append(pTableName);
         if (pInParameters.size() > 0) {
-            String delim = SELECT_WHERE;
+            String delim = WHERE;
             final Map<QueryColumn, Object> orderedParameters = new TreeMap<QueryColumn, Object>(pInParameters);
             for (final QueryColumn queryColumn : orderedParameters.keySet()) {
                 pSQLStatement.append(delim);
@@ -93,12 +90,12 @@ class StatementBuilder {
                 pSQLStatement.append(queryColumn.getOperator().getOperatorSyntax());
                 if (!queryColumn.getOperator().isUnary()) {
                     if (useNamedParameters) {
-                        pSQLStatement.append(SELECT_ASG).append(queryColumn.getColumnName());
+                        pSQLStatement.append(ASG).append(queryColumn.getColumnName());
                     } else {
-                        pSQLStatement.append(SELECT_ASG2);
+                        pSQLStatement.append(SELECT_ASG);
                     }
                 }
-                delim = SELECT_AND;
+                delim = AND;
             }
         }
         return pSQLStatement.toString();
@@ -108,7 +105,6 @@ class StatementBuilder {
 	private static final String INSERT_DELIM_1 = " (";
 	private static final String INSERT_DELIM_2 = ",";
 	private static final String INSERT_VALUES = ") VALUES ";
-	private static final String INSERT_ASG = ":";
 	private static final String INSERT_NEXT_PK_VAL = ".NEXTVAL";
 	private static final String INSERT_DELIM_3 = ")";
 
@@ -138,7 +134,7 @@ class StatementBuilder {
 				insert.append(pSequenceName).append(INSERT_NEXT_PK_VAL);
 				delim = INSERT_DELIM_2;
 			} else {
-				insert.append(INSERT_ASG).append(fieldName);
+				insert.append(ASG).append(fieldName);
 				delim = INSERT_DELIM_2;
 			}
 		}
@@ -149,7 +145,6 @@ class StatementBuilder {
 	private static final String UPDATE_PREFIX = "UPDATE ";
 	private static final String UPDATE_DELIM_1 = " SET ";
 	private static final String UPDATE_DELIM_2 = ",";
-	private static final String UPDATE_EQUALS = " = ";
 
 	public String buildUpdate(final String pTableName,
 							  final String[] pPrimaryKeyColumnNames,
@@ -168,7 +163,7 @@ class StatementBuilder {
 				}
 			}
 			if (!isPKColumn) {
-				update.append(delim).append(fieldName).append(UPDATE_EQUALS).append(INSERT_ASG).append(fieldName);
+				update.append(delim).append(fieldName).append(EQUALS).append(ASG).append(fieldName);
 				delim = UPDATE_DELIM_2;
 			}
 		}
@@ -194,6 +189,7 @@ class StatementBuilder {
     private static final String AND = " AND ";
     private static final String EQUALS = " = ";
     private static final String ASG = ":";
+    private static final String IS_NULL = " IS NULL ";
 
     private StringBuilder buildWhereClause(final StringBuilder pDML,
                                            final String[] pPrimaryKeyColumnNames,
@@ -224,8 +220,12 @@ class StatementBuilder {
                     }
                 }
                 if (!isPKColumn) {
-                    pDML.append(delim).append(fieldName).append(EQUALS);
-                    pDML.append(INSERT_ASG).append(fieldName).append(OLD_VERSION_APPENDIX);
+                    pDML.append(delim).append(fieldName);
+                    if (fieldMap.get(fieldName) != null) {
+                        pDML.append(EQUALS).append(ASG).append(fieldName).append(OLD_VERSION_APPENDIX);
+                    } else {
+                        pDML.append(IS_NULL);
+                    }
                 }
             }
         }

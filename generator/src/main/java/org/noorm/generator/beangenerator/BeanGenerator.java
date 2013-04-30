@@ -142,10 +142,7 @@ public class BeanGenerator {
 			final Random random = new Random(javaBeanName.hashCode());
 			final long serialVersionUID = random.nextLong();
 			beanClassDescriptor.setSerialVersionUID(serialVersionUID);
-            if (parameters.getOptLockFullRowCompareTableRegex() != null &&
-                    tableName0.matches(parameters.getOptLockFullRowCompareTableRegex())) {
-                beanClassDescriptor.setEnableOptLockFullRowCompare(true);
-            }
+            boolean unsupportedOptLockFullRowCompareTypes = false;
 			for (final TableMetadataBean tableMetadataBean : tableMetadataBeanList1) {
 				final BeanAttributeDescriptor beanAttributeDescriptor = new BeanAttributeDescriptor();
 				final String javaName = Utils.convertDBName2JavaName(tableMetadataBean.getColumnName(), false);
@@ -160,7 +157,11 @@ public class BeanGenerator {
 					beanAttributeDescriptor.setUpdatable(false);
 				}
 				beanAttributeDescriptor.setType(javaType);
-				beanAttributeDescriptor.setDataType(tableMetadataBean.getDataType());
+                final String dataType = tableMetadataBean.getDataType();
+				beanAttributeDescriptor.setDataType(dataType);
+                if (dataType.equals("CLOB") || dataType.equals("BLOB") || dataType.equals("XMLTYPE")) {
+                    unsupportedOptLockFullRowCompareTypes = true;
+                }
 				beanAttributeDescriptor.setColumnName(tableMetadataBean.getColumnName());
 				beanAttributeDescriptor.setMaxLength(tableMetadataBean.getCharLength().intValue());
 				if (tableMetadataBean.getNullable().equals(BeanMetaDataUtil.NOT_NULLABLE)) {
@@ -168,6 +169,15 @@ public class BeanGenerator {
 				}
 				beanClassDescriptor.addAttribute(beanAttributeDescriptor);
 			}
+            if (parameters.getOptLockFullRowCompareTableRegex() != null &&
+                    tableName0.matches(parameters.getOptLockFullRowCompareTableRegex())) {
+                if (unsupportedOptLockFullRowCompareTypes) {
+                    throw new GeneratorException("Optimistic locking using pre-change image comparison is not "
+                            .concat("supported for tables with complex data-types (CLOB, BLOB, XMLTYPE) [")
+                            .concat(tableName0).concat("]"));
+                }
+                beanClassDescriptor.setEnableOptLockFullRowCompare(true);
+            }
 			GeneratorUtil.generateFile(beanPackageDir, BEAN_VM_TEMPLATE_FILE,
 					beanClassDescriptor.getName(), beanClassDescriptor);
 			beanDMLClassDescriptor.addBean(beanClassDescriptor);
