@@ -10,6 +10,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Timestamp;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -159,6 +160,7 @@ public class JDBCDMLProcessor<T> {
                 throw new DataAccessException(DataAccessException.Type.COULD_NOT_UPDATE_NON_UPDATABLE_BEAN);
             }
             String batch = null;
+            final boolean useOptLockFullRowCompare = firstBean.getModifiedFieldsInitialValue() == null ? false : true;
             if (pBatchType.equals(BatchType.INSERT)) {
                 batch = statementBuilder.buildInsert
                         (tableName, primaryKeyColumnNames, sequenceName, fieldMap);
@@ -168,14 +170,14 @@ public class JDBCDMLProcessor<T> {
                     throw new DataAccessException(DataAccessException.Type.GENERIC_UPDATE_NOT_SUPPORTED_WITHOUT_PK);
                 }
                 batch = statementBuilder.buildUpdate
-                        (tableName, primaryKeyColumnNames, versionColumnName, fieldMap);
+                        (tableName, primaryKeyColumnNames, versionColumnName, fieldMap, useOptLockFullRowCompare);
             }
             if (pBatchType.equals(BatchType.DELETE)) {
                 if (primaryKeyColumnNames.length == 0) {
                     throw new DataAccessException(DataAccessException.Type.GENERIC_DELETE_NOT_SUPPORTED_WITHOUT_PK);
                 }
                 batch = statementBuilder.buildDelete
-                        (tableName, primaryKeyColumnNames, versionColumnName);
+                        (tableName, primaryKeyColumnNames, versionColumnName, fieldMap, useOptLockFullRowCompare);
             }
             if (log.isDebugEnabled()) {
                 debugDML(tableName, sequenceName, batch);
@@ -270,6 +272,30 @@ public class JDBCDMLProcessor<T> {
                     if (versionColumnName != null && !versionColumnName.isEmpty()) {
                         pstmt.setObjectAtName(versionColumnName.concat(StatementBuilder.OLD_VERSION_APPENDIX),
                                 fieldMap.get(versionColumnName));
+                    }
+                    if (useOptLockFullRowCompare) {
+                        final HashMap<String, Object> modifiedFieldsInitialValue = bean.getModifiedFieldsInitialValue();
+                        for (final String fieldName : fieldMap.keySet()) {
+                            boolean isPKColumn = false;
+                            for (final String pkColumnName : primaryKeyColumnNames) {
+                                if (fieldName.toUpperCase().equals(pkColumnName)) {
+                                    isPKColumn = true;
+                                }
+                            }
+                            Object value = modifiedFieldsInitialValue.get(fieldName);
+                            if (value == null) {
+                                value = fieldMap.get(fieldName);
+                            }
+                            if (value instanceof java.util.Date) {
+                                value = new Timestamp(((java.util.Date) value).getTime());
+                            }
+                            if (!isPKColumn || sequenceName == null || sequenceName.isEmpty()) {
+                                pstmt.setObjectAtName(fieldName.concat(StatementBuilder.OLD_VERSION_APPENDIX), value);
+                            }
+                        }
+                        if (pBatchType.equals(BatchType.UPDATE)) {
+                            bean.getModifiedFieldsInitialValue().clear();
+                        }
                     }
                 }
 

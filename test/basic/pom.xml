@@ -187,6 +187,7 @@
                             <value>VERSION</value>
                         </property>
                     </optLockVersionColumnMapping>
+                    <optLockFullRowCompareTableRegex>V_DEPARTMENTS</optLockFullRowCompareTableRegex>
                     <singleRowFinderRegex>(.*_unique.*)</singleRowFinderRegex>
                     <queryDeclarations>
                         <queryDeclaration>

@@ -149,15 +149,13 @@ class StatementBuilder {
 	private static final String UPDATE_PREFIX = "UPDATE ";
 	private static final String UPDATE_DELIM_1 = " SET ";
 	private static final String UPDATE_DELIM_2 = ",";
-	private static final String UPDATE_WHERE = " WHERE ";
-	private static final String UPDATE_AND = " AND ";
 	private static final String UPDATE_EQUALS = " = ";
-	private static final String UPDATE_ASG = ":";
 
 	public String buildUpdate(final String pTableName,
 							  final String[] pPrimaryKeyColumnNames,
 							  final String pVersionColumnName,
-							  final Map<String, Object> fieldMap) {
+							  final Map<String, Object> fieldMap,
+                              final boolean pUseOptLockFullRowCompare) {
 
 		final StringBuilder update = new StringBuilder();
 		update.append(UPDATE_PREFIX).append(pTableName);
@@ -174,49 +172,63 @@ class StatementBuilder {
 				delim = UPDATE_DELIM_2;
 			}
 		}
-		String updateAnd = UPDATE_WHERE;
-		for (final String pkColumnName : pPrimaryKeyColumnNames) {
-			update.append(updateAnd);
-			update.append(pkColumnName);
-			update.append(UPDATE_EQUALS);
-			update.append(UPDATE_ASG).append(pkColumnName);
-			updateAnd = UPDATE_AND;
-		}
-		if (pVersionColumnName != null && !pVersionColumnName.isEmpty()) {
-			update.append(UPDATE_AND);
-			update.append(pVersionColumnName);
-			update.append(UPDATE_EQUALS);
-			update.append(UPDATE_ASG).append(pVersionColumnName).append(OLD_VERSION_APPENDIX);
-		}
+        buildWhereClause(update, pPrimaryKeyColumnNames, pVersionColumnName, fieldMap, pUseOptLockFullRowCompare);
 		return update.toString();
 	}
 
 	private static final String DELETE_PREFIX = "DELETE FROM ";
-	private static final String DELETE_WHERE = " WHERE ";
-	private static final String DELETE_AND = " AND ";
-	private static final String DELETE_EQUALS = " = ";
-	private static final String DELETE_ASG = ":";
 
 	public String buildDelete(final String pTableName,
 							  final String[] pPrimaryKeyColumnNames,
-							  final String pVersionColumnName) {
+							  final String pVersionColumnName,
+                              final Map<String, Object> fieldMap,
+                              final boolean pUseOptLockFullRowCompare) {
 
 		final StringBuilder delete = new StringBuilder();
 		delete.append(DELETE_PREFIX).append(pTableName);
-		String deleteAnd = DELETE_WHERE;
-		for (final String pkColumnName : pPrimaryKeyColumnNames) {
-			delete.append(deleteAnd);
-			delete.append(pkColumnName);
-			delete.append(DELETE_EQUALS);
-			delete.append(DELETE_ASG).append(pkColumnName);
-			deleteAnd = DELETE_AND;
-		}
-		if (pVersionColumnName != null && !pVersionColumnName.isEmpty()) {
-			delete.append(DELETE_AND);
-			delete.append(pVersionColumnName);
-			delete.append(DELETE_EQUALS);
-			delete.append(DELETE_ASG).append(pVersionColumnName).append(OLD_VERSION_APPENDIX);
-		}
+        buildWhereClause(delete, pPrimaryKeyColumnNames, pVersionColumnName, fieldMap, pUseOptLockFullRowCompare);
 		return delete.toString();
 	}
+
+    private static final String WHERE = " WHERE ";
+    private static final String AND = " AND ";
+    private static final String EQUALS = " = ";
+    private static final String ASG = ":";
+
+    private StringBuilder buildWhereClause(final StringBuilder pDML,
+                                           final String[] pPrimaryKeyColumnNames,
+                                           final String pVersionColumnName,
+                                           final Map<String, Object> fieldMap,
+                                           final boolean pUseOptLockFullRowCompare) {
+
+        String delim = WHERE;
+        for (final String pkColumnName : pPrimaryKeyColumnNames) {
+            pDML.append(delim);
+            pDML.append(pkColumnName);
+            pDML.append(EQUALS);
+            pDML.append(ASG).append(pkColumnName);
+            delim = AND;
+        }
+        if (pVersionColumnName != null && !pVersionColumnName.isEmpty()) {
+            pDML.append(delim);
+            pDML.append(pVersionColumnName);
+            pDML.append(EQUALS);
+            pDML.append(ASG).append(pVersionColumnName).append(OLD_VERSION_APPENDIX);
+        }
+        if (pUseOptLockFullRowCompare) {
+            for (final String fieldName : fieldMap.keySet()) {
+                boolean isPKColumn = false;
+                for (final String pkColumnName : pPrimaryKeyColumnNames) {
+                    if (fieldName.equals(pkColumnName)) {
+                        isPKColumn = true;
+                    }
+                }
+                if (!isPKColumn) {
+                    pDML.append(delim).append(fieldName).append(EQUALS);
+                    pDML.append(INSERT_ASG).append(fieldName).append(OLD_VERSION_APPENDIX);
+                }
+            }
+        }
+        return pDML;
+    }
 }

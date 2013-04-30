@@ -143,7 +143,7 @@ public class BeanGenerator {
 			final long serialVersionUID = random.nextLong();
 			beanClassDescriptor.setSerialVersionUID(serialVersionUID);
             if (parameters.getOptLockFullRowCompareTableRegex() != null &&
-                    !tableName0.matches(parameters.getOptLockFullRowCompareTableRegex())) {
+                    tableName0.matches(parameters.getOptLockFullRowCompareTableRegex())) {
                 beanClassDescriptor.setEnableOptLockFullRowCompare(true);
             }
 			for (final TableMetadataBean tableMetadataBean : tableMetadataBeanList1) {
