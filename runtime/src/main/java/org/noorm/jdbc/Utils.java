@@ -173,10 +173,8 @@ public class Utils {
 		if (pOracleType.equals("DATE")) {
 			javaType = "java.util.Date";
 		}
-		if (pOracleType.length() >= 9) {
-			if (pOracleType.substring(0, 9).equals("TIMESTAMP")) {
-				javaType = "java.util.Date";
-			}
+		if (pOracleType.startsWith("TIMESTAMP")) {
+			javaType = "java.util.Date";
 		}
 		return javaType;
 	}

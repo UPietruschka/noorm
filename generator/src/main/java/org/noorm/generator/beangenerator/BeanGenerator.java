@@ -143,6 +143,7 @@ public class BeanGenerator {
 			final long serialVersionUID = random.nextLong();
 			beanClassDescriptor.setSerialVersionUID(serialVersionUID);
             boolean unsupportedOptLockFullRowCompareTypes = false;
+            String versionColumnType = "";
 			for (final TableMetadataBean tableMetadataBean : tableMetadataBeanList1) {
 				final BeanAttributeDescriptor beanAttributeDescriptor = new BeanAttributeDescriptor();
 				final String javaName = Utils.convertDBName2JavaName(tableMetadataBean.getColumnName(), false);
@@ -163,12 +164,19 @@ public class BeanGenerator {
                     unsupportedOptLockFullRowCompareTypes = true;
                 }
 				beanAttributeDescriptor.setColumnName(tableMetadataBean.getColumnName());
+                if (versionColumnName.equals(tableMetadataBean.getColumnName())) {
+                    versionColumnType = dataType;
+                }
 				beanAttributeDescriptor.setMaxLength(tableMetadataBean.getCharLength().intValue());
 				if (tableMetadataBean.getNullable().equals(BeanMetaDataUtil.NOT_NULLABLE)) {
 					beanAttributeDescriptor.setNullable(false);
 				}
 				beanClassDescriptor.addAttribute(beanAttributeDescriptor);
 			}
+            if (!versionColumnType.isEmpty()) {
+                if (versionColumnType.length() > 9) { versionColumnType = versionColumnType.substring(0, 9); }
+                beanClassDescriptor.setVersionColumnType(versionColumnType);
+            }
             if (parameters.getOptLockFullRowCompareTableRegex() != null &&
                     tableName0.matches(parameters.getOptLockFullRowCompareTableRegex())) {
                 if (unsupportedOptLockFullRowCompareTypes) {

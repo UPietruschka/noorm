@@ -21,6 +21,7 @@ public class BeanClassDescriptor {
     private String[] primaryKeyJavaNames;
 	private String sequenceName;
 	private String versionColumnName;
+    private String versionColumnType;
 	private String packageName;
 	private final List<BeanAttributeDescriptor> attributes = new ArrayList<BeanAttributeDescriptor>();
     private boolean generatePKBasedEqualsAndHashCode;
@@ -102,6 +103,14 @@ public class BeanClassDescriptor {
 	public void setVersionColumnName(final String pVersionColumnName) {
 		versionColumnName = pVersionColumnName;
 	}
+
+    public String getVersionColumnType() {
+        return versionColumnType;
+    }
+
+    public void setVersionColumnType(final String pVersionColumnType) {
+        versionColumnType = pVersionColumnType;
+    }
 
 	public void addAttribute(final BeanAttributeDescriptor pAttribute) {
 		attributes.add(pAttribute);

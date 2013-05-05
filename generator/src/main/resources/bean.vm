@@ -5,6 +5,7 @@ import java.io.Serializable;
 import java.util.HashMap;
 import org.noorm.jdbc.IBean;
 import org.noorm.jdbc.JDBCColumn;
+import org.noorm.jdbc.VersionColumnType;
 
 /**
  * Bean class for database table $class.TableName
@@ -17,6 +18,11 @@ public class $class.Name<T> implements IBean<T>, Serializable {
 	private static final String[] PK_COLUMN_NAMES = new String[]{ #foreach ($param in $class.PrimaryKeyColumnNames)"$param"#if($velocityCount<$class.PrimaryKeyColumnNames.size()), #end#end };
 	private static final String SEQUENCE_NAME = "$class.SequenceName";
 	private static final String VERSION_COLUMN_NAME = "$class.VersionColumnName";
+#if (!$class.getVersionColumnType())
+	private static final VersionColumnType VERSION_COLUMN_TYPE = null;
+#else
+	private static final VersionColumnType VERSION_COLUMN_TYPE = VersionColumnType.$class.VersionColumnType;
+#end
 #foreach ($att in $class.Attributes)
 	@JDBCColumn(name="$att.ColumnName", dataType="$att.DataType"#if(!$att.Updatable), updatable=false#end#if(!$att.Nullable), nullable=false#end#if($att.MaxLength>0), maxLength=$att.MaxLength#end)
 	protected $att.Type $att.Name;
@@ -56,6 +62,10 @@ public class $class.Name<T> implements IBean<T>, Serializable {
 
 	public String getVersionColumnName() {
 		return VERSION_COLUMN_NAME;
+	}
+
+	public VersionColumnType getVersionColumnType() {
+		return VERSION_COLUMN_TYPE;
 	}
 #foreach ($att in $class.Attributes)
 

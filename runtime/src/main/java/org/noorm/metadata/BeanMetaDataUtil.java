@@ -34,8 +34,6 @@ public class BeanMetaDataUtil {
 	public static final String NOT_NULLABLE = "N";
 	public static final String SERIAL_VERSION_UID = "serialVersionUID";
 
-    private static final Long VERSION_COLUMN_LONG_DEFAULT = 1L;
-
     private static Map<Field, Annotation[]> declaredAnnotationsCache = new HashMap<Field, Annotation[]>();
     private static Map<Class, Field[]> declaredFieldInclParentCache = new HashMap<Class, Field[]>();
 
@@ -189,24 +187,6 @@ public class BeanMetaDataUtil {
 		final String versionColumnName = pBean.getVersionColumnName();
 		setBeanPropertyByName(pBean, versionColumnName, pVersionColumnValue);
 	}
-
-    public static Object setInitialVersionColumnValue(final IBean pBean) {
-
-        final String versionColumnName = pBean.getVersionColumnName();
-        final Field property = getDeclaredFieldInclParent(pBean, versionColumnName);
-        Object initialVersionColumnValue;
-        if (property.getType().equals(Long.class)) {
-            initialVersionColumnValue = VERSION_COLUMN_LONG_DEFAULT;
-        } else { // java.sql.Timestamp
-            initialVersionColumnValue = new Timestamp(new java.util.Date().getTime());
-        }
-        try {
-            property.set(pBean, initialVersionColumnValue);
-            return initialVersionColumnValue;
-        } catch (IllegalAccessException e) {
-            throw new DataAccessException(DataAccessException.Type.COULD_NOT_ACCESS_PROPERTY_BY_REFLECTION, e);
-        }
-    }
 
 	private static void setBeanPropertyByName(final IBean pBean, final String pPropertyName, final Object pValue) {
 

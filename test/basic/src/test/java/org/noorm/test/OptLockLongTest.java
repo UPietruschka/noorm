@@ -4,8 +4,8 @@ import org.junit.Assert;
 import org.junit.Test;
 import org.noorm.jdbc.DataAccessException;
 import org.noorm.jdbc.DataSourceProvider;
-import org.noorm.jdbc.JDBCDMLProcessor;
 import org.noorm.test.hr.beans.OptLockLongBean;
+import org.noorm.test.hr.services.BeanDML;
 
 import static org.junit.Assert.*;
 import static junit.framework.Assert.fail;
@@ -20,6 +20,8 @@ public class OptLockLongTest {
 	private static final String SOME_TEXT = "SOME_TEXT";
 	private static final String SOME_NEW_TEXT = "SOME_NEW_TEXT";
 
+    private BeanDML beanDML = BeanDML.getInstance();
+
 	@Test
 	public void testOptLockLongCRUD() {
 
@@ -27,12 +29,11 @@ public class OptLockLongTest {
         try {
             final OptLockLongBean newOptLockLongBean = new OptLockLongBean();
             newOptLockLongBean.setText(SOME_TEXT);
-            JDBCDMLProcessor<OptLockLongBean> dmlProcessor = JDBCDMLProcessor.getInstance();
-            OptLockLongBean insertedOptLockLongBean =  dmlProcessor.insert(newOptLockLongBean);
+            final OptLockLongBean insertedOptLockLongBean =  beanDML.insertOptLockLong(newOptLockLongBean);
             assertEquals(SOME_TEXT, insertedOptLockLongBean.getText());
             insertedOptLockLongBean.setText(SOME_NEW_TEXT);
-            dmlProcessor.update(insertedOptLockLongBean);
-            dmlProcessor.delete(insertedOptLockLongBean);
+            beanDML.updateOptLockLong(insertedOptLockLongBean);
+            beanDML.deleteOptLockLong(insertedOptLockLongBean);
             DataSourceProvider.commit();
         } catch (Throwable e) {
             DataSourceProvider.rollback();
@@ -46,14 +47,15 @@ public class OptLockLongTest {
 		DataSourceProvider.begin();
 		final OptLockLongBean newOptLockLongBean = new OptLockLongBean();
 		newOptLockLongBean.setText(SOME_TEXT);
-        JDBCDMLProcessor<OptLockLongBean> dmlProcessor = JDBCDMLProcessor.getInstance();
-        dmlProcessor.insert(newOptLockLongBean);
+        beanDML.insertOptLockLong(newOptLockLongBean);
 		try {
 			newOptLockLongBean.setVersion(0L);
-            dmlProcessor.update(newOptLockLongBean);
+            beanDML.updateOptLockLong(newOptLockLongBean);
 			fail();
 		} catch (DataAccessException e) {
-            // Bad case test. Do nothing.
+            if (!e.getType().equals(DataAccessException.Type.OPTIMISTIC_LOCK_CONFLICT)) {
+                fail(e.getMessage());
+            }
 		} finally {
             DataSourceProvider.rollback();
         }

@@ -9,10 +9,7 @@ import org.slf4j.LoggerFactory;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Timestamp;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * Processor for database DML.
@@ -26,6 +23,8 @@ import java.util.Map;
 public class JDBCDMLProcessor<T> {
 
     private static final Logger log = LoggerFactory.getLogger(JDBCDMLProcessor.class);
+
+    private static final Long VERSION_COLUMN_LONG_DEFAULT = 1L;
 
     private static JDBCDMLProcessor dmlProcessor = new JDBCDMLProcessor();
     private JDBCStatementProcessor statementProcessor = JDBCStatementProcessor.getInstance();
@@ -240,11 +239,11 @@ public class JDBCDMLProcessor<T> {
                     if (pBatchType.equals(BatchType.INSERT)) {
                         if (!isPKColumn || sequenceName == null || sequenceName.isEmpty()) {
                             if (fieldName.equals(versionColumnName)) {
-                                // When the version column has not been initialized by the caller,
-                                // we set it here, otherwise NULL in the version column will result
-                                // in an VERSION_COLUMN_NULL exception with the next update.
                                 if (value == null) {
-                                    value = BeanMetaDataUtil.setInitialVersionColumnValue(bean);
+                                    // When the version column has not been initialized by the caller,
+                                    // we set it here, otherwise NULL in the version column will result
+                                    // in an VERSION_COLUMN_NULL exception with the next update.
+                                    value = buildVersionColumnValue(bean, pBatchType, value);
                                 }
                             }
                             pstmt.setObjectAtName(fieldName, value);
@@ -253,21 +252,11 @@ public class JDBCDMLProcessor<T> {
 
                     if (pBatchType.equals(BatchType.UPDATE)) {
                         if (fieldName.equals(versionColumnName)) {
-                            if (value instanceof Long || value instanceof Timestamp) {
-                                Object newVersion;
-                                if (value instanceof Long) {
-                                    newVersion = ((Long) value) + 1L;
-                                } else { // java.sql.Timestamp
-                                    newVersion = new Timestamp(new java.util.Date().getTime());
-                                }
-                                BeanMetaDataUtil.setVersionColumnValue(bean, newVersion);
-                                pstmt.setObjectAtName(fieldName, newVersion);
-                            } else {
-                                if (value == null) {
-                                    throw new DataAccessException(DataAccessException.Type.VERSION_COLUMN_NULL);
-                                }
-                                throw new DataAccessException(DataAccessException.Type.UNSUPPORTED_VERSION_COLUMN_TYPE);
+                            if (value == null) {
+                                throw new DataAccessException(DataAccessException.Type.VERSION_COLUMN_NULL);
                             }
+                            Object newVersion = buildVersionColumnValue(bean, pBatchType, value);
+                            pstmt.setObjectAtName(fieldName, newVersion);
                         } else {
                             if (isPKColumn && value instanceof String) {
                                 // SQL CHAR comparison semantics by default uses padding, which causes some
@@ -475,6 +464,36 @@ public class JDBCDMLProcessor<T> {
         batch(pBeanList, BatchType.INSERT, pTemporaryTableName);
         statementProcessor.callPLSQL(pPLSQLCallable, null, null, null);
         DataSourceProvider.commit();
+    }
+
+    private Object buildVersionColumnValue(final IBean pBean, final BatchType pBatchType, final Object pOldValue) {
+
+        Object value;
+        final VersionColumnType versionColumnType = pBean.getVersionColumnType();
+        if (versionColumnType.equals(VersionColumnType.NUMBER)) {
+            if (pBatchType.equals(BatchType.INSERT)) {
+                value = VERSION_COLUMN_LONG_DEFAULT;
+            } else { // BatchType.UPDATE
+                value = ((Long) pOldValue) + 1L;
+            }
+        } else {
+            final Calendar calendar = Calendar.getInstance();
+            if (versionColumnType.equals(VersionColumnType.TIMESTAMP)) {
+                value = new Timestamp(calendar.getTimeInMillis());
+            } else {
+                if (versionColumnType.equals(VersionColumnType.DATE)) {
+                    // The Oracle DATE type precision is limited to seconds only, so we have
+                    // to truncate the fractions here to get consistent settings
+                    calendar.set(Calendar.MILLISECOND, 0);
+                    value = new Timestamp(calendar.getTimeInMillis());
+                } else {
+                    throw new DataAccessException
+                            (DataAccessException.Type.UNSUPPORTED_VERSION_COLUMN_TYPE);
+                }
+            }
+        }
+        BeanMetaDataUtil.setVersionColumnValue(pBean, value);
+        return value;
     }
 
     private void issueUpdateCountException(final int pUpdateCount, final int pPassedRows) {

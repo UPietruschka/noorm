@@ -54,4 +54,10 @@ public interface IBean<T> {
 	 * @return the version column name.
 	 */
 	String getVersionColumnName();
+
+    /**
+     * The table column type used for modification checking for optimistic locking.
+     * @return the version column type.
+     */
+    VersionColumnType getVersionColumnType();
 }
