@@ -78,7 +78,6 @@ PACKAGE BODY noorm_dynamic_sql AS
     LOOP
       FETCH c_query_template INTO template_row;
       EXIT WHEN c_query_template%NOTFOUND;
-      param_name := template_row.parameter_name;
       IF (template_row.is_mandatory = 1) THEN
         final_query := final_query || template_row.sql_line;
       ELSE
