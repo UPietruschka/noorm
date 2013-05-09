@@ -39,6 +39,10 @@ public class QueryDescriptor {
         return queryDeclaration.isSingleRowQuery();
     }
 
+    public boolean isAcquireLock() {
+        return queryDeclaration.isAcquireLock();
+    }
+
     public List<ParameterDescriptor> getParameters() {
         return parameters;
     }

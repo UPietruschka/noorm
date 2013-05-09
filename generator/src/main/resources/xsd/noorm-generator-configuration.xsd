@@ -94,6 +94,7 @@
                 <xs:element name="methodName" type="xs:string" minOccurs="0"/>
                 <xs:element name="className" type="xs:string" minOccurs="0"/>
                 <xs:element name="singleRowQuery" type="xs:boolean" minOccurs="0"/>
+                <xs:element name="acquireLock" type="xs:boolean" minOccurs="0"/>
                 <xs:element name="queryColumns">
                     <xs:complexType>
                         <xs:sequence>

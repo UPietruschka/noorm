@@ -74,10 +74,12 @@ class StatementBuilder {
 
     private static final String SELECT_PREFIX = "SELECT * FROM ";
     private static final String SELECT_ASG = "?";
+    private static final String SELECT_LOCK = " FOR UPDATE";
 
     public String buildSQLStatement(final String pTableName,
                                     final Map<QueryColumn, Object> pInParameters,
-                                    final boolean useNamedParameters) {
+                                    final boolean pUseNamedParameters,
+                                    final boolean pAcquireLock) {
 
         final StringBuilder pSQLStatement = new StringBuilder();
         pSQLStatement.append(SELECT_PREFIX).append(pTableName);
@@ -89,7 +91,7 @@ class StatementBuilder {
                 pSQLStatement.append(queryColumn.getColumnName());
                 pSQLStatement.append(queryColumn.getOperator().getOperatorSyntax());
                 if (!queryColumn.getOperator().isUnary()) {
-                    if (useNamedParameters) {
+                    if (pUseNamedParameters) {
                         pSQLStatement.append(ASG).append(queryColumn.getColumnName());
                     } else {
                         pSQLStatement.append(SELECT_ASG);
@@ -97,6 +99,9 @@ class StatementBuilder {
                 }
                 delim = AND;
             }
+        }
+        if (pAcquireLock) {
+            pSQLStatement.append(SELECT_LOCK);
         }
         return pSQLStatement.toString();
     }

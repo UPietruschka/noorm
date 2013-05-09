@@ -37,6 +37,7 @@ public class QueryDeclaration {
     private String methodName;
     private String className;
     private boolean singleRowQuery = false;
+    private boolean acquireLock = false;
     private List<QueryColumn> queryColumns = new ArrayList<QueryColumn>();
 
     public String getTableName() {
@@ -77,6 +78,14 @@ public class QueryDeclaration {
 
     public void setSingleRowQuery(final boolean pSingleRowQuery) {
         singleRowQuery = pSingleRowQuery;
+    }
+
+    public boolean isAcquireLock() {
+        return acquireLock;
+    }
+
+    public void setAcquireLock(final boolean pAcquireLock) {
+        acquireLock = pAcquireLock;
     }
 
     public List<QueryColumn> getQueryColumns() {

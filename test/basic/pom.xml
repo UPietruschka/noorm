@@ -257,6 +257,7 @@
                         </queryDeclaration>
                         <queryDeclaration>
                             <tableName>countries</tableName>
+                            <acquireLock>true</acquireLock>
                             <queryColumns>
                                 <queryColumn implementation="org.noorm.jdbc.QueryColumn">
                                     <columnName>country_id</columnName>

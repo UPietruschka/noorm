@@ -65,7 +65,7 @@ public class ${class.JavaName} {
 #end
 #end
 		final JDBCStatementProcessor<$query.getBeanName()> stmtProcessor = JDBCStatementProcessor.getInstance();
-		final List<$query.getBeanName()> results = stmtProcessor.getBeanListFromSQL("$query.getTableName().toUpperCase()", parameters, ${query.getBeanName()}.class);
+		final List<$query.getBeanName()> results = stmtProcessor.getBeanListFromSQL("$query.getTableName().toUpperCase()", parameters, ${query.getBeanName()}.class, $query.isAcquireLock());
 #if($query.isSingleRowQuery())
 		if (results.isEmpty()) {
 			return null;

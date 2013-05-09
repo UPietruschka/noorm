@@ -290,7 +290,8 @@ public class JDBCStatementProcessor<T> {
      */
     public List<T> getBeanListFromSQL(final String pTableName,
                                       final Map<QueryColumn, Object> pInParameters,
-                                      final Class<T> pBeanClass) {
+                                      final Class<T> pBeanClass,
+                                      final boolean pAcquireLock) {
         try {
             if (pTableName == null || pTableName.isEmpty()) {
                 throw new IllegalArgumentException("Parameter [pTableName] must not be null.");
@@ -315,7 +316,8 @@ public class JDBCStatementProcessor<T> {
         OraclePreparedStatement pstmt = null;
         try {
             con = DataSourceProvider.getConnection();
-            final String sqlStmt = statementBuilder.buildSQLStatement(pTableName, pInParameters, USE_NAMED_PARAMETERS);
+            final String sqlStmt = statementBuilder.buildSQLStatement
+                    (pTableName, pInParameters, USE_NAMED_PARAMETERS, pAcquireLock);
             if (log.isDebugEnabled()) {
                 log.debug("Preparing and executing SQL statement: ".concat(sqlStmt)
                         .concat("; using connection : ".concat(con.toString())));
