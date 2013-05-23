@@ -652,7 +652,7 @@ public class JDBCStatementProcessor<T> {
                                      final int pRowsProcessed) {
 
         StringBuilder logMessage = new StringBuilder();
-        logMessage.append("SQL satement on table ").append(pTableName).append(" successfully terminated. ");
+        logMessage.append("SQL statement on table ").append(pTableName).append(" successfully terminated. ");
         if (pRowsProcessed >= 0) {
             logMessage.append(Integer.toString(pRowsProcessed)).append(" rows processed.");
         }

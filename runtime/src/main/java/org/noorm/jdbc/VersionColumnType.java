@@ -19,8 +19,4 @@ public enum VersionColumnType {
     public String getColumnType() {
         return columnType;
     }
-
-    public void setColumnType(String pColumnType) {
-        columnType = pColumnType;
-    }
 }

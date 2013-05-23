@@ -2,6 +2,7 @@ package org.noorm.test;
 
 import org.junit.Test;
 import org.noorm.jdbc.DataSourceProvider;
+import org.noorm.jdbc.TableLock;
 import org.noorm.test.hr.beans.CountriesBean;
 import org.noorm.test.hr.beans.DepartmentsBean;
 import org.noorm.test.hr.beans.EmployeesBean;
@@ -85,6 +86,7 @@ public class DeclaredQueriesTest {
         country.setCountryId(countryId);
         try {
             DataSourceProvider.begin();
+            TableLock.acquire(country, TableLock.LockMode.ROW_EXCLUSIVE);
             beanDML.insertCountries(country);
             final List<CountriesBean>countries = declaredQueries.findCountriesByCountryId(countryId);
             assertEquals(1, countries.size());

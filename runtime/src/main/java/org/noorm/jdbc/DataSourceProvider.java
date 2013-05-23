@@ -371,6 +371,18 @@ public class DataSourceProvider {
 		return con;
 	}
 
+    /**
+     * Verifies, whether an explicit (user managed) transaction is currently in progress, i.e., the application
+     * has explicitly issued a "begin", but has not yet terminated the transaction with "commit" or "rollback".
+     *
+     * @return true, when a transaction is in progress
+     */
+    public static boolean activeUserManagedTransaction() {
+
+        final OracleConnection con = getActiveConnectionData().getConnection();
+        return con != null;
+    }
+
 	/**
 	 * To control transactions in the calling application, the connection in use must not
 	 * turned back to the connection pool, but should be preserved in a ThreadLocal variable.
@@ -423,6 +435,7 @@ public class DataSourceProvider {
 					log.debug("Committing transaction");
 				}
 				con.commit();
+                getActiveConnectionData().reset();
 			} else {
 				if (log.isDebugEnabled()) {
 					log.debug("Delegating transaction termination to caller.");
@@ -477,6 +490,7 @@ public class DataSourceProvider {
 					log.debug("Rolling back transaction");
 				}
 				con.rollback();
+                getActiveConnectionData().reset();
 			} else {
 				if (log.isDebugEnabled()) {
 					log.debug("Delegating transaction termination to caller.");
@@ -597,7 +611,7 @@ public class DataSourceProvider {
 
         private ActiveDataSource activeDataSource;
         private OracleConnection connection;
-        private Long tsStack;
+        private Long tsStack = 0L;
 
         public ActiveDataSource getActiveDataSource() {
             return activeDataSource;
@@ -621,6 +635,11 @@ public class DataSourceProvider {
 
         public void setTsStack(final Long pTSStack) {
             tsStack = pTSStack;
+        }
+
+        public void reset() {
+            connection = null;
+            tsStack = 0L;
         }
     }
 }
