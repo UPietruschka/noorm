@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<generatorConfiguration xmlns="http://www.noorm.org/generator-configuration/1.0.0"
+                        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                        xsi:schemaLocation="http://www.noorm.org/generator-configuration/1.0.0 http://www.noorm.org/xsd/generator-configuration-1.0.0.xsd">
+
+    <beanPackageName>org.noorm.test.hr2.beans</beanPackageName>
+    <servicePackageName>org.noorm.test.hr2.services.impl</servicePackageName>
+    <serviceInterfacePackageName>org.noorm.test.hr2.services</serviceInterfacePackageName>
+    <beanTableFilterRegex>DEPARTMENTS|EMPLOYEES</beanTableFilterRegex>
+    <packageFilterRegex>--NO_MATCH_DESIRED--</packageFilterRegex>
+    <oracleTable2SequenceMapping>
+        <property>
+            <name>DEPARTMENTS</name>
+            <value>DEPARTMENTS_SEQ</value>
+        </property>
+    </oracleTable2SequenceMapping>
+    <generatePKBasedEqualsAndHashCode>false</generatePKBasedEqualsAndHashCode>
+    <dataSourceName>HR2</dataSourceName>
+    <queryDeclarations>
+        <queryDeclaration>
+            <tableName>v_employees</tableName>
+            <baseTable>employees</baseTable>
+            <methodName>findEmployees</methodName>
+            <className>EmployeeDAO</className>
+            <queryColumns>
+                <queryColumn>
+                    <columnName>salary</columnName>
+                    <operator>
+                        <operatorName>GREATER_THAN_OR_EQUAL_TO</operatorName>
+                    </operator>
+                </queryColumn>
+                <queryColumn>
+                    <columnName>commission_pct</columnName>
+                    <operator>
+                        <operatorName>LESS_THAN</operatorName>
+                    </operator>
+                </queryColumn>
+            </queryColumns>
+        </queryDeclaration>
+    </queryDeclarations>
+
+</generatorConfiguration>

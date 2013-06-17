@@ -1,8 +1,7 @@
 package org.noorm.generator.querygenerator;
 
 import org.noorm.generator.ParameterDescriptor;
-import org.noorm.generator.m2plugin.QueryDeclaration;
-import org.noorm.jdbc.QueryColumn;
+import org.noorm.generator.schema.QueryDeclaration;
 
 import java.util.ArrayList;
 import java.util.List;

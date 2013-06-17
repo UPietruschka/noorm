@@ -4,8 +4,10 @@ import org.noorm.generator.GeneratorException;
 import org.noorm.generator.GeneratorUtil;
 import org.noorm.generator.ParameterDescriptor;
 import org.noorm.generator.m2plugin.IParameters;
-import org.noorm.generator.m2plugin.QueryDeclaration;
-import org.noorm.jdbc.QueryColumn;
+import org.noorm.generator.schema.GeneratorConfiguration;
+import org.noorm.generator.schema.OperatorName;
+import org.noorm.generator.schema.QueryColumn;
+import org.noorm.generator.schema.QueryDeclaration;
 import org.noorm.jdbc.Utils;
 import org.noorm.metadata.MetadataService;
 import org.noorm.metadata.beans.TableMetadataBean;
@@ -32,17 +34,19 @@ public class QueryGenerator {
     private static final String QUERY_VM_TEMPLATE_FILE = "/declared_queries.vm";
 
     private IParameters parameters;
+    private GeneratorConfiguration configuration;
 
-    public QueryGenerator(final IParameters pParameters) {
+    public QueryGenerator(final IParameters pParameters, final GeneratorConfiguration pConfiguration) {
         parameters = pParameters;
+        configuration = pConfiguration;
     }
 
     public void execute() {
 
-        if (parameters.getServicePackageName() == null || parameters.getServicePackageName().isEmpty()) {
+        if (configuration.getServicePackageName() == null || configuration.getServicePackageName().isEmpty()) {
             throw new IllegalArgumentException("Parameter [servicePackageName] is null.");
         }
-        if (parameters.getBeanPackageName() == null || parameters.getBeanPackageName().isEmpty()) {
+        if (configuration.getBeanPackageName() == null || configuration.getBeanPackageName().isEmpty()) {
             throw new IllegalArgumentException("Parameter [beanPackageName] is null.");
         }
         if (parameters.getDestinationDirectory() == null || !parameters.getDestinationDirectory().exists()) {
@@ -51,12 +55,12 @@ public class QueryGenerator {
 
         log.info("Generating NoORM Query Declaration class.");
         final File servicePackageDir = GeneratorUtil.createPackageDir
-                (parameters.getDestinationDirectory(), parameters.getServicePackageName());
+                (parameters.getDestinationDirectory(), configuration.getServicePackageName());
         File serviceInterfacePackageDir = null;
-        if (parameters.getServiceInterfacePackageName() != null &&
-                !parameters.getServiceInterfacePackageName().isEmpty()) {
+        if (configuration.getServiceInterfacePackageName() != null &&
+                !configuration.getServiceInterfacePackageName().isEmpty()) {
             serviceInterfacePackageDir = GeneratorUtil.createPackageDir
-                    (parameters.getDestinationDirectory(), parameters.getServiceInterfacePackageName());
+                    (parameters.getDestinationDirectory(), configuration.getServiceInterfacePackageName());
         }
 
         final MetadataService metadataService = MetadataService.getInstance();
@@ -64,7 +68,7 @@ public class QueryGenerator {
         final Map<String, List<TableMetadataBean>> tableColumnMap = metadataService.findTableMetadata();
 
         final Map<String, QueryClassDescriptor> queryClasses = new HashMap<String, QueryClassDescriptor>();
-        for (final QueryDeclaration queryDeclaration : parameters.getQueryDeclarations()) {
+        for (final QueryDeclaration queryDeclaration : configuration.getQueryDeclarations()) {
             generateMethodName(queryDeclaration);
             final QueryDescriptor queryDescriptor = new QueryDescriptor();
             String t0 = queryDeclaration.getTableName();
@@ -76,17 +80,17 @@ public class QueryGenerator {
                 throw new GeneratorException("Illegal query declaration: no metadata found for table ".concat(t0));
             }
             queryDescriptor.setQueryDeclaration(queryDeclaration);
-            String beanName = Utils.convertTableName2BeanName(t0, parameters.getIgnoreTableNamePrefixes());
-            if (parameters.getExtendedBeans() != null) {
+            String beanName = GeneratorUtil.convertTableName2BeanName(t0, configuration.getIgnoreTableNamePrefixes());
+            if (configuration.getExtendedBeans() != null) {
                 final String extBeanName =
-                        Utils.getPropertyString(beanName, parameters.getExtendedBeans());
+                        GeneratorUtil.getPropertyString(beanName, configuration.getExtendedBeans());
                 if (!extBeanName.isEmpty()) {
                     beanName = extBeanName;
                 }
             }
             queryDescriptor.setBeanName(beanName);
             queryDescriptor.setBeanShortName(Utils.convertTableName2ShortName
-                    (t0, parameters.getIgnoreTableNamePrefixes()));
+                    (t0, configuration.getIgnoreTableNamePrefixes()));
             for (final QueryColumn queryColumn : queryDeclaration.getQueryColumns()) {
                 final ParameterDescriptor parameterDescriptor = new ParameterDescriptor();
                 final String columnName = queryColumn.getColumnName().toUpperCase();
@@ -95,7 +99,7 @@ public class QueryGenerator {
                 String javaType = null;
                 for (final TableMetadataBean tableMetadataBean : tableMetadataBeanList) {
                     if (tableMetadataBean.getColumnName().equals(columnName))
-                    javaType = Utils.convertOracleType2JavaType(tableMetadataBean.getDataType(),
+                    javaType = GeneratorUtil.convertOracleType2JavaType(tableMetadataBean.getDataType(),
                             tableMetadataBean.getDataPrecision(), tableMetadataBean.getDataScale());
                 }
                 if (javaType == null) {
@@ -104,6 +108,12 @@ public class QueryGenerator {
                 }
                 parameterDescriptor.setJavaType(javaType);
                 parameterDescriptor.setOperator(queryColumn.getOperator());
+                if (queryColumn.getOperator().getOperatorName().equals(OperatorName.IS_NULL)) {
+                    parameterDescriptor.setUnaryOperator(true);
+                }
+                if (queryColumn.getOperator().getOperatorName().equals(OperatorName.IS_NOT_NULL)) {
+                    parameterDescriptor.setUnaryOperator(true);
+                }
                 queryDescriptor.addParameter(parameterDescriptor);
             }
             String javaName = queryDeclaration.getClassName();
@@ -113,12 +123,12 @@ public class QueryGenerator {
             QueryClassDescriptor queryClassDescriptor = queryClasses.get(javaName);
             if (queryClassDescriptor == null) {
                 queryClassDescriptor = new QueryClassDescriptor();
-                if (parameters.getDataSourceName() != null && !parameters.getDataSourceName().isEmpty()) {
-                    queryClassDescriptor.setDataSourceName(parameters.getDataSourceName());
+                if (configuration.getDataSourceName() != null && !configuration.getDataSourceName().isEmpty()) {
+                    queryClassDescriptor.setDataSourceName(configuration.getDataSourceName());
                 }
-                queryClassDescriptor.setInterfacePackageName(parameters.getServiceInterfacePackageName());
-                queryClassDescriptor.setPackageName(parameters.getServicePackageName());
-                queryClassDescriptor.setBeanPackageName(parameters.getBeanPackageName());
+                queryClassDescriptor.setInterfacePackageName(configuration.getServiceInterfacePackageName());
+                queryClassDescriptor.setPackageName(configuration.getServicePackageName());
+                queryClassDescriptor.setBeanPackageName(configuration.getBeanPackageName());
                 queryClassDescriptor.setJavaName(javaName);
                 queryClasses.put(javaName, queryClassDescriptor);
             }
@@ -127,8 +137,8 @@ public class QueryGenerator {
         for (final QueryClassDescriptor queryClassDescriptor : queryClasses.values()) {
             GeneratorUtil.generateFile(servicePackageDir, QUERY_VM_TEMPLATE_FILE,
                     queryClassDescriptor.getJavaName(), queryClassDescriptor);
-            if (parameters.getServiceInterfacePackageName() != null &&
-                    !parameters.getServiceInterfacePackageName().isEmpty()) {
+            if (configuration.getServiceInterfacePackageName() != null &&
+                    !configuration.getServiceInterfacePackageName().isEmpty()) {
                 queryClassDescriptor.setInterface(true);
                 GeneratorUtil.generateFile(serviceInterfacePackageDir,
                         QUERY_VM_TEMPLATE_FILE, queryClassDescriptor.getJavaInterfaceName(), queryClassDescriptor);
@@ -145,7 +155,8 @@ public class QueryGenerator {
             if (pQueryDeclaration.getBaseTable() != null && !pQueryDeclaration.getBaseTable().isEmpty()) {
                 t0 = pQueryDeclaration.getBaseTable();
             }
-            final String javaTableName = Utils.convertTableName2JavaName(t0, parameters.getIgnoreTableNamePrefixes());
+            final String javaTableName =
+                    Utils.convertTableName2JavaName(t0, configuration.getIgnoreTableNamePrefixes());
             methodName.append(javaTableName);
             if (!pQueryDeclaration.getQueryColumns().isEmpty()) {
                 methodName.append(DEFAULT_METHOD_NAME_PART3);

@@ -32,6 +32,48 @@
                     </execution>
                 </executions>
             </plugin>
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>jaxb2-maven-plugin</artifactId>
+                <version>1.5</version>
+                <executions>
+                    <execution>
+                        <phase>generate-sources</phase>
+                        <goals>
+                            <goal>xjc</goal>
+                        </goals>
+                    </execution>
+                </executions>
+                <configuration>
+                    <schemaDirectory>./src/main/resources/xsd</schemaDirectory>
+                    <packageName>org.noorm.generator.schema</packageName>
+                    <target>2.2</target>
+                    <extension>true</extension>
+                    <npa>true</npa>
+                    <arguments>-no-header -Xxew -Xxew:instantiate lazy -Xxew:delete</arguments>
+                </configuration>
+                <dependencies>
+                    <!-- We integrate the jaxb-xew-plugin here to avoid ugly class generation for list based
+                     | ("maxOccurs") XML schema types. JAXB/XJC generates an unnecessary wrapper class for
+                     | list based schema specifications, the jaxb-xew-plugin resolves those.
+                    -->
+                    <dependency>
+                        <groupId>com.github.jaxb-xew-plugin</groupId>
+                        <artifactId>jaxb-xew-plugin</artifactId>
+                        <version>1.1</version>
+                    </dependency>
+                    <!--
+                     | We need to update the jaxb-xjc plugin version from 2.1.13 to the 2.2.4-1 version
+                     | used by the jaxb-xew-plugin (version 2.1.13 which does not have the required
+                     | method com.sun.codemodel.JAnnotatable.annotations()Ljava/util/Collection).
+                    -->
+                    <dependency>
+                        <groupId>com.sun.xml.bind</groupId>
+                        <artifactId>jaxb-xjc</artifactId>
+                        <version>2.2.4-1</version>
+                    </dependency>
+                </dependencies>
+            </plugin>
         </plugins>
     </build>
 

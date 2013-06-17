@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<generatorConfiguration xmlns="http://www.noorm.org/generator-configuration/1.0.0"
+                        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                        xsi:schemaLocation="http://www.noorm.org/generator-configuration/1.0.0 http://www.noorm.org/xsd/generator-configuration-1.0.0.xsd">
+
+    <beanPackageName>org.noorm.test.hr1.beans</beanPackageName>
+    <enumPackageName>org.noorm.test.hr1.enums</enumPackageName>
+    <servicePackageName>org.noorm.test.hr1.services.impl</servicePackageName>
+    <serviceInterfacePackageName>org.noorm.test.hr1.services</serviceInterfacePackageName>
+    <beanTableFilterRegex>(C.*|E.*|G.*|H.*|J.*|L.*|V.*|.*RECORD)</beanTableFilterRegex>
+    <enumTableFilterRegex>REGIONS</enumTableFilterRegex>
+    <oracleTable2SequenceMapping>
+        <property>
+            <name>(EMPLOYEES|LOCATIONS)</name>
+            <value>$1_SEQ</value>
+        </property>
+    </oracleTable2SequenceMapping>
+    <ignoreTableNamePrefixes>
+        <prefix>JOB_</prefix>
+    </ignoreTableNamePrefixes>
+    <enumTable2DisplayColumnMapping>
+        <property>
+            <name>REGIONS</name>
+            <value>REGION_NAME</value>
+        </property>
+    </enumTable2DisplayColumnMapping>
+    <singleRowFinderRegex>(find_unique.*)</singleRowFinderRegex>
+    <extendedBeans>
+        <property>
+            <name>JobsBean</name>
+            <value>org.noorm.test.JobsBeanExt</value>
+        </property>
+    </extendedBeans>
+    <dataSourceName>HR1</dataSourceName>
+
+</generatorConfiguration>

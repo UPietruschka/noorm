@@ -4,6 +4,7 @@ import org.noorm.generator.GeneratorException;
 import org.noorm.generator.GeneratorUtil;
 import org.noorm.generator.ValidatorClassDescriptor;
 import org.noorm.generator.m2plugin.IParameters;
+import org.noorm.generator.schema.GeneratorConfiguration;
 import org.noorm.metadata.BeanMetaDataUtil;
 import org.noorm.metadata.MetadataService;
 import org.noorm.metadata.beans.NameBean;
@@ -36,14 +37,16 @@ public class BeanGenerator {
 	private static final String IGNORE_BEAN_FILTER_REGEX = "(DYNSQL_QUERY_TEMPLATE)";
 
 	private IParameters parameters;
+    private GeneratorConfiguration configuration;
 
-	public BeanGenerator(final IParameters pParameters) {
+	public BeanGenerator(final IParameters pParameters, final GeneratorConfiguration pConfiguration) {
 		parameters = pParameters;
+        configuration = pConfiguration;
 	}
 
 	public void execute() throws GeneratorException {
 
-		if (parameters.getBeanPackageName() == null || parameters.getBeanPackageName().isEmpty()) {
+		if (configuration.getBeanPackageName() == null || configuration.getBeanPackageName().isEmpty()) {
 			throw new IllegalArgumentException("Parameter [beanPackageName] is null.");
 		}
 		if (parameters.getDestinationDirectory() == null || !parameters.getDestinationDirectory().exists()) {
@@ -51,16 +54,16 @@ public class BeanGenerator {
 		}
 
 		final ValidatorClassDescriptor validatorClassDescriptor = new ValidatorClassDescriptor();
-		validatorClassDescriptor.setPackageName(parameters.getBeanPackageName());
+		validatorClassDescriptor.setPackageName(configuration.getBeanPackageName());
 
 		final BeanDMLClassDescriptor beanDMLClassDescriptor = new BeanDMLClassDescriptor();
-		beanDMLClassDescriptor.setBeanPackageName(parameters.getBeanPackageName());
-		beanDMLClassDescriptor.setInterfacePackageName(parameters.getServiceInterfacePackageName());
-		beanDMLClassDescriptor.setPackageName(parameters.getServicePackageName());
+		beanDMLClassDescriptor.setBeanPackageName(configuration.getBeanPackageName());
+		beanDMLClassDescriptor.setInterfacePackageName(configuration.getServiceInterfacePackageName());
+		beanDMLClassDescriptor.setPackageName(configuration.getServicePackageName());
 
-        if (parameters.getDataSourceName() != null && !parameters.getDataSourceName().isEmpty()) {
-            validatorClassDescriptor.setDataSourceName(parameters.getDataSourceName());
-            beanDMLClassDescriptor.setDataSourceName(parameters.getDataSourceName());
+        if (configuration.getDataSourceName() != null && !configuration.getDataSourceName().isEmpty()) {
+            validatorClassDescriptor.setDataSourceName(configuration.getDataSourceName());
+            beanDMLClassDescriptor.setDataSourceName(configuration.getDataSourceName());
         }
 
         final MetadataService metadataService = MetadataService.getInstance();
@@ -79,22 +82,22 @@ public class BeanGenerator {
 
 		log.info("Generating NoORM Bean classes.");
 		final File beanPackageDir = GeneratorUtil.createPackageDir
-				(parameters.getDestinationDirectory(), parameters.getBeanPackageName());
+				(parameters.getDestinationDirectory(), configuration.getBeanPackageName());
 		final File servicePackageDir = GeneratorUtil.createPackageDir
-				(parameters.getDestinationDirectory(), parameters.getServicePackageName());
+				(parameters.getDestinationDirectory(), configuration.getServicePackageName());
 		File serviceInterfacePackageDir = null;
-		if (parameters.getServiceInterfacePackageName() != null &&
-				!parameters.getServiceInterfacePackageName().isEmpty()) {
+		if (configuration.getServiceInterfacePackageName() != null &&
+				!configuration.getServiceInterfacePackageName().isEmpty()) {
 			serviceInterfacePackageDir = GeneratorUtil.createPackageDir
-					(parameters.getDestinationDirectory(), parameters.getServiceInterfacePackageName());
+					(parameters.getDestinationDirectory(), configuration.getServiceInterfacePackageName());
 		}
 
 		for (final String tableName0 : tableColumnMap.keySet()) {
-			if (parameters.getBeanTableFilterRegex() != null &&
-					!tableName0.matches(parameters.getBeanTableFilterRegex())) {
+			if (configuration.getBeanTableFilterRegex() != null &&
+					!tableName0.matches(configuration.getBeanTableFilterRegex())) {
 				log.info("Exclude table ".concat(tableName0)
 						.concat(", table name does not match regex '")
-						.concat(parameters.getBeanTableFilterRegex())
+						.concat(configuration.getBeanTableFilterRegex())
 						.concat("'"));
 				continue;
 			}
@@ -103,15 +106,16 @@ public class BeanGenerator {
 				continue;
 			}
 			final String javaBeanName =
-					Utils.convertTableName2BeanName(tableName0, parameters.getIgnoreTableNamePrefixes());
+                    GeneratorUtil.convertTableName2BeanName(tableName0, configuration.getIgnoreTableNamePrefixes());
 			final String shortName =
-					Utils.convertTableName2ShortName(tableName0, parameters.getIgnoreTableNamePrefixes());
+					Utils.convertTableName2ShortName(tableName0, configuration.getIgnoreTableNamePrefixes());
 			final List<TableMetadataBean> tableMetadataBeanList1 = tableColumnMap.get(tableName0);
 			final BeanClassDescriptor beanClassDescriptor = new BeanClassDescriptor();
 			beanClassDescriptor.setName(javaBeanName);
 			beanClassDescriptor.setShortName(shortName);
-			if (parameters.getExtendedBeans() != null) {
-				final String extJavaBeanName = Utils.getPropertyString(javaBeanName, parameters.getExtendedBeans());
+			if (configuration.getExtendedBeans() != null) {
+				final String extJavaBeanName =
+                        GeneratorUtil.getPropertyString(javaBeanName, configuration.getExtendedBeans());
 				if (!extJavaBeanName.isEmpty()) {
 					beanClassDescriptor.setExtendedName(extJavaBeanName);
 				}
@@ -126,16 +130,16 @@ public class BeanGenerator {
 			beanClassDescriptor.setPrimaryKeyColumnNames(primaryKeyColumnNames);
             final String[] primaryKeyJavaNames = new String[primaryKeyColumnNames.length];
             for (int i = 0; i < primaryKeyColumnNames.length; i++) {
-                primaryKeyJavaNames[i] = Utils.convertDBName2JavaName(primaryKeyColumnNames[i],
-                        true, parameters.getIgnoreColumnNamePrefixes());
+                primaryKeyJavaNames[i] = GeneratorUtil.convertDBName2JavaName(primaryKeyColumnNames[i],
+                        true, configuration.getIgnoreColumnNamePrefixes());
             }
             beanClassDescriptor.setPrimaryKeyJavaNames(primaryKeyJavaNames);
-            beanClassDescriptor.setGeneratePKBasedEqualsAndHashCode(parameters.generatePKBasedEqualsAndHashCode());
+            beanClassDescriptor.setGeneratePKBasedEqualsAndHashCode(configuration.isGeneratePKBasedEqualsAndHashCode());
 			final String sequenceName = getSequenceName(tableName0, sequenceDBNameList);
 			beanClassDescriptor.setSequenceName(sequenceName);
 			final String versionColumnName = getVersionColumnName(tableName0, tableMetadataBeanList1);
 			beanClassDescriptor.setVersionColumnName(versionColumnName);
-			beanClassDescriptor.setPackageName(parameters.getBeanPackageName());
+			beanClassDescriptor.setPackageName(configuration.getBeanPackageName());
 			// Use a unique seed for serialVersionUID generation to guarantee the generation of a reproducible
 			// serialVersionUID with every new source code generation cycle.
 			final Random random = new Random(javaBeanName.hashCode());
@@ -147,10 +151,10 @@ public class BeanGenerator {
 				final BeanAttributeDescriptor beanAttributeDescriptor = new BeanAttributeDescriptor();
 				final String javaName = Utils.convertDBName2JavaName(tableMetadataBean.getColumnName(), false);
 				beanAttributeDescriptor.setName(javaName);
-                final String methodNamePostfix = Utils.convertDBName2JavaName
-                        (tableMetadataBean.getColumnName(), true, parameters.getIgnoreColumnNamePrefixes());
+                final String methodNamePostfix = GeneratorUtil.convertDBName2JavaName
+                        (tableMetadataBean.getColumnName(), true, configuration.getIgnoreColumnNamePrefixes());
                 beanAttributeDescriptor.setMethodNamePostfix(methodNamePostfix);
-				final String javaType = Utils.convertOracleType2JavaType(tableMetadataBean.getDataType(),
+				final String javaType = GeneratorUtil.convertOracleType2JavaType(tableMetadataBean.getDataType(),
 						tableMetadataBean.getDataPrecision(), tableMetadataBean.getDataScale());
 				if (tableMetadataBean.getUpdatable().equals(BeanMetaDataUtil.NOT_UPDATABLE) ||
 						tableMetadataBean.getInsertable().equals(BeanMetaDataUtil.NOT_UPDATABLE)) {
@@ -176,8 +180,8 @@ public class BeanGenerator {
                 if (versionColumnType.length() > 9) { versionColumnType = versionColumnType.substring(0, 9); }
                 beanClassDescriptor.setVersionColumnType(versionColumnType);
             }
-            if (parameters.getOptLockFullRowCompareTableRegex() != null &&
-                    tableName0.matches(parameters.getOptLockFullRowCompareTableRegex())) {
+            if (configuration.getOptLockFullRowCompareTableRegex() != null &&
+                    tableName0.matches(configuration.getOptLockFullRowCompareTableRegex())) {
                 if (unsupportedOptLockFullRowCompareTypes) {
                     throw new GeneratorException("Optimistic locking using pre-change image comparison is not "
                             .concat("supported for tables with complex data-types (CLOB, BLOB, XMLTYPE) [")
@@ -193,8 +197,8 @@ public class BeanGenerator {
 				BEAN_VALIDATOR_CLASS_NAME, validatorClassDescriptor);
 		GeneratorUtil.generateFile(servicePackageDir, BEAN_DML_VM_TEMPLATE_FILE,
                 beanDMLClassDescriptor.getJavaName(), beanDMLClassDescriptor);
-		if (parameters.getServiceInterfacePackageName() != null &&
-				!parameters.getServiceInterfacePackageName().isEmpty()) {
+		if (configuration.getServiceInterfacePackageName() != null &&
+				!configuration.getServiceInterfacePackageName().isEmpty()) {
 			beanDMLClassDescriptor.setInterface(true);
 			GeneratorUtil.generateFile(serviceInterfacePackageDir, BEAN_DML_VM_TEMPLATE_FILE,
 					beanDMLClassDescriptor.getJavaInterfaceName(), beanDMLClassDescriptor);
@@ -204,7 +208,8 @@ public class BeanGenerator {
 	private String getSequenceName(final String pTableName,
 								   final List<NameBean> pSequenceDBNameList) {
 
-		final String sequenceName = Utils.getPropertyString(pTableName, parameters.getOracleTable2SequenceMapping());
+		final String sequenceName =
+                GeneratorUtil.getPropertyString(pTableName, configuration.getOracleTable2SequenceMapping());
 		if (sequenceName.isEmpty()) {
 			log.info("No matching sequence-name has been found for table-name ".concat(pTableName));
 			return sequenceName;
@@ -232,9 +237,9 @@ public class BeanGenerator {
 			}
 		}
 		if (pkColumnNames.isEmpty()) {
-			if (parameters.getViewName2PrimaryKeyMapping() != null) {
+			if (configuration.getViewName2PrimaryKeyMapping() != null) {
 				final String viewPKName =
-						Utils.getPropertyString(pTableName, parameters.getViewName2PrimaryKeyMapping());
+                        GeneratorUtil.getPropertyString(pTableName, configuration.getViewName2PrimaryKeyMapping());
 				if (!viewPKName.isEmpty()) {
 					pkColumnNames.add(viewPKName);
 				}
@@ -252,8 +257,9 @@ public class BeanGenerator {
 										final List<TableMetadataBean> pTableMetadataBeanList) {
 
 		String versionColumnName = "";
-		if (parameters.getOptLockVersionColumnMapping() != null) {
-			versionColumnName = Utils.getPropertyString(pTableName, parameters.getOptLockVersionColumnMapping());
+		if (configuration.getOptLockVersionColumnMapping() != null) {
+			versionColumnName =
+                    GeneratorUtil.getPropertyString(pTableName, configuration.getOptLockVersionColumnMapping());
 		}
 		if (versionColumnName.isEmpty()) {
 			log.info("No matching version-column-name has been found for table-name ".concat(pTableName));

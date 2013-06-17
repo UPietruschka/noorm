@@ -38,7 +38,7 @@ DROP TABLE opt_variants;
 CREATE TABLE opt_variants
 (
  opt_var_id NUMBER NOT NULL,
- opt_variant_name CHAR(32) NOT NULL
+ opt_variant_name CHAR(64) NOT NULL
 );
 ALTER TABLE opt_variants ADD CONSTRAINT opt_variants_pk PRIMARY KEY (opt_var_id);
 

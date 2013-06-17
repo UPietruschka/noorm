@@ -4,6 +4,7 @@ import org.noorm.generator.GeneratorException;
 import org.noorm.generator.GeneratorUtil;
 import org.noorm.generator.ValidatorClassDescriptor;
 import org.noorm.generator.m2plugin.IParameters;
+import org.noorm.generator.schema.GeneratorConfiguration;
 import org.noorm.metadata.MetadataService;
 import org.noorm.jdbc.Utils;
 import org.noorm.metadata.beans.TableMetadataBean;
@@ -30,14 +31,16 @@ public class EnumGenerator {
 	private static final String ENUM_VALIDATOR_CLASS_NAME = "GenericEnumValidator";
 
 	private IParameters parameters;
+    private GeneratorConfiguration configuration;
 
-	public EnumGenerator(final IParameters pParameters) {
-		parameters = pParameters;
-	}
+    public EnumGenerator(final IParameters pParameters, final GeneratorConfiguration pConfiguration) {
+        parameters = pParameters;
+        configuration = pConfiguration;
+    }
 
 	public void execute() throws GeneratorException {
 
-		if (parameters.getEnumPackageName() == null || parameters.getEnumPackageName().isEmpty()) {
+		if (configuration.getEnumPackageName() == null || configuration.getEnumPackageName().isEmpty()) {
 			throw new IllegalArgumentException("Parameter [enumPackageName] is null.");
 		}
 		if (parameters.getDestinationDirectory() == null || !parameters.getDestinationDirectory().exists()) {
@@ -45,9 +48,9 @@ public class EnumGenerator {
 		}
 
 		ValidatorClassDescriptor validatorClassDescriptor = new ValidatorClassDescriptor();
-		validatorClassDescriptor.setPackageName(parameters.getEnumPackageName());
-        if (parameters.getDataSourceName() != null && !parameters.getDataSourceName().isEmpty()) {
-            validatorClassDescriptor.setDataSourceName(parameters.getDataSourceName());
+		validatorClassDescriptor.setPackageName(configuration.getEnumPackageName());
+        if (configuration.getDataSourceName() != null && !configuration.getDataSourceName().isEmpty()) {
+            validatorClassDescriptor.setDataSourceName(configuration.getDataSourceName());
         }
 
         log.info("Retrieving table metadata from Oracle database.");
@@ -55,29 +58,30 @@ public class EnumGenerator {
 		final Map<String, List<TableMetadataBean>> tableColumnMap = metadataService.findTableMetadata();
 
 		log.info("Generating NoORM Enum classes.");
-		final File enumPackageDir =
-				GeneratorUtil.createPackageDir(parameters.getDestinationDirectory(), parameters.getEnumPackageName());
+		final File enumPackageDir =	GeneratorUtil.createPackageDir
+                (parameters.getDestinationDirectory(), configuration.getEnumPackageName());
 
 		for (final String tableName0 : tableColumnMap.keySet()) {
-			if (parameters.getEnumTableFilterRegex() != null &&
-					!tableName0.matches(parameters.getEnumTableFilterRegex())) {
+			if (configuration.getEnumTableFilterRegex() != null &&
+					!tableName0.matches(configuration.getEnumTableFilterRegex())) {
 				log.info("Exclude table ".concat(tableName0)
 						.concat(", table name does not match regex '")
-						.concat(parameters.getEnumTableFilterRegex())
+						.concat(configuration.getEnumTableFilterRegex())
 						.concat("'"));
 				continue;
 			}
 			final String javaEnumName =
-					Utils.convertTableName2JavaName(tableName0, parameters.getIgnoreTableNamePrefixes());
+					Utils.convertTableName2JavaName(tableName0, configuration.getIgnoreTableNamePrefixes());
 			final List<TableMetadataBean> tableMetadataBeanList1 = tableColumnMap.get(tableName0);
 			final EnumClassDescriptor enumClassDescriptor = new EnumClassDescriptor();
 			enumClassDescriptor.setName(javaEnumName);
 			validatorClassDescriptor.getClassNames().add(javaEnumName);
 			enumClassDescriptor.setTableName(tableName0);
-			enumClassDescriptor.setPackageName(parameters.getEnumPackageName());
+			enumClassDescriptor.setPackageName(configuration.getEnumPackageName());
 			String displayColumnName;
-			if (parameters.getEnumTable2DisplayColumnMapping() != null) {
-				displayColumnName = Utils.getPropertyString(tableName0, parameters.getEnumTable2DisplayColumnMapping());
+			if (configuration.getEnumTable2DisplayColumnMapping() != null) {
+				displayColumnName =
+                        GeneratorUtil.getPropertyString(tableName0, configuration.getEnumTable2DisplayColumnMapping());
 			} else {
 				throw new GeneratorException
 						("Parameter [enumTable2DisplayColumnMapping] must be set to enable enum generation.");
@@ -91,10 +95,10 @@ public class EnumGenerator {
 				final EnumAttributeDescriptor enumAttributeDescriptor = new EnumAttributeDescriptor();
                 final String javaName = Utils.convertDBName2JavaName(tableMetadataBean.getColumnName(), false);
                 enumAttributeDescriptor.setName(javaName);
-                final String methodNamePostfix = Utils.convertDBName2JavaName
-                        (tableMetadataBean.getColumnName(), true, parameters.getIgnoreColumnNamePrefixes());
+                final String methodNamePostfix = GeneratorUtil.convertDBName2JavaName
+                        (tableMetadataBean.getColumnName(), true, configuration.getIgnoreColumnNamePrefixes());
                 enumAttributeDescriptor.setMethodNamePostfix(methodNamePostfix);
-				final String javaType = Utils.convertOracleType2JavaType(tableMetadataBean.getDataType(),
+				final String javaType = GeneratorUtil.convertOracleType2JavaType(tableMetadataBean.getDataType(),
 						tableMetadataBean.getDataPrecision(), tableMetadataBean.getDataScale());
 				enumAttributeDescriptor.setType(javaType);
 				enumAttributeDescriptor.setColumnName(tableMetadataBean.getColumnName());

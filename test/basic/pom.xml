@@ -19,7 +19,7 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-dependency-plugin</artifactId>
-                <version>2.4</version>
+                <version>2.8</version>
                 <executions>
                     <execution>
                         <id>unpack</id>
@@ -143,158 +143,6 @@
                     <url>${jdbc.url}</url>
                     <username>${jdbc.username}</username>
                     <password>${jdbc.password}</password>
-                    <beanPackageName>org.noorm.test.hr.beans</beanPackageName>
-                    <packageFilterRegex>(.*SERVICE|.*SEARCH)</packageFilterRegex>
-                    <servicePackageName>org.noorm.test.hr.services</servicePackageName>
-                    <enumPackageName>org.noorm.test.hr.enums</enumPackageName>
-                    <enumTableFilterRegex>REGIONS|OPT_VARIANTS</enumTableFilterRegex>
-                    <ignoreColumnNamePrefixes>
-                        <prefix>OPT_</prefix>
-                    </ignoreColumnNamePrefixes>
-                    <enumTable2DisplayColumnMapping>
-                        <property>
-                            <name>REGIONS</name>
-                            <value>REGION_NAME</value>
-                        </property>
-                        <property>
-                            <name>OPT_VARIANTS</name>
-                            <value>OPT_VARIANT_NAME</value>
-                        </property>
-                    </enumTable2DisplayColumnMapping>
-                    <oracleTable2SequenceMapping>
-                        <property>
-                            <name>(EMPLOYEES|DEPARTMENTS|LOCATIONS|OPT_LOCK_.*|COMPLEX.*)</name>
-                            <value>$1_SEQ</value>
-                        </property>
-                        <property>
-                            <name>(V_DEPARTMENTS)</name>
-                            <value>DEPARTMENTS_SEQ</value>
-                        </property>
-                    </oracleTable2SequenceMapping>
-                    <viewName2PrimaryKeyMapping>
-                        <property>
-                            <name>V_DEPARTMENTS</name>
-                            <value>DEPARTMENT_ID</value>
-                        </property>
-                    </viewName2PrimaryKeyMapping>
-                    <optLockVersionColumnMapping>
-                        <property>
-                            <name>OPT_LOCK_.*</name>
-                            <value>OPT_VERSION</value>
-                        </property>
-                        <property>
-                            <name>COMPLEX_.*</name>
-                            <value>VERSION</value>
-                        </property>
-                    </optLockVersionColumnMapping>
-                    <optLockFullRowCompareTableRegex>V_DEPARTMENTS|JOBS|JOB_HISTORY</optLockFullRowCompareTableRegex>
-                    <singleRowFinderRegex>(.*_unique.*)</singleRowFinderRegex>
-                    <queryDeclarations>
-                        <queryDeclaration>
-                            <tableName>employees</tableName>
-                            <queryColumns>
-                                <queryColumn implementation="org.noorm.jdbc.QueryColumn">
-                                    <columnName>commission_pct</columnName>
-                                    <operator>
-                                        <operatorName>EQUAL_TO</operatorName>
-                                    </operator>
-                                </queryColumn>
-                            </queryColumns>
-                        </queryDeclaration>
-                        <queryDeclaration>
-                            <tableName>employees</tableName>
-                            <methodName>findEmployeesWithCommission</methodName>
-                            <queryColumns>
-                                <queryColumn implementation="org.noorm.jdbc.QueryColumn">
-                                    <columnName>commission_pct</columnName>
-                                    <operator>
-                                        <operatorName>IS_NOT_NULL</operatorName>
-                                    </operator>
-                                </queryColumn>
-                            </queryColumns>
-                        </queryDeclaration>
-                        <queryDeclaration>
-                            <tableName>employees</tableName>
-                            <methodName>findEmployeesWithoutCommission</methodName>
-                            <queryColumns>
-                                <queryColumn implementation="org.noorm.jdbc.QueryColumn">
-                                    <columnName>commission_pct</columnName>
-                                    <operator>
-                                        <operatorName>IS_NULL</operatorName>
-                                    </operator>
-                                </queryColumn>
-                            </queryColumns>
-                        </queryDeclaration>
-                        <queryDeclaration>
-                            <tableName>departments</tableName>
-                            <singleRowQuery>true</singleRowQuery>
-                            <queryColumns>
-                                <queryColumn implementation="org.noorm.jdbc.QueryColumn">
-                                    <columnName>department_id</columnName>
-                                    <operator>
-                                        <operatorName>EQUAL_TO</operatorName>
-                                    </operator>
-                                </queryColumn>
-                            </queryColumns>
-                        </queryDeclaration>
-                        <queryDeclaration>
-                            <tableName>jobs_synonym</tableName>
-                            <methodName>findJobsSynonymsBySalary</methodName>
-                            <queryColumns>
-                                <queryColumn implementation="org.noorm.jdbc.QueryColumn">
-                                    <columnName>min_salary</columnName>
-                                    <operator>
-                                        <operatorName>GREATER_THAN_OR_EQUAL_TO</operatorName>
-                                    </operator>
-                                </queryColumn>
-                                <queryColumn implementation="org.noorm.jdbc.QueryColumn">
-                                    <columnName>max_salary</columnName>
-                                    <operator>
-                                        <operatorName>LESS_THAN_OR_EQUAL_TO</operatorName>
-                                    </operator>
-                                </queryColumn>
-                            </queryColumns>
-                        </queryDeclaration>
-                        <queryDeclaration>
-                            <tableName>countries</tableName>
-                            <acquireLock>true</acquireLock>
-                            <queryColumns>
-                                <queryColumn implementation="org.noorm.jdbc.QueryColumn">
-                                    <columnName>country_id</columnName>
-                                    <operator>
-                                        <operatorName>EQUAL_TO</operatorName>
-                                    </operator>
-                                </queryColumn>
-                            </queryColumns>
-                        </queryDeclaration>
-                        <queryDeclaration>
-                            <tableName>v_employees</tableName>
-                            <baseTable>employees</baseTable>
-                            <methodName>findEmployeesByDepartmentCity</methodName>
-                            <className>EmployeeFinder</className>
-                            <queryColumns>
-                                <queryColumn implementation="org.noorm.jdbc.QueryColumn">
-                                    <columnName>department_name</columnName>
-                                </queryColumn>
-                                <queryColumn implementation="org.noorm.jdbc.QueryColumn">
-                                    <columnName>city</columnName>
-                                </queryColumn>
-                            </queryColumns>
-                        </queryDeclaration>
-                        <queryDeclaration>
-                            <tableName>v_employees</tableName>
-                            <baseTable>employees</baseTable>
-                            <className>EmployeeFinder</className>
-                            <queryColumns>
-                                <queryColumn implementation="org.noorm.jdbc.QueryColumn">
-                                    <columnName>department_name</columnName>
-                                    <operator>
-                                        <operatorName>LIKE</operatorName>
-                                    </operator>
-                                </queryColumn>
-                            </queryColumns>
-                        </queryDeclaration>
-                    </queryDeclarations>
                 </configuration>
             </plugin>
         </plugins>
@@ -313,7 +161,7 @@
         <dependency>
             <groupId>org.eclipse.persistence</groupId>
             <artifactId>org.eclipse.persistence.jpa</artifactId>
-            <version>2.3.2</version>
+            <version>2.5.0</version>
         </dependency>
         <dependency>
             <groupId>${oracle.groupId}</groupId>
@@ -323,12 +171,12 @@
         <dependency>
             <groupId>ch.qos.logback</groupId>
             <artifactId>logback-classic</artifactId>
-            <version>1.0.11</version>
+            <version>1.0.13</version>
         </dependency>
         <dependency>
             <groupId>org.eclipse.persistence</groupId>
             <artifactId>javax.persistence</artifactId>
-            <version>2.0.3</version>
+            <version>2.1.0</version>
         </dependency>
     </dependencies>
 

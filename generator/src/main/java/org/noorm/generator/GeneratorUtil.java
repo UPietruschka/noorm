@@ -3,12 +3,16 @@ package org.noorm.generator;
 import org.apache.velocity.Template;
 import org.apache.velocity.VelocityContext;
 import org.apache.velocity.app.Velocity;
+import org.noorm.generator.schema.Property;
 import org.noorm.jdbc.Utils;
 
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  * @author Ulf Pietruschka / ulf.pietruschka@etenso.com
@@ -16,6 +20,8 @@ import java.io.IOException;
  *         Time: 12:18
  */
 public class GeneratorUtil {
+
+    private static final String BEAN_NAME_APPENDIX = "Bean";
 
 	public static void generateFile(final File pDir,
 									final String pVelocityTemplateFile,
@@ -57,4 +63,108 @@ public class GeneratorUtil {
 		}
 		return packageDir;
 	}
+
+    public static String convertDBName2JavaName(final String pDBName,
+                                                final boolean pCapitalizeFirst,
+                                                final List<String> pIgnoreColumnNamePrefixes) {
+        String nameBaseColumnName = pDBName;
+        if (pIgnoreColumnNamePrefixes != null) {
+            for (final String ignoredPrefix : pIgnoreColumnNamePrefixes) {
+                if (pDBName.startsWith(ignoredPrefix)) {
+                    nameBaseColumnName = pDBName.substring(ignoredPrefix.length());
+                }
+            }
+        }
+        return Utils.convertDBName2JavaName(nameBaseColumnName, pCapitalizeFirst);
+    }
+
+    /**
+     * Converts an Oracle table name to a Java Bean name.
+     * @see Utils (convertTableName2JavaName(String, java.util.List))
+     * @param pTableName the database table name
+     * @param pIgnoreTableNamePrefixes optional list of table name prefixes to be ignored at conversion
+     * @return the Java Bean name
+     */
+    public static String convertTableName2BeanName(final String pTableName,
+                                                   final List<String> pIgnoreTableNamePrefixes) {
+
+        return Utils.convertTableName2JavaName(pTableName, pIgnoreTableNamePrefixes).concat(BEAN_NAME_APPENDIX);
+    }
+
+    /**
+     * Maps the given Oracle type to the corresponding Java type, which represents the Oracle type in
+     * the generated Java Bean class (e.g. "VARCHAR2" -> "String").
+     *
+     * @param pOracleType the Oracle type name
+     * @param pDataPrecision the data precision of the Oracle type, if available
+     * @param pDataScale the data scale of the Oracle type, if available
+     * @return the Java type name
+     */
+    public static String convertOracleType2JavaType(final String pOracleType,
+                                                    final Long pDataPrecision,
+                                                    final Long pDataScale) {
+
+        String javaType = "String";
+        if (pOracleType.equals("RAW")) {
+            javaType = "byte[]";
+        }
+        if (pOracleType.equals("BLOB")) {
+            javaType = "byte[]";
+        }
+        if (pOracleType.equals("NUMBER")) {
+            if (pDataPrecision != null && pDataPrecision > 0L && pDataScale != 0 && pDataScale > 0L) {
+                javaType = "Double";
+            } else {
+                javaType = "Long";
+            }
+        }
+        if (pOracleType.equals("BINARY_FLOAT")) {
+            javaType = "Float";
+        }
+        if (pOracleType.equals("BINARY_DOUBLE")) {
+            javaType = "Double";
+        }
+        if (pOracleType.equals("FLOAT")) {
+            javaType = "Double";
+        }
+        if (pOracleType.equals("DATE")) {
+            javaType = "java.util.Date";
+        }
+        if (pOracleType.startsWith("TIMESTAMP")) {
+            javaType = "java.util.Date";
+        }
+        return javaType;
+    }
+
+    /**
+     * Replaces strings or parts of strings with a replacement expression.
+     * This method iterates through the given properties, which should contain pairs of search pattern and
+     * replacement patterns for string replacement in the input string. For the first search pattern, which
+     * matches the input string, the replacement pattern is applied. The simplest form of string replacement
+     * is a direct replacement of the search pattern with the replacement pattern without any usage of
+     * regular expressions (e.g. "CUSTOMER" -> "CUSTOMER_SEQ"). Regular expressions allow for a compact
+     * representation of more generic replacements (e.g. search/replace expressions "(.*)" / "$1_SEQ" also
+     * results in the replacement string "CUSTOMER_SEQ" for input string "CUSTOMER").
+     *
+     * @param pInput the input string subject to regular expression replacement
+     * @param pProperties a collection of key/value pairs for search/replace expressions
+     * @return the modified input string
+     */
+    public static String getPropertyString(final String pInput, final List<Property> pProperties) {
+
+        String propertyString = "";
+        if (pProperties != null) {
+            for (final Property property : pProperties) {
+                final String searchPattern = property.getName();
+                final Pattern finder = Pattern.compile(searchPattern);
+                final Matcher matcher = finder.matcher(pInput);
+                if (matcher.matches()) {
+                    final String replacePattern = property.getValue();
+                    propertyString = matcher.replaceFirst(replacePattern);
+                    break;
+                }
+            }
+        }
+        return propertyString;
+    }
 }

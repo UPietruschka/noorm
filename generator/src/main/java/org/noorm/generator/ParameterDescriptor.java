@@ -1,6 +1,6 @@
 package org.noorm.generator;
 
-import org.noorm.jdbc.Operator;
+import org.noorm.generator.schema.Operator;
 
 /**
  * @author Ulf Pietruschka / ulf.pietruschka@etenso.com
@@ -12,14 +12,15 @@ public class ParameterDescriptor {
 	private String javaName;
 	private String oracleName;
 	private String javaType;
-    // The operator is only used for declared queries
+    // The operator and the unaryOperator-indicator are only used for declared queries
     private Operator operator;
+    private boolean unaryOperator = false;
 
 	public void setJavaName(final String pJavaName) {
 		javaName = pJavaName;
 	}
 
-	public String getJavaName() {
+    public String getJavaName() {
 		return javaName;
 	}
 
@@ -49,5 +50,13 @@ public class ParameterDescriptor {
 
     public void setOperator(final Operator pOperator) {
         operator = pOperator;
+    }
+
+    public boolean isUnaryOperator() {
+        return unaryOperator;
+    }
+
+    public void setUnaryOperator(final boolean pUnary) {
+        unaryOperator = pUnary;
     }
 }

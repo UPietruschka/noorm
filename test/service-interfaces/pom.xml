@@ -28,7 +28,7 @@
                     <dependency>
                         <groupId>ch.qos.logback</groupId>
                         <artifactId>logback-classic</artifactId>
-                        <version>1.0.11</version>
+                        <version>1.0.13</version>
                     </dependency>
                 </dependencies>
                 <executions>
@@ -39,38 +39,10 @@
                             <goal>generate-noorm</goal>
                         </goals>
                         <configuration>
-                            <dataSourceName>HR1</dataSourceName>
                             <url>${jdbc.url}</url>
                             <username>${jdbc.username}</username>
                             <password>${jdbc.password}</password>
-                            <beanPackageName>org.noorm.test.hr1.beans</beanPackageName>
-                            <beanTableFilterRegex>(C.*|E.*|G.*|H.*|J.*|L.*|V.*|.*RECORD)</beanTableFilterRegex>
-                            <ignoreTableNamePrefixes>
-                                <prefix>JOB_</prefix>
-                            </ignoreTableNamePrefixes>
-                            <extendedBeans>
-                                <property>
-                                    <name>JobsBean</name>
-                                    <value>org.noorm.test.JobsBeanExt</value>
-                                </property>
-                            </extendedBeans>
-                            <serviceInterfacePackageName>org.noorm.test.hr1.services</serviceInterfacePackageName>
-                            <servicePackageName>org.noorm.test.hr1.services.impl</servicePackageName>
-                            <singleRowFinderRegex>(find_unique.*)</singleRowFinderRegex>
-                            <enumPackageName>org.noorm.test.hr1.enums</enumPackageName>
-                            <enumTableFilterRegex>REGIONS</enumTableFilterRegex>
-                            <enumTable2DisplayColumnMapping>
-                                <property>
-                                    <name>REGIONS</name>
-                                    <value>REGION_NAME</value>
-                                </property>
-                            </enumTable2DisplayColumnMapping>
-                            <oracleTable2SequenceMapping>
-                                <property>
-                                    <name>(EMPLOYEES|LOCATIONS)</name>
-                                    <value>$1_SEQ</value>
-                                </property>
-                            </oracleTable2SequenceMapping>
+                            <generatorConfiguration>${project.basedir}/src/main/noorm/configuration_HR1.xml</generatorConfiguration>
                         </configuration>
                     </execution>
                     <execution>
@@ -80,44 +52,10 @@
                             <goal>generate-noorm</goal>
                         </goals>
                         <configuration>
-                            <dataSourceName>HR2</dataSourceName>
                             <url>${jdbc.url}</url>
                             <username>${jdbc.username}</username>
                             <password>${jdbc.password}</password>
-                            <beanPackageName>org.noorm.test.hr2.beans</beanPackageName>
-                            <beanTableFilterRegex>DEPARTMENTS|EMPLOYEES</beanTableFilterRegex>
-                            <packageFilterRegex>--NO_MATCH_DESIRED--</packageFilterRegex>
-                            <serviceInterfacePackageName>org.noorm.test.hr2.services</serviceInterfacePackageName>
-                            <servicePackageName>org.noorm.test.hr2.services.impl</servicePackageName>
-                            <oracleTable2SequenceMapping>
-                                <property>
-                                    <name>DEPARTMENTS</name>
-                                    <value>DEPARTMENTS_SEQ</value>
-                                </property>
-                            </oracleTable2SequenceMapping>
-                            <queryDeclarations>
-                                <queryDeclaration>
-                                    <tableName>v_employees</tableName>
-                                    <baseTable>employees</baseTable>
-                                    <methodName>findEmployees</methodName>
-                                    <className>EmployeeDAO</className>
-                                    <queryColumns>
-                                        <queryColumn implementation="org.noorm.jdbc.QueryColumn">
-                                            <columnName>salary</columnName>
-                                            <operator>
-                                                <operatorName>GREATER_THAN_OR_EQUAL_TO</operatorName>
-                                            </operator>
-                                        </queryColumn>
-                                        <queryColumn implementation="org.noorm.jdbc.QueryColumn">
-                                            <columnName>commission_pct</columnName>
-                                            <operator>
-                                                <operatorName>LESS_THAN</operatorName>
-                                            </operator>
-                                        </queryColumn>
-                                    </queryColumns>
-                                </queryDeclaration>
-                            </queryDeclarations>
-                            <generatePKBasedEqualsAndHashCode>false</generatePKBasedEqualsAndHashCode>
+                            <generatorConfiguration>${project.basedir}/src/main/noorm/configuration_HR2.xml</generatorConfiguration>
                         </configuration>
                     </execution>
                 </executions>
@@ -130,12 +68,12 @@
         <dependency>
             <groupId>org.springframework</groupId>
             <artifactId>spring-context</artifactId>
-            <version>3.2.0.RELEASE</version>
+            <version>3.2.3.RELEASE</version>
         </dependency>
         <dependency>
             <groupId>org.springframework</groupId>
             <artifactId>spring-test</artifactId>
-            <version>3.2.0.RELEASE</version>
+            <version>3.2.3.RELEASE</version>
         </dependency>
     </dependencies>
 

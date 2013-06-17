@@ -1,90 +1,48 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema"
-           xmlns="http://www.noorm.org/generator-configuration"
-           targetNamespace="http://www.noorm.org/generator-configuration"
-           elementFormDefault="unqualified">
+           xmlns="http://www.noorm.org/generator-configuration/1.0.0"
+           targetNamespace="http://www.noorm.org/generator-configuration/1.0.0"
+           elementFormDefault="qualified"
+           attributeFormDefault="unqualified">
 
-    <xs:element name="generator">
+    <xs:element name="generatorConfiguration">
         <xs:complexType>
             <xs:sequence>
-                <xs:element name="destinationDirectory" type="xs:string"
-                            default="${project.build.directory}/generated-sources/noorm"/>
-                <xs:element name="project" type="xs:string" default="${project}"/>
                 <xs:element name="beanPackageName" type="xs:string"/>
                 <xs:element name="enumPackageName" type="xs:string" minOccurs="0"/>
                 <xs:element name="servicePackageName" type="xs:string"/>
-                <xs:element name="dataSourceName" type="xs:string" minOccurs="0"/>
-                <xs:element name="url" type="xs:string"/>
-                <xs:element name="username" type="xs:string"/>
-                <xs:element name="password" type="xs:string"/>
-                <xs:element name="ignoreTableNamePrefixes" minOccurs="0">
-                    <xs:complexType>
-                        <xs:sequence>
-                            <xs:element name="prefix" type="xs:string" maxOccurs="unbounded"/>
-                        </xs:sequence>
-                    </xs:complexType>
-                </xs:element>
-                <xs:element name="ignoreColumnNamePrefixes" minOccurs="0">
-                    <xs:complexType>
-                        <xs:sequence>
-                            <xs:element name="prefix" type="xs:string" maxOccurs="unbounded"/>
-                        </xs:sequence>
-                    </xs:complexType>
-                </xs:element>
+                <xs:element name="serviceInterfacePackageName" type="xs:string" minOccurs="0"/>
                 <xs:element name="beanTableFilterRegex" type="xs:string" minOccurs="0"/>
                 <xs:element name="enumTableFilterRegex" type="xs:string" minOccurs="0"/>
-                <xs:element name="enumTable2DisplayColumnMapping" minOccurs="0">
-                    <xs:complexType>
-                        <xs:sequence>
-                            <xs:element name="property" type="property"/>
-                        </xs:sequence>
-                    </xs:complexType>
-                </xs:element>
-                <xs:element name="oracleTable2SequenceMapping" minOccurs="0">
-                    <xs:complexType>
-                        <xs:sequence>
-                            <xs:element name="property" type="property"/>
-                        </xs:sequence>
-                    </xs:complexType>
-                </xs:element>
-                <xs:element name="optimisticLockColumnMapping" minOccurs="0">
-                    <xs:complexType>
-                        <xs:sequence>
-                            <xs:element name="property" type="property"/>
-                        </xs:sequence>
-                    </xs:complexType>
-                </xs:element>
-                <xs:element name="viewName2PrimaryKeyMapping" minOccurs="0">
-                    <xs:complexType>
-                        <xs:sequence>
-                            <xs:element name="property" type="property"/>
-                        </xs:sequence>
-                    </xs:complexType>
-                </xs:element>
                 <xs:element name="packageFilterRegex" type="xs:string" minOccurs="0"/>
+                <xs:element name="oracleTable2SequenceMapping" type="propertyList" minOccurs="0"/>
+                <xs:element name="ignoreTableNamePrefixes" type="prefixList" minOccurs="0"/>
+                <xs:element name="ignoreColumnNamePrefixes" type="prefixList" minOccurs="0"/>
+                <xs:element name="enumTable2DisplayColumnMapping" type="propertyList" minOccurs="0"/>
+                <xs:element name="optLockVersionColumnMapping" type="propertyList" minOccurs="0"/>
+                <xs:element name="optLockFullRowCompareTableRegex" type="xs:string" minOccurs="0"/>
+                <xs:element name="viewName2PrimaryKeyMapping" type="propertyList" minOccurs="0"/>
                 <xs:element name="singleRowFinderRegex" type="xs:string" minOccurs="0"/>
                 <xs:element name="pageableProcedureNameRegex" type="xs:string" minOccurs="0"/>
-                <xs:element name="serviceInterfacePackageName" type="xs:string" minOccurs="0"/>
-                <xs:element name="extendedBeans" minOccurs="0">
-                    <xs:complexType>
-                        <xs:sequence>
-                            <xs:element name="property" type="property"/>
-                        </xs:sequence>
-                    </xs:complexType>
-                </xs:element>
-                <xs:element ref="queryDeclarations" minOccurs="0"/>
+                <xs:element name="extendedBeans" type="propertyList" minOccurs="0"/>
                 <xs:element name="generatePKBasedEqualsAndHashCode" type="xs:boolean" minOccurs="0"/>
+                <xs:element name="dataSourceName" type="xs:string" minOccurs="0"/>
+                <xs:element name="queryDeclarations" type="queryDeclarations" minOccurs="0"/>
             </xs:sequence>
         </xs:complexType>
     </xs:element>
 
-    <xs:element name="queryDeclarations">
-        <xs:complexType>
-            <xs:sequence>
-                <xs:element ref="queryDeclaration" maxOccurs="unbounded"/>
-            </xs:sequence>
-        </xs:complexType>
-    </xs:element>
+    <xs:complexType name="prefixList">
+        <xs:sequence>
+            <xs:element name="prefix" type="xs:string" maxOccurs="unbounded"/>
+        </xs:sequence>
+    </xs:complexType>
+
+    <xs:complexType name="queryDeclarations">
+        <xs:sequence>
+            <xs:element ref="queryDeclaration" maxOccurs="unbounded"/>
+        </xs:sequence>
+    </xs:complexType>
 
     <xs:element name="queryDeclaration">
         <xs:complexType>
@@ -95,7 +53,7 @@
                 <xs:element name="className" type="xs:string" minOccurs="0"/>
                 <xs:element name="singleRowQuery" type="xs:boolean" minOccurs="0"/>
                 <xs:element name="acquireLock" type="xs:boolean" minOccurs="0"/>
-                <xs:element name="queryColumns">
+                <xs:element name="queryColumns" minOccurs="0">
                     <xs:complexType>
                         <xs:sequence>
                             <xs:element name="queryColumn" type="queryColumn" maxOccurs="unbounded"/>
@@ -109,15 +67,14 @@
     <xs:complexType name="queryColumn">
         <xs:sequence>
             <xs:element name="columnName" type="xs:string"/>
-            <xs:element name="operator" minOccurs="0">
-                <xs:complexType>
-                    <xs:sequence>
-                        <xs:element name="operatorName" type="operatorName"/>
-                    </xs:sequence>
-                </xs:complexType>
-            </xs:element>
+            <xs:element name="operator" type="operator" minOccurs="0"/>
         </xs:sequence>
-        <xs:attribute name="implementation" type="xs:string" use="optional" default="org.noorm.jdbc.QueryColumn"/>
+    </xs:complexType>
+
+    <xs:complexType name="operator">
+        <xs:sequence>
+            <xs:element name="operatorName" type="operatorName"/>
+        </xs:sequence>
     </xs:complexType>
 
     <xs:simpleType name="operatorName">
@@ -133,6 +90,12 @@
             <xs:enumeration value="IS_NOT_NULL"/>
         </xs:restriction>
     </xs:simpleType>
+
+    <xs:complexType name="propertyList">
+        <xs:sequence>
+            <xs:element name="property" type="property" maxOccurs="unbounded"/>
+        </xs:sequence>
+    </xs:complexType>
 
     <xs:complexType name="property">
         <xs:sequence>
