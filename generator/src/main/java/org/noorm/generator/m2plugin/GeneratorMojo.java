@@ -17,10 +17,14 @@ import org.noorm.generator.servicegenerator.ServiceGenerator;
 import org.noorm.jdbc.DataSourceProvider;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.xml.sax.SAXException;
 
+import javax.xml.XMLConstants;
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Unmarshaller;
+import javax.xml.validation.Schema;
+import javax.xml.validation.SchemaFactory;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -38,6 +42,7 @@ public class GeneratorMojo extends AbstractMojo implements IParameters {
 	private static final Logger log = LoggerFactory.getLogger(GeneratorMojo.class);
 
     private static final String XML_SCHEMA_PACKAGE = "org.noorm.generator.schema";
+    private static final String XML_SCHEMA_URL = "/xsd/noorm-generator-configuration.xsd";
     private GeneratorConfiguration configuration;
 
 	/**
@@ -134,14 +139,19 @@ public class GeneratorMojo extends AbstractMojo implements IParameters {
         }
         FileInputStream inputStream = null;
         try {
+            final SchemaFactory schemaFactory = SchemaFactory.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI);
+            final Schema schema = schemaFactory.newSchema(GeneratorMojo.class.getResource(XML_SCHEMA_URL));
             inputStream = new FileInputStream(generatorConfiguration);
             final JAXBContext jaxbContext = JAXBContext.newInstance(XML_SCHEMA_PACKAGE);
             final Unmarshaller unmarshaller = jaxbContext.createUnmarshaller();
+            unmarshaller.setSchema(schema);
             configuration = (GeneratorConfiguration) unmarshaller.unmarshal(inputStream);
         } catch (JAXBException e) {
             throw new MojoFailureException("Could not open configuration ".concat(fileName), e);
         } catch (IOException e) {
             throw new MojoFailureException("Could not parse configuration ".concat(fileName), e);
+        } catch (SAXException e) {
+            throw new MojoFailureException("Could not instantiate the NoORM generator XML schema.", e);
         } finally {
             if (inputStream != null) {
                 try {
