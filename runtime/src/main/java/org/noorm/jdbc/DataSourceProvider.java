@@ -227,7 +227,7 @@ public class DataSourceProvider {
 		if (jndiName != null) {
 
 			try {
-				log.info("Trying to establish data source using JDNI name ".concat(jndiName));
+				log.info("Trying to establish data source using JNDI name ".concat(jndiName));
 				final Context initCtx = new InitialContext();
                 dataSource = (DataSource) initCtx.lookup(jndiName);
 				log.info("JNDI data source lookup successful.");
