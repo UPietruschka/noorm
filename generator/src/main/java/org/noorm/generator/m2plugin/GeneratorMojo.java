@@ -54,7 +54,7 @@ public class GeneratorMojo extends AbstractMojo implements IParameters {
     /**
      * Destination directory for generated source files.
      */
-    @Parameter(defaultValue = "${project.basedir}/src/main/noorm/configuration.xml")
+    @Parameter(defaultValue = "${project.basedir}/src/noorm/configuration.xml")
     protected File generatorConfiguration;
 
 	/**

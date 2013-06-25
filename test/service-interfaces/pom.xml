@@ -42,7 +42,7 @@
                             <url>${jdbc.url}</url>
                             <username>${jdbc.username}</username>
                             <password>${jdbc.password}</password>
-                            <generatorConfiguration>${project.basedir}/src/main/noorm/configuration_HR1.xml</generatorConfiguration>
+                            <generatorConfiguration>src/noorm/configuration_HR1.xml</generatorConfiguration>
                         </configuration>
                     </execution>
                     <execution>
@@ -55,7 +55,7 @@
                             <url>${jdbc.url}</url>
                             <username>${jdbc.username}</username>
                             <password>${jdbc.password}</password>
-                            <generatorConfiguration>${project.basedir}/src/main/noorm/configuration_HR2.xml</generatorConfiguration>
+                            <generatorConfiguration>src/noorm/configuration_HR2.xml</generatorConfiguration>
                         </configuration>
                     </execution>
                 </executions>
