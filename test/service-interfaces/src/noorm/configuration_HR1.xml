@@ -9,12 +9,12 @@
     <serviceInterfacePackageName>org.noorm.test.hr1.services</serviceInterfacePackageName>
     <beanTableFilterRegex>(C.*|E.*|G.*|H.*|J.*|L.*|V.*|.*RECORD)</beanTableFilterRegex>
     <enumTableFilterRegex>REGIONS</enumTableFilterRegex>
-    <oracleTable2SequenceMapping>
+    <table2SequenceMapping>
         <property>
             <name>(EMPLOYEES|LOCATIONS)</name>
             <value>$1_SEQ</value>
         </property>
-    </oracleTable2SequenceMapping>
+    </table2SequenceMapping>
     <ignoreTableNamePrefixes>
         <prefix>JOB_</prefix>
     </ignoreTableNamePrefixes>

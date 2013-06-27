@@ -374,9 +374,19 @@ public class JDBCDMLProcessor<T> {
                     final Class primaryKeyType =
                             BeanMetaDataUtil.getBeanPropertyType(firstBean, primaryKeyColumnNames[0]);
                     if (primaryKeyType.equals(Long.class)) {
-                        Long generatedKey = generatedKeyResultSet.getLong(1);
-                        log.debug("Generated key value " + generatedKey + " retrieved for table " + tableName);
+                        final Long generatedKey = generatedKeyResultSet.getLong(1);
                         BeanMetaDataUtil.setPrimaryKeyValue(firstBean, generatedKey);
+                        continue;
+                    }
+                    if (primaryKeyType.equals(Integer.class)) {
+                        final Integer generatedKey = generatedKeyResultSet.getInt(1);
+                        BeanMetaDataUtil.setPrimaryKeyValue(firstBean, generatedKey);
+                        continue;
+                    }
+                    if (primaryKeyType.equals(Short.class)) {
+                        final Short generatedKey = generatedKeyResultSet.getShort(1);
+                        BeanMetaDataUtil.setPrimaryKeyValue(firstBean, generatedKey);
+                        continue;
                     }
                 }
             }

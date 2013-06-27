@@ -78,9 +78,9 @@ public class EmployeeServiceTest {
             employeesBean.setHireDate(new java.util.Date(1200000000000L));  // January 10, 2008, 22:20
             employeesBean.setJobId("IT_PROG");
             employeesBean.setSalary(5000.00D);
-            employeesBean.setCommissionPct(0.28D);
+            employeesBean.setCommissionPct(new java.math.BigDecimal(0.28D));
             employeesBean.setManagerId(108L);
-            employeesBean.setDepartmentId(60L);
+            employeesBean.setDepartmentId(60);
             final EmployeesBean newEmployeesBean = beanDML.insertEmployees(employeesBean);
             final List<EmployeesBean> employeesBeanList1 = employeeService.findEmployeesByLastname("Doe");
             assertEquals(employeesBeanList1.size(), 1);

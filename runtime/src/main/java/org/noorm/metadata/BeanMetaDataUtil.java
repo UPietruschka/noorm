@@ -167,11 +167,12 @@ public class BeanMetaDataUtil {
 	 * @param pBean the bean instance.
 	 * @param pPKValue the value of the primary key.
 	 */
-	public static void setPrimaryKeyValue(final IBean pBean, final Long pPKValue) {
+	public static void setPrimaryKeyValue(final IBean pBean, final Number pPKValue) {
 
 		if (pBean.getPrimaryKeyColumnNames().length != 1) {
 			throw new DataAccessException(DataAccessException.Type.OPERATION_NOT_SUPPORTED_WITH_COMPOSITE_PK);
 		}
+        log.debug("Generated key value " + pPKValue + " retrieved for table " + pBean.getTableName());
 		final String primaryKeyColumnName = pBean.getPrimaryKeyColumnNames()[0];
 		setBeanPropertyByName(pBean, primaryKeyColumnName, pPKValue);
 	}

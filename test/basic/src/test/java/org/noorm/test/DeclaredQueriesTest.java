@@ -26,7 +26,7 @@ public class DeclaredQueriesTest {
     @Test
     public void testFindDepartment() {
 
-        final Long departmentId = 10L;
+        final Integer departmentId = 10;
         final String departmentName = "Administration";
         final DeclaredQueries declaredQueries = DeclaredQueries.getInstance();
         final DepartmentsBean department = declaredQueries.findDepartmentsByDepartmentId(departmentId);
@@ -38,7 +38,8 @@ public class DeclaredQueriesTest {
     public void testFindDoubleEqual() {
 
         final DeclaredQueries declaredQueries = DeclaredQueries.getInstance();
-        final List<EmployeesBean> employees = declaredQueries.findEmployeesByCommissionPct(0.25d);
+        final List<EmployeesBean> employees =
+                declaredQueries.findEmployeesByCommissionPct(new java.math.BigDecimal(0.25D));
         assertEquals(6, employees.size());
     }
 

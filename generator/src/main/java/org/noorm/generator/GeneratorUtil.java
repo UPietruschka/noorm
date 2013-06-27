@@ -3,6 +3,7 @@ package org.noorm.generator;
 import org.apache.velocity.Template;
 import org.apache.velocity.VelocityContext;
 import org.apache.velocity.app.Velocity;
+import org.noorm.generator.schema.CustomTypeMapping;
 import org.noorm.generator.schema.Property;
 import org.noorm.jdbc.Utils;
 
@@ -102,7 +103,31 @@ public class GeneratorUtil {
      */
     public static String convertOracleType2JavaType(final String pOracleType,
                                                     final Long pDataPrecision,
-                                                    final Long pDataScale) {
+                                                    final Long pDataScale,
+                                                    final String pTableName,
+                                                    final String pColumnOrParamName,
+                                                    final List<CustomTypeMapping> pCustomTypeMappings) {
+
+        if (pCustomTypeMappings != null) {
+            for (final CustomTypeMapping typeMapping : pCustomTypeMappings) {
+                if (pOracleType.equals(typeMapping.getDatabaseType())) {
+                    if (typeMapping.getColumnFilterRegex() != null) {
+                        final Pattern finder1 = Pattern.compile(typeMapping.getColumnFilterRegex().toUpperCase());
+                        final Matcher matcher1 = finder1.matcher(pColumnOrParamName.toUpperCase());
+                        if (matcher1.matches()) {
+                            return typeMapping.getJavaType();
+                        }
+                    }
+                    if (typeMapping.getTableFilterRegex() != null && pTableName != null) {
+                        final Pattern finder2 = Pattern.compile(typeMapping.getTableFilterRegex().toUpperCase());
+                        final Matcher matcher2 = finder2.matcher(pTableName.toUpperCase());
+                        if (matcher2.matches()) {
+                            return typeMapping.getJavaType();
+                        }
+                    }
+                }
+            }
+        }
 
         String javaType = "String";
         if (pOracleType.equals("RAW")) {

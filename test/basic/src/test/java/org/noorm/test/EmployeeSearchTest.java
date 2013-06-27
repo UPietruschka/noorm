@@ -70,7 +70,7 @@ public class EmployeeSearchTest {
     public void testPageableSearch() {
 
         final EmployeeSearch employeeSearch = EmployeeSearch.getInstance();
-        final List<Long> idBeanList = employeeSearch.findEmployeeIds(50L);
+        final List<Long> idBeanList = employeeSearch.findEmployeeIds(50);
         Long[] dataIdArray = idBeanList.toArray(new Long[idBeanList.size()]);
         final PageableBeanList<EmployeesBean> empBeanList =
                 (PageableBeanList<EmployeesBean>) employeeSearch.findPageableEmpsByIdlist(dataIdArray);

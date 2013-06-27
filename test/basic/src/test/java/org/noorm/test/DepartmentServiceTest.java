@@ -17,14 +17,14 @@ import static org.junit.Assert.*;
  */
 public class DepartmentServiceTest {
 
-    private static final Long SHIPPING_DEPARTMENT_ID = 50L;
+    private static final Integer SHIPPING_DEPARTMENT_ID = 50;
     private static final String SHIPPING_DEPARTMENT_NAME = "Shipping";
     private static final String SHIPPING_DEPARTMENT_CITY = "South San Francisco";
     private static final String SHIPPING_DEPARTMENT_MANAGER_LAST_NAME = "Fripp";
     private static final Long SHIPPING_DEPARTMENT_EMPLOYEE_COUNT = 45L;
     private static final String NEW_DEPARTMENT_NAME = "Training";
-    private static final Long NEW_DEPARTMENT_LOCATION_ID = 3200L;
-    private static final Long NEW_DEPARTMENT_LOCATION_ID1 = 3100L;
+    private static final Integer NEW_DEPARTMENT_LOCATION_ID = 3200;
+    private static final Integer NEW_DEPARTMENT_LOCATION_ID1 = 3100;
     private static final Long NEW_DEPARTMENT_MANAGER_ID = 205L;
 
 	private BeanDML beanDML = BeanDML.getInstance();

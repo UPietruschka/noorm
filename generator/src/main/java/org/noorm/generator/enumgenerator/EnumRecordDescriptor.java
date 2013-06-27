@@ -30,7 +30,7 @@ public class EnumRecordDescriptor {
 
 	public String getFormattedValue(final EnumAttributeDescriptor pAttributeDescriptor) {
 		Object value = attributeValues.get(pAttributeDescriptor);
-		// Only String and Long supported yet
+		// Only String and whole number types supported
 		if (pAttributeDescriptor.getType().equals("String")) {
 			return "\"".concat((String) value).trim().concat("\"");
 		}
@@ -40,6 +40,18 @@ public class EnumRecordDescriptor {
 			}
 			return value.toString().concat("L");
 		}
-		throw new UnsupportedOperationException("EnumGenerator only supports String and Long types.");
+        if (pAttributeDescriptor.getType().equals("Integer")) {
+            if (value instanceof BigDecimal) {
+                value = ((BigDecimal) value).intValue();
+            }
+            return value.toString();
+        }
+        if (pAttributeDescriptor.getType().equals("Short")) {
+            if (value instanceof BigDecimal) {
+                value = ((BigDecimal) value).shortValue();
+            }
+            return value.toString();
+        }
+		throw new UnsupportedOperationException("EnumGenerator only supports String and whole number types.");
 	}
 }

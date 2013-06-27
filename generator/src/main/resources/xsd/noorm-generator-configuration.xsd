@@ -63,11 +63,11 @@
                         </xs:documentation>
                     </xs:annotation>
                 </xs:element>
-                <xs:element name="oracleTable2SequenceMapping" type="propertyList" minOccurs="0">
+                <xs:element name="table2SequenceMapping" type="propertyList" minOccurs="0">
                     <xs:annotation>
                         <xs:documentation>
-                            Primary key generation for new records being inserted into the database is based on
-                            a numeric ID column and an Oracle sequence. Oracle sequences are not tied to a table
+                            Primary key generation for new records being inserted into the database can be based
+                            on a numeric ID column and an sequence. Sequences are not tied to a table
                             by definition, so associating a table with a sequence is done using this property
                             list. Note that the association TABLE_NAME/SEQUENCE_NAME can either be done on a per
                             table basis, or using one or more regular expressions to specify a mapping rule like
@@ -134,7 +134,7 @@
                 <xs:element name="viewName2PrimaryKeyMapping" type="propertyList" minOccurs="0">
                     <xs:annotation>
                         <xs:documentation>
-                            The Oracle data dictionary does not provide unambiguous information for the primary
+                            The database metadata does not provide unambiguous information for the primary
                             key of a view (for tables, this information is available). When the intended use of a
                             view includes DML operations (which requires the view to contain one and only one
                             key-preserved table) or data access with the PageableBeanList, NoORM needs a key to
@@ -148,9 +148,8 @@
                 <xs:element name="singleRowFinderRegex" type="xs:string" minOccurs="0">
                     <xs:annotation>
                         <xs:documentation>
-                            Accessing data mapped to Beans always uses an Oracle reference cursor to retrieve
-                            the data. However, using the PL/SQL procedures signature does not provide any hint,
-                            if the returned reference cursor is limited to a single row (which in turn changes
+                            Using the signature of a stored procedure to generate code does not provide any hint,
+                            if the returned data is limited to a single row (which in turn changes
                             the signature of the generated Java code, instead of a List a single Bean is returned).
                             Use this parameter to specify a regular expression matching all procedure names
                             subject to single row retrieval.
@@ -221,6 +220,21 @@
                             to reduce the query declaration for automatic Java code generation to a single entity
                             (table, view), the columns subject to the where-conditions (concatenated by "AND") and
                             the operators used for the columns in the where-conditions.
+                        </xs:documentation>
+                    </xs:annotation>
+                </xs:element>
+                <xs:element name="customTypeMappings" type="customTypeMappings" minOccurs="0">
+                    <xs:annotation>
+                        <xs:documentation>
+                            The Java code generator defines for every database type a default Java type, which is used in
+                            the generated classes for attributes and method parameters (e.g. NUMBER -> java.lang.Long).
+                            However, this mapping may not be suitable for certain situations. This configuration parameter
+                            provides a flexible way to define custom type mappings.
+                            Note that the database type depends on the database system and is not checked for validity, but
+                            simply compared against the database types as retrieved from the database metadata. So, an
+                            invalid database type has simply no effect.
+                            The specified Java type however is checked for existence by the code generator, but not for
+                            validity with respect to a proper data conversion in the JDBC driver used.
                         </xs:documentation>
                     </xs:annotation>
                 </xs:element>
@@ -375,6 +389,74 @@
             <xs:enumeration value="IS_NOT_NULL"/>
         </xs:restriction>
     </xs:simpleType>
+
+    <xs:complexType name="customTypeMappings">
+        <xs:annotation>
+            <xs:documentation>
+                A list of custom type mappings (see type "customTypeMapping").
+            </xs:documentation>
+        </xs:annotation>
+        <xs:sequence>
+            <xs:element ref="customTypeMapping" maxOccurs="unbounded"/>
+        </xs:sequence>
+    </xs:complexType>
+
+    <xs:element name="customTypeMapping">
+        <xs:annotation>
+            <xs:documentation>
+                A single type mapping with its application scope.
+            </xs:documentation>
+        </xs:annotation>
+        <xs:complexType>
+            <xs:sequence>
+                <xs:choice>
+                    <xs:element name="tableFilterRegex" type="xs:string">
+                        <xs:annotation>
+                            <xs:documentation>
+                                The scope of the custom type mapping can be specified on a per table basis using
+                                regular expressions to identify the table(s) for the application of the custom
+                                type mapping.
+                                To apply the specified type mapping to all tables (and columns), a wildcard
+                                expression can be used (".*").
+                            </xs:documentation>
+                        </xs:annotation>
+                    </xs:element>
+                    <xs:element name="columnFilterRegex" type="xs:string">
+                        <xs:annotation>
+                            <xs:documentation>
+                                The scope of the custom type mapping can be specified on a per column basis using
+                                regular expressions to identify the column(s) for the application of the custom
+                                type mapping..
+                            </xs:documentation>
+                        </xs:annotation>
+                    </xs:element>
+                </xs:choice>
+                <xs:element name="databaseType" type="xs:string">
+                    <xs:annotation>
+                        <xs:documentation>
+                            The database (source) type of the custom type mapping. This is the SQL standard or
+                            vendor specific type declaration like "INTEGER" or "NUMBER". Note that only the base
+                            type declaration is used to identify an attribute applicable for a custom type
+                            mapping (e.g. fractions of numeric types are ignored, but through the usage of the
+                            filter regex for tables and columns it is usually no problem to restrict the mapping
+                            to the column(s) of choice).
+                        </xs:documentation>
+                    </xs:annotation>
+                </xs:element>
+                <xs:element name="javaType" type="xs:string">
+                    <xs:annotation>
+                        <xs:documentation>
+                            The Java (destination) type of the custom mapping. This is the type used in the generated
+                            Java code for bean attributes, enum attributes or service method parameters.
+                            Java types from package "java.lang.*" do not need to get fully specified (i.e., "Long",
+                            "Double", etc., is sufficient), other types must be fully specified
+                            (e.g. "java.math.BigDecimal").
+                        </xs:documentation>
+                    </xs:annotation>
+                </xs:element>
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
 
     <xs:complexType name="propertyList">
         <xs:sequence>

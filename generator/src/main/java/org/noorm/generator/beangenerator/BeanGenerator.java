@@ -149,25 +149,27 @@ public class BeanGenerator {
             String versionColumnType = "";
 			for (final TableMetadataBean tableMetadataBean : tableMetadataBeanList1) {
 				final BeanAttributeDescriptor beanAttributeDescriptor = new BeanAttributeDescriptor();
-				final String javaName = Utils.convertDBName2JavaName(tableMetadataBean.getColumnName(), false);
+                final String columnName = tableMetadataBean.getColumnName();
+				final String javaName = Utils.convertDBName2JavaName(columnName, false);
 				beanAttributeDescriptor.setName(javaName);
                 final String methodNamePostfix = GeneratorUtil.convertDBName2JavaName
-                        (tableMetadataBean.getColumnName(), true, configuration.getIgnoreColumnNamePrefixes());
+                        (columnName, true, configuration.getIgnoreColumnNamePrefixes());
                 beanAttributeDescriptor.setMethodNamePostfix(methodNamePostfix);
-				final String javaType = GeneratorUtil.convertOracleType2JavaType(tableMetadataBean.getDataType(),
-						tableMetadataBean.getDataPrecision(), tableMetadataBean.getDataScale());
+                final String dataType = tableMetadataBean.getDataType();
+				final String javaType = GeneratorUtil.convertOracleType2JavaType(dataType,
+						tableMetadataBean.getDataPrecision(), tableMetadataBean.getDataScale(),
+                        tableMetadataBean.getTableName(), columnName, configuration.getCustomTypeMappings());
 				if (tableMetadataBean.getUpdatable().equals(BeanMetaDataUtil.NOT_UPDATABLE) ||
 						tableMetadataBean.getInsertable().equals(BeanMetaDataUtil.NOT_UPDATABLE)) {
 					beanAttributeDescriptor.setUpdatable(false);
 				}
 				beanAttributeDescriptor.setType(javaType);
-                final String dataType = tableMetadataBean.getDataType();
 				beanAttributeDescriptor.setDataType(dataType);
                 if (dataType.equals("CLOB") || dataType.equals("BLOB") || dataType.equals("XMLTYPE")) {
                     unsupportedOptLockFullRowCompareTypes = true;
                 }
-				beanAttributeDescriptor.setColumnName(tableMetadataBean.getColumnName());
-                if (versionColumnName.equals(tableMetadataBean.getColumnName())) {
+				beanAttributeDescriptor.setColumnName(columnName);
+                if (versionColumnName.equals(columnName)) {
                     versionColumnType = dataType;
                 }
 				beanAttributeDescriptor.setMaxLength(tableMetadataBean.getCharLength().intValue());
@@ -209,7 +211,7 @@ public class BeanGenerator {
 								   final List<NameBean> pSequenceDBNameList) {
 
 		final String sequenceName =
-                GeneratorUtil.getPropertyString(pTableName, configuration.getOracleTable2SequenceMapping());
+                GeneratorUtil.getPropertyString(pTableName, configuration.getTable2SequenceMapping());
 		if (sequenceName.isEmpty()) {
 			log.info("No matching sequence-name has been found for table-name ".concat(pTableName));
 			return sequenceName;

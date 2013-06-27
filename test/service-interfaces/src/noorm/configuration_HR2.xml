@@ -8,12 +8,12 @@
     <serviceInterfacePackageName>org.noorm.test.hr2.services</serviceInterfacePackageName>
     <beanTableFilterRegex>DEPARTMENTS|EMPLOYEES</beanTableFilterRegex>
     <packageFilterRegex>--NO_MATCH_DESIRED--</packageFilterRegex>
-    <oracleTable2SequenceMapping>
+    <table2SequenceMapping>
         <property>
             <name>DEPARTMENTS</name>
             <value>DEPARTMENTS_SEQ</value>
         </property>
-    </oracleTable2SequenceMapping>
+    </table2SequenceMapping>
     <generatePKBasedEqualsAndHashCode>false</generatePKBasedEqualsAndHashCode>
     <dataSourceName>HR2</dataSourceName>
     <queryDeclarations>

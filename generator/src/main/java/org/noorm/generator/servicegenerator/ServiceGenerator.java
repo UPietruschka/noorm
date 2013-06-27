@@ -117,7 +117,9 @@ public class ServiceGenerator {
 								oracleTypeName.equals(JDBCStatementProcessor.NOORM_ID_LIST_ORACLE_TYPE_NAME)) {
 							parameterDescriptor.setJavaType(NOORM_ID_LIST_JAVA_TYPE_NAME);
 						} else {
-							final String javaType = GeneratorUtil.convertOracleType2JavaType(oracleType, null, null);
+							final String javaType = GeneratorUtil.convertOracleType2JavaType
+                                    (oracleType, null, null, null,
+                                     parameterDescriptor.getOracleName(), configuration.getCustomTypeMappings());
 							parameterDescriptor.setJavaType(javaType);
 						}
 						procedureDescriptor.addParameter(parameterDescriptor);
@@ -161,8 +163,9 @@ public class ServiceGenerator {
 								}
 							}
 						} else {
-							final String javaType =
-                                    GeneratorUtil.convertOracleType2JavaType(parameter.getDataType(), null, null);
+							final String javaType = GeneratorUtil.convertOracleType2JavaType
+                                    (parameter.getDataType(), null, null, null,
+                                     parameter.getName(), configuration.getCustomTypeMappings());
 							procedureDescriptor.setOutParamJavaType(javaType);
 							procedureDescriptor.setOutParamScalar(true);
 						}

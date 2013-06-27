@@ -34,7 +34,7 @@ public class JobServiceTest {
         try {
             JobService jobService = JobService.getInstance();
             // Increase the salary for the given department by 8%
-            jobService.increaseSalary(90L, 0.08d);
+            jobService.increaseSalary(90, 0.08d);
             EmployeeSearch employeeSearch = EmployeeSearch.getInstance();
             // Search for an exact match of the first employee with increased salary
             List<EmployeesBean> employeesBeanList0 =

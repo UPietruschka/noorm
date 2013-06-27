@@ -8,7 +8,7 @@
     <servicePackageName>org.noorm.test.hr.services</servicePackageName>
     <enumTableFilterRegex>REGIONS|OPT_VARIANTS</enumTableFilterRegex>
     <packageFilterRegex>(.*SERVICE|.*SEARCH)</packageFilterRegex>
-    <oracleTable2SequenceMapping>
+    <table2SequenceMapping>
         <property>
             <name>(EMPLOYEES|DEPARTMENTS|LOCATIONS|OPT_LOCK_.*|COMPLEX.*)</name>
             <value>$1_SEQ</value>
@@ -17,7 +17,7 @@
             <name>(V_DEPARTMENTS)</name>
             <value>DEPARTMENTS_SEQ</value>
         </property>
-    </oracleTable2SequenceMapping>
+    </table2SequenceMapping>
     <ignoreColumnNamePrefixes>
         <prefix>OPT_</prefix>
     </ignoreColumnNamePrefixes>
@@ -155,5 +155,17 @@
             </queryColumns>
         </queryDeclaration>
     </queryDeclarations>
+    <customTypeMappings>
+        <customTypeMapping>
+            <columnFilterRegex>COMMISSION_PCT</columnFilterRegex>
+            <databaseType>NUMBER</databaseType>
+            <javaType>java.math.BigDecimal</javaType>
+        </customTypeMapping>
+        <customTypeMapping>
+            <columnFilterRegex>COUNTRY_ID|REGION_ID|DEPARTMENT_ID|LOCATION_ID|OPT_ID|P_DEPARTMENT_ID</columnFilterRegex>
+            <databaseType>NUMBER</databaseType>
+            <javaType>Integer</javaType>
+        </customTypeMapping>
+    </customTypeMappings>
 
 </generatorConfiguration>

@@ -99,8 +99,13 @@ public class QueryGenerator {
                 String javaType = null;
                 for (final TableMetadataBean tableMetadataBean : tableMetadataBeanList) {
                     if (tableMetadataBean.getColumnName().equals(columnName))
-                    javaType = GeneratorUtil.convertOracleType2JavaType(tableMetadataBean.getDataType(),
-                            tableMetadataBean.getDataPrecision(), tableMetadataBean.getDataScale());
+                    javaType = GeneratorUtil.convertOracleType2JavaType(
+                            tableMetadataBean.getDataType(),
+                            tableMetadataBean.getDataPrecision(),
+                            tableMetadataBean.getDataScale(),
+                            tableMetadataBean.getTableName(),
+                            tableMetadataBean.getColumnName(),
+                            configuration.getCustomTypeMappings());
                 }
                 if (javaType == null) {
                     throw new GeneratorException("Illegal query declaration: no metadata found for table ".concat(t0)

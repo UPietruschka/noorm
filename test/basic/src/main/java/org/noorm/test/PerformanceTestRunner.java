@@ -62,7 +62,7 @@ public class PerformanceTestRunner {
             final String email = "JDOE" + i;
             final String jobId = JOB_IDS[i % JOB_IDS.length];
             final Double salary = 1000D + i / 4;
-            final Long departmentId = ((i % 27) + 1) * 10L;
+            final Integer departmentId = ((i % 27) + 1) * 10;
             final EmployeesBean employeesBean = assembleEmployee(lastName, email, jobId, salary, departmentId);
             employeeList.add(employeesBean);
         }
@@ -85,7 +85,7 @@ public class PerformanceTestRunner {
     private static void testEmployeeUpdate(List<EmployeesBean> pEmployeesBeanList) {
 
         for (final EmployeesBean employee : pEmployeesBeanList) {
-            employee.setCommissionPct(0.22D);
+            employee.setCommissionPct(new java.math.BigDecimal(0.22D));
         }
         beanDML.updateEmployeesList(pEmployeesBeanList);
     }
@@ -99,7 +99,7 @@ public class PerformanceTestRunner {
                                                   final String pEmail,
                                                   final String pJobId,
                                                   final Double pSalary,
-                                                  final Long pDepartmentId) {
+                                                  final Integer pDepartmentId) {
 
         final EmployeesBean employeesBean = new EmployeesBean();
         employeesBean.setFirstName("John");
@@ -109,7 +109,7 @@ public class PerformanceTestRunner {
         employeesBean.setHireDate(new java.util.Date(1200000000000L));  // January 10, 2008, 22:20
         employeesBean.setJobId(pJobId);
         employeesBean.setSalary(pSalary);
-        employeesBean.setCommissionPct(0.21D);
+        employeesBean.setCommissionPct(new java.math.BigDecimal(0.21D));
         employeesBean.setManagerId(108L);
         employeesBean.setDepartmentId(pDepartmentId);
         return employeesBean;
