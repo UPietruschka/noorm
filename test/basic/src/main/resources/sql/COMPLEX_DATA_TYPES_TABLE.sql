@@ -7,6 +7,8 @@ CREATE TABLE complex_data_types
  blob_column BLOB,
  clob_column CLOB,
  xml_column XMLTYPE,
+ boolean_flag NUMBER(1),
+ string_converted_number NUMBER,
  version NUMBER DEFAULT 1
 );
 ALTER TABLE complex_data_types ADD CONSTRAINT complex_data_types_pk PRIMARY KEY (id);

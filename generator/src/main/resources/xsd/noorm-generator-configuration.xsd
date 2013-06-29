@@ -443,20 +443,42 @@
                         </xs:documentation>
                     </xs:annotation>
                 </xs:element>
-                <xs:element name="javaType" type="xs:string">
+                <xs:element name="javaType" type="javaType">
                     <xs:annotation>
                         <xs:documentation>
-                            The Java (destination) type of the custom mapping. This is the type used in the generated
-                            Java code for bean attributes, enum attributes or service method parameters.
-                            Java types from package "java.lang.*" do not need to get fully specified (i.e., "Long",
-                            "Double", etc., is sufficient), other types must be fully specified
-                            (e.g. "java.math.BigDecimal").
+                            The Java type for the custom type mapping (see enumeration "javaType")
                         </xs:documentation>
                     </xs:annotation>
                 </xs:element>
             </xs:sequence>
         </xs:complexType>
     </xs:element>
+
+    <xs:simpleType name="javaType">
+        <xs:annotation>
+            <xs:documentation>
+                The Java (destination) type of a custom mapping. This is the type used in the generated
+                Java code for bean attributes, enum attributes or service method parameters.
+                Java types from package "java.lang.*" do not need to get fully specified (i.e., "Long",
+                "Double", etc., is sufficient), other types must be fully specified
+                (e.g. "java.math.BigDecimal").
+            </xs:documentation>
+        </xs:annotation>
+        <xs:restriction base="xs:string">
+            <xs:enumeration value="String"/>
+            <xs:enumeration value="Boolean"/>
+            <xs:enumeration value="Long"/>
+            <xs:enumeration value="Integer"/>
+            <xs:enumeration value="Short"/>
+            <xs:enumeration value="Byte"/>
+            <xs:enumeration value="Float"/>
+            <xs:enumeration value="Double"/>
+            <xs:enumeration value="java.math.BigDecimal"/>
+            <xs:enumeration value="java.util.Date"/>
+            <xs:enumeration value="java.sql.Date"/>
+            <xs:enumeration value="java.sql.Timestamp"/>
+        </xs:restriction>
+    </xs:simpleType>
 
     <xs:complexType name="propertyList">
         <xs:sequence>

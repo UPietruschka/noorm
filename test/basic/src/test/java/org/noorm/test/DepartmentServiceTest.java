@@ -6,6 +6,7 @@ import org.noorm.test.hr.beans.VDepartmentsBean;
 import org.noorm.test.hr.services.BeanDML;
 import org.noorm.test.hr.services.DepartmentService;
 
+import java.math.BigInteger;
 import java.util.List;
 
 import static org.junit.Assert.*;

@@ -157,14 +157,24 @@
     </queryDeclarations>
     <customTypeMappings>
         <customTypeMapping>
+            <columnFilterRegex>STRING_CONVERTED_NUMBER</columnFilterRegex>
+            <databaseType>NUMBER</databaseType>
+            <javaType>String</javaType>
+        </customTypeMapping>
+        <customTypeMapping>
             <columnFilterRegex>COMMISSION_PCT</columnFilterRegex>
             <databaseType>NUMBER</databaseType>
             <javaType>java.math.BigDecimal</javaType>
         </customTypeMapping>
         <customTypeMapping>
-            <columnFilterRegex>COUNTRY_ID|REGION_ID|DEPARTMENT_ID|LOCATION_ID|OPT_ID|P_DEPARTMENT_ID</columnFilterRegex>
+            <columnFilterRegex>REGION_ID|DEPARTMENT_ID|OPT_ID|LOCATION_ID|P_DEPARTMENT_ID</columnFilterRegex>
             <databaseType>NUMBER</databaseType>
             <javaType>Integer</javaType>
+        </customTypeMapping>
+        <customTypeMapping>
+            <columnFilterRegex>BOOLEAN_FLAG</columnFilterRegex>
+            <databaseType>NUMBER</databaseType>
+            <javaType>Boolean</javaType>
         </customTypeMapping>
     </customTypeMappings>
 

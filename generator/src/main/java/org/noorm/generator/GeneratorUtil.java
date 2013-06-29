@@ -115,14 +115,14 @@ public class GeneratorUtil {
                         final Pattern finder1 = Pattern.compile(typeMapping.getColumnFilterRegex().toUpperCase());
                         final Matcher matcher1 = finder1.matcher(pColumnOrParamName.toUpperCase());
                         if (matcher1.matches()) {
-                            return typeMapping.getJavaType();
+                            return typeMapping.getJavaType().value();
                         }
                     }
                     if (typeMapping.getTableFilterRegex() != null && pTableName != null) {
                         final Pattern finder2 = Pattern.compile(typeMapping.getTableFilterRegex().toUpperCase());
                         final Matcher matcher2 = finder2.matcher(pTableName.toUpperCase());
                         if (matcher2.matches()) {
-                            return typeMapping.getJavaType();
+                            return typeMapping.getJavaType().value();
                         }
                     }
                 }
