@@ -73,7 +73,9 @@ public final class DataAccessException extends RuntimeException {
 		OPERATION_NOT_SUPPORTED_WITH_COMPOSITE_PK(2400L, "OPERATION_NOT_SUPPORTED_WITH_COMPOSITE_PK", "Operation not supported with composite primary key."),
         COULD_NOT_ACCESS_JDBC_METADATA(3000L, "COULD_NOT_ACCESS_JDBC_METADATA", "Could not access JDBC metadata."),
         COULD_NOT_ACQUIRE_TABLE_LOCK(3100L, "COULD_NOT_ACQUIRE_TABLE_LOCK", "Could not acquire table lock."),
-        ISOLATED_TABLE_LOCK(3200L, "ISOLATED_TABLE_LOCK", "Acquiring table locks requires explicit (user managed) transaction handling.");
+        ISOLATED_TABLE_LOCK(3200L, "ISOLATED_TABLE_LOCK", "Acquiring table locks requires explicit (user managed) transaction handling."),
+        COULD_NOT_CREATE_LOB(3250L, "COULD_NOT_CREATE_LOB", "Could not create LOB type (Clob, Blob, NClob or SQLXML)."),
+        ISOLATED_LOB_CREATION(3300L, "ISOLATED_LOB_CREATION", "Creating Clob, Blob, NClob and SQLXML requires explicit (user managed) transaction handling.");
 
         private final Long id;
 		private final String code;

@@ -240,6 +240,14 @@ public class BeanMapper<T> {
                 continue;
 			}
 
+            if (fieldType == java.sql.Date.class) {
+                Timestamp timestamp = pResultSet.getTimestamp(fieldName);
+                if (!pResultSet.wasNull()) {
+                    field.set(pBean, new java.sql.Date(timestamp.getTime()));
+                }
+                continue;
+            }
+
 			if (fieldType == BigDecimal.class) {
 				field.set(pBean, pResultSet.getBigDecimal(fieldName));
                 continue;
@@ -291,7 +299,32 @@ public class BeanMapper<T> {
                 //         }
                 //     }
                 // }
+                continue;
 			}
+            if (fieldType == Clob.class) {
+                final Clob value = pResultSet.getClob(fieldName);
+                if (!pResultSet.wasNull()) {
+                    field.set(pBean, value);
+                }
+                continue;
+            }
+            if (fieldType == NClob.class) {
+                final NClob value = pResultSet.getNClob(fieldName);
+                if (!pResultSet.wasNull()) {
+                    field.set(pBean, value);
+                }
+                continue;
+            }
+            if (fieldType == Blob.class) {
+                final Blob value = pResultSet.getBlob(fieldName);
+                if (!pResultSet.wasNull()) {
+                    field.set(pBean, value);
+                }
+                continue;
+            }
+            final String errMsg = "Datatype conversion failed for [".concat(fieldName)
+                    .concat(" / ").concat(fieldType.getName()).concat("].");
+            throw new DataAccessException(DataAccessException.Type.UNSUPPORTED_DATATYPE, errMsg);
 		}
 	}
 }

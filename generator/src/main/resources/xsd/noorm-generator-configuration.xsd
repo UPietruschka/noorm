@@ -477,6 +477,10 @@
             <xs:enumeration value="java.util.Date"/>
             <xs:enumeration value="java.sql.Date"/>
             <xs:enumeration value="java.sql.Timestamp"/>
+            <xs:enumeration value="java.sql.Clob"/>
+            <xs:enumeration value="java.sql.NClob"/>
+            <xs:enumeration value="java.sql.Blob"/>
+            <xs:enumeration value="java.sql.SQLXML"/>
         </xs:restriction>
     </xs:simpleType>
 

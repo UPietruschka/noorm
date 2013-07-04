@@ -25,7 +25,7 @@ public class ComplexDataTypeTest {
     private static final String SOME_XML = "<root type=\"INSERT\"><e1>TEST1</e1><e2>TEST2</e2></root>";
     private static final String SOME_NEW_XML = "<root type=\"UPDATE\"><e1>TEST3</e1><e2>TEST4</e2></root>";
     /*
-     Test large BLOBs with 50MB. Larger test BLOB sizes may be suitable, but 50MB should run out of the
+     Test large BLOBs with 20MB. Larger test BLOB sizes may be suitable, but 20MB should run out of the
      box for fresh IDE setups without the need to increase heap size.
      */
     private static final int TWENTY_MB = 20971520;
@@ -43,13 +43,14 @@ public class ComplexDataTypeTest {
             final ComplexDataTypesBean insertedBean = dmlProcessor.insert(complexDataTypesBean);
             final ComplexDataTypesBean insertedBean0 = complexDataService.findUniqueCdtById(insertedBean.getId());
             assertEquals(insertedBean, insertedBean0);
-            assertArrayEquals(SOME_BYTE_ARRAY, insertedBean.getRawTypeColumn());
+            assertArrayEquals(SOME_BYTE_ARRAY, insertedBean0.getRawTypeColumn());
             insertedBean.setRawTypeColumn(SOME_NEW_BYTE_ARRAY);
-            dmlProcessor.update(insertedBean);
-            dmlProcessor.delete(insertedBean);
+            dmlProcessor.update(insertedBean0);
+            dmlProcessor.delete(insertedBean0);
             DataSourceProvider.commit();
         } catch (Throwable e) {
             DataSourceProvider.rollback();
+            e.printStackTrace();
             fail(e.getMessage());
         }
     }
@@ -65,13 +66,14 @@ public class ComplexDataTypeTest {
             final ComplexDataTypesBean insertedBean = dmlProcessor.insert(complexDataTypesBean);
             final ComplexDataTypesBean insertedBean0 = complexDataService.findUniqueCdtById(insertedBean.getId());
             assertEquals(insertedBean, insertedBean0);
-            assertArrayEquals(SOME_BYTE_ARRAY, insertedBean.getBlobColumn());
+            assertArrayEquals(SOME_BYTE_ARRAY, insertedBean0.getBlobColumn());
             insertedBean.setBlobColumn(SOME_NEW_BYTE_ARRAY);
-            dmlProcessor.update(insertedBean);
-            dmlProcessor.delete(insertedBean);
+            dmlProcessor.update(insertedBean0);
+            dmlProcessor.delete(insertedBean0);
             DataSourceProvider.commit();
         } catch (Throwable e) {
             DataSourceProvider.rollback();
+            e.printStackTrace();
             fail(e.getMessage());
         }
     }
@@ -102,6 +104,7 @@ public class ComplexDataTypeTest {
             DataSourceProvider.commit();
         } catch (Throwable e) {
             DataSourceProvider.rollback();
+            e.printStackTrace();
             fail(e.getMessage());
         }
     }
@@ -117,13 +120,14 @@ public class ComplexDataTypeTest {
             final ComplexDataTypesBean insertedBean = dmlProcessor.insert(complexDataTypesBean);
             final ComplexDataTypesBean insertedBean0 = complexDataService.findUniqueCdtById(insertedBean.getId());
             assertEquals(insertedBean, insertedBean0);
-            assertEquals(SOME_TEXT, insertedBean.getClobColumn());
+            assertEquals(SOME_TEXT, insertedBean0.getClobColumn());
             insertedBean.setClobColumn(SOME_NEW_TEXT);
-            dmlProcessor.update(insertedBean);
-            dmlProcessor.delete(insertedBean);
+            dmlProcessor.update(insertedBean0);
+            dmlProcessor.delete(insertedBean0);
             DataSourceProvider.commit();
         } catch (Throwable e) {
             DataSourceProvider.rollback();
+            e.printStackTrace();
             fail(e.getMessage());
         }
     }
@@ -144,6 +148,7 @@ public class ComplexDataTypeTest {
             DataSourceProvider.commit();
         } catch (Throwable e) {
             DataSourceProvider.rollback();
+            e.printStackTrace();
             fail(e.getMessage());
         }
     }
@@ -160,10 +165,11 @@ public class ComplexDataTypeTest {
             final ComplexDataTypesBean insertedBean = dmlProcessor.insert(complexDataTypesBean);
             final ComplexDataTypesBean insertedBean0 = complexDataService.findUniqueCdtById(insertedBean.getId());
             assertEquals(insertedBean, insertedBean0);
-            dmlProcessor.delete(insertedBean);
+            dmlProcessor.delete(insertedBean0);
             DataSourceProvider.commit();
         } catch (Throwable e) {
             DataSourceProvider.rollback();
+            e.printStackTrace();
             fail(e.getMessage());
         }
     }
@@ -179,13 +185,18 @@ public class ComplexDataTypeTest {
             final ComplexDataTypesBean insertedBean = dmlProcessor.insert(complexDataTypesBean);
             final ComplexDataTypesBean insertedBean0 = complexDataService.findUniqueCdtById(insertedBean.getId());
             assertEquals(insertedBean, insertedBean0);
-            assertEquals(SOME_XML, insertedBean.getXmlColumn());
+            // The XML is returned from the database with a different formatting, which causes a simple
+            // compare to fail. Thus, we remove all whitespace prior to comparison
+            final String normalizedSOME_XML = SOME_XML.replaceAll("\\s","");
+            final String normalizedOracleValues = insertedBean0.getXmlColumn().replaceAll("\\s","");
+            assertEquals(normalizedSOME_XML, normalizedOracleValues);
             insertedBean.setXmlColumn(SOME_NEW_XML);
-            dmlProcessor.update(insertedBean);
-            dmlProcessor.delete(insertedBean);
+            dmlProcessor.update(insertedBean0);
+            dmlProcessor.delete(insertedBean0);
             DataSourceProvider.commit();
         } catch (Throwable e) {
             DataSourceProvider.rollback();
+            e.printStackTrace();
             fail(e.getMessage());
         }
     }

@@ -110,7 +110,7 @@ public class GeneratorUtil {
 
         if (pCustomTypeMappings != null) {
             for (final CustomTypeMapping typeMapping : pCustomTypeMappings) {
-                if (pOracleType.equals(typeMapping.getDatabaseType())) {
+                if (pOracleType.startsWith(typeMapping.getDatabaseType())) {
                     if (typeMapping.getColumnFilterRegex() != null) {
                         final Pattern finder1 = Pattern.compile(typeMapping.getColumnFilterRegex().toUpperCase());
                         final Matcher matcher1 = finder1.matcher(pColumnOrParamName.toUpperCase());
