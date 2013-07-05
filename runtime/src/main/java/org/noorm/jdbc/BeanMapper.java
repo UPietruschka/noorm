@@ -28,7 +28,7 @@ public class BeanMapper<T> {
 
 	private static BeanMapper mapper = new BeanMapper();
 	private static final Logger log = LoggerFactory.getLogger(BeanMapper.class);
-    private static int DEFAULT_BUFFER_SIZE = 4096;
+    private static final String XMLTYPE = "XMLTYPE";
 
 	public static <T> BeanMapper<T> getInstance() {
 
@@ -159,6 +159,7 @@ public class BeanMapper<T> {
 			throws IllegalAccessException, SQLException {
 
 		String fieldName = null;
+        String dataType = null;
 		for (final Field field : pFields) {
 			// Ignore serialVersionUID
 			if (BeanMetaDataUtil.SERIAL_VERSION_UID.equals(field.getName())) {
@@ -171,6 +172,7 @@ public class BeanMapper<T> {
 				if (annotations[0].annotationType() == JDBCColumn.class) {
 					final JDBCColumn colAnn = (JDBCColumn) annotations[0];
 					fieldName = colAnn.name();
+                    dataType = colAnn.dataType();
 				}
 			} else {
 				// Ignore pFields without JDBCColumn annotation (interpreted transient)
@@ -196,11 +198,21 @@ public class BeanMapper<T> {
 			// Bean specification.
 
 			if (fieldType == String.class) {
-                // Handling includes CHAR, VARCHAR2, NCHAR and NVHARCHAR2, but also for complex data-types
-                // like CLOB and XMLTYPE, which are mapped to Strings. For large CLOBs or XMLTYPEs, using
-                // the stream-based getters in the ResultSet API may be suitable (getCharacterStream),
-                // but the driver uses streaming behind the scenes anyway, so we do not need to use it here.
-                final String value = pResultSet.getString(fieldName);
+                // Handling includes CHAR, VARCHAR2, NCHAR and NVHARCHAR2, but also for complex data-type
+                // CLOB. Things are more complicated for XML types (Oracle proprietary type XMLTYPE and
+                // standard JDBC 4.0 type java.sql.SQLXML). Oracle has limited support for the SQLXML prior
+                // to Oracle 11.2. Even with Oracle 11.2, the behaviour may depend on the Oracle JDBC driver,
+                // so version 11.2.0.3.0 is known to be buggy and does not work with the standard access
+                // mechanisms used here.
+                String value = null;
+                if (dataType.equals(XMLTYPE)) {
+                    final SQLXML sqlxml = pResultSet.getSQLXML(fieldName);
+                    if (sqlxml != null) {
+                        value = sqlxml.getString();
+                    }
+                } else {
+                    value = pResultSet.getString(fieldName);
+                }
                 if (value != null) {
                     field.set(pBean, value.trim());
                 }
@@ -317,6 +329,13 @@ public class BeanMapper<T> {
             }
             if (fieldType == Blob.class) {
                 final Blob value = pResultSet.getBlob(fieldName);
+                if (!pResultSet.wasNull()) {
+                    field.set(pBean, value);
+                }
+                continue;
+            }
+            if (fieldType == SQLXML.class) {
+                final SQLXML value = pResultSet.getSQLXML(fieldName);
                 if (!pResultSet.wasNull()) {
                     field.set(pBean, value);
                 }

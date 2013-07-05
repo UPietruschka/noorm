@@ -201,6 +201,11 @@
             <databaseType>BLOB</databaseType>
             <javaType>java.sql.Blob</javaType>
         </customTypeMapping>
+        <customTypeMapping>
+            <columnFilterRegex>CONVERTED_XMLTYPE</columnFilterRegex>
+            <databaseType>XMLTYPE</databaseType>
+            <javaType>java.sql.SQLXML</javaType>
+        </customTypeMapping>
     </customTypeMappings>
 
 </generatorConfiguration>

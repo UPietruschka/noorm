@@ -1,6 +1,5 @@
 package org.noorm.test;
 
-import org.junit.Ignore;
 import org.junit.Test;
 import org.noorm.jdbc.DataSourceProvider;
 import org.noorm.jdbc.JDBCDMLProcessor;
@@ -8,6 +7,7 @@ import org.noorm.jdbc.LOBHelper;
 import org.noorm.test.hr.beans.ComplexDataTypesBean;
 import org.noorm.test.hr.services.ComplexDataService;
 
+import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.Reader;
@@ -16,6 +16,7 @@ import java.sql.Blob;
 import java.sql.Clob;
 import java.sql.NClob;
 
+import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
 
@@ -34,8 +35,6 @@ public class LOBStreamingTest {
     private static final byte[] SOME_NEW_BYTE_ARRAY = new byte[] { 0, 9, 8, 7, 6, 5, 4, 3, 2, 1 };
     private static final String SOME_TEXT = "SOME_TEXT";
     private static final String SOME_NEW_TEXT = "SOME_NEW_TEXT";
-    private static final String SOME_XML = "<root type=\"INSERT\"><e1>TEST1</e1><e2>TEST2</e2></root>";
-    private static final String SOME_NEW_XML = "<root type=\"UPDATE\"><e1>TEST3</e1><e2>TEST4</e2></root>";
 
     private ComplexDataService complexDataService = ComplexDataService.getInstance();
 
@@ -54,13 +53,12 @@ public class LOBStreamingTest {
             complexDataTypesBean.setConvertedClobColumn(clob);
             final JDBCDMLProcessor<ComplexDataTypesBean> dmlProcessor = JDBCDMLProcessor.getInstance();
             final ComplexDataTypesBean insertedBean = dmlProcessor.insert(complexDataTypesBean);
+            clob.free();
             final ComplexDataTypesBean insertedBean0 = complexDataService.findUniqueCdtById(insertedBean.getId());
             assertEquals(insertedBean, insertedBean0);
             final Reader reader1 = insertedBean0.getConvertedClobColumn().getCharacterStream();
-            final char[] buffer1 = new char[SOME_TEXT.length()];
-            reader1.read(buffer1);
-            reader1.close();
-            assertEquals(SOME_TEXT, String.copyValueOf(buffer1));
+            final String clob1 = readFully(reader1);
+            assertEquals(SOME_TEXT, clob1);
 
             // Update
             final Writer writer2 = insertedBean0.getConvertedClobColumn().setCharacterStream(1);
@@ -70,10 +68,8 @@ public class LOBStreamingTest {
             final ComplexDataTypesBean insertedBean1 = complexDataService.findUniqueCdtById(insertedBean0.getId());
             assertEquals(insertedBean0, insertedBean1);
             final Reader reader2 = insertedBean1.getConvertedClobColumn().getCharacterStream();
-            final char[] buffer2 = new char[SOME_NEW_TEXT.length()];
-            reader2.read(buffer2);
-            reader2.close();
-            assertEquals(SOME_NEW_TEXT, String.copyValueOf(buffer2));
+            final String clob2 = readFully(reader2);
+            assertEquals(SOME_NEW_TEXT, clob2);
 
             // Delete
             dmlProcessor.delete(insertedBean0);
@@ -101,13 +97,12 @@ public class LOBStreamingTest {
             complexDataTypesBean.setConvertedNclobColumn(nclob);
             final JDBCDMLProcessor<ComplexDataTypesBean> dmlProcessor = JDBCDMLProcessor.getInstance();
             final ComplexDataTypesBean insertedBean = dmlProcessor.insert(complexDataTypesBean);
+            nclob.free();
             final ComplexDataTypesBean insertedBean0 = complexDataService.findUniqueCdtById(insertedBean.getId());
             assertEquals(insertedBean, insertedBean0);
             final Reader reader1 = insertedBean0.getConvertedNclobColumn().getCharacterStream();
-            final char[] buffer1 = new char[SOME_TEXT.length()];
-            reader1.read(buffer1);
-            reader1.close();
-            assertEquals(SOME_TEXT, String.copyValueOf(buffer1));
+            final String clob1 = readFully(reader1);
+            assertEquals(SOME_TEXT, clob1);
 
             // Update
             final Writer writer2 = insertedBean0.getConvertedNclobColumn().setCharacterStream(1);
@@ -117,10 +112,8 @@ public class LOBStreamingTest {
             final ComplexDataTypesBean insertedBean1 = complexDataService.findUniqueCdtById(insertedBean0.getId());
             assertEquals(insertedBean0, insertedBean1);
             final Reader reader2 = insertedBean1.getConvertedNclobColumn().getCharacterStream();
-            final char[] buffer2 = new char[SOME_NEW_TEXT.length()];
-            reader2.read(buffer2);
-            reader2.close();
-            assertEquals(SOME_NEW_TEXT, String.copyValueOf(buffer2));
+            final String clob2 = readFully(reader2);
+            assertEquals(SOME_NEW_TEXT, clob2);
 
             // Delete
             dmlProcessor.delete(insertedBean0);
@@ -133,7 +126,6 @@ public class LOBStreamingTest {
         }
     }
 
-    @Ignore
     @Test
     public void testBlobCRUD() {
 
@@ -149,13 +141,14 @@ public class LOBStreamingTest {
             complexDataTypesBean.setConvertedBlobColumn(blob);
             final JDBCDMLProcessor<ComplexDataTypesBean> dmlProcessor = JDBCDMLProcessor.getInstance();
             final ComplexDataTypesBean insertedBean = dmlProcessor.insert(complexDataTypesBean);
+            blob.free();
             final ComplexDataTypesBean insertedBean0 = complexDataService.findUniqueCdtById(insertedBean.getId());
             assertEquals(insertedBean, insertedBean0);
             final InputStream iStream = insertedBean0.getConvertedBlobColumn().getBinaryStream();
             final byte[] buffer1 = new byte[SOME_BYTE_ARRAY.length];
             iStream.read(buffer1);
             iStream.close();
-            assertEquals(SOME_BYTE_ARRAY, buffer1);
+            assertArrayEquals(SOME_BYTE_ARRAY, buffer1);
 
             // Update
             final OutputStream oStream2 = insertedBean0.getConvertedBlobColumn().setBinaryStream(1);
@@ -169,7 +162,7 @@ public class LOBStreamingTest {
             final byte[] buffer2 = new byte[SOME_NEW_BYTE_ARRAY.length];
             iStream2.read(buffer2);
             iStream2.close();
-            assertEquals(SOME_NEW_BYTE_ARRAY, buffer2);
+            assertArrayEquals(SOME_NEW_BYTE_ARRAY, buffer2);
 
             // Delete
             dmlProcessor.delete(insertedBean0);
@@ -180,5 +173,16 @@ public class LOBStreamingTest {
             e.printStackTrace();
             fail(e.getMessage());
         }
+    }
+
+    private String readFully(final Reader pReader) throws IOException {
+
+        final char[] cBuf = new char[64];
+        final StringBuffer sBuf = new StringBuffer();
+        int numChars;
+        while ((numChars = pReader.read(cBuf, 0, cBuf.length)) > 0) {
+            sBuf.append(cBuf, 0, numChars);
+        }
+        return sBuf.toString();
     }
 }

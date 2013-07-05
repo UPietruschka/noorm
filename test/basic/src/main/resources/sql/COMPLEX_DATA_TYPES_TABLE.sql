@@ -14,6 +14,7 @@ CREATE TABLE complex_data_types
  converted_number NUMBER,
  converted_timestamp TIMESTAMP,
  converted_date DATE,
+ converted_xmltype XMLTYPE,
  version NUMBER DEFAULT 1
 );
 ALTER TABLE complex_data_types ADD CONSTRAINT complex_data_types_pk PRIMARY KEY (id);

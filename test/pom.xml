@@ -25,6 +25,39 @@
         <jdbc.password>hr</jdbc.password>
     </properties>
 
+    <profiles>
+        <profile>
+            <id>xml-test</id>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-surefire-plugin</artifactId>
+                        <version>2.15</version>
+                        <configuration>
+                            <includes>
+                                <include>**/*Test.java</include>
+                                <include>**/XMLVerification.java</include>
+                            </includes>
+                        </configuration>
+                    </plugin>
+                </plugins>
+            </build>
+            <dependencies>
+                <dependency>
+                    <groupId>${oracle.groupId}</groupId>
+                    <artifactId>${oracle.xdb.artifactId}</artifactId>
+                    <version>${oracle.version}</version>
+                </dependency>
+                <dependency>
+                    <groupId>${oracle.groupId}</groupId>
+                    <artifactId>${oracle.xmlparser.artifactId}</artifactId>
+                    <version>${oracle.version}</version>
+                </dependency>
+            </dependencies>
+        </profile>
+    </profiles>
+
     <dependencies>
 
         <dependency>

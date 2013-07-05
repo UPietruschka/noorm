@@ -22,8 +22,6 @@ public class ComplexDataTypeTest {
     private static final byte[] SOME_NEW_BYTE_ARRAY = new byte[] { 0, 9, 8, 7, 6, 5, 4, 3, 2, 1 };
     private static final String SOME_TEXT = "SOME_TEXT";
     private static final String SOME_NEW_TEXT = "SOME_NEW_TEXT";
-    private static final String SOME_XML = "<root type=\"INSERT\"><e1>TEST1</e1><e2>TEST2</e2></root>";
-    private static final String SOME_NEW_XML = "<root type=\"UPDATE\"><e1>TEST3</e1><e2>TEST4</e2></root>";
     /*
      Test large BLOBs with 20MB. Larger test BLOB sizes may be suitable, but 20MB should run out of the
      box for fresh IDE setups without the need to increase heap size.
@@ -165,33 +163,6 @@ public class ComplexDataTypeTest {
             final ComplexDataTypesBean insertedBean = dmlProcessor.insert(complexDataTypesBean);
             final ComplexDataTypesBean insertedBean0 = complexDataService.findUniqueCdtById(insertedBean.getId());
             assertEquals(insertedBean, insertedBean0);
-            dmlProcessor.delete(insertedBean0);
-            DataSourceProvider.commit();
-        } catch (Throwable e) {
-            DataSourceProvider.rollback();
-            e.printStackTrace();
-            fail(e.getMessage());
-        }
-    }
-
-    @Test
-    public void testXMLTypeCRUD() {
-
-        DataSourceProvider.begin();
-        try {
-            final ComplexDataTypesBean complexDataTypesBean = new ComplexDataTypesBean();
-            complexDataTypesBean.setXmlColumn(SOME_XML);
-            final JDBCDMLProcessor<ComplexDataTypesBean> dmlProcessor = JDBCDMLProcessor.getInstance();
-            final ComplexDataTypesBean insertedBean = dmlProcessor.insert(complexDataTypesBean);
-            final ComplexDataTypesBean insertedBean0 = complexDataService.findUniqueCdtById(insertedBean.getId());
-            assertEquals(insertedBean, insertedBean0);
-            // The XML is returned from the database with a different formatting, which causes a simple
-            // compare to fail. Thus, we remove all whitespace prior to comparison
-            final String normalizedSOME_XML = SOME_XML.replaceAll("\\s","");
-            final String normalizedOracleValues = insertedBean0.getXmlColumn().replaceAll("\\s","");
-            assertEquals(normalizedSOME_XML, normalizedOracleValues);
-            insertedBean.setXmlColumn(SOME_NEW_XML);
-            dmlProcessor.update(insertedBean0);
             dmlProcessor.delete(insertedBean0);
             DataSourceProvider.commit();
         } catch (Throwable e) {
