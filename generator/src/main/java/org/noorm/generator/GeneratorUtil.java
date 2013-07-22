@@ -94,34 +94,28 @@ public class GeneratorUtil {
 
     /**
      * Maps the given Oracle type to the corresponding Java type, which represents the Oracle type in
-     * the generated Java Bean class (e.g. "VARCHAR2" -> "String").
+     * the generated Java service class (e.g. "VARCHAR2" -> "String").
      *
      * @param pOracleType the Oracle type name
-     * @param pDataPrecision the data precision of the Oracle type, if available
-     * @param pDataScale the data scale of the Oracle type, if available
+     * @param pParamName the parameter name (of a stored procedure)
+     * @param pCustomTypeMappings the custom type mapping
      * @return the Java type name
      */
     public static String convertOracleType2JavaType(final String pOracleType,
-                                                    final Long pDataPrecision,
-                                                    final Long pDataScale,
-                                                    final String pTableName,
-                                                    final String pColumnOrParamName,
+                                                    final String pParamName,
                                                     final List<CustomTypeMapping> pCustomTypeMappings) {
 
         if (pCustomTypeMappings != null) {
             for (final CustomTypeMapping typeMapping : pCustomTypeMappings) {
                 if (pOracleType.startsWith(typeMapping.getDatabaseType())) {
-                    if (typeMapping.getColumnFilterRegex() != null) {
-                        final Pattern finder1 = Pattern.compile(typeMapping.getColumnFilterRegex().toUpperCase());
-                        final Matcher matcher1 = finder1.matcher(pColumnOrParamName.toUpperCase());
-                        if (matcher1.matches()) {
-                            return typeMapping.getJavaType().value();
+                    if (typeMapping.getParameterFilterRegex() != null) {
+                        if (typeMapping.getColumnFilterRegex() != null || typeMapping.getTableFilterRegex() != null) {
+                            throw new GeneratorException("Element 'parameterFilterRegex' must not be defined"
+                                    .concat(" together with elements 'tableFilterRegex' or 'columnFilterRegex'"));
                         }
-                    }
-                    if (typeMapping.getTableFilterRegex() != null && pTableName != null) {
-                        final Pattern finder2 = Pattern.compile(typeMapping.getTableFilterRegex().toUpperCase());
-                        final Matcher matcher2 = finder2.matcher(pTableName.toUpperCase());
-                        if (matcher2.matches()) {
+                        final Pattern finder0 = Pattern.compile(typeMapping.getParameterFilterRegex().toUpperCase());
+                        final Matcher matcher0 = finder0.matcher(pParamName.toUpperCase());
+                        if (matcher0.matches()) {
                             return typeMapping.getJavaType().value();
                         }
                     }
@@ -129,6 +123,76 @@ public class GeneratorUtil {
             }
         }
 
+        return convertOracleType2JavaType(pOracleType, 0L, 0L);
+    }
+
+    /**
+     * Maps the given Oracle type to the corresponding Java type, which represents the Oracle type in
+     * the generated Java Bean class (e.g. "VARCHAR2" -> "String").
+     *
+     * @param pOracleType the Oracle type name
+     * @param pDataPrecision the data precision of the Oracle type, if available
+     * @param pDataScale the data scale of the Oracle type, if available
+     * @param pTableName the table name
+     * @param pColumnName the column name
+     * @param pCustomTypeMappings the custom type mapping
+     * @return the Java type name
+     */
+
+    public static String convertOracleType2JavaType(final String pOracleType,
+                                                    final Long pDataPrecision,
+                                                    final Long pDataScale,
+                                                    final String pTableName,
+                                                    final String pColumnName,
+                                                    final List<CustomTypeMapping> pCustomTypeMappings) {
+
+        if (pCustomTypeMappings != null) {
+            for (final CustomTypeMapping typeMapping : pCustomTypeMappings) {
+                if (pOracleType.startsWith(typeMapping.getDatabaseType()) &&
+                        typeMapping.getParameterFilterRegex() == null) {
+                    if (typeMapping.getColumnFilterRegex() == null && typeMapping.getTableFilterRegex() == null) {
+                        // Though it is possible to specify attributes 'minOccurs' and 'maxOccurs' to a choice
+                        // element in XML schema to indicate that "al least" one element should be defined, the
+                        // generated code for this construction is rather awkward, so we do the check for this here
+                        // (a 'choice' is no longer used, but simple elements with 'minOccurs="0"')
+                        throw new GeneratorException("At least one of the elements 'columnFilterRegex'"
+                                .concat(" or 'tableFilterRegex' must be specified for each custom type mapping"));
+                    }
+                    boolean tableNameMatches = false;
+                    boolean columnNameMatches = false;
+                    if (typeMapping.getColumnFilterRegex() != null) {
+                        final Pattern finder1 = Pattern.compile(typeMapping.getColumnFilterRegex().toUpperCase());
+                        final Matcher matcher1 = finder1.matcher(pColumnName.toUpperCase());
+                        if (matcher1.matches()) {
+                            columnNameMatches = true;
+                        }
+                    } else {
+                        // No specified column-name restriction includes all columns.
+                        columnNameMatches = true;
+                    }
+                    if (typeMapping.getTableFilterRegex() != null) {
+                        final Pattern finder2 = Pattern.compile(typeMapping.getTableFilterRegex().toUpperCase());
+                        final Matcher matcher2 = finder2.matcher(pTableName.toUpperCase());
+                        if (matcher2.matches()) {
+                            tableNameMatches = true;
+                        }
+                    } else {
+                        // No specified table-name restriction includes all tables.
+                        tableNameMatches = true;
+                    }
+                    if (tableNameMatches && columnNameMatches) {
+                        return typeMapping.getJavaType().value();
+                    }
+                }
+            }
+        }
+
+        return convertOracleType2JavaType(pOracleType, pDataPrecision, pDataScale);
+    }
+
+    private static String convertOracleType2JavaType(final String pOracleType,
+                                                     final Long pDataPrecision,
+                                                     final Long pDataScale) {
         String javaType = "String";
         if (pOracleType.equals("RAW")) {
             javaType = "byte[]";
@@ -137,7 +201,7 @@ public class GeneratorUtil {
             javaType = "byte[]";
         }
         if (pOracleType.equals("NUMBER")) {
-            if (pDataPrecision != null && pDataPrecision > 0L && pDataScale != 0 && pDataScale > 0L) {
+            if (pDataPrecision != null && pDataPrecision > 0L && pDataScale != null && pDataScale > 0L) {
                 javaType = "Double";
             } else {
                 javaType = "Long";

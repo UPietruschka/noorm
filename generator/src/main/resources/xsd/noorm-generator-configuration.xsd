@@ -409,28 +409,35 @@
         </xs:annotation>
         <xs:complexType>
             <xs:sequence>
-                <xs:choice>
-                    <xs:element name="tableFilterRegex" type="xs:string">
-                        <xs:annotation>
-                            <xs:documentation>
-                                The scope of the custom type mapping can be specified on a per table basis using
-                                regular expressions to identify the table(s) for the application of the custom
-                                type mapping.
-                                To apply the specified type mapping to all tables (and columns), a wildcard
-                                expression can be used (".*").
-                            </xs:documentation>
-                        </xs:annotation>
-                    </xs:element>
-                    <xs:element name="columnFilterRegex" type="xs:string">
-                        <xs:annotation>
-                            <xs:documentation>
-                                The scope of the custom type mapping can be specified on a per column basis using
-                                regular expressions to identify the column(s) for the application of the custom
-                                type mapping..
-                            </xs:documentation>
-                        </xs:annotation>
-                    </xs:element>
-                </xs:choice>
+                <xs:element name="parameterFilterRegex" type="xs:string" minOccurs="0">
+                    <xs:annotation>
+                        <xs:documentation>
+                            The scope of the custom type mapping can be specified on a per parameter basis using
+                            regular expressions to identify the parameter(s) for the application of the custom
+                            type mapping..
+                        </xs:documentation>
+                    </xs:annotation>
+                </xs:element>
+                <xs:element name="tableFilterRegex" type="xs:string" minOccurs="0">
+                    <xs:annotation>
+                        <xs:documentation>
+                            The scope of the custom type mapping can be specified on a per table basis using
+                            regular expressions to identify the table(s) for the application of the custom
+                            type mapping.
+                            To apply the specified type mapping to all tables (and columns), a wildcard
+                            expression can be used (".*").
+                        </xs:documentation>
+                    </xs:annotation>
+                </xs:element>
+                <xs:element name="columnFilterRegex" type="xs:string" minOccurs="0">
+                    <xs:annotation>
+                        <xs:documentation>
+                            The scope of the custom type mapping can be specified on a per column basis using
+                            regular expressions to identify the column(s) for the application of the custom
+                            type mapping..
+                        </xs:documentation>
+                    </xs:annotation>
+                </xs:element>
                 <xs:element name="databaseType" type="xs:string">
                     <xs:annotation>
                         <xs:documentation>

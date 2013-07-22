@@ -157,6 +157,7 @@
     </queryDeclarations>
     <customTypeMappings>
         <customTypeMapping>
+            <tableFilterRegex>COMPLEX_DATA_TYPES</tableFilterRegex>
             <columnFilterRegex>CONVERTED_NUMBER</columnFilterRegex>
             <databaseType>NUMBER</databaseType>
             <javaType>String</javaType>
@@ -167,7 +168,17 @@
             <javaType>java.math.BigDecimal</javaType>
         </customTypeMapping>
         <customTypeMapping>
-            <columnFilterRegex>REGION_ID|DEPARTMENT_ID|OPT_ID|LOCATION_ID|P_DEPARTMENT_ID</columnFilterRegex>
+            <columnFilterRegex>REGION_ID|DEPARTMENT_ID|OPT_ID|LOCATION_ID</columnFilterRegex>
+            <databaseType>NUMBER</databaseType>
+            <javaType>Integer</javaType>
+        </customTypeMapping>
+        <customTypeMapping>
+            <parameterFilterRegex>P_DEPARTMENT_ID</parameterFilterRegex>
+            <databaseType>NUMBER</databaseType>
+            <javaType>Integer</javaType>
+        </customTypeMapping>
+        <customTypeMapping>
+            <tableFilterRegex>COUNTRIES</tableFilterRegex>
             <databaseType>NUMBER</databaseType>
             <javaType>Integer</javaType>
         </customTypeMapping>
