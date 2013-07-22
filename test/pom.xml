@@ -20,7 +20,12 @@
 
     <properties>
         <jdbc.driver.name>oracle.jdbc.OracleDriver</jdbc.driver.name>
-        <jdbc.url>jdbc:oracle:thin:@localhost:1521:XE</jdbc.url>
+        <jdbc.url>jdbc:oracle:thin:@
+            (DESCRIPTION =
+            (ADDRESS_LIST = (ADDRESS = (PROTOCOL = TCP)(HOST = localhost)(PORT = 1521)))
+            (CONNECT_DATA = (SERVER = DEDICATED)(SERVICE_NAME = XE))
+            )
+        </jdbc.url>
         <jdbc.username>hr</jdbc.username>
         <jdbc.password>hr</jdbc.password>
     </properties>
