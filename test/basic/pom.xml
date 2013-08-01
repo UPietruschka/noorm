@@ -81,6 +81,7 @@
                                 <srcFile>target/noorm/plsql/DYNSQL_QUERY_TEMPLATE.sql</srcFile>
                                 <srcFile>src/main/resources/sql/QUERY_TEMPLATES.sql</srcFile>
                                 <srcFile>src/main/resources/sql/OPT_LOCK_TABLES.sql</srcFile>
+                                <srcFile>src/main/resources/sql/CASE_SENSITIVE_TABLE.sql</srcFile>
                                 <srcFile>src/main/resources/sql/COMPLEX_DATA_TYPES_TABLE.sql</srcFile>
                                 <srcFile>src/main/resources/sql/JOBS_SYNONYM.sql</srcFile>
                             </srcFiles>

@@ -10,7 +10,7 @@
     <packageFilterRegex>(.*SERVICE|.*SEARCH)</packageFilterRegex>
     <table2SequenceMapping>
         <property>
-            <name>(EMPLOYEES|DEPARTMENTS|LOCATIONS|OPT_LOCK_.*|COMPLEX.*)</name>
+            <name>(EMPLOYEES|DEPARTMENTS|LOCATIONS|OPT_LOCK_.*|COMPLEX.*|CASE.*)</name>
             <value>$1_SEQ</value>
         </property>
         <property>
@@ -39,6 +39,10 @@
         <property>
             <name>COMPLEX_.*</name>
             <value>VERSION</value>
+        </property>
+        <property>
+            <name>CASE_.*</name>
+            <value>version</value>
         </property>
     </optLockVersionColumnMapping>
     <optLockFullRowCompareTableRegex>V_DEPARTMENTS|JOBS|JOB_HISTORY</optLockFullRowCompareTableRegex>
@@ -153,6 +157,9 @@
                     </operator>
                 </queryColumn>
             </queryColumns>
+        </queryDeclaration>
+        <queryDeclaration>
+            <tableName>case_sensitive_table</tableName>
         </queryDeclaration>
     </queryDeclarations>
     <customTypeMappings>
