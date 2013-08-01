@@ -9,7 +9,6 @@ import org.slf4j.LoggerFactory;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
-import java.sql.Timestamp;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
@@ -34,7 +33,7 @@ public class BeanMetaDataUtil {
 	public static final String NOT_NULLABLE = "N";
 	public static final String SERIAL_VERSION_UID = "serialVersionUID";
 
-    private static Map<Field, Annotation[]> declaredAnnotationsCache = new HashMap<Field, Annotation[]>();
+    private static Map<Field, JDBCColumn> jdbcColumnAnnotationCache = new HashMap<Field, JDBCColumn>();
     private static Map<Class, Field[]> declaredFieldInclParentCache = new HashMap<Class, Field[]>();
 
 	/**
@@ -88,14 +87,19 @@ public class BeanMetaDataUtil {
      * @param pField the field
      * @return the annotations for the given field
      */
-    public static Annotation[] getDeclaredAnnotations(final Field pField) {
+    public static JDBCColumn getJDBCColumnAnnotation(final Field pField) {
 
-        Annotation[] annotations = declaredAnnotationsCache.get(pField);
-        if (annotations == null) {
-            annotations = pField.getDeclaredAnnotations();
-            declaredAnnotationsCache.put(pField, annotations);
+        JDBCColumn jdbcColumn = jdbcColumnAnnotationCache.get(pField);
+        if (jdbcColumn == null) {
+            final Annotation[] annotations = pField.getDeclaredAnnotations();
+            if (annotations != null && annotations.length > 0) {
+                if (annotations[0].annotationType() == JDBCColumn.class) {
+                    jdbcColumn = (JDBCColumn) annotations[0];
+                }
+                jdbcColumnAnnotationCache.put(pField, jdbcColumn);
+            }
         }
-        return annotations;
+        return jdbcColumn;
     }
 
 	/**

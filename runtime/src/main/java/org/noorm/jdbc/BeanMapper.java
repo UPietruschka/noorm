@@ -131,16 +131,13 @@ public class BeanMapper<T> {
 				continue;
 			}
 			field.setAccessible(true);
-			final Annotation[] annotations = BeanMetaDataUtil.getDeclaredAnnotations(field);
-			if (annotations != null && annotations.length > 0) {
-				if (annotations[0].annotationType() == JDBCColumn.class) {
-					final JDBCColumn colAnn = (JDBCColumn) annotations[0];
-					if (!colAnn.updatable()) {
-						continue;
-					}
-					fieldName = colAnn.name();
-				}
-			} else {
+            final JDBCColumn colAnn = BeanMetaDataUtil.getJDBCColumnAnnotation(field);
+            if (colAnn != null) {
+                if (!colAnn.updatable()) {
+                    continue;
+                }
+                fieldName = colAnn.name();
+            } else {
 				// Ignore fields without JDBCColumn annotation (interpreted transient)
 				continue;
 			}
@@ -167,17 +164,14 @@ public class BeanMapper<T> {
 			}
 			field.setAccessible(true);
 			final Class fieldType = field.getType();
-			final Annotation[] annotations = BeanMetaDataUtil.getDeclaredAnnotations(field);
-			if (annotations != null && annotations.length > 0) {
-				if (annotations[0].annotationType() == JDBCColumn.class) {
-					final JDBCColumn colAnn = (JDBCColumn) annotations[0];
-					fieldName = colAnn.name();
-                    dataType = colAnn.dataType();
-				}
-			} else {
-				// Ignore pFields without JDBCColumn annotation (interpreted transient)
-				continue;
-			}
+            final JDBCColumn colAnn = BeanMetaDataUtil.getJDBCColumnAnnotation(field);
+            if (colAnn != null) {
+                fieldName = colAnn.name();
+                dataType = colAnn.dataType();
+            } else {
+                // Ignore fields without JDBCColumn annotation (interpreted transient)
+                continue;
+            }
 
 			if (log.isTraceEnabled()) {
 				StringBuilder logMessage = new StringBuilder();

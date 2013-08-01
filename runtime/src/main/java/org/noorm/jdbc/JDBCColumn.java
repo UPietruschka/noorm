@@ -17,5 +17,6 @@ public @interface JDBCColumn {
 	String dataType() default "";
 	boolean updatable() default true;
 	boolean nullable() default true;
+    boolean caseSensitiveName() default false;
 	int maxLength() default 0;
 }

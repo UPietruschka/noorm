@@ -1,5 +1,10 @@
 package org.noorm.jdbc;
 
+import org.noorm.metadata.BeanMetaDataUtil;
+
+import java.lang.reflect.Field;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 
@@ -113,35 +118,46 @@ class StatementBuilder {
 	private static final String INSERT_NEXT_PK_VAL = ".NEXTVAL";
 	private static final String INSERT_DELIM_3 = ")";
 
-	public String buildInsert(final String pTableName,
-							  final String[] pPrimaryKeyColumnNames,
-							  final String pSequenceName,
-							  final Map<String, Object> fieldMap) {
+	public String buildInsert(final IBean pBean) {
 
+        final String tableName = pBean.getTableName();
+        final String[] primaryKeyColumnNames = pBean.getPrimaryKeyColumnNames();
+        final String sequenceName = pBean.getSequenceName();
+        final Field[] fields = BeanMetaDataUtil.getDeclaredFieldsInclParent(pBean.getClass());
 		final StringBuilder insert = new StringBuilder();
-		insert.append(INSERT_PREFIX).append(pTableName);
+		insert.append(INSERT_PREFIX).append(tableName);
 		String delim = INSERT_DELIM_1;
-		for (final String fieldName : fieldMap.keySet()) {
-			insert.append(delim).append(fieldName);
-			delim = INSERT_DELIM_2;
-		}
+        for (final Field field : fields) {
+            final JDBCColumn colAnn = BeanMetaDataUtil.getJDBCColumnAnnotation(field);
+            if (colAnn != null && colAnn.updatable()) {
+                if (colAnn.caseSensitiveName()) {
+                    insert.append(delim).append("\"".concat(colAnn.name()).concat("\""));
+                } else {
+                    insert.append(delim).append(colAnn.name());
+                }
+                delim = INSERT_DELIM_2;
+            }
+        }
 		insert.append(INSERT_VALUES);
 		delim = INSERT_DELIM_1;
-		for (final String fieldName : fieldMap.keySet()) {
-			insert.append(delim);
-			boolean isPKColumn = false;
-			for (final String pkColumnName : pPrimaryKeyColumnNames) {
-				if (fieldName.equals(pkColumnName)) {
-					isPKColumn = true;
-				}
-			}
-			if (isPKColumn && pSequenceName != null && !pSequenceName.isEmpty()) {
-				insert.append(pSequenceName).append(INSERT_NEXT_PK_VAL);
-				delim = INSERT_DELIM_2;
-			} else {
-				insert.append(ASG).append(fieldName);
-				delim = INSERT_DELIM_2;
-			}
+        for (final Field field : fields) {
+            final JDBCColumn colAnn = BeanMetaDataUtil.getJDBCColumnAnnotation(field);
+            if (colAnn != null && colAnn.updatable()) {
+                insert.append(delim);
+                boolean isPKColumn = false;
+                for (final String pkColumnName : primaryKeyColumnNames) {
+                    if (colAnn.name().equals(pkColumnName)) {
+                        isPKColumn = true;
+                    }
+                }
+                if (isPKColumn && sequenceName != null && !sequenceName.isEmpty()) {
+                    insert.append(sequenceName).append(INSERT_NEXT_PK_VAL);
+                    delim = INSERT_DELIM_2;
+                } else {
+                    insert.append(ASG).append(colAnn.name());
+                    delim = INSERT_DELIM_2;
+                }
+            }
 		}
 		insert.append(INSERT_DELIM_3);
 		return insert.toString();
@@ -151,42 +167,47 @@ class StatementBuilder {
 	private static final String UPDATE_DELIM_1 = " SET ";
 	private static final String UPDATE_DELIM_2 = ",";
 
-	public String buildUpdate(final String pTableName,
-							  final String[] pPrimaryKeyColumnNames,
-							  final String pVersionColumnName,
-							  final Map<String, Object> fieldMap,
+	public String buildUpdate(final IBean pBean,
                               final boolean pUseOptLockFullRowCompare) {
 
+        final String tableName = pBean.getTableName();
+        final String[] primaryKeyColumnNames = pBean.getPrimaryKeyColumnNames();
+        final Field[] fields = BeanMetaDataUtil.getDeclaredFieldsInclParent(pBean.getClass());
 		final StringBuilder update = new StringBuilder();
-		update.append(UPDATE_PREFIX).append(pTableName);
+		update.append(UPDATE_PREFIX).append(tableName);
 		String delim = UPDATE_DELIM_1;
-		for (final String fieldName : fieldMap.keySet()) {
-			boolean isPKColumn = false;
-			for (final String pkColumnName : pPrimaryKeyColumnNames) {
-				if (fieldName.equals(pkColumnName)) {
-					isPKColumn = true;
-				}
-			}
-			if (!isPKColumn) {
-				update.append(delim).append(fieldName).append(EQUALS).append(ASG).append(fieldName);
-				delim = UPDATE_DELIM_2;
-			}
+        for (final Field field : fields) {
+            final JDBCColumn colAnn = BeanMetaDataUtil.getJDBCColumnAnnotation(field);
+            if (colAnn != null && colAnn.updatable()) {
+                boolean isPKColumn = false;
+                for (final String pkColumnName : primaryKeyColumnNames) {
+                    if (colAnn.name().equals(pkColumnName)) {
+                        isPKColumn = true;
+                    }
+                }
+                if (!isPKColumn) {
+                    String fieldName = colAnn.name();
+                    if (colAnn.caseSensitiveName()) {
+                        fieldName = "\"".concat(colAnn.name()).concat("\"");
+                    }
+                    update.append(delim).append(fieldName).append(EQUALS).append(ASG).append(colAnn.name());
+                    delim = UPDATE_DELIM_2;
+                }
+            }
 		}
-        buildWhereClause(update, pPrimaryKeyColumnNames, pVersionColumnName, fieldMap, pUseOptLockFullRowCompare);
+        buildWhereClause(pBean, update, pUseOptLockFullRowCompare);
 		return update.toString();
 	}
 
 	private static final String DELETE_PREFIX = "DELETE FROM ";
 
-	public String buildDelete(final String pTableName,
-							  final String[] pPrimaryKeyColumnNames,
-							  final String pVersionColumnName,
-                              final Map<String, Object> fieldMap,
+	public String buildDelete(final IBean pBean,
                               final boolean pUseOptLockFullRowCompare) {
 
+        final String tableName = pBean.getTableName();
 		final StringBuilder delete = new StringBuilder();
-		delete.append(DELETE_PREFIX).append(pTableName);
-        buildWhereClause(delete, pPrimaryKeyColumnNames, pVersionColumnName, fieldMap, pUseOptLockFullRowCompare);
+		delete.append(DELETE_PREFIX).append(tableName);
+        buildWhereClause(pBean, delete, pUseOptLockFullRowCompare);
 		return delete.toString();
 	}
 
@@ -196,36 +217,60 @@ class StatementBuilder {
     private static final String ASG = ":";
     private static final String IS_NULL = " IS NULL ";
 
-    private StringBuilder buildWhereClause(final StringBuilder pDML,
-                                           final String[] pPrimaryKeyColumnNames,
-                                           final String pVersionColumnName,
-                                           final Map<String, Object> fieldMap,
+    private StringBuilder buildWhereClause(final IBean pBean,
+                                           final StringBuilder pDML,
                                            final boolean pUseOptLockFullRowCompare) {
 
+        final String[] primaryKeyColumnNames = pBean.getPrimaryKeyColumnNames();
+        final String versionColumnName = pBean.getVersionColumnName();
+        final BeanMapper<IBean> mapper = BeanMapper.getInstance();
+        final Map<String, Object> fieldMap = mapper.toMap(pBean);
+        final Field[] fields = BeanMetaDataUtil.getDeclaredFieldsInclParent(pBean.getClass());
+        final List<String> caseSensitiveFields = new ArrayList<String>();
+        for (final Field field : fields) {
+            final JDBCColumn colAnn = BeanMetaDataUtil.getJDBCColumnAnnotation(field);
+            if (colAnn != null && colAnn.caseSensitiveName()) {
+                caseSensitiveFields.add(colAnn.name());
+            }
+        }
+
         String delim = WHERE;
-        for (final String pkColumnName : pPrimaryKeyColumnNames) {
+        for (final String pkColumnName : primaryKeyColumnNames) {
             pDML.append(delim);
-            pDML.append(pkColumnName);
+            if (caseSensitiveFields.contains(pkColumnName)) {
+                pDML.append("\"".concat(pkColumnName).concat("\""));
+            } else {
+                pDML.append(pkColumnName);
+            }
             pDML.append(EQUALS);
             pDML.append(ASG).append(pkColumnName);
             delim = AND;
         }
-        if (pVersionColumnName != null && !pVersionColumnName.isEmpty()) {
+        if (versionColumnName != null && !versionColumnName.isEmpty()) {
             pDML.append(delim);
-            pDML.append(pVersionColumnName);
+            if (caseSensitiveFields.contains(versionColumnName)) {
+                pDML.append("\"".concat(versionColumnName).concat("\""));
+            } else {
+                pDML.append(versionColumnName);
+            }
             pDML.append(EQUALS);
-            pDML.append(ASG).append(pVersionColumnName).append(OLD_VERSION_APPENDIX);
+            pDML.append(ASG).append(versionColumnName).append(OLD_VERSION_APPENDIX);
         }
         if (pUseOptLockFullRowCompare) {
             for (final String fieldName : fieldMap.keySet()) {
                 boolean isPKColumn = false;
-                for (final String pkColumnName : pPrimaryKeyColumnNames) {
+                for (final String pkColumnName : primaryKeyColumnNames) {
                     if (fieldName.equals(pkColumnName)) {
                         isPKColumn = true;
                     }
                 }
                 if (!isPKColumn) {
-                    pDML.append(delim).append(fieldName);
+                    pDML.append(delim);
+                    if (caseSensitiveFields.contains(fieldName)) {
+                        pDML.append("\"".concat(fieldName).concat("\""));
+                    } else {
+                        pDML.append(fieldName);
+                    }
                     if (fieldMap.get(fieldName) != null) {
                         pDML.append(EQUALS).append(ASG).append(fieldName).append(OLD_VERSION_APPENDIX);
                     } else {

@@ -49,7 +49,7 @@ public class JDBCDMLProcessor<T> {
 
         List<IBean> beanList = new ArrayList<IBean>();
         beanList.add(pBean);
-        return batch(beanList, BatchType.INSERT, null);
+        return batch(beanList, BatchType.INSERT);
     }
 
     /**
@@ -62,7 +62,7 @@ public class JDBCDMLProcessor<T> {
      */
     public void insert(final List<? extends IBean> pBeanList) {
 
-        batch(pBeanList, BatchType.INSERT, null);
+        batch(pBeanList, BatchType.INSERT);
     }
 
     /**
@@ -75,7 +75,7 @@ public class JDBCDMLProcessor<T> {
 
         List<IBean> beanList = new ArrayList<IBean>();
         beanList.add(pBean);
-        return batch(beanList, BatchType.UPDATE, null);
+        return batch(beanList, BatchType.UPDATE);
     }
 
     /**
@@ -99,7 +99,7 @@ public class JDBCDMLProcessor<T> {
                 return;
             }
         }
-        batch(pBeanList, BatchType.UPDATE, null);
+        batch(pBeanList, BatchType.UPDATE);
     }
 
     /**
@@ -135,10 +135,10 @@ public class JDBCDMLProcessor<T> {
                 return;
             }
         }
-        batch(pBeanList, BatchType.DELETE, null);
+        batch(pBeanList, BatchType.DELETE);
     }
 
-    private T batch(final List<? extends IBean> pBeanList, final BatchType pBatchType, final String pTableName) {
+    private T batch(final List<? extends IBean> pBeanList, final BatchType pBatchType) {
 
         try {
             if (pBeanList == null) {
@@ -162,7 +162,6 @@ public class JDBCDMLProcessor<T> {
         try {
             con = DataSourceProvider.getConnection();
             final IBean firstBean = pBeanList.get(0);
-            String tableName = firstBean.getTableName();
             final String[] primaryKeyColumnNames = firstBean.getPrimaryKeyColumnNames();
             // There is currently no full support for returning generated keys in batch operation
             // Thus we support this for single-row inserts only.
@@ -170,38 +169,26 @@ public class JDBCDMLProcessor<T> {
                 returnModifiedBean = true;
             }
             final String versionColumnName = firstBean.getVersionColumnName();
-            final String sequenceName = firstBean.getSequenceName();
-            if (pTableName != null && !pTableName.isEmpty()) {
-                // Special treatment of intermediary inserts into temporary tables for merge.
-                // The passed table-name replaces the table-name of the Bean and sequences are disabled.
-                tableName = pTableName;
-            }
-            final BeanMapper<IBean> mapper = BeanMapper.getInstance();
-            Map<String, Object> fieldMap = mapper.toMap(firstBean);
-            if (fieldMap.isEmpty()) {
-                throw new DataAccessException(DataAccessException.Type.COULD_NOT_UPDATE_NON_UPDATABLE_BEAN);
-            }
             String batch = null;
             final boolean useOptLockFullRowCompare = firstBean.getModifiedFieldsInitialValue() == null ? false : true;
             if (pBatchType.equals(BatchType.INSERT)) {
-                batch = statementBuilder.buildInsert
-                        (tableName, primaryKeyColumnNames, sequenceName, fieldMap);
+                batch = statementBuilder.buildInsert(firstBean);
             }
             if (pBatchType.equals(BatchType.UPDATE)) {
                 if (primaryKeyColumnNames.length == 0) {
                     throw new DataAccessException(DataAccessException.Type.GENERIC_UPDATE_NOT_SUPPORTED_WITHOUT_PK);
                 }
-                batch = statementBuilder.buildUpdate
-                        (tableName, primaryKeyColumnNames, versionColumnName, fieldMap, useOptLockFullRowCompare);
+                batch = statementBuilder.buildUpdate(firstBean, useOptLockFullRowCompare);
             }
             if (pBatchType.equals(BatchType.DELETE)) {
                 if (primaryKeyColumnNames.length == 0) {
                     throw new DataAccessException(DataAccessException.Type.GENERIC_DELETE_NOT_SUPPORTED_WITHOUT_PK);
                 }
-                batch = statementBuilder.buildDelete
-                        (tableName, primaryKeyColumnNames, versionColumnName, fieldMap, useOptLockFullRowCompare);
+                batch = statementBuilder.buildDelete(firstBean, useOptLockFullRowCompare);
             }
             if (log.isDebugEnabled()) {
+                final String tableName = firstBean.getTableName();
+                final String sequenceName = firstBean.getSequenceName();
                 debugDML(tableName, sequenceName, batch);
             }
             if (returnModifiedBean) {
@@ -223,12 +210,16 @@ public class JDBCDMLProcessor<T> {
             int batchCount = 0;
             for (final IBean bean : pBeanList) {
 
-                fieldMap = mapper.toMap(bean);
+                final BeanMapper<IBean> mapper = BeanMapper.getInstance();
+                Map<String, Object> fieldMap = mapper.toMap(bean);
+                if (fieldMap.isEmpty()) {
+                    throw new DataAccessException(DataAccessException.Type.COULD_NOT_UPDATE_NON_UPDATABLE_BEAN);
+                }
                 for (final String fieldName : fieldMap.keySet()) {
 
                     boolean isPKColumn = false;
                     for (final String pkColumnName : primaryKeyColumnNames) {
-                        if (fieldName.toUpperCase().equals(pkColumnName)) {
+                        if (fieldName.equals(pkColumnName)) {
                             isPKColumn = true;
                         }
                     }
@@ -237,6 +228,7 @@ public class JDBCDMLProcessor<T> {
                         value = new Timestamp(((java.util.Date) value).getTime());
                     }
                     if (pBatchType.equals(BatchType.INSERT)) {
+                        final String sequenceName = firstBean.getSequenceName();
                         if (!isPKColumn || sequenceName == null || sequenceName.isEmpty()) {
                             if (fieldName.equals(versionColumnName)) {
                                 if (value == null) {
@@ -297,7 +289,7 @@ public class JDBCDMLProcessor<T> {
                         for (final String fieldName : fieldMap.keySet()) {
                             boolean isPKColumn = false;
                             for (final String pkColumnName : primaryKeyColumnNames) {
-                                if (fieldName.toUpperCase().equals(pkColumnName)) {
+                                if (fieldName.equals(pkColumnName)) {
                                     isPKColumn = true;
                                 }
                             }
@@ -333,6 +325,7 @@ public class JDBCDMLProcessor<T> {
                 batchCount += batchCount0;
             }
             if (log.isDebugEnabled()) {
+                final String tableName = firstBean.getTableName();
                 log.debug(("Bean data has been attached to JDBC prepared statement. " +
                         "Executing DML statement for table/entity ".concat(tableName)
                                 .concat(" [").concat(batch).concat("] using connection : ".concat(con.toString()))));
@@ -411,69 +404,6 @@ public class JDBCDMLProcessor<T> {
             } catch (SQLException ignored) {
             } // Nothing to do
         }
-    }
-
-    /**
-     * Convenience wrapper for the list merge for merging a single Bean.
-     *
-     * @param pPLSQLCallable	  the name of PL/SQL merge procedure with the notation PACKAGENAME.PROCEDURE.
-     * @param pTemporaryTableName the name of the temporary table used to prepare the merge operation.
-     * @param pBean			   the Bean to be persisted.
-     */
-    public void merge(final String pPLSQLCallable,
-                      final String pTemporaryTableName,
-                      final IBean pBean) {
-
-        List<IBean> beanList = new ArrayList<IBean>();
-        beanList.add(pBean);
-        merge(pPLSQLCallable, pTemporaryTableName, beanList);
-    }
-
-    /**
-     * This method is somewhat similar to method "merge" of a JPA EntityManager. It supports inserts
-     * as well as updates. Beyond this method, Class JDBCStatementProcessor only supports access to
-     * stored procedures, but for inserts and updates (in particular: bulk inserts/updates) using
-     * a prepared statement is still the preferable option, not only considering the complexity
-     * of complex types required for inserts and updates using PL/SQL, but also, because we have
-     * a quite enhanced support for batch inserts/updates in the JDBC driver as well.
-     *
-     * @param pPLSQLCallable	  the name of PL/SQL merge procedure with the notation PACKAGENAME.PROCEDURE.
-     * @param pTemporaryTableName the name of the temporary table used to prepare the merge operation.
-     * @param pBeanList		   a list containing the Beans to be persisted.
-     */
-    public void merge(final String pPLSQLCallable,
-                      final String pTemporaryTableName,
-                      final List<? extends IBean> pBeanList) {
-
-        try {
-            if (pPLSQLCallable == null || pPLSQLCallable.isEmpty()) {
-                throw new IllegalArgumentException("Parameter [pPLSQLCallable] must not be null.");
-            }
-            if (pTemporaryTableName == null || pTemporaryTableName.isEmpty()) {
-                throw new IllegalArgumentException("Parameter [pTemporaryTableName] must not be null.");
-            }
-            if (pBeanList == null) {
-                throw new IllegalArgumentException("Parameter [pBeanList] must not be null.");
-            }
-            if (pBeanList.isEmpty()) {
-                return;
-            }
-            if (pBeanList.get(0) == null) {
-                throw new IllegalArgumentException("Parameter [pBeanList] must not contain null members.");
-            }
-        } catch (IllegalArgumentException e) {
-            throw new DataAccessException(DataAccessException.Type.PARAMETERS_MUST_NOT_BE_NULL, e);
-        }
-
-        if (log.isDebugEnabled()) {
-            Class beanClass = pBeanList.get(0).getClass();
-            statementProcessor.debugPLSQLCall(pPLSQLCallable, null, beanClass);
-        }
-
-        DataSourceProvider.begin();
-        batch(pBeanList, BatchType.INSERT, pTemporaryTableName);
-        statementProcessor.callPLSQL(pPLSQLCallable, null, null, null);
-        DataSourceProvider.commit();
     }
 
     private Object buildVersionColumnValue(final IBean pBean, final BatchType pBatchType, final Object pOldValue) {

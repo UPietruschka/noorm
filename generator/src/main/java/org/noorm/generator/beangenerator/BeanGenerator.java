@@ -168,6 +168,9 @@ public class BeanGenerator {
                 if (dataType.equals("CLOB") || dataType.equals("BLOB") || dataType.equals("XMLTYPE")) {
                     unsupportedOptLockFullRowCompareTypes = true;
                 }
+                if (!columnName.equals(columnName.toUpperCase())) {
+                    beanAttributeDescriptor.setCaseSensitiveName(true);
+                }
 				beanAttributeDescriptor.setColumnName(columnName);
                 if (versionColumnName.equals(columnName)) {
                     versionColumnType = dataType;

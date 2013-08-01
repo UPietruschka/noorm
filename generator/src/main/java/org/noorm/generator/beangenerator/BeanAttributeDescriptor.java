@@ -16,9 +16,10 @@ public class BeanAttributeDescriptor {
 	private String dataType;
 	private boolean updatable = true;
 	private boolean nullable = true;
+    private boolean caseSensitiveName = false;
 	private int maxLength = 0;
 
-	public void setName(final String pName) {
+    public void setName(final String pName) {
 		name = pName;
 	}
 
@@ -81,4 +82,12 @@ public class BeanAttributeDescriptor {
 	public void setNullable(final boolean pNullable) {
 		nullable = pNullable;
 	}
+
+    public boolean isCaseSensitiveName() {
+        return caseSensitiveName;
+    }
+
+    public void setCaseSensitiveName(final boolean pCaseSensitiveName) {
+        caseSensitiveName = pCaseSensitiveName;
+    }
 }
