@@ -136,6 +136,11 @@ public class BeanGenerator {
             beanClassDescriptor.setPrimaryKeyJavaNames(primaryKeyJavaNames);
             beanClassDescriptor.setGeneratePKBasedEqualsAndHashCode(configuration.isGeneratePKBasedEqualsAndHashCode());
 			final String sequenceName = getSequenceName(tableName0, sequenceDBNameList);
+            if (sequenceName != null && !sequenceName.isEmpty() && primaryKeyColumnNames.length != 1) {
+                throw new GeneratorException(("Using sequences to generate IDs is only supported for tables "
+                        .concat(" with one and only one primary key column [")
+                        .concat(tableName0).concat("]")));
+            }
 			beanClassDescriptor.setSequenceName(sequenceName);
 			final String versionColumnName = getVersionColumnName(tableName0, tableMetadataBeanList1);
 			beanClassDescriptor.setVersionColumnName(versionColumnName);

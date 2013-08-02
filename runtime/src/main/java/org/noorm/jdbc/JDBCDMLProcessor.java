@@ -164,8 +164,10 @@ public class JDBCDMLProcessor<T> {
             final IBean firstBean = pBeanList.get(0);
             final String[] primaryKeyColumnNames = firstBean.getPrimaryKeyColumnNames();
             // There is currently no full support for returning generated keys in batch operation
-            // Thus we support this for single-row inserts only.
-            if (pBeanList.size() == 1 && pBatchType.equals(BatchType.INSERT) && primaryKeyColumnNames.length > 0) {
+            // Thus we support this for single-row inserts only, which use a sequence for ID generation
+            final String sequenceName = firstBean.getSequenceName();
+            if (pBeanList.size() == 1 && pBatchType.equals(BatchType.INSERT) &&
+                    sequenceName != null && !sequenceName.isEmpty()) {
                 returnModifiedBean = true;
             }
             final String versionColumnName = firstBean.getVersionColumnName();
@@ -188,7 +190,6 @@ public class JDBCDMLProcessor<T> {
             }
             if (log.isDebugEnabled()) {
                 final String tableName = firstBean.getTableName();
-                final String sequenceName = firstBean.getSequenceName();
                 debugDML(tableName, sequenceName, batch);
             }
             if (returnModifiedBean) {
@@ -228,7 +229,6 @@ public class JDBCDMLProcessor<T> {
                         value = new Timestamp(((java.util.Date) value).getTime());
                     }
                     if (pBatchType.equals(BatchType.INSERT)) {
-                        final String sequenceName = firstBean.getSequenceName();
                         if (!isPKColumn || sequenceName == null || sequenceName.isEmpty()) {
                             if (fieldName.equals(versionColumnName)) {
                                 if (value == null) {
