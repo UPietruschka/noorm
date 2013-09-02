@@ -72,7 +72,7 @@ public class QueryGenerator {
             generateMethodName(queryDeclaration);
             final QueryDescriptor queryDescriptor = new QueryDescriptor();
             String t0 = queryDeclaration.getTableName();
-            final List<TableMetadataBean> tableMetadataBeanList = tableColumnMap.get(t0.toUpperCase());
+            final List<TableMetadataBean> tableMetadataBeanList = tableColumnMap.get(t0);
             if (queryDeclaration.getBaseTable() != null && !queryDeclaration.getBaseTable().isEmpty()) {
                 t0 = queryDeclaration.getBaseTable();
             }
@@ -93,7 +93,7 @@ public class QueryGenerator {
                     (t0, configuration.getIgnoreTableNamePrefixes()));
             for (final QueryColumn queryColumn : queryDeclaration.getQueryColumns()) {
                 final ParameterDescriptor parameterDescriptor = new ParameterDescriptor();
-                final String columnName = queryColumn.getColumnName().toUpperCase();
+                final String columnName = queryColumn.getColumnName();
                 parameterDescriptor.setJavaName(PARAMETER_PREFIX + Utils.convertDBName2JavaName(columnName, true));
                 parameterDescriptor.setOracleName(columnName);
                 String javaType = null;

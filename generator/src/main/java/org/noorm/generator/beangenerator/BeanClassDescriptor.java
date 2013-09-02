@@ -17,7 +17,8 @@ public class BeanClassDescriptor {
 	private String shortName;
 	private String extendedName;
 	private String tableName;
-	private String[] primaryKeyColumnNames;
+    private boolean isTableNameCaseSensitive = false;
+    private String[] primaryKeyColumnNames;
     private String[] primaryKeyJavaNames;
 	private String sequenceName;
 	private String versionColumnName;
@@ -67,6 +68,14 @@ public class BeanClassDescriptor {
 	public void setTableName(final String pTableName) {
 		tableName = pTableName;
 	}
+
+    public boolean isTableNameCaseSensitive() {
+        return isTableNameCaseSensitive;
+    }
+
+    public void setTableNameCaseSensitive(final boolean pTableNameCaseSensitive) {
+        isTableNameCaseSensitive = pTableNameCaseSensitive;
+    }
 
 	public String[] getPrimaryKeyColumnNames() {
 		return primaryKeyColumnNames;

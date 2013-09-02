@@ -10,8 +10,12 @@
     <packageFilterRegex>(.*SERVICE|.*SEARCH)</packageFilterRegex>
     <table2SequenceMapping>
         <property>
-            <name>(EMPLOYEES|DEPARTMENTS|LOCATIONS|OPT_LOCK_.*|COMPLEX.*|CASE.*)</name>
+            <name>(EMPLOYEES|DEPARTMENTS|LOCATIONS|OPT_LOCK_.*|COMPLEX.*)</name>
             <value>$1_SEQ</value>
+        </property>
+        <property>
+            <name>(case_sensitive_table)</name>
+            <value>CASE_SENSITIVE_TABLE_SEQ</value>
         </property>
         <property>
             <name>(V_DEPARTMENTS)</name>
@@ -41,7 +45,7 @@
             <value>VERSION</value>
         </property>
         <property>
-            <name>CASE_.*</name>
+            <name>case_.*</name>
             <value>version</value>
         </property>
     </optLockVersionColumnMapping>
@@ -55,10 +59,10 @@
     <singleRowFinderRegex>(.*_unique.*)</singleRowFinderRegex>
     <queryDeclarations>
         <queryDeclaration>
-            <tableName>employees</tableName>
+            <tableName>EMPLOYEES</tableName>
             <queryColumns>
                 <queryColumn>
-                    <columnName>commission_pct</columnName>
+                    <columnName>COMMISSION_PCT</columnName>
                     <operator>
                         <operatorName>EQUAL_TO</operatorName>
                     </operator>
@@ -66,11 +70,11 @@
             </queryColumns>
         </queryDeclaration>
         <queryDeclaration>
-            <tableName>employees</tableName>
+            <tableName>EMPLOYEES</tableName>
             <methodName>findEmployeesWithCommission</methodName>
             <queryColumns>
                 <queryColumn>
-                    <columnName>commission_pct</columnName>
+                    <columnName>COMMISSION_PCT</columnName>
                     <operator>
                         <operatorName>IS_NOT_NULL</operatorName>
                     </operator>
@@ -78,11 +82,11 @@
             </queryColumns>
         </queryDeclaration>
         <queryDeclaration>
-            <tableName>employees</tableName>
+            <tableName>EMPLOYEES</tableName>
             <methodName>findEmployeesWithoutCommission</methodName>
             <queryColumns>
                 <queryColumn>
-                    <columnName>commission_pct</columnName>
+                    <columnName>COMMISSION_PCT</columnName>
                     <operator>
                         <operatorName>IS_NULL</operatorName>
                     </operator>
@@ -90,11 +94,11 @@
             </queryColumns>
         </queryDeclaration>
         <queryDeclaration>
-            <tableName>departments</tableName>
+            <tableName>DEPARTMENTS</tableName>
             <singleRowQuery>true</singleRowQuery>
             <queryColumns>
                 <queryColumn>
-                    <columnName>department_id</columnName>
+                    <columnName>DEPARTMENT_ID</columnName>
                     <operator>
                         <operatorName>EQUAL_TO</operatorName>
                     </operator>
@@ -102,17 +106,17 @@
             </queryColumns>
         </queryDeclaration>
         <queryDeclaration>
-            <tableName>jobs_synonym</tableName>
+            <tableName>JOBS_SYNONYM</tableName>
             <methodName>findJobsSynonymsBySalary</methodName>
             <queryColumns>
                 <queryColumn>
-                    <columnName>min_salary</columnName>
+                    <columnName>MIN_SALARY</columnName>
                     <operator>
                         <operatorName>GREATER_THAN_OR_EQUAL_TO</operatorName>
                     </operator>
                 </queryColumn>
                 <queryColumn>
-                    <columnName>max_salary</columnName>
+                    <columnName>MAX_SALARY</columnName>
                     <operator>
                         <operatorName>LESS_THAN_OR_EQUAL_TO</operatorName>
                     </operator>
@@ -120,11 +124,11 @@
             </queryColumns>
         </queryDeclaration>
         <queryDeclaration>
-            <tableName>countries</tableName>
+            <tableName>COUNTRIES</tableName>
             <acquireLock>true</acquireLock>
             <queryColumns>
                 <queryColumn>
-                    <columnName>country_id</columnName>
+                    <columnName>COUNTRY_ID</columnName>
                     <operator>
                         <operatorName>EQUAL_TO</operatorName>
                     </operator>
@@ -132,26 +136,26 @@
             </queryColumns>
         </queryDeclaration>
         <queryDeclaration>
-            <tableName>v_employees</tableName>
-            <baseTable>employees</baseTable>
+            <tableName>V_EMPLOYEES</tableName>
+            <baseTable>EMPLOYEES</baseTable>
             <methodName>findEmployeesByDepartmentCity</methodName>
             <className>EmployeeFinder</className>
             <queryColumns>
                 <queryColumn>
-                    <columnName>department_name</columnName>
+                    <columnName>DEPARTMENT_NAME</columnName>
                 </queryColumn>
                 <queryColumn>
-                    <columnName>city</columnName>
+                    <columnName>CITY</columnName>
                 </queryColumn>
             </queryColumns>
         </queryDeclaration>
         <queryDeclaration>
-            <tableName>v_employees</tableName>
-            <baseTable>employees</baseTable>
+            <tableName>V_EMPLOYEES</tableName>
+            <baseTable>EMPLOYEES</baseTable>
             <className>EmployeeFinder</className>
             <queryColumns>
                 <queryColumn>
-                    <columnName>department_name</columnName>
+                    <columnName>DEPARTMENT_NAME</columnName>
                     <operator>
                         <operatorName>LIKE</operatorName>
                     </operator>

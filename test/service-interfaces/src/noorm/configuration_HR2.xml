@@ -18,19 +18,19 @@
     <dataSourceName>HR2</dataSourceName>
     <queryDeclarations>
         <queryDeclaration>
-            <tableName>v_employees</tableName>
-            <baseTable>employees</baseTable>
+            <tableName>V_EMPLOYEES</tableName>
+            <baseTable>EMPLOYEES</baseTable>
             <methodName>findEmployees</methodName>
             <className>EmployeeDAO</className>
             <queryColumns>
                 <queryColumn>
-                    <columnName>salary</columnName>
+                    <columnName>SALARY</columnName>
                     <operator>
                         <operatorName>GREATER_THAN_OR_EQUAL_TO</operatorName>
                     </operator>
                 </queryColumn>
                 <queryColumn>
-                    <columnName>commission_pct</columnName>
+                    <columnName>COMMISSION_PCT</columnName>
                     <operator>
                         <operatorName>LESS_THAN</operatorName>
                     </operator>

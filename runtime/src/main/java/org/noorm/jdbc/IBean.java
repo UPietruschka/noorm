@@ -37,6 +37,12 @@ public interface IBean<T> {
 	 */
 	String getTableName();
 
+    /**
+     * Indicates, whether the table name is case sensitive.
+     * @return true, when the table name is case sensitive
+     */
+    boolean isTableNameCaseSensitive();
+
 	/**
 	 * The Oracle name of the primary key columns.
 	 * @return the primary key column names.

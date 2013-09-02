@@ -15,6 +15,7 @@ public class $class.Name<T> implements IBean<T>, Serializable {
 
 	private static final long serialVersionUID = $class.getSerialVersionUID()L;
 	private static final String TABLE_NAME = "$class.TableName";
+	private static final boolean IS_TABLE_NAME_CASE_SENSITIVE = $class.isTableNameCaseSensitive();
 	private static final String[] PK_COLUMN_NAMES = new String[]{ #foreach ($param in $class.PrimaryKeyColumnNames)"$param"#if($velocityCount<$class.PrimaryKeyColumnNames.size()), #end#end };
 	private static final String SEQUENCE_NAME = "$class.SequenceName";
 	private static final String VERSION_COLUMN_NAME = "$class.VersionColumnName";
@@ -50,6 +51,10 @@ public class $class.Name<T> implements IBean<T>, Serializable {
 
 	public String getTableName() {
 		return TABLE_NAME;
+	}
+
+	public boolean isTableNameCaseSensitive() {
+		return IS_TABLE_NAME_CASE_SENSITIVE;
 	}
 
 	public String[] getPrimaryKeyColumnNames() {

@@ -126,6 +126,9 @@ public class BeanGenerator {
 				validatorClassDescriptor.getClassNames().add(javaBeanName);
 			}
 			beanClassDescriptor.setTableName(tableName0);
+            if (!tableName0.equals(tableName0.toUpperCase())) {
+                beanClassDescriptor.setTableNameCaseSensitive(true);
+            }
 			final String[] primaryKeyColumnNames = getPrimaryKeyColumnNames(tableName0, pkColumnNameList);
 			beanClassDescriptor.setPrimaryKeyColumnNames(primaryKeyColumnNames);
             final String[] primaryKeyJavaNames = new String[primaryKeyColumnNames.length];
@@ -227,7 +230,7 @@ public class BeanGenerator {
 		// Check the matched sequence name against the sequence names retrieved from the database
 		for (final NameBean sequenceDBName : pSequenceDBNameList) {
 			if (sequenceName.equals(sequenceDBName.getName())) {
-				return sequenceName;
+				return sequenceDBName.getName();
 			}
 		}
 		log.info("Matching sequence-name ".concat(sequenceName).concat(" has been found for table-name ")

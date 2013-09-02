@@ -87,7 +87,11 @@ class StatementBuilder {
                                     final boolean pAcquireLock) {
 
         final StringBuilder pSQLStatement = new StringBuilder();
-        pSQLStatement.append(SELECT_PREFIX).append(pTableName);
+        if (!pTableName.equals(pTableName.toUpperCase())) {
+            pSQLStatement.append(SELECT_PREFIX).append("\"".concat(pTableName).concat("\""));
+        } else {
+            pSQLStatement.append(SELECT_PREFIX).append(pTableName);
+        }
         if (pInParameters.size() > 0) {
             String delim = WHERE;
             final Map<QueryColumn, Object> orderedParameters = new TreeMap<QueryColumn, Object>(pInParameters);
@@ -125,7 +129,11 @@ class StatementBuilder {
         final String sequenceName = pBean.getSequenceName();
         final Field[] fields = BeanMetaDataUtil.getDeclaredFieldsInclParent(pBean.getClass());
 		final StringBuilder insert = new StringBuilder();
-		insert.append(INSERT_PREFIX).append(tableName);
+        if (pBean.isTableNameCaseSensitive()) {
+            insert.append(INSERT_PREFIX).append("\"".concat(tableName).concat("\""));
+        } else {
+            insert.append(INSERT_PREFIX).append(tableName);
+        }
 		String delim = INSERT_DELIM_1;
         for (final Field field : fields) {
             final JDBCColumn colAnn = BeanMetaDataUtil.getJDBCColumnAnnotation(field);
@@ -151,7 +159,11 @@ class StatementBuilder {
                     }
                 }
                 if (isPKColumn && sequenceName != null && !sequenceName.isEmpty()) {
-                    insert.append(sequenceName).append(INSERT_NEXT_PK_VAL);
+                    if (!sequenceName.equals(sequenceName.toUpperCase())) {
+                        insert.append("\"".concat(sequenceName).concat("\"")).append(INSERT_NEXT_PK_VAL);
+                    } else {
+                        insert.append(sequenceName).append(INSERT_NEXT_PK_VAL);
+                    }
                     delim = INSERT_DELIM_2;
                 } else {
                     insert.append(ASG).append(colAnn.name());
@@ -174,7 +186,11 @@ class StatementBuilder {
         final String[] primaryKeyColumnNames = pBean.getPrimaryKeyColumnNames();
         final Field[] fields = BeanMetaDataUtil.getDeclaredFieldsInclParent(pBean.getClass());
 		final StringBuilder update = new StringBuilder();
-		update.append(UPDATE_PREFIX).append(tableName);
+        if (pBean.isTableNameCaseSensitive()) {
+            update.append(UPDATE_PREFIX).append("\"".concat(tableName).concat("\""));
+        } else {
+            update.append(UPDATE_PREFIX).append(tableName);
+        }
 		String delim = UPDATE_DELIM_1;
         for (final Field field : fields) {
             final JDBCColumn colAnn = BeanMetaDataUtil.getJDBCColumnAnnotation(field);
@@ -206,7 +222,11 @@ class StatementBuilder {
 
         final String tableName = pBean.getTableName();
 		final StringBuilder delete = new StringBuilder();
-		delete.append(DELETE_PREFIX).append(tableName);
+        if (pBean.isTableNameCaseSensitive()) {
+            delete.append(DELETE_PREFIX).append("\"".concat(tableName).concat("\""));
+        } else {
+            delete.append(DELETE_PREFIX).append(tableName);
+        }
         buildWhereClause(pBean, delete, pUseOptLockFullRowCompare);
 		return delete.toString();
 	}
