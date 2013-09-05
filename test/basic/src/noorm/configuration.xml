@@ -15,7 +15,7 @@
         </property>
         <property>
             <name>(case_sensitive_table)</name>
-            <value>CASE_SENSITIVE_TABLE_SEQ</value>
+            <value>case_sensitive_table_seq</value>
         </property>
         <property>
             <name>(V_DEPARTMENTS)</name>
