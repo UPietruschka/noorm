@@ -166,8 +166,10 @@ public class JDBCDMLProcessor<T> {
             // There is currently no full support for returning generated keys in batch operation
             // Thus we support this for single-row inserts only, which use a sequence for ID generation
             final String sequenceName = firstBean.getSequenceName();
+            final Long sequenceIncrement = firstBean.getSequenceIncrement();
+            final boolean useInlineSequenceValueGeneration = firstBean.useInlineSequenceValueGeneration();
             if (pBeanList.size() == 1 && pBatchType.equals(BatchType.INSERT) &&
-                    sequenceName != null && !sequenceName.isEmpty()) {
+                    sequenceName != null && !sequenceName.isEmpty() && useInlineSequenceValueGeneration) {
                 returnModifiedBean = true;
             }
             final String versionColumnName = firstBean.getVersionColumnName();
@@ -239,6 +241,15 @@ public class JDBCDMLProcessor<T> {
                                 }
                             }
                             pstmt.setObjectAtName(fieldName, value);
+                        } else {
+                            if (!useInlineSequenceValueGeneration) {
+                                final Class primaryKeyType =
+                                        BeanMetaDataUtil.getBeanPropertyType(firstBean, primaryKeyColumnNames[0]);
+                                final Number sequenceValue = DataSourceProvider
+                                        .getNextSequenceValue(sequenceName, sequenceIncrement, primaryKeyType);
+                                BeanMetaDataUtil.setPrimaryKeyValue(firstBean, sequenceValue);
+                                pstmt.setObjectAtName(fieldName, sequenceValue);
+                            }
                         }
                     }
 

@@ -10,8 +10,12 @@
     <packageFilterRegex>(.*SERVICE|.*SEARCH)</packageFilterRegex>
     <table2SequenceMapping>
         <property>
-            <name>(EMPLOYEES|DEPARTMENTS|LOCATIONS|OPT_LOCK_.*|COMPLEX.*)</name>
+            <name>(EMPLOYEES|DEPARTMENTS|LOCATIONS|COMPLEX.*)</name>
             <value>$1_SEQ</value>
+        </property>
+        <property>
+            <name>(OPT_LOCK_.*)</name>
+            <value>OPT_LOCK_SEQ</value>
         </property>
         <property>
             <name>(case_sensitive_table)</name>
@@ -22,6 +26,7 @@
             <value>DEPARTMENTS_SEQ</value>
         </property>
     </table2SequenceMapping>
+    <inlineSequenceTableFilterRegex>(OPT_.*)</inlineSequenceTableFilterRegex>
     <ignoreColumnNamePrefixes>
         <prefix>OPT_</prefix>
     </ignoreColumnNamePrefixes>

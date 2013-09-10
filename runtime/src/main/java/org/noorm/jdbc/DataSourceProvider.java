@@ -2,6 +2,7 @@ package org.noorm.jdbc;
 
 import oracle.jdbc.OracleCallableStatement;
 import oracle.jdbc.OracleConnection;
+import oracle.jdbc.OraclePreparedStatement;
 import oracle.jdbc.pool.OracleDataSource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -10,6 +11,7 @@ import javax.naming.Context;
 import javax.naming.InitialContext;
 import javax.naming.NamingException;
 import javax.sql.DataSource;
+import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.Map;
@@ -517,6 +519,13 @@ public class DataSourceProvider {
 		}
 	}
 
+    public static Number getNextSequenceValue(final String pSequenceName,
+                                              final Long pSequenceIncrement,
+                                              final Class pType) {
+
+        return getActiveConnectionData().getNextSequenceValue(pSequenceName, pSequenceIncrement, pType);
+    }
+
 	/**
 	 * Returns the currently size of JDBC update and insert batches. The default is 100.
 	 *
@@ -612,6 +621,8 @@ public class DataSourceProvider {
         private ActiveDataSource activeDataSource;
         private OracleConnection connection;
         private Long tsStack = 0L;
+        private Map<String, Number> lastSequenceDBValues = new HashMap<String, Number>();
+        private Map<String, Number> sequenceCache = new HashMap<String, Number>();
 
         public ActiveDataSource getActiveDataSource() {
             return activeDataSource;
@@ -640,6 +651,77 @@ public class DataSourceProvider {
         public void reset() {
             connection = null;
             tsStack = 0L;
+        }
+
+        public synchronized Number getNextSequenceValue(final String pSequenceName,
+                                                        final Long pSequenceIncrement,
+                                                        final Class pType) {
+
+            Number lastSequenceDBValue = lastSequenceDBValues.get(pSequenceName);
+            final Number currentSequenceValue = sequenceCache.get(pSequenceName);
+            final boolean useCachedValues = lastSequenceDBValue != null && currentSequenceValue.longValue()
+                    < lastSequenceDBValue.longValue() + pSequenceIncrement.longValue() - 1;
+            if (useCachedValues) {
+                Number nextSequenceValue = null;
+                if (pType.equals(Long.class)) {
+                    nextSequenceValue = currentSequenceValue.longValue() + 1;
+                }
+                if (pType.equals(Integer.class)) {
+                    nextSequenceValue = currentSequenceValue.intValue() + 1;
+                }
+                if (pType.equals(Short.class)) {
+                    nextSequenceValue = currentSequenceValue.shortValue() + 1;
+                }
+                sequenceCache.put(pSequenceName, nextSequenceValue);
+                return nextSequenceValue;
+            } else {
+                lastSequenceDBValue = getLastSequenceDBValue(pSequenceName, pType);
+                lastSequenceDBValues.put(pSequenceName, lastSequenceDBValue);
+                sequenceCache.put(pSequenceName, lastSequenceDBValue);
+                return lastSequenceDBValue;
+            }
+        }
+
+        private Number getLastSequenceDBValue(final String pSequenceName, final Class pType) {
+
+            String sequenceName = pSequenceName;
+            if (!pSequenceName.equals(pSequenceName.toUpperCase())) {
+                sequenceName = "\"".concat(pSequenceName).concat("\"");
+            }
+            final String sequenceQuery = "SELECT ".concat(sequenceName).concat(".NEXTVAL FROM DUAL");
+            OraclePreparedStatement pstmt = null;
+            boolean success = true;
+
+            try {
+                pstmt = (OraclePreparedStatement) connection.prepareStatement(sequenceQuery);
+                final ResultSet resultSet = pstmt.executeQuery();
+                resultSet.next();
+                Number sequenceValue = null;
+                if (pType.equals(Long.class)) {
+                    sequenceValue = resultSet.getLong(1);
+                }
+                if (pType.equals(Integer.class)) {
+                    sequenceValue = resultSet.getInt(1);
+                }
+                if (pType.equals(Short.class)) {
+                    sequenceValue = resultSet.getShort(1);
+                }
+                return sequenceValue;
+            } catch (Exception e) {
+                log.error(DataAccessException.Type.COULD_NOT_ACCESS_DATA.getDescription(), e);
+                success = false;
+                throw new DataAccessException(DataAccessException.Type.COULD_NOT_ACCESS_DATA, e);
+            } finally {
+                try {
+                    if (pstmt != null) {
+                        pstmt.close();
+                    }
+                    if (connection != null && !connection.isClosed()) {
+                        DataSourceProvider.returnConnection(connection, success);
+                    }
+                } catch (SQLException ignored) {
+                } // Nothing to do
+            }
         }
     }
 }

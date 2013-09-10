@@ -127,6 +127,7 @@ class StatementBuilder {
         final String tableName = pBean.getTableName();
         final String[] primaryKeyColumnNames = pBean.getPrimaryKeyColumnNames();
         final String sequenceName = pBean.getSequenceName();
+        final boolean useInlineSequenceValueGeneration = pBean.useInlineSequenceValueGeneration();
         final Field[] fields = BeanMetaDataUtil.getDeclaredFieldsInclParent(pBean.getClass());
 		final StringBuilder insert = new StringBuilder();
         if (pBean.isTableNameCaseSensitive()) {
@@ -158,7 +159,7 @@ class StatementBuilder {
                         isPKColumn = true;
                     }
                 }
-                if (isPKColumn && sequenceName != null && !sequenceName.isEmpty()) {
+                if (isPKColumn && sequenceName != null && !sequenceName.isEmpty() && useInlineSequenceValueGeneration) {
                     if (!sequenceName.equals(sequenceName.toUpperCase())) {
                         insert.append("\"".concat(sequenceName).concat("\"")).append(INSERT_NEXT_PK_VAL);
                     } else {

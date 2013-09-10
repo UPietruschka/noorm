@@ -152,6 +152,10 @@ public class BeanGenerator {
                 beanClassDescriptor.setSequenceName("");
                 beanClassDescriptor.setSequenceIncrement(0L);
             }
+            if (configuration.getInlineSequenceTableFilterRegex() != null &&
+                    tableName0.matches(configuration.getInlineSequenceTableFilterRegex())) {
+                beanClassDescriptor.setUseInlineSequenceValueGeneration(true);
+            }
 			final String versionColumnName = getVersionColumnName(tableName0, tableMetadataBeanList1);
 			beanClassDescriptor.setVersionColumnName(versionColumnName);
 			beanClassDescriptor.setPackageName(configuration.getBeanPackageName());

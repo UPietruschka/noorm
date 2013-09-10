@@ -22,7 +22,8 @@ public class BeanClassDescriptor {
     private String[] primaryKeyJavaNames;
 	private String sequenceName;
     private Long sequenceIncrement;
-	private String versionColumnName;
+    private boolean useInlineSequenceValueGeneration = false;
+    private String versionColumnName;
     private String versionColumnType;
 	private String packageName;
 	private final List<BeanAttributeDescriptor> attributes = new ArrayList<BeanAttributeDescriptor>();
@@ -112,6 +113,14 @@ public class BeanClassDescriptor {
 
     public void setSequenceIncrement(final Long pSequenceIncrement) {
         sequenceIncrement = pSequenceIncrement;
+    }
+
+    public boolean useInlineSequenceValueGeneration() {
+        return useInlineSequenceValueGeneration;
+    }
+
+    public void setUseInlineSequenceValueGeneration(final boolean pUseInlineSequenceValueGeneration) {
+        useInlineSequenceValueGeneration = pUseInlineSequenceValueGeneration;
     }
 
 	public String getVersionColumnName() {

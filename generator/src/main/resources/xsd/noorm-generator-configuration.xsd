@@ -75,6 +75,24 @@
                         </xs:documentation>
                     </xs:annotation>
                 </xs:element>
+                <xs:element name="inlineSequenceTableFilterRegex" type="xs:string" minOccurs="0">
+                    <xs:annotation>
+                        <xs:documentation>
+                            Regular expression to filter tables and views for inline sequence value generation.
+                            When sequences are used to generate primary key values for tables, the sequence
+                            values are retrieved from the database using a separate SQL statement. This is
+                            the most flexible approach concerning performance for bulk inserts and the provision
+                            of the generated values for the application (i.e., the beans subject to insertion
+                            are modified by setting the primary key values on the fly).
+                            However, for tables typically having single inserts only (no bulk inserts) with a
+                            sequence increment of 1, it can be preferable to inline the sequence generation to
+                            avoid the extra database round-trip to get the next sequence value. For single
+                            row inserts, NoORM can return the updated bean (primary key value), too.
+                            This parameters allows for a flexible specification of the beans / tables subject to
+                            inline sequence value generation using a regular expression.
+                        </xs:documentation>
+                    </xs:annotation>
+                </xs:element>
                 <xs:element name="ignoreTableNamePrefixes" type="prefixList" minOccurs="0">
                     <xs:annotation>
                         <xs:documentation>
