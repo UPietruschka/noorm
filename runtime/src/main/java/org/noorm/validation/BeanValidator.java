@@ -4,8 +4,8 @@ import org.noorm.jdbc.IBean;
 import org.noorm.jdbc.JDBCColumn;
 import org.noorm.metadata.BeanMetaDataUtil;
 import org.noorm.metadata.MetadataService;
-import org.noorm.metadata.beans.NameBean;
 import org.noorm.metadata.beans.PrimaryKeyColumnBean;
+import org.noorm.metadata.beans.SequenceBean;
 import org.noorm.metadata.beans.TableMetadataBean;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -26,7 +26,7 @@ public class BeanValidator {
 
 	protected Map<String, List<TableMetadataBean>> tableColumnMap;
 	protected List<PrimaryKeyColumnBean> allPKColumnNameList;
-	protected List<NameBean> sequenceDBNameList;
+	protected List<SequenceBean> sequenceDBNameList;
 
 	public void loadMetadata() {
 
@@ -154,7 +154,7 @@ public class BeanValidator {
 
 		if (!pBean.getSequenceName().isEmpty()) {
 			boolean sequenceFound = false;
-			for (final NameBean sequenceName : sequenceDBNameList) {
+			for (final SequenceBean sequenceName : sequenceDBNameList) {
 				if (sequenceName.getName().equals(pBean.getSequenceName())) {
 					sequenceFound = true;
 				}

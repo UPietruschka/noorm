@@ -63,10 +63,10 @@ PACKAGE BODY noorm_metadata AS
     AND    procedure_name IS NOT NULL;
   END find_procedure_names;
 
-  PROCEDURE find_sequence_names(p_sequence_names OUT name_refcur) AS
+  PROCEDURE find_sequence_names(p_sequence_names OUT sequence_refcur) AS
   BEGIN
     OPEN p_sequence_names FOR
-    SELECT sequence_name name
+    SELECT sequence_name, increment_by
     FROM   user_sequences;
   END find_sequence_names;
 

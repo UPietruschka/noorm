@@ -21,6 +21,7 @@ public class BeanClassDescriptor {
     private String[] primaryKeyColumnNames;
     private String[] primaryKeyJavaNames;
 	private String sequenceName;
+    private Long sequenceIncrement;
 	private String versionColumnName;
     private String versionColumnType;
 	private String packageName;
@@ -104,6 +105,14 @@ public class BeanClassDescriptor {
 	public void setSequenceName(final String pSequenceName) {
 		sequenceName = pSequenceName;
 	}
+
+    public Long getSequenceIncrement() {
+        return sequenceIncrement;
+    }
+
+    public void setSequenceIncrement(final Long pSequenceIncrement) {
+        sequenceIncrement = pSequenceIncrement;
+    }
 
 	public String getVersionColumnName() {
 		return versionColumnName;

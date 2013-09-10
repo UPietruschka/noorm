@@ -3,6 +3,7 @@ package org.noorm.metadata;
 import org.noorm.metadata.beans.NameBean;
 import org.noorm.metadata.beans.ParameterBean;
 import org.noorm.metadata.beans.PrimaryKeyColumnBean;
+import org.noorm.metadata.beans.SequenceBean;
 import org.noorm.metadata.beans.TableMetadataBean;
 import org.noorm.jdbc.JDBCStatementProcessor;
 import org.slf4j.Logger;
@@ -86,12 +87,12 @@ public class MetadataService {
 				("noorm_metadata.find_procedure_names", "p_procedure_names", filterParameters, NameBean.class);
 	}
 
-	public List<NameBean> findSequenceNames() {
+	public List<SequenceBean> findSequenceNames() {
 
-		final JDBCStatementProcessor<NameBean> statementProcessor = JDBCStatementProcessor.getInstance();
+		final JDBCStatementProcessor<SequenceBean> statementProcessor = JDBCStatementProcessor.getInstance();
 		final Map<String, Object> filterParameters = new HashMap<String, Object>();
 		return statementProcessor.getBeanListFromPLSQL
-				("noorm_metadata.find_sequence_names", "p_sequence_names", filterParameters, NameBean.class);
+				("noorm_metadata.find_sequence_names", "p_sequence_names", filterParameters, SequenceBean.class);
 	}
 
 	public List<PrimaryKeyColumnBean> findPkColumns() {

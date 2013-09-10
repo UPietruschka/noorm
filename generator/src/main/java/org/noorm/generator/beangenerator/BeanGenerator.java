@@ -7,8 +7,8 @@ import org.noorm.generator.m2plugin.IParameters;
 import org.noorm.generator.schema.GeneratorConfiguration;
 import org.noorm.metadata.BeanMetaDataUtil;
 import org.noorm.metadata.MetadataService;
-import org.noorm.metadata.beans.NameBean;
 import org.noorm.metadata.beans.PrimaryKeyColumnBean;
+import org.noorm.metadata.beans.SequenceBean;
 import org.noorm.metadata.beans.TableMetadataBean;
 import org.noorm.jdbc.Utils;
 import org.slf4j.Logger;
@@ -78,7 +78,7 @@ public class BeanGenerator {
 		final List<PrimaryKeyColumnBean> pkColumnNameList = metadataService.findPkColumns();
 
 		log.info("Retrieving sequence metadata from Oracle database.");
-		final List<NameBean> sequenceDBNameList = metadataService.findSequenceNames();
+		final List<SequenceBean> sequenceList = metadataService.findSequenceNames();
 
 		log.info("Generating NoORM Bean classes.");
 		final File beanPackageDir = GeneratorUtil.createPackageDir
@@ -138,13 +138,20 @@ public class BeanGenerator {
             }
             beanClassDescriptor.setPrimaryKeyJavaNames(primaryKeyJavaNames);
             beanClassDescriptor.setGeneratePKBasedEqualsAndHashCode(configuration.isGeneratePKBasedEqualsAndHashCode());
-			final String sequenceName = getSequenceName(tableName0, sequenceDBNameList);
-            if (sequenceName != null && !sequenceName.isEmpty() && primaryKeyColumnNames.length != 1) {
-                throw new GeneratorException(("Using sequences to generate IDs is only supported for tables "
-                        .concat(" with one and only one primary key column [")
-                        .concat(tableName0).concat("]")));
+			final SequenceBean sequence = getSequence(tableName0, sequenceList);
+            if (sequence != null) {
+                final String sequenceName = sequence.getName();
+                if (primaryKeyColumnNames.length != 1) {
+                    throw new GeneratorException(("Using sequences to generate IDs is only supported for tables "
+                            .concat(" with one and only one primary key column [")
+                            .concat(tableName0).concat("]")));
+                }
+                beanClassDescriptor.setSequenceName(sequenceName);
+                beanClassDescriptor.setSequenceIncrement(sequence.getIncrementBy());
+            } else {
+                beanClassDescriptor.setSequenceName("");
+                beanClassDescriptor.setSequenceIncrement(0L);
             }
-			beanClassDescriptor.setSequenceName(sequenceName);
 			final String versionColumnName = getVersionColumnName(tableName0, tableMetadataBeanList1);
 			beanClassDescriptor.setVersionColumnName(versionColumnName);
 			beanClassDescriptor.setPackageName(configuration.getBeanPackageName());
@@ -218,24 +225,24 @@ public class BeanGenerator {
 		}
 	}
 
-	private String getSequenceName(final String pTableName,
-								   final List<NameBean> pSequenceDBNameList) {
+	private SequenceBean getSequence(final String pTableName,
+                                     final List<SequenceBean> pSequenceList) {
 
 		final String sequenceName =
                 GeneratorUtil.getPropertyString(pTableName, configuration.getTable2SequenceMapping());
 		if (sequenceName.isEmpty()) {
 			log.info("No matching sequence-name has been found for table-name ".concat(pTableName));
-			return sequenceName;
+			return null;
 		}
 		// Check the matched sequence name against the sequence names retrieved from the database
-		for (final NameBean sequenceDBName : pSequenceDBNameList) {
-			if (sequenceName.equals(sequenceDBName.getName())) {
-				return sequenceDBName.getName();
+		for (final SequenceBean sequence : pSequenceList) {
+			if (sequenceName.equals(sequence.getName())) {
+				return sequence;
 			}
 		}
-		log.info("Matching sequence-name ".concat(sequenceName).concat(" has been found for table-name ")
+		throw new GeneratorException("Matching sequence-name ".concat(sequenceName)
+                .concat(" has been found for table-name ")
 				.concat(pTableName).concat(", but no database sequence with this name could be found."));
-		return sequenceName;
 	}
 
 	private String[] getPrimaryKeyColumnNames(final String pTableName,
