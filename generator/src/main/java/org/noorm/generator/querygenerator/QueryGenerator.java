@@ -75,9 +75,13 @@ public class QueryGenerator {
             final List<TableMetadataBean> tableMetadataBeanList = tableColumnMap.get(t0);
             if (queryDeclaration.getBaseTable() != null && !queryDeclaration.getBaseTable().isEmpty()) {
                 t0 = queryDeclaration.getBaseTable();
+                if (tableColumnMap.get(t0) == null) {
+                    throw new GeneratorException("Illegal query declaration: no metadata found for table ".concat(t0));
+                }
             }
             if (tableMetadataBeanList == null) {
-                throw new GeneratorException("Illegal query declaration: no metadata found for table ".concat(t0));
+                throw new GeneratorException("Illegal query declaration: no metadata found for table "
+                        .concat(queryDeclaration.getTableName()));
             }
             queryDescriptor.setQueryDeclaration(queryDeclaration);
             String beanName = GeneratorUtil.convertTableName2BeanName(t0, configuration.getIgnoreTableNamePrefixes());
@@ -98,14 +102,15 @@ public class QueryGenerator {
                 parameterDescriptor.setOracleName(columnName);
                 String javaType = null;
                 for (final TableMetadataBean tableMetadataBean : tableMetadataBeanList) {
-                    if (tableMetadataBean.getColumnName().equals(columnName))
-                    javaType = GeneratorUtil.convertOracleType2JavaType(
-                            tableMetadataBean.getDataType(),
-                            tableMetadataBean.getDataPrecision(),
-                            tableMetadataBean.getDataScale(),
-                            tableMetadataBean.getTableName(),
-                            tableMetadataBean.getColumnName(),
-                            configuration.getCustomTypeMappings());
+                    if (tableMetadataBean.getColumnName().equals(columnName)) {
+                        javaType = GeneratorUtil.convertOracleType2JavaType(
+                                tableMetadataBean.getDataType(),
+                                tableMetadataBean.getDataPrecision(),
+                                tableMetadataBean.getDataScale(),
+                                tableMetadataBean.getTableName(),
+                                tableMetadataBean.getColumnName(),
+                                configuration.getCustomTypeMappings());
+                    }
                 }
                 if (javaType == null) {
                     throw new GeneratorException("Illegal query declaration: no metadata found for table ".concat(t0)
