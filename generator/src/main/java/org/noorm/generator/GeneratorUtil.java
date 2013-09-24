@@ -194,7 +194,7 @@ public class GeneratorUtil {
                                                      final Long pDataPrecision,
                                                      final Long pDataScale) {
         String javaType = "String";
-        if (pOracleType.equals("RAW")) {
+        if (pOracleType.endsWith("RAW")) {
             javaType = "byte[]";
         }
         if (pOracleType.equals("BLOB")) {
