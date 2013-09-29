@@ -268,11 +268,14 @@ public class DataSourceProvider {
         return dataSource;
 	}
 
-	static void returnConnection(final OracleConnection pCon, final boolean pSuccess) {
+	static void returnConnection(final boolean pSuccess) {
 
 		OracleConnection con = getActiveConnectionData().getConnection();
 		try {
-			if (con == null || con.isClosed()) {
+            if (con == null || con.isClosed()) {
+                throw new DataAccessException(DataAccessException.Type.STALE_TRANSACTION);
+            }
+			if (getActiveConnectionData().getTsStack() == 0L) {
 				if (log.isDebugEnabled()) {
 					log.debug("Returning connection to connection pool.");
 				}
@@ -285,11 +288,11 @@ public class DataSourceProvider {
 				// the advantage of this way of transaction automation outweighs a possible
 				// minimal performance reduction.
 				if (pSuccess) {
-					pCon.commit();
+                    con.commit();
 				} else {
-					pCon.rollback();
+                    con.rollback();
 				}
-				pCon.close();
+                con.close();
 			}
 		} catch (SQLException e) {
 			throw new DataAccessException(DataAccessException.Type.CONNECTION_ACCESS_FAILURE, e);
@@ -327,7 +330,7 @@ public class DataSourceProvider {
 	private static OracleConnection getConnection(final boolean pRetain) throws SQLException {
 
 		OracleConnection con = getActiveConnectionData().getConnection();
-		if (con == null || con.isClosed()) {
+		if (getActiveConnectionData().getTsStack() == 0L) {
 			if (log.isDebugEnabled()) {
 				if (pRetain) {
 					log.debug("Acquiring retainable connection from connection pool.");
@@ -354,9 +357,7 @@ public class DataSourceProvider {
             if (getActiveConfiguration().isDebugMode()) {
 				enableDebugMode(con);
 			}
-			if (pRetain) {
-                getActiveConnectionData().setConnection(con);
-			}
+            getActiveConnectionData().setConnection(con);
 		}
 		if (pRetain) {
 			Long tsStackThreadLocal0 = getActiveConnectionData().getTsStack();
@@ -381,8 +382,7 @@ public class DataSourceProvider {
      */
     public static boolean activeUserManagedTransaction() {
 
-        final OracleConnection con = getActiveConnectionData().getConnection();
-        return con != null;
+        return getActiveConnectionData().getTsStack() > 0L;
     }
 
 	/**
@@ -691,8 +691,16 @@ public class DataSourceProvider {
             final String sequenceQuery = "SELECT ".concat(sequenceName).concat(".NEXTVAL FROM DUAL");
             OraclePreparedStatement pstmt = null;
             boolean success = true;
+            boolean conAlreadyEstablished = true;
 
             try {
+                if (connection == null) {
+                    // The connection used here will usually be just the connection held by this subclass, but when
+                    // it has not been initialized yet, we will run into a NPE, thus we go the standard way be using
+                    // DataSourceProvider.getConnection()
+                    DataSourceProvider.getConnection();
+                    conAlreadyEstablished = false;
+                }
                 pstmt = (OraclePreparedStatement) connection.prepareStatement(sequenceQuery);
                 final ResultSet resultSet = pstmt.executeQuery();
                 resultSet.next();
@@ -716,8 +724,8 @@ public class DataSourceProvider {
                     if (pstmt != null) {
                         pstmt.close();
                     }
-                    if (connection != null && !connection.isClosed()) {
-                        DataSourceProvider.returnConnection(connection, success);
+                    if (connection != null && !connection.isClosed() && !conAlreadyEstablished) {
+                        DataSourceProvider.returnConnection(success);
                     }
                 } catch (SQLException ignored) {
                 } // Nothing to do

@@ -52,7 +52,7 @@ public class TableLock {
                     stmt.close();
                 }
                 if (con != null && !con.isClosed()) {
-                    DataSourceProvider.returnConnection(con, success);
+                    DataSourceProvider.returnConnection(success);
                 }
             } catch (SQLException ignored) {
             } // Nothing to do

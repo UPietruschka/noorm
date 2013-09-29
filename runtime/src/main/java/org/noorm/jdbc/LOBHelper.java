@@ -65,7 +65,7 @@ public class LOBHelper {
         } finally {
             try {
                 if (con != null && !con.isClosed()) {
-                    DataSourceProvider.returnConnection(con, success);
+                    DataSourceProvider.returnConnection(success);
                 }
             } catch (SQLException ignored) {
             } // Nothing to do

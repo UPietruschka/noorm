@@ -27,8 +27,6 @@ public class JDBCDMLProcessor<T> {
     private static final Long VERSION_COLUMN_LONG_DEFAULT = 1L;
 
     private static JDBCDMLProcessor dmlProcessor = new JDBCDMLProcessor();
-    private JDBCStatementProcessor statementProcessor = JDBCStatementProcessor.getInstance();
-
     private final StatementBuilder statementBuilder = new StatementBuilder();
 
     private JDBCDMLProcessor() {
@@ -410,7 +408,7 @@ public class JDBCDMLProcessor<T> {
                     pstmt.close();
                 }
                 if (con != null && !con.isClosed()) {
-                    DataSourceProvider.returnConnection(con, success);
+                    DataSourceProvider.returnConnection(success);
                 }
             } catch (SQLException ignored) {
             } // Nothing to do
