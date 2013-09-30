@@ -17,24 +17,10 @@
     <generatePKBasedEqualsAndHashCode>false</generatePKBasedEqualsAndHashCode>
     <dataSourceName>HR2</dataSourceName>
     <queryDeclarations>
-        <queryDeclaration>
-            <tableName>V_EMPLOYEES</tableName>
-            <baseTable>EMPLOYEES</baseTable>
-            <methodName>findEmployees</methodName>
-            <className>EmployeeDAO</className>
+        <queryDeclaration tableName="V_EMPLOYEES" baseTable="EMPLOYEES" methodName="findEmployees" className="EmployeeDAO">
             <queryColumns>
-                <queryColumn>
-                    <columnName>SALARY</columnName>
-                    <operator>
-                        <operatorName>GREATER_THAN_OR_EQUAL_TO</operatorName>
-                    </operator>
-                </queryColumn>
-                <queryColumn>
-                    <columnName>COMMISSION_PCT</columnName>
-                    <operator>
-                        <operatorName>LESS_THAN</operatorName>
-                    </operator>
-                </queryColumn>
+                <queryColumn name="SALARY" operator="GREATER_THAN_OR_EQUAL_TO"/>
+                <queryColumn name="COMMISSION_PCT" operator="LESS_THAN"/>
             </queryColumns>
         </queryDeclaration>
     </queryDeclarations>

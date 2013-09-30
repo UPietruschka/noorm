@@ -293,59 +293,6 @@
         </xs:annotation>
         <xs:complexType>
             <xs:sequence>
-                <xs:element name="tableName" type="xs:string">
-                    <xs:annotation>
-                        <xs:documentation>
-                            The name of the database entity (table or view) to query against.
-                        </xs:documentation>
-                    </xs:annotation>
-                </xs:element>
-                <xs:element name="baseTable" type="xs:string" minOccurs="0">
-                    <xs:annotation>
-                        <xs:documentation>
-                            The name of the database entity (table or view), which is the base for the returning
-                            type. When parameter "tableName" is a view, the desired return type may be only one of
-                            the tables contained in the view.
-                        </xs:documentation>
-                    </xs:annotation>
-                </xs:element>
-                <xs:element name="methodName" type="xs:string" minOccurs="0">
-                    <xs:annotation>
-                        <xs:documentation>
-                            The (Java) method name for the generated code (if omitted, NoORM automatically
-                            generates a method name. This is typically suitable, if not too many query columns
-                            are defined. For many query columns, manual method name specification if preferable).
-                        </xs:documentation>
-                    </xs:annotation>
-                </xs:element>
-                <xs:element name="className" type="xs:string" minOccurs="0">
-                    <xs:annotation>
-                        <xs:documentation>
-                            The name of the Java class to be generated (Optional, by default NoORM generates one
-                            single class named "DeclaredQueries" for all declared queries. By explicitly specifying
-                            a class name it is possible to group the declared queries).
-                        </xs:documentation>
-                    </xs:annotation>
-                </xs:element>
-                <xs:element name="singleRowQuery" type="xs:boolean" minOccurs="0">
-                    <xs:annotation>
-                        <xs:documentation>
-                            Indicates, whether the generated query is expected to return a single row only.
-                            This will change the method return type from "java.util.List" to the respective
-                            type (default is false).
-                        </xs:documentation>
-                    </xs:annotation>
-                </xs:element>
-                <xs:element name="acquireLock" type="xs:boolean" minOccurs="0">
-                    <xs:annotation>
-                        <xs:documentation>
-                            Indicates, whether NoORM should acquire a lock for the retrieved rows (by appending
-                            the "FOR UPDATE" clause to the generated SQL).
-                            Note that this option is only useful when used in an explicitly managed transaction
-                            (user-managed), otherwise an exception is thrown.
-                        </xs:documentation>
-                    </xs:annotation>
-                </xs:element>
                 <xs:element name="queryColumns" minOccurs="0">
                     <xs:annotation>
                         <xs:documentation>
@@ -359,6 +306,59 @@
                     </xs:complexType>
                 </xs:element>
             </xs:sequence>
+            <xs:attribute name="tableName" use="required" type="xs:string">
+                <xs:annotation>
+                    <xs:documentation>
+                        The name of the database entity (table or view) to query against.
+                    </xs:documentation>
+                </xs:annotation>
+            </xs:attribute>
+            <xs:attribute name="baseTable" type="xs:string">
+                <xs:annotation>
+                    <xs:documentation>
+                        The name of the database entity (table or view), which is the base for the returning
+                        type. When parameter "tableName" is a view, the desired return type may be only one of
+                        the tables contained in the view.
+                    </xs:documentation>
+                </xs:annotation>
+            </xs:attribute>
+            <xs:attribute name="methodName" type="xs:string">
+                <xs:annotation>
+                    <xs:documentation>
+                        The (Java) method name for the generated code (if omitted, NoORM automatically
+                        generates a method name. This is typically suitable, if not too many query columns
+                        are defined. For many query columns, manual method name specification if preferable).
+                    </xs:documentation>
+                </xs:annotation>
+            </xs:attribute>
+            <xs:attribute name="className" type="xs:string">
+                <xs:annotation>
+                    <xs:documentation>
+                        The name of the Java class to be generated (Optional, by default NoORM generates one
+                        single class named "DeclaredQueries" for all declared queries. By explicitly specifying
+                        a class name it is possible to group the declared queries).
+                    </xs:documentation>
+                </xs:annotation>
+            </xs:attribute>
+            <xs:attribute name="singleRowQuery" type="xs:boolean">
+                <xs:annotation>
+                    <xs:documentation>
+                        Indicates, whether the generated query is expected to return a single row only.
+                        This will change the method return type from "java.util.List" to the respective
+                        type (default is false).
+                    </xs:documentation>
+                </xs:annotation>
+            </xs:attribute>
+            <xs:attribute name="acquireLock" type="xs:boolean">
+                <xs:annotation>
+                    <xs:documentation>
+                        Indicates, whether NoORM should acquire a lock for the retrieved rows (by appending
+                        the "FOR UPDATE" clause to the generated SQL).
+                        Note that this option is only useful when used in an explicitly managed transaction
+                        (user-managed), otherwise an exception is thrown.
+                    </xs:documentation>
+                </xs:annotation>
+            </xs:attribute>
         </xs:complexType>
     </xs:element>
 
@@ -369,21 +369,8 @@
                 with an operator for the construction of the full WHERE condition.
             </xs:documentation>
         </xs:annotation>
-        <xs:sequence>
-            <xs:element name="columnName" type="xs:string"/>
-            <xs:element name="operator" type="operator" minOccurs="0"/>
-        </xs:sequence>
-    </xs:complexType>
-
-    <xs:complexType name="operator">
-        <xs:annotation>
-            <xs:documentation>
-                The operator used for the construction of a WHERE condition.
-            </xs:documentation>
-        </xs:annotation>
-        <xs:sequence>
-            <xs:element name="operatorName" type="operatorName"/>
-        </xs:sequence>
+        <xs:attribute name="name" use="required" type="xs:string"/>
+        <xs:attribute name="operator" type="operatorName"/>
     </xs:complexType>
 
     <xs:simpleType name="operatorName">

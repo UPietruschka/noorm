@@ -97,7 +97,7 @@ public class QueryGenerator {
                     (t0, configuration.getIgnoreTableNamePrefixes()));
             for (final QueryColumn queryColumn : queryDeclaration.getQueryColumns()) {
                 final ParameterDescriptor parameterDescriptor = new ParameterDescriptor();
-                final String columnName = queryColumn.getColumnName();
+                final String columnName = queryColumn.getName();
                 parameterDescriptor.setJavaName(PARAMETER_PREFIX + Utils.convertDBName2JavaName(columnName, true));
                 parameterDescriptor.setOracleName(columnName);
                 String javaType = null;
@@ -118,10 +118,10 @@ public class QueryGenerator {
                 }
                 parameterDescriptor.setJavaType(javaType);
                 parameterDescriptor.setOperator(queryColumn.getOperator());
-                if (queryColumn.getOperator().getOperatorName().equals(OperatorName.IS_NULL)) {
+                if (queryColumn.getOperator().equals(OperatorName.IS_NULL)) {
                     parameterDescriptor.setUnaryOperator(true);
                 }
-                if (queryColumn.getOperator().getOperatorName().equals(OperatorName.IS_NOT_NULL)) {
+                if (queryColumn.getOperator().equals(OperatorName.IS_NOT_NULL)) {
                     parameterDescriptor.setUnaryOperator(true);
                 }
                 queryDescriptor.addParameter(parameterDescriptor);
@@ -178,7 +178,7 @@ public class QueryGenerator {
                 if (pQueryDeclaration.getQueryColumns().size() > 4) { substringLength = 2; }
                 if (pQueryDeclaration.getQueryColumns().size() > 8) { substringLength = 1; }
                 for (final QueryColumn queryColumn : pQueryDeclaration.getQueryColumns()) {
-                    final String javaColumnName = Utils.convertDBName2JavaName(queryColumn.getColumnName(), true);
+                    final String javaColumnName = Utils.convertDBName2JavaName(queryColumn.getName(), true);
                     methodName.append(javaColumnName, 0, Math.min(substringLength, javaColumnName.length()));
                 }
             }

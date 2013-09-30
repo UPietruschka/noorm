@@ -63,113 +63,49 @@
     </viewName2PrimaryKeyMapping>
     <singleRowFinderRegex>(.*_unique.*)</singleRowFinderRegex>
     <queryDeclarations>
-        <queryDeclaration>
-            <tableName>EMPLOYEES</tableName>
+        <queryDeclaration tableName="EMPLOYEES">
             <queryColumns>
-                <queryColumn>
-                    <columnName>COMMISSION_PCT</columnName>
-                    <operator>
-                        <operatorName>EQUAL_TO</operatorName>
-                    </operator>
-                </queryColumn>
+                <queryColumn name="COMMISSION_PCT" operator="EQUAL_TO"/>
             </queryColumns>
         </queryDeclaration>
-        <queryDeclaration>
-            <tableName>EMPLOYEES</tableName>
-            <methodName>findEmployeesWithCommission</methodName>
+        <queryDeclaration tableName="EMPLOYEES" methodName="findEmployeesWithCommission">
             <queryColumns>
-                <queryColumn>
-                    <columnName>COMMISSION_PCT</columnName>
-                    <operator>
-                        <operatorName>IS_NOT_NULL</operatorName>
-                    </operator>
-                </queryColumn>
+                <queryColumn name="COMMISSION_PCT" operator="IS_NOT_NULL"/>
             </queryColumns>
         </queryDeclaration>
-        <queryDeclaration>
-            <tableName>EMPLOYEES</tableName>
-            <methodName>findEmployeesWithoutCommission</methodName>
+        <queryDeclaration tableName="EMPLOYEES" methodName="findEmployeesWithoutCommission">
             <queryColumns>
-                <queryColumn>
-                    <columnName>COMMISSION_PCT</columnName>
-                    <operator>
-                        <operatorName>IS_NULL</operatorName>
-                    </operator>
-                </queryColumn>
+                <queryColumn name="COMMISSION_PCT" operator="IS_NULL"/>
             </queryColumns>
         </queryDeclaration>
-        <queryDeclaration>
-            <tableName>DEPARTMENTS</tableName>
-            <singleRowQuery>true</singleRowQuery>
+        <queryDeclaration tableName="DEPARTMENTS" singleRowQuery="true">
             <queryColumns>
-                <queryColumn>
-                    <columnName>DEPARTMENT_ID</columnName>
-                    <operator>
-                        <operatorName>EQUAL_TO</operatorName>
-                    </operator>
-                </queryColumn>
+                <queryColumn name="DEPARTMENT_ID" operator="EQUAL_TO"/>
             </queryColumns>
         </queryDeclaration>
-        <queryDeclaration>
-            <tableName>JOBS_SYNONYM</tableName>
-            <methodName>findJobsSynonymsBySalary</methodName>
+        <queryDeclaration tableName="JOBS_SYNONYM" methodName="findJobsSynonymsBySalary">
             <queryColumns>
-                <queryColumn>
-                    <columnName>MIN_SALARY</columnName>
-                    <operator>
-                        <operatorName>GREATER_THAN_OR_EQUAL_TO</operatorName>
-                    </operator>
-                </queryColumn>
-                <queryColumn>
-                    <columnName>MAX_SALARY</columnName>
-                    <operator>
-                        <operatorName>LESS_THAN_OR_EQUAL_TO</operatorName>
-                    </operator>
-                </queryColumn>
+                <queryColumn name="MIN_SALARY" operator="GREATER_THAN_OR_EQUAL_TO"/>
+                <queryColumn name="MAX_SALARY" operator="LESS_THAN_OR_EQUAL_TO"/>
             </queryColumns>
         </queryDeclaration>
-        <queryDeclaration>
-            <tableName>COUNTRIES</tableName>
-            <acquireLock>true</acquireLock>
+        <queryDeclaration tableName="COUNTRIES" acquireLock="true">
             <queryColumns>
-                <queryColumn>
-                    <columnName>COUNTRY_ID</columnName>
-                    <operator>
-                        <operatorName>EQUAL_TO</operatorName>
-                    </operator>
-                </queryColumn>
+                <queryColumn name="COUNTRY_ID" operator="EQUAL_TO"/>
             </queryColumns>
         </queryDeclaration>
-        <queryDeclaration>
-            <tableName>V_EMPLOYEES</tableName>
-            <baseTable>EMPLOYEES</baseTable>
-            <methodName>findEmployeesByDepartmentCity</methodName>
-            <className>EmployeeFinder</className>
+        <queryDeclaration tableName="V_EMPLOYEES" baseTable="EMPLOYEES" methodName="findEmployeesByDepartmentCity" className="EmployeeFinder">
             <queryColumns>
-                <queryColumn>
-                    <columnName>DEPARTMENT_NAME</columnName>
-                </queryColumn>
-                <queryColumn>
-                    <columnName>CITY</columnName>
-                </queryColumn>
+                <queryColumn name="DEPARTMENT_NAME"/>
+                <queryColumn name="CITY"/>
             </queryColumns>
         </queryDeclaration>
-        <queryDeclaration>
-            <tableName>V_EMPLOYEES</tableName>
-            <baseTable>EMPLOYEES</baseTable>
-            <className>EmployeeFinder</className>
+        <queryDeclaration tableName="V_EMPLOYEES" baseTable="EMPLOYEES" className="EmployeeFinder">
             <queryColumns>
-                <queryColumn>
-                    <columnName>DEPARTMENT_NAME</columnName>
-                    <operator>
-                        <operatorName>LIKE</operatorName>
-                    </operator>
-                </queryColumn>
+                <queryColumn name="DEPARTMENT_NAME" operator="LIKE"/>
             </queryColumns>
         </queryDeclaration>
-        <queryDeclaration>
-            <tableName>case_sensitive_table</tableName>
-        </queryDeclaration>
+        <queryDeclaration tableName="case_sensitive_table"/>
     </queryDeclarations>
     <customTypeMappings>
         <customTypeMapping>

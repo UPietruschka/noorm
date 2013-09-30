@@ -241,9 +241,7 @@ public class GeneratorMojo extends AbstractMojo implements IParameters {
             }
             for (final QueryColumn queryColumn : queryDeclaration.getQueryColumns()) {
                 if (queryColumn.getOperator() == null) {
-                    final Operator operator = new Operator();
-                    operator.setOperatorName(OperatorName.EQUAL_TO);
-                    queryColumn.setOperator(operator);
+                    queryColumn.setOperator(OperatorName.EQUAL_TO);
                 }
             }
         }
