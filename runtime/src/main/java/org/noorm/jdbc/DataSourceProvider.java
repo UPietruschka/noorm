@@ -519,9 +519,9 @@ public class DataSourceProvider {
 		}
 	}
 
-    public static Number getNextSequenceValue(final String pSequenceName,
-                                              final Long pSequenceIncrement,
-                                              final Class pType) {
+    static Number getNextSequenceValue(final String pSequenceName,
+                                       final Long pSequenceIncrement,
+                                       final Class pType) {
 
         return getActiveConnectionData().getNextSequenceValue(pSequenceName, pSequenceIncrement, pType);
     }
