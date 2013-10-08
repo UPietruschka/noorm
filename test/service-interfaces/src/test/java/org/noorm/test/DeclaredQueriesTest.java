@@ -3,7 +3,7 @@ package org.noorm.test;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.noorm.jdbc.DataSourceProvider;
-import org.noorm.test.hr2.beans.EmployeesBean;
+import org.noorm.test.hr2.beans.Employees;
 import org.noorm.test.hr2.services.IEmployeeDAO;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
@@ -33,7 +33,7 @@ public class DeclaredQueriesTest {
         DataSourceProvider.setActiveDataSource(HR2_DATA_SOURCE);
         final Double salaryLimit = 4000.0;
         final Double commissionLimit = 0.2;
-        List<EmployeesBean> employees = employeeDAO.findEmployees(salaryLimit, commissionLimit);
+        List<Employees> employees = employeeDAO.findEmployees(salaryLimit, commissionLimit);
         assertEquals(10, employees.size());
     }
 }

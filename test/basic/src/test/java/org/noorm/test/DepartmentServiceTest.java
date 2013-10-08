@@ -2,11 +2,10 @@ package org.noorm.test;
 
 import org.junit.Test;
 import org.noorm.jdbc.DataSourceProvider;
-import org.noorm.test.hr.beans.VDepartmentsBean;
+import org.noorm.test.hr.beans.VDepartments;
 import org.noorm.test.hr.services.BeanDML;
 import org.noorm.test.hr.services.DepartmentService;
 
-import java.math.BigInteger;
 import java.util.List;
 
 import static org.junit.Assert.*;
@@ -34,14 +33,14 @@ public class DepartmentServiceTest {
     public void testFindVDepartmentById() {
 
         final DepartmentService departmentService = DepartmentService.getInstance();
-        final List<VDepartmentsBean> vDepartmentsBeanList =
+        final List<VDepartments> vDepartmentsList =
                 departmentService.findDepartmentsById(SHIPPING_DEPARTMENT_ID);
-        assertEquals(1L, vDepartmentsBeanList.size());
-        final VDepartmentsBean departmentsBean = vDepartmentsBeanList.get(0);
-        assertEquals(SHIPPING_DEPARTMENT_NAME, departmentsBean.getDepartmentName());
-        assertEquals(SHIPPING_DEPARTMENT_CITY, departmentsBean.getCity());
-        assertEquals(SHIPPING_DEPARTMENT_MANAGER_LAST_NAME, departmentsBean.getLastName());
-        assertEquals(SHIPPING_DEPARTMENT_EMPLOYEE_COUNT, departmentsBean.getEmployeeCount());
+        assertEquals(1L, vDepartmentsList.size());
+        final VDepartments departments = vDepartmentsList.get(0);
+        assertEquals(SHIPPING_DEPARTMENT_NAME, departments.getDepartmentName());
+        assertEquals(SHIPPING_DEPARTMENT_CITY, departments.getCity());
+        assertEquals(SHIPPING_DEPARTMENT_MANAGER_LAST_NAME, departments.getLastName());
+        assertEquals(SHIPPING_DEPARTMENT_EMPLOYEE_COUNT, departments.getEmployeeCount());
     }
 
     @Test
@@ -50,21 +49,21 @@ public class DepartmentServiceTest {
         DataSourceProvider.begin();
         try {
             final DepartmentService departmentService = DepartmentService.getInstance();
-            final VDepartmentsBean newDepartmentsBean = new VDepartmentsBean();
-            newDepartmentsBean.setDepartmentName(NEW_DEPARTMENT_NAME);
-            newDepartmentsBean.setLocationId(NEW_DEPARTMENT_LOCATION_ID);
-            newDepartmentsBean.setManagerId(NEW_DEPARTMENT_MANAGER_ID);
-            final VDepartmentsBean newDepartmentsBean1 = beanDML.insertVDepartments(newDepartmentsBean);
-            assertNotNull(newDepartmentsBean1);
-            final List<VDepartmentsBean> vDepartmentsBeanList =
-                    departmentService.findDepartmentsById(newDepartmentsBean1.getDepartmentId());
-            assertEquals(1L, vDepartmentsBeanList.size());
-            newDepartmentsBean1.setLocationId(NEW_DEPARTMENT_LOCATION_ID1);
-            beanDML.updateVDepartments(newDepartmentsBean1);
-            beanDML.deleteVDepartments(newDepartmentsBean1);
-            final List<VDepartmentsBean> vDepartmentsBeanList1 =
-                    departmentService.findDepartmentsById(newDepartmentsBean1.getDepartmentId());
-            assertEquals(0L, vDepartmentsBeanList1.size());
+            final VDepartments newDepartments = new VDepartments();
+            newDepartments.setDepartmentName(NEW_DEPARTMENT_NAME);
+            newDepartments.setLocationId(NEW_DEPARTMENT_LOCATION_ID);
+            newDepartments.setManagerId(NEW_DEPARTMENT_MANAGER_ID);
+            final VDepartments newDepartments1 = beanDML.insertVDepartments(newDepartments);
+            assertNotNull(newDepartments1);
+            final List<VDepartments> vDepartmentsList =
+                    departmentService.findDepartmentsById(newDepartments1.getDepartmentId());
+            assertEquals(1L, vDepartmentsList.size());
+            newDepartments1.setLocationId(NEW_DEPARTMENT_LOCATION_ID1);
+            beanDML.updateVDepartments(newDepartments1);
+            beanDML.deleteVDepartments(newDepartments1);
+            final List<VDepartments> vDepartmentsList1 =
+                    departmentService.findDepartmentsById(newDepartments1.getDepartmentId());
+            assertEquals(0L, vDepartmentsList1.size());
             DataSourceProvider.commit();
         } catch (Throwable e) {
             DataSourceProvider.rollback();

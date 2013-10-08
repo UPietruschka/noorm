@@ -2,11 +2,11 @@ package org.noorm.test;
 
 import org.junit.Test;
 import org.noorm.jdbc.DataSourceProvider;
-import org.noorm.test.hr.beans.EmpDetailsViewBean;
-import org.noorm.test.hr.beans.EmployeesBean;
-import org.noorm.test.hr.beans.JobHistoryBean;
-import org.noorm.test.hr.beans.JobsBean;
-import org.noorm.test.hr.beans.SalaryGroupRecordBean;
+import org.noorm.test.hr.beans.EmpDetailsView;
+import org.noorm.test.hr.beans.Employees;
+import org.noorm.test.hr.beans.JobHistory;
+import org.noorm.test.hr.beans.Jobs;
+import org.noorm.test.hr.beans.SalaryGroupRecord;
 import org.noorm.test.hr.services.BeanDML;
 import org.noorm.test.hr.services.EmployeeService;
 
@@ -32,21 +32,21 @@ public class EmployeeServiceTest {
 		DataSourceProvider.begin();
         try {
             final EmployeeService employeeService = EmployeeService.getInstance();
-            final List<EmployeesBean> employeesBeanList = employeeService.findAllEmployees();
+            final List<Employees> employeesList = employeeService.findAllEmployees();
             // For brevity and readability of the log, we do not iterate over the whole list
             int i = 0;
-            for (final EmployeesBean employeesBean : employeesBeanList) {
+            for (final Employees employees : employeesList) {
 
-                final Long employeeId = employeesBean.getEmployeeId();
-                final EmployeesBean employeesBean0 = employeeService.findUniqueEmployeeById(employeeId);
-                assertEquals(employeesBean0, employeesBean);
+                final Long employeeId = employees.getEmployeeId();
+                final Employees employees0 = employeeService.findUniqueEmployeeById(employeeId);
+                assertEquals(employees0, employees);
 
-                final String employeeLastName = employeesBean.getLastName();
-                final List<EmployeesBean> employeesBeanList2 = employeeService.findEmployeesByLastname(employeeLastName);
+                final String employeeLastName = employees.getLastName();
+                final List<Employees> employeesList2 = employeeService.findEmployeesByLastname(employeeLastName);
                 // Multiple employees with the same last name may exist. Just check, if the desired employee is contained
                 boolean employeeFound = false;
-                for (final EmployeesBean employeesBean1 : employeesBeanList2) {
-                    if (employeesBean.equals(employeesBean1)) {
+                for (final Employees employees1 : employeesList2) {
+                    if (employees.equals(employees1)) {
                         employeeFound = true;
                     }
                 }
@@ -70,38 +70,38 @@ public class EmployeeServiceTest {
         try {
             // Create a new record and insert it into the database
             final EmployeeService employeeService = EmployeeService.getInstance();
-            final EmployeesBean employeesBean = new EmployeesBean();
-            employeesBean.setFirstName("John");
-            employeesBean.setLastName("Doe");
-            employeesBean.setEmail("JDOE");
-            employeesBean.setPhoneNumber("123.456.7890");
-            employeesBean.setHireDate(new java.util.Date(1200000000000L));  // January 10, 2008, 22:20
-            employeesBean.setJobId("IT_PROG");
-            employeesBean.setSalary(5000.00D);
-            employeesBean.setCommissionPct(new java.math.BigDecimal(0.28D));
-            employeesBean.setManagerId(108L);
-            employeesBean.setDepartmentId(60);
-            final EmployeesBean newEmployeesBean = beanDML.insertEmployees(employeesBean);
-            final List<EmployeesBean> employeesBeanList1 = employeeService.findEmployeesByLastname("Doe");
-            assertEquals(employeesBeanList1.size(), 1);
-            assertEquals(employeesBeanList1.get(0), newEmployeesBean);
+            final Employees employees = new Employees();
+            employees.setFirstName("John");
+            employees.setLastName("Doe");
+            employees.setEmail("JDOE");
+            employees.setPhoneNumber("123.456.7890");
+            employees.setHireDate(new java.util.Date(1200000000000L));  // January 10, 2008, 22:20
+            employees.setJobId("IT_PROG");
+            employees.setSalary(5000.00D);
+            employees.setCommissionPct(new java.math.BigDecimal(0.28D));
+            employees.setManagerId(108L);
+            employees.setDepartmentId(60);
+            final Employees newEmployees = beanDML.insertEmployees(employees);
+            final List<Employees> employeesList1 = employeeService.findEmployeesByLastname("Doe");
+            assertEquals(employeesList1.size(), 1);
+            assertEquals(employeesList1.get(0), newEmployees);
 
             // Modify the just inserted record
-            newEmployeesBean.setLastName("Public");
-            beanDML.updateEmployees(newEmployeesBean);
-            final List<EmployeesBean> employeesBeanList2 = employeeService.findEmployeesByLastname("Doe");
-            assertEquals(employeesBeanList2.size(), 0);
-            final List<EmployeesBean> employeesBeanList3 = employeeService.findEmployeesByLastname("Public");
-            assertEquals(employeesBeanList3.size(), 1);
-            assertEquals(employeesBeanList3.get(0), newEmployeesBean);
+            newEmployees.setLastName("Public");
+            beanDML.updateEmployees(newEmployees);
+            final List<Employees> employeesList2 = employeeService.findEmployeesByLastname("Doe");
+            assertEquals(employeesList2.size(), 0);
+            final List<Employees> employeesList3 = employeeService.findEmployeesByLastname("Public");
+            assertEquals(employeesList3.size(), 1);
+            assertEquals(employeesList3.get(0), newEmployees);
 
             // Delete the just inserted record. We have to delete the job history record inserted by the trigger, too
-            final List<JobHistoryBean> jobHistoryBeanList =
-                    employeeService.findJobHistoryByEmpId(newEmployeesBean.getEmployeeId());
-            beanDML.deleteJobHistoryList(jobHistoryBeanList);
-            beanDML.deleteEmployees(newEmployeesBean);
-            final List<EmployeesBean> employeesBeanList4 = employeeService.findEmployeesByLastname("Public");
-            assertEquals(employeesBeanList4.size(), 0);
+            final List<JobHistory> jobHistoryList =
+                    employeeService.findJobHistoryByEmpId(newEmployees.getEmployeeId());
+            beanDML.deleteJobHistoryList(jobHistoryList);
+            beanDML.deleteEmployees(newEmployees);
+            final List<Employees> employeesList4 = employeeService.findEmployeesByLastname("Public");
+            assertEquals(employeesList4.size(), 0);
 
             DataSourceProvider.commit();
         } catch (Throwable e) {
@@ -119,14 +119,14 @@ public class EmployeeServiceTest {
 		DataSourceProvider.begin();
         try {
             final EmployeeService employeeService = EmployeeService.getInstance();
-            final List<EmpDetailsViewBean> empDetailsBeanList = employeeService.findAllEmployeeDetails();
+            final List<EmpDetailsView> empDetailsList = employeeService.findAllEmployeeDetails();
             // For brevity and readability of the log, we do not iterate over the whole list
             int i = 0;
-            for (final EmpDetailsViewBean empDetailsBean : empDetailsBeanList) {
+            for (final EmpDetailsView empDetails : empDetailsList) {
 
-                final Long employeeId = empDetailsBean.getEmployeeId();
-                final EmployeesBean employeesBean0 = employeeService.findUniqueEmployeeById(employeeId);
-                assertNotNull(employeesBean0);
+                final Long employeeId = empDetails.getEmployeeId();
+                final Employees employees0 = employeeService.findUniqueEmployeeById(employeeId);
+                assertNotNull(employees0);
                 if (i++ >= 20) { break; }
             }
             DataSourceProvider.commit();
@@ -140,9 +140,9 @@ public class EmployeeServiceTest {
 	public void testSalaryGroups() {
 
 		final EmployeeService employeeService = EmployeeService.getInstance();
-		final List<SalaryGroupRecordBean> salaryGroupBeanList = employeeService.findSalaryGroups();
-		assertEquals(15, salaryGroupBeanList.size());
-		SalaryGroupRecordBean lowestSalaryGroup = salaryGroupBeanList.get(0);
+		final List<SalaryGroupRecord> salaryGroupList = employeeService.findSalaryGroups();
+		assertEquals(15, salaryGroupList.size());
+		SalaryGroupRecord lowestSalaryGroup = salaryGroupList.get(0);
 		Long salaryGroupUpperLimit = lowestSalaryGroup.getSalaryGroup();
 		assertEquals(2000L, salaryGroupUpperLimit.longValue());
 		Long count = lowestSalaryGroup.getCnt();
@@ -159,27 +159,27 @@ public class EmployeeServiceTest {
         try {
             // Create a new record and insert it into the database
             final EmployeeService employeeService = EmployeeService.getInstance();
-            final JobsBean jobsBean = new JobsBean();
-            jobsBean.setJobId("CT_MGR");
-            jobsBean.setJobTitle("Controller");
-            jobsBean.setMinSalary(8000L);
-            jobsBean.setMaxSalary(12000L);
-            final JobsBean newJobsBean =  beanDML.insertJobs(jobsBean);
-            final List<JobsBean> jobsBeanList = employeeService.findJobById("CT_MGR");
-            assertEquals(jobsBeanList.size(), 1);
-            assertEquals(jobsBeanList.get(0), newJobsBean);
+            final Jobs jobs = new Jobs();
+            jobs.setJobId("CT_MGR");
+            jobs.setJobTitle("Controller");
+            jobs.setMinSalary(8000L);
+            jobs.setMaxSalary(12000L);
+            final Jobs newJobs =  beanDML.insertJobs(jobs);
+            final List<Jobs> jobsList = employeeService.findJobById("CT_MGR");
+            assertEquals(jobsList.size(), 1);
+            assertEquals(jobsList.get(0), newJobs);
 
             // Modify the just inserted record
-            newJobsBean.setJobTitle("Controlling");
-            beanDML.updateJobs(newJobsBean);
-            final List<JobsBean> jobsBeanList2 = employeeService.findJobById("CT_MGR");
-            assertEquals(jobsBeanList2.size(), 1);
-            assertEquals(jobsBeanList2.get(0).getJobTitle(), "Controlling");
+            newJobs.setJobTitle("Controlling");
+            beanDML.updateJobs(newJobs);
+            final List<Jobs> jobsList2 = employeeService.findJobById("CT_MGR");
+            assertEquals(jobsList2.size(), 1);
+            assertEquals(jobsList2.get(0).getJobTitle(), "Controlling");
 
             // Delete the just inserted record.
-            beanDML.deleteJobs(newJobsBean);
-            final List<JobsBean> jobsBeanList3 = employeeService.findJobById("CT_MGR");
-            assertEquals(jobsBeanList3.size(), 0);
+            beanDML.deleteJobs(newJobs);
+            final List<Jobs> jobsList3 = employeeService.findJobById("CT_MGR");
+            assertEquals(jobsList3.size(), 0);
 
             DataSourceProvider.commit();
         } catch (Throwable e) {

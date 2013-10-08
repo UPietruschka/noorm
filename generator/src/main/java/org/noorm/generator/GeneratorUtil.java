@@ -3,8 +3,9 @@ package org.noorm.generator;
 import org.apache.velocity.Template;
 import org.apache.velocity.VelocityContext;
 import org.apache.velocity.app.Velocity;
-import org.noorm.generator.schema.CustomTypeMapping;
-import org.noorm.generator.schema.Property;
+import org.noorm.generator.schema.TypeMapping;
+import org.noorm.generator.schema.GeneratorConfiguration;
+import org.noorm.generator.schema.Mapping;
 import org.noorm.jdbc.Utils;
 
 import java.io.BufferedWriter;
@@ -21,8 +22,6 @@ import java.util.regex.Pattern;
  *         Time: 12:18
  */
 public class GeneratorUtil {
-
-    private static final String BEAN_NAME_APPENDIX = "Bean";
 
 	public static void generateFile(final File pDir,
 									final String pVelocityTemplateFile,
@@ -67,29 +66,38 @@ public class GeneratorUtil {
 
     public static String convertDBName2JavaName(final String pDBName,
                                                 final boolean pCapitalizeFirst,
-                                                final List<String> pIgnoreColumnNamePrefixes) {
+                                                final List<Mapping> pDBNameMappings) {
+
         String nameBaseColumnName = pDBName;
-        if (pIgnoreColumnNamePrefixes != null) {
-            for (final String ignoredPrefix : pIgnoreColumnNamePrefixes) {
-                if (pDBName.startsWith(ignoredPrefix)) {
-                    nameBaseColumnName = pDBName.substring(ignoredPrefix.length());
-                }
+        if (pDBNameMappings != null) {
+            final String mappedString = getMappedString(pDBName, pDBNameMappings);
+            if (mappedString != null && !mappedString.isEmpty()) {
+                nameBaseColumnName = mappedString;
             }
         }
         return Utils.convertDBName2JavaName(nameBaseColumnName, pCapitalizeFirst);
     }
 
     /**
-     * Converts an Oracle table name to a Java Bean name.
-     * @see Utils (convertTableName2JavaName(String, java.util.List))
+     * Converts an Oracle table name to a Java name. The optional list of ignored table name prefixes is used
+     * to remove the table name prefix from the generated name. This is useful, when many or all tables in a
+     * database schema share a common name prefix, which should be visible in the generated code (e.g. "TBL_").
+     *
      * @param pTableName the database table name
-     * @param pIgnoreTableNamePrefixes optional list of table name prefixes to be ignored at conversion
-     * @return the Java Bean name
+     * @param pTableNameMappings optional list of table name mappings to define Java names
+     * @return the Java name
      */
-    public static String convertTableName2BeanName(final String pTableName,
-                                                   final List<String> pIgnoreTableNamePrefixes) {
+    public static String convertTableName2JavaName(final String pTableName,
+                                                   final List<Mapping> pTableNameMappings) {
 
-        return Utils.convertTableName2JavaName(pTableName, pIgnoreTableNamePrefixes).concat(BEAN_NAME_APPENDIX);
+        String nameBaseTableName = pTableName;
+        if (pTableNameMappings != null) {
+            final String mappedString = getMappedString(pTableName, pTableNameMappings);
+            if (mappedString != null && !mappedString.isEmpty()) {
+                nameBaseTableName = mappedString;
+            }
+        }
+        return Utils.convertDBName2JavaName(nameBaseTableName, true);
     }
 
     /**
@@ -98,15 +106,15 @@ public class GeneratorUtil {
      *
      * @param pOracleType the Oracle type name
      * @param pParamName the parameter name (of a stored procedure)
-     * @param pCustomTypeMappings the custom type mapping
+     * @param pTypeMappings the custom type mapping
      * @return the Java type name
      */
     public static String convertOracleType2JavaType(final String pOracleType,
                                                     final String pParamName,
-                                                    final List<CustomTypeMapping> pCustomTypeMappings) {
+                                                    final List<TypeMapping> pTypeMappings) {
 
-        if (pCustomTypeMappings != null) {
-            for (final CustomTypeMapping typeMapping : pCustomTypeMappings) {
+        if (pTypeMappings != null) {
+            for (final TypeMapping typeMapping : pTypeMappings) {
                 if (pOracleType.startsWith(typeMapping.getDatabaseType())) {
                     if (typeMapping.getParameterFilterRegex() != null) {
                         if (typeMapping.getColumnFilterRegex() != null || typeMapping.getTableFilterRegex() != null) {
@@ -135,7 +143,7 @@ public class GeneratorUtil {
      * @param pDataScale the data scale of the Oracle type, if available
      * @param pTableName the table name
      * @param pColumnName the column name
-     * @param pCustomTypeMappings the custom type mapping
+     * @param pTypeMappings the custom type mapping
      * @return the Java type name
      */
 
@@ -144,10 +152,10 @@ public class GeneratorUtil {
                                                     final Long pDataScale,
                                                     final String pTableName,
                                                     final String pColumnName,
-                                                    final List<CustomTypeMapping> pCustomTypeMappings) {
+                                                    final List<TypeMapping> pTypeMappings) {
 
-        if (pCustomTypeMappings != null) {
-            for (final CustomTypeMapping typeMapping : pCustomTypeMappings) {
+        if (pTypeMappings != null) {
+            for (final TypeMapping typeMapping : pTypeMappings) {
                 if (pOracleType.startsWith(typeMapping.getDatabaseType()) &&
                         typeMapping.getParameterFilterRegex() == null) {
                     if (typeMapping.getColumnFilterRegex() == null && typeMapping.getTableFilterRegex() == null) {
@@ -227,7 +235,7 @@ public class GeneratorUtil {
 
     /**
      * Replaces strings or parts of strings with a replacement expression.
-     * This method iterates through the given properties, which should contain pairs of search pattern and
+     * This method iterates through the given mappings, which should contain pairs of search patterns and
      * replacement patterns for string replacement in the input string. For the first search pattern, which
      * matches the input string, the replacement pattern is applied. The simplest form of string replacement
      * is a direct replacement of the search pattern with the replacement pattern without any usage of
@@ -236,24 +244,81 @@ public class GeneratorUtil {
      * results in the replacement string "CUSTOMER_SEQ" for input string "CUSTOMER").
      *
      * @param pInput the input string subject to regular expression replacement
-     * @param pProperties a collection of key/value pairs for search/replace expressions
+     * @param pMappings a collection of key/value pairs for search/replace expressions
      * @return the modified input string
      */
-    public static String getPropertyString(final String pInput, final List<Property> pProperties) {
+    public static String getMappedString(final String pInput, final List<Mapping> pMappings) {
 
-        String propertyString = "";
-        if (pProperties != null) {
-            for (final Property property : pProperties) {
-                final String searchPattern = property.getName();
+        String mappedString = "";
+        if (pMappings != null) {
+            for (final Mapping property : pMappings) {
+                final String searchPattern = property.getKey();
                 final Pattern finder = Pattern.compile(searchPattern);
                 final Matcher matcher = finder.matcher(pInput);
                 if (matcher.matches()) {
                     final String replacePattern = property.getValue();
-                    propertyString = matcher.replaceFirst(replacePattern);
+                    mappedString = matcher.replaceFirst(replacePattern);
                     break;
                 }
             }
         }
-        return propertyString;
+        return mappedString;
+    }
+
+    public static boolean hasBeanPackageName(final GeneratorConfiguration pConfiguration) {
+
+        if (pConfiguration.getBeanPackage() == null) {
+            return false;
+        }
+        if (pConfiguration.getBeanPackage().getName() == null || pConfiguration.getBeanPackage().getName().isEmpty()) {
+            return false;
+        }
+        return true;
+    }
+
+    public static boolean hasEnumPackageName(final GeneratorConfiguration pConfiguration) {
+
+        if (pConfiguration.getEnumPackage() == null) {
+            return false;
+        }
+        if (pConfiguration.getEnumPackage().getName() == null || pConfiguration.getEnumPackage().getName().isEmpty()) {
+            return false;
+        }
+        return true;
+    }
+
+    public static boolean hasServicePackageName(final GeneratorConfiguration pConfiguration) {
+
+        if (pConfiguration.getServicePackage() == null) {
+            return false;
+        }
+        if (pConfiguration.getServicePackage().getName() == null
+                || pConfiguration.getServicePackage().getName().isEmpty()) {
+            return false;
+        }
+        return true;
+    }
+
+    public static boolean hasServiceInterfacePackageName(final GeneratorConfiguration pConfiguration) {
+
+        if (pConfiguration.getServiceInterfacePackage() == null) {
+            return false;
+        }
+        if (pConfiguration.getServiceInterfacePackage().getName() == null
+                || pConfiguration.getServiceInterfacePackage().getName().isEmpty()) {
+            return false;
+        }
+        return true;
+    }
+
+    public static boolean hasDataSourceName(final GeneratorConfiguration pConfiguration) {
+
+        if (pConfiguration.getDataSource() == null) {
+            return false;
+        }
+        if (pConfiguration.getDataSource().getName() == null || pConfiguration.getDataSource().getName().isEmpty()) {
+            return false;
+        }
+        return true;
     }
 }

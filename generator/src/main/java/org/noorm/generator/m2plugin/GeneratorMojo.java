@@ -9,6 +9,7 @@ import org.apache.maven.plugins.annotations.Mojo;
 import org.apache.maven.plugins.annotations.Parameter;
 import org.apache.maven.project.MavenProject;
 import org.apache.velocity.app.Velocity;
+import org.noorm.generator.GeneratorUtil;
 import org.noorm.generator.beangenerator.BeanGenerator;
 import org.noorm.generator.enumgenerator.EnumGenerator;
 import org.noorm.generator.querygenerator.QueryGenerator;
@@ -178,19 +179,19 @@ public class GeneratorMojo extends AbstractMojo implements IParameters {
 		beanGenerator.execute();
 
 		// Generate Enums
-		if (configuration.getEnumPackageName() != null && !configuration.getEnumPackageName().isEmpty()) {
+		if (GeneratorUtil.hasEnumPackageName(configuration)) {
 			final EnumGenerator enumGenerator = new EnumGenerator(this, configuration);
 			enumGenerator.execute();
 		}
 
 		// Generate Services
-		if (configuration.getServicePackageName() !=null && !configuration.getServicePackageName().isEmpty()) {
+        if (GeneratorUtil.hasServicePackageName(configuration)) {
 			final ServiceGenerator serviceGenerator = new ServiceGenerator(this, configuration);
 			serviceGenerator.execute();
 		}
 
         // Generate Declared Queries
-        if (configuration.getQueryDeclarations() !=null && !configuration.getQueryDeclarations().isEmpty()) {
+        if (configuration.getQueryDeclarations() != null && !configuration.getQueryDeclarations().isEmpty()) {
             final QueryGenerator queryGenerator = new QueryGenerator(this, configuration);
             queryGenerator.execute();
         }
@@ -239,7 +240,7 @@ public class GeneratorMojo extends AbstractMojo implements IParameters {
             if (queryDeclaration.isSingleRowQuery() == null) {
                 queryDeclaration.setSingleRowQuery(Boolean.FALSE);
             }
-            for (final QueryColumn queryColumn : queryDeclaration.getQueryColumns()) {
+            for (final QueryColumn queryColumn : queryDeclaration.getQueryColumn()) {
                 if (queryColumn.getOperator() == null) {
                     queryColumn.setOperator(OperatorName.EQUAL_TO);
                 }

@@ -4,7 +4,7 @@ import org.junit.Assert;
 import org.junit.Test;
 import org.noorm.jdbc.DataAccessException;
 import org.noorm.jdbc.DataSourceProvider;
-import org.noorm.test.hr.beans.OptLockLongBean;
+import org.noorm.test.hr.beans.OptLockLong;
 import org.noorm.test.hr.services.BeanDML;
 
 import static org.junit.Assert.*;
@@ -27,13 +27,13 @@ public class OptLockLongTest {
 
 		DataSourceProvider.begin();
         try {
-            final OptLockLongBean newOptLockLongBean = new OptLockLongBean();
-            newOptLockLongBean.setText(SOME_TEXT);
-            final OptLockLongBean insertedOptLockLongBean =  beanDML.insertOptLockLong(newOptLockLongBean);
-            assertEquals(SOME_TEXT, insertedOptLockLongBean.getText());
-            insertedOptLockLongBean.setText(SOME_NEW_TEXT);
-            beanDML.updateOptLockLong(insertedOptLockLongBean);
-            beanDML.deleteOptLockLong(insertedOptLockLongBean);
+            final OptLockLong newOptLockLong = new OptLockLong();
+            newOptLockLong.setText(SOME_TEXT);
+            final OptLockLong insertedOptLockLong =  beanDML.insertOptLockLong(newOptLockLong);
+            assertEquals(SOME_TEXT, insertedOptLockLong.getText());
+            insertedOptLockLong.setText(SOME_NEW_TEXT);
+            beanDML.updateOptLockLong(insertedOptLockLong);
+            beanDML.deleteOptLockLong(insertedOptLockLong);
             DataSourceProvider.commit();
         } catch (Throwable e) {
             DataSourceProvider.rollback();
@@ -45,12 +45,12 @@ public class OptLockLongTest {
 	public void testFailOptLockLongCRUD() {
 
 		DataSourceProvider.begin();
-		final OptLockLongBean newOptLockLongBean = new OptLockLongBean();
-		newOptLockLongBean.setText(SOME_TEXT);
-        beanDML.insertOptLockLong(newOptLockLongBean);
+		final OptLockLong newOptLockLong = new OptLockLong();
+		newOptLockLong.setText(SOME_TEXT);
+        beanDML.insertOptLockLong(newOptLockLong);
 		try {
-			newOptLockLongBean.setVersion(0L);
-            beanDML.updateOptLockLong(newOptLockLongBean);
+			newOptLockLong.setVersion(0L);
+            beanDML.updateOptLockLong(newOptLockLong);
 			fail();
 		} catch (DataAccessException e) {
             if (!e.getType().equals(DataAccessException.Type.OPTIMISTIC_LOCK_CONFLICT)) {

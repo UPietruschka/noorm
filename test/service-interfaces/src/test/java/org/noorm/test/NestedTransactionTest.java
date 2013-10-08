@@ -73,9 +73,9 @@ public class NestedTransactionTest {
 
     private void changeJob() {
 
-        final List<JobsBeanExt> jobsBeanList = employeeService.findJobById("IT_PROG");
+        final List<JobsExt> jobsBeanList = employeeService.findJobById("IT_PROG");
         assertEquals(1, jobsBeanList.size());
-        JobsBeanExt job = jobsBeanList.get(0);
+        JobsExt job = jobsBeanList.get(0);
         job.setMaxSalary(10000L);
         beanDML_HR1.updateJobs(job);
     }

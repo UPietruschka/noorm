@@ -4,7 +4,7 @@ import org.junit.Assert;
 import org.junit.Test;
 import org.noorm.jdbc.DataAccessException;
 import org.noorm.jdbc.DataSourceProvider;
-import org.noorm.test.hr.beans.OptLockTimestampBean;
+import org.noorm.test.hr.beans.OptLockTimestamp;
 import org.noorm.test.hr.services.BeanDML;
 
 import java.sql.Timestamp;
@@ -29,14 +29,14 @@ public class OptLockTimestampTest {
 
         DataSourceProvider.begin();
         try {
-            final OptLockTimestampBean newOptLockTimestampBean = new OptLockTimestampBean();
-            newOptLockTimestampBean.setText(SOME_TEXT);
-            final OptLockTimestampBean insertedOptLockTimestampBean =
-                    beanDML.insertOptLockTimestamp(newOptLockTimestampBean);
-            assertEquals(SOME_TEXT, insertedOptLockTimestampBean.getText());
-            insertedOptLockTimestampBean.setText(SOME_NEW_TEXT);
-            beanDML.updateOptLockTimestamp(insertedOptLockTimestampBean);
-            beanDML.deleteOptLockTimestamp(insertedOptLockTimestampBean);
+            final OptLockTimestamp newOptLockTimestamp = new OptLockTimestamp();
+            newOptLockTimestamp.setText(SOME_TEXT);
+            final OptLockTimestamp insertedOptLockTimestamp =
+                    beanDML.insertOptLockTimestamp(newOptLockTimestamp);
+            assertEquals(SOME_TEXT, insertedOptLockTimestamp.getText());
+            insertedOptLockTimestamp.setText(SOME_NEW_TEXT);
+            beanDML.updateOptLockTimestamp(insertedOptLockTimestamp);
+            beanDML.deleteOptLockTimestamp(insertedOptLockTimestamp);
             DataSourceProvider.commit();
         } catch (Throwable e) {
             DataSourceProvider.rollback();
@@ -48,12 +48,12 @@ public class OptLockTimestampTest {
     public void testFailOptLockTimestampCRUD() {
 
         DataSourceProvider.begin();
-        final OptLockTimestampBean newOptLockTimestampBean = new OptLockTimestampBean();
-        newOptLockTimestampBean.setText(SOME_TEXT);
-        beanDML.insertOptLockTimestamp(newOptLockTimestampBean);
+        final OptLockTimestamp newOptLockTimestamp = new OptLockTimestamp();
+        newOptLockTimestamp.setText(SOME_TEXT);
+        beanDML.insertOptLockTimestamp(newOptLockTimestamp);
         try {
-            newOptLockTimestampBean.setVersion(new Timestamp(1200000000000L)); // January 10, 2008, 22:20
-            beanDML.updateOptLockTimestamp(newOptLockTimestampBean);
+            newOptLockTimestamp.setVersion(new Timestamp(1200000000000L)); // January 10, 2008, 22:20
+            beanDML.updateOptLockTimestamp(newOptLockTimestamp);
             fail();
         } catch (DataAccessException e) {
             if (!e.getType().equals(DataAccessException.Type.OPTIMISTIC_LOCK_CONFLICT)) {

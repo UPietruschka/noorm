@@ -4,7 +4,7 @@ import org.junit.Test;
 import org.noorm.jdbc.DataSourceProvider;
 import org.noorm.jdbc.JDBCDMLProcessor;
 import org.noorm.jdbc.LOBHelper;
-import org.noorm.test.hr.beans.ComplexDataTypesBean;
+import org.noorm.test.hr.beans.ComplexDataTypes;
 import org.noorm.test.hr.services.ComplexDataService;
 
 import java.io.IOException;
@@ -45,34 +45,34 @@ public class LOBStreamingTest {
         try {
 
             // Creation
-            final ComplexDataTypesBean complexDataTypesBean = new ComplexDataTypesBean();
+            final ComplexDataTypes complexDataTypes = new ComplexDataTypes();
             final Clob clob = LOBHelper.createClob();
             final Writer writer1 = clob.setCharacterStream(1);
             writer1.append(SOME_TEXT);
             writer1.close();
-            complexDataTypesBean.setConvertedClobColumn(clob);
-            final JDBCDMLProcessor<ComplexDataTypesBean> dmlProcessor = JDBCDMLProcessor.getInstance();
-            final ComplexDataTypesBean insertedBean = dmlProcessor.insert(complexDataTypesBean);
+            complexDataTypes.setConvertedClobColumn(clob);
+            final JDBCDMLProcessor<ComplexDataTypes> dmlProcessor = JDBCDMLProcessor.getInstance();
+            final ComplexDataTypes inserted = dmlProcessor.insert(complexDataTypes);
             clob.free();
-            final ComplexDataTypesBean insertedBean0 = complexDataService.findUniqueCdtById(insertedBean.getId());
-            assertEquals(insertedBean, insertedBean0);
-            final Reader reader1 = insertedBean0.getConvertedClobColumn().getCharacterStream();
+            final ComplexDataTypes inserted0 = complexDataService.findUniqueCdtById(inserted.getId());
+            assertEquals(inserted, inserted0);
+            final Reader reader1 = inserted0.getConvertedClobColumn().getCharacterStream();
             final String clob1 = readFully(reader1);
             assertEquals(SOME_TEXT, clob1);
 
             // Update
-            final Writer writer2 = insertedBean0.getConvertedClobColumn().setCharacterStream(1);
+            final Writer writer2 = inserted0.getConvertedClobColumn().setCharacterStream(1);
             writer2.append(SOME_NEW_TEXT);
             writer2.close();
-            dmlProcessor.update(insertedBean0);
-            final ComplexDataTypesBean insertedBean1 = complexDataService.findUniqueCdtById(insertedBean0.getId());
-            assertEquals(insertedBean0, insertedBean1);
-            final Reader reader2 = insertedBean1.getConvertedClobColumn().getCharacterStream();
+            dmlProcessor.update(inserted0);
+            final ComplexDataTypes inserted1 = complexDataService.findUniqueCdtById(inserted0.getId());
+            assertEquals(inserted0, inserted1);
+            final Reader reader2 = inserted1.getConvertedClobColumn().getCharacterStream();
             final String clob2 = readFully(reader2);
             assertEquals(SOME_NEW_TEXT, clob2);
 
             // Delete
-            dmlProcessor.delete(insertedBean0);
+            dmlProcessor.delete(inserted0);
             DataSourceProvider.commit();
 
         } catch (Throwable e) {
@@ -89,34 +89,34 @@ public class LOBStreamingTest {
         try {
 
             // Creation
-            final ComplexDataTypesBean complexDataTypesBean = new ComplexDataTypesBean();
+            final ComplexDataTypes complexDataTypes = new ComplexDataTypes();
             final NClob nclob = LOBHelper.createNClob();
             final Writer writer1 = nclob.setCharacterStream(1);
             writer1.append(SOME_TEXT);
             writer1.close();
-            complexDataTypesBean.setConvertedNclobColumn(nclob);
-            final JDBCDMLProcessor<ComplexDataTypesBean> dmlProcessor = JDBCDMLProcessor.getInstance();
-            final ComplexDataTypesBean insertedBean = dmlProcessor.insert(complexDataTypesBean);
+            complexDataTypes.setConvertedNclobColumn(nclob);
+            final JDBCDMLProcessor<ComplexDataTypes> dmlProcessor = JDBCDMLProcessor.getInstance();
+            final ComplexDataTypes inserted = dmlProcessor.insert(complexDataTypes);
             nclob.free();
-            final ComplexDataTypesBean insertedBean0 = complexDataService.findUniqueCdtById(insertedBean.getId());
-            assertEquals(insertedBean, insertedBean0);
-            final Reader reader1 = insertedBean0.getConvertedNclobColumn().getCharacterStream();
+            final ComplexDataTypes inserted0 = complexDataService.findUniqueCdtById(inserted.getId());
+            assertEquals(inserted, inserted0);
+            final Reader reader1 = inserted0.getConvertedNclobColumn().getCharacterStream();
             final String clob1 = readFully(reader1);
             assertEquals(SOME_TEXT, clob1);
 
             // Update
-            final Writer writer2 = insertedBean0.getConvertedNclobColumn().setCharacterStream(1);
+            final Writer writer2 = inserted0.getConvertedNclobColumn().setCharacterStream(1);
             writer2.append(SOME_NEW_TEXT);
             writer2.close();
-            dmlProcessor.update(insertedBean0);
-            final ComplexDataTypesBean insertedBean1 = complexDataService.findUniqueCdtById(insertedBean0.getId());
-            assertEquals(insertedBean0, insertedBean1);
-            final Reader reader2 = insertedBean1.getConvertedNclobColumn().getCharacterStream();
+            dmlProcessor.update(inserted0);
+            final ComplexDataTypes inserted1 = complexDataService.findUniqueCdtById(inserted0.getId());
+            assertEquals(inserted0, inserted1);
+            final Reader reader2 = inserted1.getConvertedNclobColumn().getCharacterStream();
             final String clob2 = readFully(reader2);
             assertEquals(SOME_NEW_TEXT, clob2);
 
             // Delete
-            dmlProcessor.delete(insertedBean0);
+            dmlProcessor.delete(inserted0);
             DataSourceProvider.commit();
 
         } catch (Throwable e) {
@@ -133,39 +133,39 @@ public class LOBStreamingTest {
         try {
 
             // Creation
-            final ComplexDataTypesBean complexDataTypesBean = new ComplexDataTypesBean();
+            final ComplexDataTypes complexDataTypes = new ComplexDataTypes();
             final Blob blob = LOBHelper.createBlob();
             final OutputStream oStream1 = blob.setBinaryStream(1);
             oStream1.write(SOME_BYTE_ARRAY);
             oStream1.close();
-            complexDataTypesBean.setConvertedBlobColumn(blob);
-            final JDBCDMLProcessor<ComplexDataTypesBean> dmlProcessor = JDBCDMLProcessor.getInstance();
-            final ComplexDataTypesBean insertedBean = dmlProcessor.insert(complexDataTypesBean);
+            complexDataTypes.setConvertedBlobColumn(blob);
+            final JDBCDMLProcessor<ComplexDataTypes> dmlProcessor = JDBCDMLProcessor.getInstance();
+            final ComplexDataTypes inserted = dmlProcessor.insert(complexDataTypes);
             blob.free();
-            final ComplexDataTypesBean insertedBean0 = complexDataService.findUniqueCdtById(insertedBean.getId());
-            assertEquals(insertedBean, insertedBean0);
-            final InputStream iStream = insertedBean0.getConvertedBlobColumn().getBinaryStream();
+            final ComplexDataTypes inserted0 = complexDataService.findUniqueCdtById(inserted.getId());
+            assertEquals(inserted, inserted0);
+            final InputStream iStream = inserted0.getConvertedBlobColumn().getBinaryStream();
             final byte[] buffer1 = new byte[SOME_BYTE_ARRAY.length];
             iStream.read(buffer1);
             iStream.close();
             assertArrayEquals(SOME_BYTE_ARRAY, buffer1);
 
             // Update
-            final OutputStream oStream2 = insertedBean0.getConvertedBlobColumn().setBinaryStream(1);
+            final OutputStream oStream2 = inserted0.getConvertedBlobColumn().setBinaryStream(1);
             oStream2.write(SOME_NEW_BYTE_ARRAY);
             oStream2.close();
-            dmlProcessor.update(insertedBean0);
-            final ComplexDataTypesBean insertedBean1 = complexDataService.findUniqueCdtById(insertedBean0.getId());
-            assertEquals(insertedBean0, insertedBean1);
+            dmlProcessor.update(inserted0);
+            final ComplexDataTypes inserted1 = complexDataService.findUniqueCdtById(inserted0.getId());
+            assertEquals(inserted0, inserted1);
 
-            final InputStream iStream2 = insertedBean1.getConvertedBlobColumn().getBinaryStream();
+            final InputStream iStream2 = inserted1.getConvertedBlobColumn().getBinaryStream();
             final byte[] buffer2 = new byte[SOME_NEW_BYTE_ARRAY.length];
             iStream2.read(buffer2);
             iStream2.close();
             assertArrayEquals(SOME_NEW_BYTE_ARRAY, buffer2);
 
             // Delete
-            dmlProcessor.delete(insertedBean0);
+            dmlProcessor.delete(inserted0);
             DataSourceProvider.commit();
 
         } catch (Throwable e) {

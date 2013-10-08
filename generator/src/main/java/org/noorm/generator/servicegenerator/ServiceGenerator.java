@@ -5,6 +5,7 @@ import org.noorm.generator.ParameterDescriptor;
 import org.noorm.generator.ValidatorClassDescriptor;
 import org.noorm.generator.m2plugin.IParameters;
 import org.noorm.generator.schema.GeneratorConfiguration;
+import org.noorm.generator.schema.Regex;
 import org.noorm.metadata.MetadataService;
 import org.noorm.jdbc.Utils;
 import org.noorm.metadata.beans.NameBean;
@@ -47,10 +48,10 @@ public class ServiceGenerator {
 
 	public void execute() {
 
-		if (configuration.getServicePackageName() == null || configuration.getServicePackageName().isEmpty()) {
+        if (!GeneratorUtil.hasServicePackageName(configuration)) {
 			throw new IllegalArgumentException("Parameter [servicePackageName] is null.");
 		}
-		if (configuration.getBeanPackageName() == null || configuration.getBeanPackageName().isEmpty()) {
+        if (!GeneratorUtil.hasBeanPackageName(configuration)) {
 			throw new IllegalArgumentException("Parameter [beanPackageName] is null.");
 		}
 		if (parameters.getDestinationDirectory() == null || !parameters.getDestinationDirectory().exists()) {
@@ -58,24 +59,24 @@ public class ServiceGenerator {
 		}
 
 		ValidatorClassDescriptor validatorClassDescriptor = new ValidatorClassDescriptor();
-		validatorClassDescriptor.setPackageName(configuration.getServicePackageName());
-        if (configuration.getDataSourceName() != null && !configuration.getDataSourceName().isEmpty()) {
-            validatorClassDescriptor.setDataSourceName(configuration.getDataSourceName());
+		validatorClassDescriptor.setPackageName(configuration.getServicePackage().getName());
+        if (GeneratorUtil.hasDataSourceName(configuration)) {
+            validatorClassDescriptor.setDataSourceName(configuration.getDataSource().getName());
         }
 
         log.info("Generating NoORM Service classes.");
 		final File servicePackageDir = GeneratorUtil.createPackageDir
-				(parameters.getDestinationDirectory(), configuration.getServicePackageName());
+				(parameters.getDestinationDirectory(), configuration.getServicePackage().getName());
 		File serviceInterfacePackageDir = null;
-		if (configuration.getServiceInterfacePackageName() != null &&
-				!configuration.getServiceInterfacePackageName().isEmpty()) {
+        if (GeneratorUtil.hasServiceInterfacePackageName(configuration)) {
 			serviceInterfacePackageDir = GeneratorUtil.createPackageDir
-					(parameters.getDestinationDirectory(), configuration.getServiceInterfacePackageName());
+					(parameters.getDestinationDirectory(), configuration.getServiceInterfacePackage().getName());
 		}
 
-		String packageFilterRegex = configuration.getPackageFilterRegex();
-		if (packageFilterRegex == null || packageFilterRegex.isEmpty()) {
-			packageFilterRegex = DEFAULT_PACKAGE_FILTER_REGEX;
+        String packageFilterRegex = DEFAULT_PACKAGE_FILTER_REGEX;
+        final Regex packageFilter = configuration.getPackageFilter();
+		if (packageFilter != null && packageFilter.getRegex() != null) {
+			packageFilterRegex = packageFilter.getRegex();
 		}
 		final MetadataService metadataService = MetadataService.getInstance();
 		final List<NameBean> packageNames = metadataService.findPackageNames(packageFilterRegex);
@@ -86,14 +87,16 @@ public class ServiceGenerator {
 			}
 			final ServiceClassDescriptor serviceClassDescriptor = new ServiceClassDescriptor();
 			final String javaClassName = Utils.convertDBName2JavaName(packageName.getName(), true);
-            if (configuration.getDataSourceName() != null && !configuration.getDataSourceName().isEmpty()) {
-                serviceClassDescriptor.setDataSourceName(configuration.getDataSourceName());
+            if (GeneratorUtil.hasDataSourceName(configuration)) {
+                serviceClassDescriptor.setDataSourceName(configuration.getDataSource().getName());
             }
             serviceClassDescriptor.setJavaName(javaClassName);
 			serviceClassDescriptor.setDatabasePackageName(packageName.getName().toLowerCase());
-			serviceClassDescriptor.setInterfacePackageName(configuration.getServiceInterfacePackageName());
-			serviceClassDescriptor.setPackageName(configuration.getServicePackageName());
-			serviceClassDescriptor.setBeanPackageName(configuration.getBeanPackageName());
+            if (GeneratorUtil.hasServiceInterfacePackageName(configuration)) {
+                serviceClassDescriptor.setInterfacePackageName(configuration.getServiceInterfacePackage().getName());
+            }
+			serviceClassDescriptor.setPackageName(configuration.getServicePackage().getName());
+			serviceClassDescriptor.setBeanPackageName(configuration.getBeanPackage().getName());
 			final Integer codeHashValue = metadataService.getPackageHashValue(packageName.getName());
 			serviceClassDescriptor.setCodeHashValue(codeHashValue);
 			validatorClassDescriptor.getClassNames().add(javaClassName);
@@ -118,14 +121,13 @@ public class ServiceGenerator {
 							parameterDescriptor.setJavaType(NOORM_ID_LIST_JAVA_TYPE_NAME);
 						} else {
 							final String javaType = GeneratorUtil.convertOracleType2JavaType (oracleType,
-                                    parameterDescriptor.getOracleName(), configuration.getCustomTypeMappings());
+                                    parameterDescriptor.getOracleName(), configuration.getTypeMappings());
 							parameterDescriptor.setJavaType(javaType);
 						}
 						procedureDescriptor.addParameter(parameterDescriptor);
-						if (configuration.getPageableProcedureNameRegex() != null &&
-								!configuration.getPageableProcedureNameRegex().isEmpty()) {
-							if (procedureName.getName().toLowerCase().matches
-									(configuration.getPageableProcedureNameRegex())) {
+                        final Regex pageableProcedureName = configuration.getPageableProcedureName();
+						if (pageableProcedureName != null && pageableProcedureName.getRegex() != null) {
+							if (procedureName.getName().toLowerCase().matches(pageableProcedureName.getRegex())) {
 								procedureDescriptor.setPageableFinder(true);
 							}
 						} else {
@@ -142,10 +144,10 @@ public class ServiceGenerator {
 							if (rowTypeName.equals(NOORM_METADATA_ID_RECORD)) {
 								procedureDescriptor.setOutParamJavaType(Long.class.getSimpleName());
 							} else {
-								String javaBeanName = GeneratorUtil.convertTableName2BeanName
-										(rowTypeName.toUpperCase(), configuration.getIgnoreTableNamePrefixes());
+								String javaBeanName = GeneratorUtil.convertTableName2JavaName
+                                        (rowTypeName.toUpperCase(), configuration.getTableNameMappings());
 								if (configuration.getExtendedBeans() != null) {
-									final String extJavaBeanName = GeneratorUtil.getPropertyString
+									final String extJavaBeanName = GeneratorUtil.getMappedString
                                             (javaBeanName, configuration.getExtendedBeans());
 									if (!extJavaBeanName.isEmpty()) {
 										javaBeanName = extJavaBeanName;
@@ -154,16 +156,15 @@ public class ServiceGenerator {
 								procedureDescriptor.setOutParamJavaType(javaBeanName);
 							}
 							procedureDescriptor.setOutParamRefCursor(true);
-							if (configuration.getSingleRowFinderRegex() != null &&
-									!configuration.getSingleRowFinderRegex().isEmpty()) {
-								if (procedureName.getName().toLowerCase().matches
-										(configuration.getSingleRowFinderRegex())) {
+                            final Regex singleRowFinder = configuration.getSingleRowFinder();
+							if (singleRowFinder != null) {
+								if (procedureName.getName().toLowerCase().matches(singleRowFinder.getRegex())) {
 									procedureDescriptor.setSingleRowFinder(true);
 								}
 							}
 						} else {
 							final String javaType = GeneratorUtil.convertOracleType2JavaType (parameter.getDataType(),
-                                    parameter.getName(), configuration.getCustomTypeMappings());
+                                    parameter.getName(), configuration.getTypeMappings());
 							procedureDescriptor.setOutParamJavaType(javaType);
 							procedureDescriptor.setOutParamScalar(true);
 						}
@@ -173,8 +174,7 @@ public class ServiceGenerator {
 			}
 			GeneratorUtil.generateFile(servicePackageDir, SERVICE_VM_TEMPLATE_FILE,
 					serviceClassDescriptor.getJavaName(), serviceClassDescriptor);
-			if (configuration.getServiceInterfacePackageName() != null &&
-					!configuration.getServiceInterfacePackageName().isEmpty()) {
+            if (GeneratorUtil.hasServiceInterfacePackageName(configuration)) {
 				serviceClassDescriptor.setInterface(true);
 				GeneratorUtil.generateFile(serviceInterfacePackageDir, SERVICE_VM_TEMPLATE_FILE,
 						serviceClassDescriptor.getJavaInterfaceName(), serviceClassDescriptor);

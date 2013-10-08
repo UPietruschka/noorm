@@ -2,7 +2,7 @@ package org.noorm.test;
 
 import org.junit.Test;
 import org.noorm.jdbc.DataSourceProvider;
-import org.noorm.test.hr.beans.JobsSynonymBean;
+import org.noorm.test.hr.beans.JobsSynonym;
 import org.noorm.test.hr.services.BeanDML;
 import org.noorm.test.hr.services.DeclaredQueries;
 
@@ -24,7 +24,7 @@ public class JobSynonymTest {
     public void testGetEmployeeCount() {
 
         DeclaredQueries queries = DeclaredQueries.getInstance();
-        final List<JobsSynonymBean> jobs = queries.findJobsSynonymsBySalary(3000L, 10000L);
+        final List<JobsSynonym> jobs = queries.findJobsSynonymsBySalary(3000L, 10000L);
         assertEquals(JOB_COUNT, jobs.size());
     }
 
@@ -33,13 +33,13 @@ public class JobSynonymTest {
 
         DataSourceProvider.begin();
         try {
-            final JobsSynonymBean job = new JobsSynonymBean();
+            final JobsSynonym job = new JobsSynonym();
             job.setJobId("TEST_ID");
             job.setJobTitle("Test Title");
             job.setMinSalary(0L);
             job.setMaxSalary(1L);
             BeanDML beanDML = BeanDML.getInstance();
-            final JobsSynonymBean job0 = beanDML.insertJobsSynonym(job);
+            final JobsSynonym job0 = beanDML.insertJobsSynonym(job);
             job0.setMaxSalary(2L);
             beanDML.updateJobsSynonym(job0);
             beanDML.deleteJobsSynonym(job0);

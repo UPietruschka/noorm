@@ -3,172 +3,77 @@
                         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
                         xsi:schemaLocation="http://www.noorm.org/generator-configuration/1.0.0 http://www.noorm.org/xsd/generator-configuration-1.0.0.xsd">
 
-    <beanPackageName>org.noorm.test.hr.beans</beanPackageName>
-    <enumPackageName>org.noorm.test.hr.enums</enumPackageName>
-    <servicePackageName>org.noorm.test.hr.services</servicePackageName>
-    <enumTableFilterRegex>REGIONS|OPT_VARIANTS</enumTableFilterRegex>
-    <packageFilterRegex>(.*SERVICE|.*SEARCH)</packageFilterRegex>
-    <table2SequenceMapping>
-        <property>
-            <name>(EMPLOYEES|DEPARTMENTS|LOCATIONS|COMPLEX.*)</name>
-            <value>$1_SEQ</value>
-        </property>
-        <property>
-            <name>(OPT_LOCK_.*)</name>
-            <value>OPT_LOCK_SEQ</value>
-        </property>
-        <property>
-            <name>(case_sensitive_table)</name>
-            <value>case_sensitive_table_seq</value>
-        </property>
-        <property>
-            <name>(V_DEPARTMENTS)</name>
-            <value>DEPARTMENTS_SEQ</value>
-        </property>
-    </table2SequenceMapping>
-    <inlineSequenceTableFilterRegex>(OPT_.*)</inlineSequenceTableFilterRegex>
-    <ignoreColumnNamePrefixes>
-        <prefix>OPT_</prefix>
-    </ignoreColumnNamePrefixes>
-    <enumTable2DisplayColumnMapping>
-        <property>
-            <name>REGIONS</name>
-            <value>REGION_NAME</value>
-        </property>
-        <property>
-            <name>OPT_VARIANTS</name>
-            <value>OPT_VARIANT_NAME</value>
-        </property>
-    </enumTable2DisplayColumnMapping>
-    <optLockVersionColumnMapping>
-        <property>
-            <name>OPT_LOCK_.*</name>
-            <value>OPT_VERSION</value>
-        </property>
-        <property>
-            <name>COMPLEX_.*</name>
-            <value>VERSION</value>
-        </property>
-        <property>
-            <name>case_.*</name>
-            <value>version</value>
-        </property>
-    </optLockVersionColumnMapping>
-    <optLockFullRowCompareTableRegex>V_DEPARTMENTS|JOBS|JOB_HISTORY</optLockFullRowCompareTableRegex>
-    <viewName2PrimaryKeyMapping>
-        <property>
-            <name>V_DEPARTMENTS</name>
-            <value>DEPARTMENT_ID</value>
-        </property>
-    </viewName2PrimaryKeyMapping>
-    <singleRowFinderRegex>(.*_unique.*)</singleRowFinderRegex>
+    <beanPackage name="org.noorm.test.hr.beans"/>
+    <enumPackage name="org.noorm.test.hr.enums"/>
+    <servicePackage name="org.noorm.test.hr.services"/>
+    <enumTableFilter regex="REGIONS|OPT_VARIANTS"/>
+    <packageFilter regex="(.*SERVICE|.*SEARCH)"/>
+    <table2SequenceMappings>
+        <mapping key="(EMPLOYEES|DEPARTMENTS|LOCATIONS|COMPLEX.*)" value="$1_SEQ"/>
+        <mapping key="(OPT_LOCK_.*)" value="OPT_LOCK_SEQ"/>
+        <mapping key="(case_sensitive_table)" value="case_sensitive_table_seq"/>
+        <mapping key="(V_DEPARTMENTS)" value="DEPARTMENTS_SEQ"/>
+    </table2SequenceMappings>
+    <inlineSequenceTableFilter regex="(OPT_.*)"/>
+    <columnNameMappings>
+        <mapping key="(OPT_)(.*)" value="$2"/>
+    </columnNameMappings>
+    <enumTable2DisplayColumnMappings>
+        <mapping key="REGIONS" value="REGION_NAME"/>
+        <mapping key="OPT_VARIANTS" value="OPT_VARIANT_NAME"/>
+    </enumTable2DisplayColumnMappings>
+    <optLockVersionColumnMappings>
+        <mapping key="OPT_LOCK_.*" value="OPT_VERSION"/>
+        <mapping key="COMPLEX_.*" value="VERSION"/>
+        <mapping key="case_.*" value="version"/>
+    </optLockVersionColumnMappings>
+    <optLockFullRowCompareTableFilter regex="V_DEPARTMENTS|JOBS|JOB_HISTORY"/>
+    <viewName2PrimaryKeyMappings>
+        <mapping key="V_DEPARTMENTS" value="DEPARTMENT_ID"/>
+    </viewName2PrimaryKeyMappings>
+    <singleRowFinder regex="(.*_unique.*)"/>
     <queryDeclarations>
         <queryDeclaration tableName="EMPLOYEES">
-            <queryColumns>
-                <queryColumn name="COMMISSION_PCT" operator="EQUAL_TO"/>
-            </queryColumns>
+            <queryColumn name="COMMISSION_PCT" operator="EQUAL_TO"/>
         </queryDeclaration>
         <queryDeclaration tableName="EMPLOYEES" methodName="findEmployeesWithCommission">
-            <queryColumns>
-                <queryColumn name="COMMISSION_PCT" operator="IS_NOT_NULL"/>
-            </queryColumns>
+            <queryColumn name="COMMISSION_PCT" operator="IS_NOT_NULL"/>
         </queryDeclaration>
         <queryDeclaration tableName="EMPLOYEES" methodName="findEmployeesWithoutCommission">
-            <queryColumns>
-                <queryColumn name="COMMISSION_PCT" operator="IS_NULL"/>
-            </queryColumns>
+            <queryColumn name="COMMISSION_PCT" operator="IS_NULL"/>
         </queryDeclaration>
         <queryDeclaration tableName="DEPARTMENTS" singleRowQuery="true">
-            <queryColumns>
-                <queryColumn name="DEPARTMENT_ID" operator="EQUAL_TO"/>
-            </queryColumns>
+            <queryColumn name="DEPARTMENT_ID" operator="EQUAL_TO"/>
         </queryDeclaration>
         <queryDeclaration tableName="JOBS_SYNONYM" methodName="findJobsSynonymsBySalary">
-            <queryColumns>
-                <queryColumn name="MIN_SALARY" operator="GREATER_THAN_OR_EQUAL_TO"/>
-                <queryColumn name="MAX_SALARY" operator="LESS_THAN_OR_EQUAL_TO"/>
-            </queryColumns>
+            <queryColumn name="MIN_SALARY" operator="GREATER_THAN_OR_EQUAL_TO"/>
+            <queryColumn name="MAX_SALARY" operator="LESS_THAN_OR_EQUAL_TO"/>
         </queryDeclaration>
         <queryDeclaration tableName="COUNTRIES" acquireLock="true">
-            <queryColumns>
-                <queryColumn name="COUNTRY_ID" operator="EQUAL_TO"/>
-            </queryColumns>
+            <queryColumn name="COUNTRY_ID" operator="EQUAL_TO"/>
         </queryDeclaration>
         <queryDeclaration tableName="V_EMPLOYEES" baseTable="EMPLOYEES" methodName="findEmployeesByDepartmentCity" className="EmployeeFinder">
-            <queryColumns>
-                <queryColumn name="DEPARTMENT_NAME"/>
-                <queryColumn name="CITY"/>
-            </queryColumns>
+            <queryColumn name="DEPARTMENT_NAME"/>
+            <queryColumn name="CITY"/>
         </queryDeclaration>
         <queryDeclaration tableName="V_EMPLOYEES" baseTable="EMPLOYEES" className="EmployeeFinder">
-            <queryColumns>
-                <queryColumn name="DEPARTMENT_NAME" operator="LIKE"/>
-            </queryColumns>
+            <queryColumn name="DEPARTMENT_NAME" operator="LIKE"/>
         </queryDeclaration>
         <queryDeclaration tableName="case_sensitive_table"/>
     </queryDeclarations>
-    <customTypeMappings>
-        <customTypeMapping>
-            <tableFilterRegex>COMPLEX_DATA_TYPES</tableFilterRegex>
-            <columnFilterRegex>CONVERTED_NUMBER</columnFilterRegex>
-            <databaseType>NUMBER</databaseType>
-            <javaType>String</javaType>
-        </customTypeMapping>
-        <customTypeMapping>
-            <columnFilterRegex>COMMISSION_PCT</columnFilterRegex>
-            <databaseType>NUMBER</databaseType>
-            <javaType>java.math.BigDecimal</javaType>
-        </customTypeMapping>
-        <customTypeMapping>
-            <columnFilterRegex>REGION_ID|DEPARTMENT_ID|OPT_ID|LOCATION_ID</columnFilterRegex>
-            <databaseType>NUMBER</databaseType>
-            <javaType>Integer</javaType>
-        </customTypeMapping>
-        <customTypeMapping>
-            <parameterFilterRegex>P_DEPARTMENT_ID</parameterFilterRegex>
-            <databaseType>NUMBER</databaseType>
-            <javaType>Integer</javaType>
-        </customTypeMapping>
-        <customTypeMapping>
-            <tableFilterRegex>COUNTRIES</tableFilterRegex>
-            <databaseType>NUMBER</databaseType>
-            <javaType>Integer</javaType>
-        </customTypeMapping>
-        <customTypeMapping>
-            <columnFilterRegex>BOOLEAN_FLAG</columnFilterRegex>
-            <databaseType>NUMBER</databaseType>
-            <javaType>Boolean</javaType>
-        </customTypeMapping>
-        <customTypeMapping>
-            <columnFilterRegex>CONVERTED_DATE</columnFilterRegex>
-            <databaseType>DATE</databaseType>
-            <javaType>java.sql.Date</javaType>
-        </customTypeMapping>
-        <customTypeMapping>
-            <columnFilterRegex>CONVERTED_TIMESTAMP</columnFilterRegex>
-            <databaseType>TIMESTAMP</databaseType>
-            <javaType>java.sql.Timestamp</javaType>
-        </customTypeMapping>
-        <customTypeMapping>
-            <columnFilterRegex>CONVERTED_CLOB_COLUMN</columnFilterRegex>
-            <databaseType>CLOB</databaseType>
-            <javaType>java.sql.Clob</javaType>
-        </customTypeMapping>
-        <customTypeMapping>
-            <columnFilterRegex>CONVERTED_NCLOB_COLUMN</columnFilterRegex>
-            <databaseType>NCLOB</databaseType>
-            <javaType>java.sql.NClob</javaType>
-        </customTypeMapping>
-        <customTypeMapping>
-            <columnFilterRegex>CONVERTED_BLOB_COLUMN</columnFilterRegex>
-            <databaseType>BLOB</databaseType>
-            <javaType>java.sql.Blob</javaType>
-        </customTypeMapping>
-        <customTypeMapping>
-            <columnFilterRegex>CONVERTED_XMLTYPE</columnFilterRegex>
-            <databaseType>XMLTYPE</databaseType>
-            <javaType>java.sql.SQLXML</javaType>
-        </customTypeMapping>
-    </customTypeMappings>
+    <typeMappings>
+        <typeMapping tableFilterRegex="COMPLEX_DATA_TYPES" columnFilterRegex="CONVERTED_NUMBER" databaseType="NUMBER" javaType="String"/>
+        <typeMapping columnFilterRegex="COMMISSION_PCT" databaseType="NUMBER" javaType="java.math.BigDecimal"/>
+        <typeMapping columnFilterRegex="REGION_ID|DEPARTMENT_ID|OPT_ID|LOCATION_ID" databaseType="NUMBER" javaType="Integer"/>
+        <typeMapping parameterFilterRegex="P_DEPARTMENT_ID" databaseType="NUMBER" javaType="Integer"/>
+        <typeMapping tableFilterRegex="COUNTRIES" databaseType="NUMBER" javaType="Integer"/>
+        <typeMapping columnFilterRegex="BOOLEAN_FLAG" databaseType="NUMBER" javaType="Boolean"/>
+        <typeMapping columnFilterRegex="CONVERTED_DATE" databaseType="DATE" javaType="java.sql.Date"/>
+        <typeMapping columnFilterRegex="CONVERTED_TIMESTAMP" databaseType="TIMESTAMP" javaType="java.sql.Timestamp"/>
+        <typeMapping columnFilterRegex="CONVERTED_CLOB_COLUMN" databaseType="CLOB" javaType="java.sql.Clob"/>
+        <typeMapping columnFilterRegex="CONVERTED_NCLOB_COLUMN" databaseType="NCLOB" javaType="java.sql.NClob"/>
+        <typeMapping columnFilterRegex="CONVERTED_BLOB_COLUMN" databaseType="BLOB" javaType="java.sql.Blob"/>
+        <typeMapping columnFilterRegex="CONVERTED_XMLTYPE" databaseType="XMLTYPE" javaType="java.sql.SQLXML"/>
+    </typeMappings>
 
 </generatorConfiguration>

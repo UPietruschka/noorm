@@ -2,8 +2,8 @@ package org.noorm.test;
 
 import org.junit.Test;
 import org.noorm.jdbc.DataSourceProvider;
-import org.noorm.test.hr.beans.EmployeesBean;
-import org.noorm.test.hr.beans.JobHistoryBean;
+import org.noorm.test.hr.beans.Employees;
+import org.noorm.test.hr.beans.JobHistory;
 import org.noorm.test.hr.services.BeanDML;
 import org.noorm.test.hr.services.EmployeeService;
 
@@ -38,11 +38,11 @@ public class MultiThreadTest {
         final Date start = startC.getTime();
         final Date search = searchC.getTime();
         final Date end = endC.getTime();
-        final List<JobHistoryBean> jobHistoryList = new ArrayList<JobHistoryBean>();
-        final List<EmployeesBean> employeeList = employeeService.findAllEmployees();
+        final List<JobHistory> jobHistoryList = new ArrayList<JobHistory>();
+        final List<Employees> employeeList = employeeService.findAllEmployees();
         int i = 0;
-        for (final EmployeesBean employee : employeeList) {
-            final JobHistoryBean jobHistory = new JobHistoryBean();
+        for (final Employees employee : employeeList) {
+            final JobHistory jobHistory = new JobHistory();
             jobHistory.setEmployeeId(employee.getEmployeeId());
             jobHistory.setJobId("IT_PROG");
             jobHistory.setStartDate(start);
@@ -61,9 +61,9 @@ public class MultiThreadTest {
             fail(e.getMessage());
         }
 
-        final List<JobHistoryBean> jobHistoryList1 = employeeService.findJobHistoryByDate(search);
+        final List<JobHistory> jobHistoryList1 = employeeService.findJobHistoryByDate(search);
         assertEquals(jobHistoryList1.size(), TEST_LOOP_COUNT);
-        for (final JobHistoryBean jobHistory : jobHistoryList1) {
+        for (final JobHistory jobHistory : jobHistoryList1) {
             beanDML.deleteJobHistory(jobHistory);
         }
     }

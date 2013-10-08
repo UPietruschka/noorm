@@ -67,43 +67,6 @@ public class Utils {
 	}
 
     /**
-     * Converts an Oracle table name to a short table name.
-     * @see #convertTableName2JavaName(String, java.util.List)
-     * @param pTableName the database table name
-     * @param pIgnoreTableNamePrefixes optional list of table name prefixes to be ignored at conversion
-     * @return the short table name
-     */
-	public static String convertTableName2ShortName(final String pTableName,
-												    final List<String> pIgnoreTableNamePrefixes) {
-
-		return convertTableName2JavaName(pTableName, pIgnoreTableNamePrefixes);
-	}
-
-    /**
-     * Converts an Oracle table name to a Java name. The optional list of ignored table name prefixes is used
-     * to remove the table name prefix from the generated name. This is useful, when many or all tables in a
-     * database schema share a common name prefix, which should be visible in the generated code (e.g. "TBL_").
-     *
-     * @see #convertDBName2JavaName(String, boolean)
-     * @param pTableName the database table name
-     * @param pIgnoreTableNamePrefixes optional list of table name prefixes to be ignored at conversion
-     * @return the Java name
-     */
-	public static String convertTableName2JavaName(final String pTableName,
-												   final List<String> pIgnoreTableNamePrefixes) {
-
-		String nameBaseTableName = pTableName;
-		if (pIgnoreTableNamePrefixes != null) {
-			for (final String ignoredPrefix : pIgnoreTableNamePrefixes) {
-				if (pTableName.startsWith(ignoredPrefix)) {
-					nameBaseTableName = pTableName.substring(ignoredPrefix.length());
-				}
-			}
-		}
-		return convertDBName2JavaName(nameBaseTableName, true);
-	}
-
-    /**
      * Converts the given input into a valid format for the Java enum display name.
      * Java enum display names are not allowed to contain the characters " ", "/", "-", ",", ".", ";".
      * These characters are replaced by an underscore. In addition, when the name starts with a digit,

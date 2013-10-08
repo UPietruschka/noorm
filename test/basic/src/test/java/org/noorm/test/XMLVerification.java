@@ -4,7 +4,7 @@ import org.junit.Test;
 import org.noorm.jdbc.DataSourceProvider;
 import org.noorm.jdbc.JDBCDMLProcessor;
 import org.noorm.jdbc.LOBHelper;
-import org.noorm.test.hr.beans.ComplexDataTypesBean;
+import org.noorm.test.hr.beans.ComplexDataTypes;
 import org.noorm.test.hr.services.ComplexDataService;
 
 import java.io.IOException;
@@ -35,20 +35,20 @@ public class XMLVerification {
 
         DataSourceProvider.begin();
         try {
-            final ComplexDataTypesBean complexDataTypesBean = new ComplexDataTypesBean();
-            complexDataTypesBean.setXmlColumn(SOME_XML);
-            final JDBCDMLProcessor<ComplexDataTypesBean> dmlProcessor = JDBCDMLProcessor.getInstance();
-            final ComplexDataTypesBean insertedBean = dmlProcessor.insert(complexDataTypesBean);
-            final ComplexDataTypesBean insertedBean0 = complexDataService.findUniqueCdtById(insertedBean.getId());
-            assertEquals(insertedBean, insertedBean0);
+            final ComplexDataTypes complexDataTypes = new ComplexDataTypes();
+            complexDataTypes.setXmlColumn(SOME_XML);
+            final JDBCDMLProcessor<ComplexDataTypes> dmlProcessor = JDBCDMLProcessor.getInstance();
+            final ComplexDataTypes inserted = dmlProcessor.insert(complexDataTypes);
+            final ComplexDataTypes inserted0 = complexDataService.findUniqueCdtById(inserted.getId());
+            assertEquals(inserted, inserted0);
             // The XML is returned from the database with a different formatting, which causes a simple
             // compare to fail. Thus, we remove all whitespace prior to comparison
             final String normalizedSOME_XML = SOME_XML.replaceAll("\\s","");
-            final String normalizedOracleValues = insertedBean0.getXmlColumn().replaceAll("\\s","");
+            final String normalizedOracleValues = inserted0.getXmlColumn().replaceAll("\\s","");
             assertEquals(normalizedSOME_XML, normalizedOracleValues);
-            insertedBean.setXmlColumn(SOME_NEW_XML);
-            dmlProcessor.update(insertedBean0);
-            dmlProcessor.delete(insertedBean0);
+            inserted.setXmlColumn(SOME_NEW_XML);
+            dmlProcessor.update(inserted0);
+            dmlProcessor.delete(inserted0);
             DataSourceProvider.commit();
         } catch (Throwable e) {
             DataSourceProvider.rollback();
@@ -64,18 +64,18 @@ public class XMLVerification {
         try {
 
             // Creation
-            final ComplexDataTypesBean complexDataTypesBean = new ComplexDataTypesBean();
+            final ComplexDataTypes complexDataTypes = new ComplexDataTypes();
             final SQLXML sqlxml1 = LOBHelper.createSQLXML();
             final Writer writer1 = sqlxml1.setCharacterStream();
             writer1.append(SOME_XML);
             writer1.close();
-            complexDataTypesBean.setConvertedXmltype(sqlxml1);
-            final JDBCDMLProcessor<ComplexDataTypesBean> dmlProcessor = JDBCDMLProcessor.getInstance();
-            final ComplexDataTypesBean insertedBean = dmlProcessor.insert(complexDataTypesBean);
+            complexDataTypes.setConvertedXmltype(sqlxml1);
+            final JDBCDMLProcessor<ComplexDataTypes> dmlProcessor = JDBCDMLProcessor.getInstance();
+            final ComplexDataTypes inserted = dmlProcessor.insert(complexDataTypes);
             sqlxml1.free();
-            final ComplexDataTypesBean insertedBean0 = complexDataService.findUniqueCdtById(insertedBean.getId());
-            assertEquals(insertedBean, insertedBean0);
-            final Reader reader1 = insertedBean0.getConvertedXmltype().getCharacterStream();
+            final ComplexDataTypes inserted0 = complexDataService.findUniqueCdtById(inserted.getId());
+            assertEquals(inserted, inserted0);
+            final Reader reader1 = inserted0.getConvertedXmltype().getCharacterStream();
             final String xml1 = readFully(reader1);
             // The XML is returned from the database with a different formatting, which causes a simple
             // compare to fail. Thus, we remove all whitespace prior to comparison
@@ -88,12 +88,12 @@ public class XMLVerification {
             final Writer writer2 = sqlxml2.setCharacterStream();
             writer2.append(SOME_NEW_XML);
             writer2.close();
-            insertedBean0.setConvertedXmltype(sqlxml2);
-            dmlProcessor.update(insertedBean0);
+            inserted0.setConvertedXmltype(sqlxml2);
+            dmlProcessor.update(inserted0);
             sqlxml2.free();
-            final ComplexDataTypesBean insertedBean1 = complexDataService.findUniqueCdtById(insertedBean0.getId());
-            assertEquals(insertedBean0, insertedBean1);
-            final Reader reader2 = insertedBean1.getConvertedXmltype().getCharacterStream();
+            final ComplexDataTypes inserted1 = complexDataService.findUniqueCdtById(inserted0.getId());
+            assertEquals(inserted0, inserted1);
+            final Reader reader2 = inserted1.getConvertedXmltype().getCharacterStream();
             final String xml2 = readFully(reader2);
             // The XML is returned from the database with a different formatting, which causes a simple
             // compare to fail. Thus, we remove all whitespace prior to comparison
@@ -102,7 +102,7 @@ public class XMLVerification {
             assertEquals(normalizedSOME_NEW_XML, normalizedOracleValues2);
 
             // Delete
-            dmlProcessor.delete(insertedBean0);
+            dmlProcessor.delete(inserted0);
             DataSourceProvider.commit();
 
         } catch (Throwable e) {

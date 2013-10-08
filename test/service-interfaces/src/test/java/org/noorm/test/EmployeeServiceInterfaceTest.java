@@ -3,11 +3,11 @@ package org.noorm.test;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.noorm.jdbc.DataSourceProvider;
-import org.noorm.test.hr1.beans.EmpDetailsViewBean;
-import org.noorm.test.hr1.beans.EmployeesBean;
-import org.noorm.test.hr1.beans.HistoryBean;
+import org.noorm.test.hr1.beans.EmpDetailsView;
+import org.noorm.test.hr1.beans.Employees;
+import org.noorm.test.hr1.beans.History;
 import org.noorm.test.hr1.services.IEmployeeService;
-import org.noorm.test.hr2.beans.DepartmentsBean;
+import org.noorm.test.hr2.beans.Departments;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
@@ -44,19 +44,19 @@ public class EmployeeServiceInterfaceTest {
         try {
             DataSourceProvider.setActiveDataSource(HR1_DATA_SOURCE);
             DataSourceProvider.begin();
-            final List<EmployeesBean> employeesBeanList = employeeService.findAllEmployees();
-            for (final EmployeesBean employeesBean : employeesBeanList) {
+            final List<Employees> employeesList = employeeService.findAllEmployees();
+            for (final Employees employees : employeesList) {
 
-                final Long employeeId = employeesBean.getEmployeeId();
-                final EmployeesBean employeesBean1 = employeeService.findUniqueEmployeeById(employeeId);
-                assertEquals(employeesBean, employeesBean1);
+                final Long employeeId = employees.getEmployeeId();
+                final Employees employees1 = employeeService.findUniqueEmployeeById(employeeId);
+                assertEquals(employees, employees1);
 
-                final String employeeLastName = employeesBean.getLastName();
-                final List<EmployeesBean> employeesBeanList2 = employeeService.findEmployeesByLastname(employeeLastName);
+                final String employeeLastName = employees.getLastName();
+                final List<Employees> employeesList2 = employeeService.findEmployeesByLastname(employeeLastName);
                 // Multiple employees with the same last name may exist. Just check, if the desired employee is contained
                 boolean employeeFound = false;
-                for (final EmployeesBean employeesBean2 : employeesBeanList2) {
-                    if (employeesBean.equals(employeesBean2)) {
+                for (final Employees employees2 : employeesList2) {
+                    if (employees.equals(employees2)) {
                         employeeFound = true;
                     }
                 }
@@ -80,39 +80,39 @@ public class EmployeeServiceInterfaceTest {
             DataSourceProvider.begin();
 
             // Create a new record and insert it into the database
-            final EmployeesBean employeesBean = new EmployeesBean();
-            employeesBean.setFirstName("John");
-            employeesBean.setLastName("Doe");
-            employeesBean.setEmail("JDOE");
-            employeesBean.setPhoneNumber("123.456.7890");
-            employeesBean.setHireDate(new java.util.Date(1200000000000L));  // January 10, 2008, 22:20
-            employeesBean.setJobId("IT_PROG");
-            employeesBean.setSalary(5000.00D);
-            employeesBean.setCommissionPct(0.28D);
-            employeesBean.setManagerId(108L);
-            employeesBean.setDepartmentId(60L);
-            final EmployeesBean newEmployeesBean = beanDML_HR1.insertEmployees(employeesBean);
-            final List<EmployeesBean> employeesBeanList1 = employeeService.findEmployeesByLastname("Doe");
-            assertEquals(1, employeesBeanList1.size());
-            assertEquals(newEmployeesBean, employeesBeanList1.get(0));
+            final Employees employees = new Employees();
+            employees.setFirstName("John");
+            employees.setLastName("Doe");
+            employees.setEmail("JDOE");
+            employees.setPhoneNumber("123.456.7890");
+            employees.setHireDate(new java.util.Date(1200000000000L));  // January 10, 2008, 22:20
+            employees.setJobId("IT_PROG");
+            employees.setSalary(5000.00D);
+            employees.setCommissionPct(0.28D);
+            employees.setManagerId(108L);
+            employees.setDepartmentId(60L);
+            final Employees newEmployees = beanDML_HR1.insertEmployees(employees);
+            final List<Employees> employeesList1 = employeeService.findEmployeesByLastname("Doe");
+            assertEquals(1, employeesList1.size());
+            assertEquals(newEmployees, employeesList1.get(0));
 
             // Modify the just inserted record
-            newEmployeesBean.setLastName("Public");
-            beanDML_HR1.updateEmployees(newEmployeesBean);
-            final List<EmployeesBean> employeesBeanList2 = employeeService.findEmployeesByLastname("Doe");
-            assertEquals(0, employeesBeanList2.size());
-            final List<EmployeesBean> employeesBeanList3 = employeeService.findEmployeesByLastname("Public");
-            assertEquals(1, employeesBeanList3.size());
-            assertEquals(newEmployeesBean, employeesBeanList3.get(0));
+            newEmployees.setLastName("Public");
+            beanDML_HR1.updateEmployees(newEmployees);
+            final List<Employees> employeesList2 = employeeService.findEmployeesByLastname("Doe");
+            assertEquals(0, employeesList2.size());
+            final List<Employees> employeesList3 = employeeService.findEmployeesByLastname("Public");
+            assertEquals(1, employeesList3.size());
+            assertEquals(newEmployees, employeesList3.get(0));
 
             DataSourceProvider.setActiveDataSource(HR1_DATA_SOURCE);
             // Delete the just inserted record. We have to delete the job history record inserted by the trigger, too
-            final List<HistoryBean> jobHistoryBeanList =
-                    employeeService.findJobHistoryByEmpId(newEmployeesBean.getEmployeeId());
-            beanDML_HR1.deleteHistoryList(jobHistoryBeanList);
-            beanDML_HR1.deleteEmployees(newEmployeesBean);
-            final List<EmployeesBean> employeesBeanList4 = employeeService.findEmployeesByLastname("Public");
-            assertEquals(0, employeesBeanList4.size());
+            final List<History> jobHistoryList =
+                    employeeService.findJobHistoryByEmpId(newEmployees.getEmployeeId());
+            beanDML_HR1.deleteHistoryList(jobHistoryList);
+            beanDML_HR1.deleteEmployees(newEmployees);
+            final List<Employees> employeesList4 = employeeService.findEmployeesByLastname("Public");
+            assertEquals(0, employeesList4.size());
 
             DataSourceProvider.commit();
         } catch (Throwable e) {
@@ -128,9 +128,9 @@ public class EmployeeServiceInterfaceTest {
             DataSourceProvider.setActiveDataSource(HR2_DATA_SOURCE);
             DataSourceProvider.begin();
             // Create a new record and insert it into the database
-            final DepartmentsBean department = new DepartmentsBean();
+            final Departments department = new Departments();
             department.setDepartmentName("New Department");
-            final DepartmentsBean newDepartment = beanDML_HR2.insertDepartments(department);
+            final Departments newDepartment = beanDML_HR2.insertDepartments(department);
 
             // Modify the just inserted record
             newDepartment.setDepartmentName("Updated Department");
@@ -152,12 +152,12 @@ public class EmployeeServiceInterfaceTest {
             // number of available connections of the Oracle test database.
             DataSourceProvider.setActiveDataSource(HR1_DATA_SOURCE);
             DataSourceProvider.begin();
-            final List<EmpDetailsViewBean> empDetailsBeanList = employeeService.findAllEmployeeDetails();
-            for (final EmpDetailsViewBean empDetailsBean : empDetailsBeanList) {
+            final List<EmpDetailsView> empDetailsList = employeeService.findAllEmployeeDetails();
+            for (final EmpDetailsView empDetails : empDetailsList) {
 
-                final Long employeeId = empDetailsBean.getEmployeeId();
-                final EmployeesBean employeesBean1 = employeeService.findUniqueEmployeeById(employeeId);
-                assertNotNull(employeesBean1);
+                final Long employeeId = empDetails.getEmployeeId();
+                final Employees employees1 = employeeService.findUniqueEmployeeById(employeeId);
+                assertNotNull(employees1);
             }
             DataSourceProvider.commit();
         } catch (Throwable e) {
@@ -177,27 +177,27 @@ public class EmployeeServiceInterfaceTest {
             DataSourceProvider.begin();
 
             // Create a new record and insert it into the database
-            final JobsBeanExt jobsBean = new JobsBeanExt();
-            jobsBean.setJobId("CT_MGR");
-            jobsBean.setJobTitle("Controller");
-            jobsBean.setMinSalary(8000L);
-            jobsBean.setMaxSalary(12000L);
-            final JobsBeanExt newJobsBean = beanDML_HR1.insertJobs(jobsBean);
-            final List<JobsBeanExt> jobsBeanList = employeeService.findJobById("CT_MGR");
-            assertEquals(1, jobsBeanList.size());
-            assertEquals(newJobsBean, jobsBeanList.get(0));
+            final JobsExt jobs = new JobsExt();
+            jobs.setJobId("CT_MGR");
+            jobs.setJobTitle("Controller");
+            jobs.setMinSalary(8000L);
+            jobs.setMaxSalary(12000L);
+            final JobsExt newJobs = beanDML_HR1.insertJobs(jobs);
+            final List<JobsExt> jobsList = employeeService.findJobById("CT_MGR");
+            assertEquals(1, jobsList.size());
+            assertEquals(newJobs, jobsList.get(0));
 
             // Modify the just inserted record
-            newJobsBean.setJobTitle("Controlling");
-            beanDML_HR1.updateJobs(newJobsBean);
-            final List<JobsBeanExt> jobsBeanList2 = employeeService.findJobById("CT_MGR");
-            assertEquals(1, jobsBeanList2.size());
-            assertEquals("Controlling", jobsBeanList2.get(0).getJobTitle());
+            newJobs.setJobTitle("Controlling");
+            beanDML_HR1.updateJobs(newJobs);
+            final List<JobsExt> jobsList2 = employeeService.findJobById("CT_MGR");
+            assertEquals(1, jobsList2.size());
+            assertEquals("Controlling", jobsList2.get(0).getJobTitle());
 
             // Delete the just inserted record.
-            beanDML_HR1.deleteJobs(newJobsBean);
-            final List<JobsBeanExt> jobsBeanList3 = employeeService.findJobById("CT_MGR");
-            assertEquals(0, jobsBeanList3.size());
+            beanDML_HR1.deleteJobs(newJobs);
+            final List<JobsExt> jobsList3 = employeeService.findJobById("CT_MGR");
+            assertEquals(0, jobsList3.size());
 
             DataSourceProvider.commit();
         } catch (Throwable e) {

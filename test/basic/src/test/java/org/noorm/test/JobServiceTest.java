@@ -2,7 +2,7 @@ package org.noorm.test;
 
 import org.junit.Test;
 import org.noorm.jdbc.DataSourceProvider;
-import org.noorm.test.hr.beans.EmployeesBean;
+import org.noorm.test.hr.beans.Employees;
 import org.noorm.test.hr.services.EmployeeSearch;
 import org.noorm.test.hr.services.JobService;
 
@@ -37,13 +37,13 @@ public class JobServiceTest {
             jobService.increaseSalary(90, 0.08d);
             EmployeeSearch employeeSearch = EmployeeSearch.getInstance();
             // Search for an exact match of the first employee with increased salary
-            List<EmployeesBean> employeesBeanList0 =
+            List<Employees> employeesList0 =
                     employeeSearch.findEmployeesByFilter(null, null, null, null, 25920L, 25920L);
-            assertEquals(1, employeesBeanList0.size());
+            assertEquals(1, employeesList0.size());
             // Search for an exact match of the second and third employee with increased salary
-            List<EmployeesBean> employeesBeanList1 =
+            List<Employees> employeesList1 =
                     employeeSearch.findEmployeesByFilter(null, null, null, null, 18360L, 18360L);
-            assertEquals(2, employeesBeanList1.size());
+            assertEquals(2, employeesList1.size());
         } finally {
             DataSourceProvider.rollback();
         }

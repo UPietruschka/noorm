@@ -1,7 +1,7 @@
 package org.noorm.test;
 
 import org.noorm.jdbc.DataSourceProvider;
-import org.noorm.test.hr.beans.EmployeesBean;
+import org.noorm.test.hr.beans.Employees;
 import org.noorm.test.hr.services.BeanDML;
 import org.noorm.test.hr.services.EmployeeService;
 
@@ -40,7 +40,7 @@ public class PerformanceTestRunner {
         DataSourceProvider.begin();
         try {
             testEmployeeInsert(true);
-            final List<EmployeesBean> employeesBeanList = testEmployeeSearch();
+            final List<Employees> employeesBeanList = testEmployeeSearch();
             testEmployeeUpdate(employeesBeanList);
             testEmployeeDelete(employeesBeanList);
             DataSourceProvider.commit();
@@ -56,15 +56,15 @@ public class PerformanceTestRunner {
 
     private static void testEmployeeInsert(final boolean pUseBatchMode) {
 
-        final List<EmployeesBean> employeeList = new ArrayList<EmployeesBean>();
+        final List<Employees> employeeList = new ArrayList<Employees>();
         for (int i = 0; i < TEST_LOOP; i++) {
             final String lastName = "Doe";
             final String email = "JDOE" + i;
             final String jobId = JOB_IDS[i % JOB_IDS.length];
             final Double salary = 1000D + i / 4;
             final Integer departmentId = ((i % 27) + 1) * 10;
-            final EmployeesBean employeesBean = assembleEmployee(lastName, email, jobId, salary, departmentId);
-            employeeList.add(employeesBean);
+            final Employees employees = assembleEmployee(lastName, email, jobId, salary, departmentId);
+            employeeList.add(employees);
         }
         if (pUseBatchMode) {
             beanDML.insertEmployeesList(employeeList);
@@ -75,33 +75,33 @@ public class PerformanceTestRunner {
         }
     }
 
-    private static List<EmployeesBean> testEmployeeSearch() {
+    private static List<Employees> testEmployeeSearch() {
 
         final EmployeeService employeeService = EmployeeService.getInstance();
-        final List<EmployeesBean> employeesBeanList = employeeService.findEmployeesByLastname("Doe");
+        final List<Employees> employeesBeanList = employeeService.findEmployeesByLastname("Doe");
         return employeesBeanList;
     }
 
-    private static void testEmployeeUpdate(List<EmployeesBean> pEmployeesBeanList) {
+    private static void testEmployeeUpdate(List<Employees> pEmployeesBeanList) {
 
-        for (final EmployeesBean employee : pEmployeesBeanList) {
+        for (final Employees employee : pEmployeesBeanList) {
             employee.setCommissionPct(new java.math.BigDecimal(0.22D));
         }
         beanDML.updateEmployeesList(pEmployeesBeanList);
     }
 
-    private static void testEmployeeDelete(List<EmployeesBean> pEmployeesBeanList) {
+    private static void testEmployeeDelete(List<Employees> pEmployeesBeanList) {
 
         beanDML.deleteEmployeesList(pEmployeesBeanList);
     }
 
-    private static EmployeesBean assembleEmployee(final String pLastName,
-                                                  final String pEmail,
-                                                  final String pJobId,
-                                                  final Double pSalary,
-                                                  final Integer pDepartmentId) {
+    private static Employees assembleEmployee(final String pLastName,
+                                              final String pEmail,
+                                              final String pJobId,
+                                              final Double pSalary,
+                                              final Integer pDepartmentId) {
 
-        final EmployeesBean employeesBean = new EmployeesBean();
+        final Employees employeesBean = new Employees();
         employeesBean.setFirstName("John");
         employeesBean.setLastName(pLastName);
         employeesBean.setEmail(pEmail);

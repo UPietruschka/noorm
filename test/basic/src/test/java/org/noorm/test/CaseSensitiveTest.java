@@ -2,7 +2,7 @@ package org.noorm.test;
 
 import org.junit.Test;
 import org.noorm.jdbc.DataSourceProvider;
-import org.noorm.test.hr.beans.CaseSensitiveTableBean;
+import org.noorm.test.hr.beans.CaseSensitiveTable;
 import org.noorm.test.hr.services.BeanDML;
 import org.noorm.test.hr.services.DeclaredQueries;
 
@@ -10,7 +10,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.fail;
 
 /**
@@ -28,24 +27,24 @@ public class CaseSensitiveTest {
         DataSourceProvider.begin();
         try {
             final DeclaredQueries declaredQueries = DeclaredQueries.getInstance();
-            final List<CaseSensitiveTableBean> csBeanList = new ArrayList<CaseSensitiveTableBean>();
-            final CaseSensitiveTableBean csBean1 = new CaseSensitiveTableBean();
-            csBean1.setC1(1L);
-            csBean1.setC2("A");
-            csBeanList.add(csBean1);
-            final CaseSensitiveTableBean csBean2 = new CaseSensitiveTableBean();
-            csBean2.setC1(2L);
-            csBean2.setC2("B");
-            csBeanList.add(csBean2);
-            beanDML.insertCaseSensitiveTableList(csBeanList);
-            final List<CaseSensitiveTableBean> csBeanBeanList = declaredQueries.findCaseSensitiveTable();
-            assertEquals(2L, csBeanBeanList.size());
-            final CaseSensitiveTableBean newCSBean1 = csBeanBeanList.get(0);
-            newCSBean1.setC2("C");
-            beanDML.updateCaseSensitiveTable(newCSBean1);
-            beanDML.deleteCaseSensitiveTableList(csBeanBeanList);
-            final List<CaseSensitiveTableBean> csBeanBeanList1 = declaredQueries.findCaseSensitiveTable();
-            assertEquals(0L, csBeanBeanList1.size());
+            final List<CaseSensitiveTable> csList = new ArrayList<CaseSensitiveTable>();
+            final CaseSensitiveTable cs1 = new CaseSensitiveTable();
+            cs1.setC1(1L);
+            cs1.setC2("A");
+            csList.add(cs1);
+            final CaseSensitiveTable cs2 = new CaseSensitiveTable();
+            cs2.setC1(2L);
+            cs2.setC2("B");
+            csList.add(cs2);
+            beanDML.insertCaseSensitiveTableList(csList);
+            final List<CaseSensitiveTable> csList1 = declaredQueries.findCaseSensitiveTable();
+            assertEquals(2L, csList1.size());
+            final CaseSensitiveTable newCS1 = csList1.get(0);
+            newCS1.setC2("C");
+            beanDML.updateCaseSensitiveTable(newCS1);
+            beanDML.deleteCaseSensitiveTableList(csList1);
+            final List<CaseSensitiveTable> csList2 = declaredQueries.findCaseSensitiveTable();
+            assertEquals(0L, csList2.size());
             DataSourceProvider.commit();
         } catch (Throwable e) {
             DataSourceProvider.rollback();

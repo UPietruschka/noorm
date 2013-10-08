@@ -3,9 +3,9 @@ package org.noorm.test;
 import org.junit.Test;
 import org.noorm.jdbc.DataSourceProvider;
 import org.noorm.jdbc.TableLock;
-import org.noorm.test.hr.beans.CountriesBean;
-import org.noorm.test.hr.beans.DepartmentsBean;
-import org.noorm.test.hr.beans.EmployeesBean;
+import org.noorm.test.hr.beans.Countries;
+import org.noorm.test.hr.beans.Departments;
+import org.noorm.test.hr.beans.Employees;
 import org.noorm.test.hr.services.BeanDML;
 import org.noorm.test.hr.services.DeclaredQueries;
 import org.noorm.test.hr.services.EmployeeFinder;
@@ -29,7 +29,7 @@ public class DeclaredQueriesTest {
         final Integer departmentId = 10;
         final String departmentName = "Administration";
         final DeclaredQueries declaredQueries = DeclaredQueries.getInstance();
-        final DepartmentsBean department = declaredQueries.findDepartmentsByDepartmentId(departmentId);
+        final Departments department = declaredQueries.findDepartmentsByDepartmentId(departmentId);
         assertNotNull(department);
         assertEquals(department.getDepartmentName(), departmentName);
     }
@@ -38,7 +38,7 @@ public class DeclaredQueriesTest {
     public void testFindDoubleEqual() {
 
         final DeclaredQueries declaredQueries = DeclaredQueries.getInstance();
-        final List<EmployeesBean> employees =
+        final List<Employees> employees =
                 declaredQueries.findEmployeesByCommissionPct(new java.math.BigDecimal(0.25D));
         assertEquals(6, employees.size());
     }
@@ -47,7 +47,7 @@ public class DeclaredQueriesTest {
     public void testFindIsNull() {
 
         final DeclaredQueries declaredQueries = DeclaredQueries.getInstance();
-        final List<EmployeesBean> employees = declaredQueries.findEmployeesWithoutCommission();
+        final List<Employees> employees = declaredQueries.findEmployeesWithoutCommission();
         assertEquals(72, employees.size());
     }
 
@@ -55,7 +55,7 @@ public class DeclaredQueriesTest {
     public void testFindIsNotNull() {
 
         final DeclaredQueries declaredQueries = DeclaredQueries.getInstance();
-        final List<EmployeesBean> employees = declaredQueries.findEmployeesWithCommission();
+        final List<Employees> employees = declaredQueries.findEmployeesWithCommission();
         assertEquals(35, employees.size());
     }
 
@@ -65,7 +65,7 @@ public class DeclaredQueriesTest {
         final String departmentName = "Sales";
         final String city = "Oxford";
         final EmployeeFinder employeeFinder = EmployeeFinder.getInstance();
-        final List<EmployeesBean> employees = employeeFinder.findEmployeesByDepartmentCity(departmentName, city);
+        final List<Employees> employees = employeeFinder.findEmployeesByDepartmentCity(departmentName, city);
         assertEquals(34, employees.size());
     }
 
@@ -74,7 +74,7 @@ public class DeclaredQueriesTest {
 
         final String departmentName = "S%"; // Shipping, Sales
         final EmployeeFinder employeeFinder = EmployeeFinder.getInstance();
-        final List<EmployeesBean> employees = employeeFinder.findEmployeesByDepartmentName(departmentName);
+        final List<Employees> employees = employeeFinder.findEmployeesByDepartmentName(departmentName);
         assertEquals(79, employees.size());
     }
 
@@ -83,13 +83,13 @@ public class DeclaredQueriesTest {
 
         final String countryId = "X";
         final DeclaredQueries declaredQueries = DeclaredQueries.getInstance();
-        final CountriesBean country = new CountriesBean();
+        final Countries country = new Countries();
         country.setCountryId(countryId);
         try {
             DataSourceProvider.begin();
             TableLock.acquire(country, TableLock.LockMode.ROW_EXCLUSIVE);
             beanDML.insertCountries(country);
-            final List<CountriesBean>countries = declaredQueries.findCountriesByCountryId(countryId);
+            final List<Countries>countries = declaredQueries.findCountriesByCountryId(countryId);
             assertEquals(1, countries.size());
             beanDML.deleteCountries(country);
             DataSourceProvider.commit();

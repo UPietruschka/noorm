@@ -51,60 +51,60 @@ public class BeanDML {
 #if($bean.isUpdatable())
 
 #if($class.isInterface())
-	$bean.getDMLName() insert$bean.getShortName()(final $bean.getDMLName() p$bean.getShortName());
+	$bean.getDMLName() insert$bean.getName()(final $bean.getDMLName() p$bean.getName());
 
-	void insert$bean.getShortName()List(final List<$bean.getDMLName()> p$bean.getShortName()List);
+	void insert$bean.getName()List(final List<$bean.getDMLName()> p$bean.getName()List);
 
-	$bean.getDMLName() update$bean.getShortName()(final $bean.getDMLName() p$bean.getShortName());
+	$bean.getDMLName() update$bean.getName()(final $bean.getDMLName() p$bean.getName());
 
-	void update$bean.getShortName()List(final List<$bean.getDMLName()> p$bean.getShortName()List);
+	void update$bean.getName()List(final List<$bean.getDMLName()> p$bean.getName()List);
 
-	void delete$bean.getShortName()(final $bean.getDMLName() p$bean.getShortName());
+	void delete$bean.getName()(final $bean.getDMLName() p$bean.getName());
 
-	void delete$bean.getShortName()List(final List<$bean.getDMLName()> p$bean.getShortName()List);
+	void delete$bean.getName()List(final List<$bean.getDMLName()> p$bean.getName()List);
 #else
-	public $bean.getDMLName() insert$bean.getShortName()(final $bean.getDMLName() p$bean.getShortName()) {
+	public $bean.getDMLName() insert$bean.getName()(final $bean.getDMLName() p$bean.getName()) {
 #if ($class.hasDataSourceName())
 		DataSourceProvider.setActiveDataSource(DATA_SOURCE_NAME);
 #end
 		final JDBCDMLProcessor<$bean.getDMLName()> dmlProcessor = JDBCDMLProcessor.getInstance();
-		return dmlProcessor.insert(p$bean.getShortName());
+		return dmlProcessor.insert(p$bean.getName());
 	}
 
-	public void insert$bean.getShortName()List(final List<$bean.getDMLName()> p$bean.getShortName()List) {
+	public void insert$bean.getName()List(final List<$bean.getDMLName()> p$bean.getName()List) {
 #if ($class.hasDataSourceName())
 		DataSourceProvider.setActiveDataSource(DATA_SOURCE_NAME);
 #end
-		typelessDMLProcessor.insert(p$bean.getShortName()List);
+		typelessDMLProcessor.insert(p$bean.getName()List);
 	}
 
-	public $bean.getDMLName() update$bean.getShortName()(final $bean.getDMLName() p$bean.getShortName()) {
+	public $bean.getDMLName() update$bean.getName()(final $bean.getDMLName() p$bean.getName()) {
 #if ($class.hasDataSourceName())
 		DataSourceProvider.setActiveDataSource(DATA_SOURCE_NAME);
 #end
 		final JDBCDMLProcessor<$bean.getDMLName()> dmlProcessor = JDBCDMLProcessor.getInstance();
-		return dmlProcessor.update(p$bean.getShortName());
+		return dmlProcessor.update(p$bean.getName());
 	}
 
-	public void update$bean.getShortName()List(final List<$bean.getDMLName()> p$bean.getShortName()List) {
+	public void update$bean.getName()List(final List<$bean.getDMLName()> p$bean.getName()List) {
 #if ($class.hasDataSourceName())
 		DataSourceProvider.setActiveDataSource(DATA_SOURCE_NAME);
 #end
-		typelessDMLProcessor.update(p$bean.getShortName()List);
+		typelessDMLProcessor.update(p$bean.getName()List);
 	}
 
-	public void delete$bean.getShortName()(final $bean.getDMLName() p$bean.getShortName()) {
+	public void delete$bean.getName()(final $bean.getDMLName() p$bean.getName()) {
 #if ($class.hasDataSourceName())
 		DataSourceProvider.setActiveDataSource(DATA_SOURCE_NAME);
 #end
-		typelessDMLProcessor.delete(p$bean.getShortName());
+		typelessDMLProcessor.delete(p$bean.getName());
 	}
 
-	public void delete$bean.getShortName()List(final List<$bean.getDMLName()> p$bean.getShortName()List) {
+	public void delete$bean.getName()List(final List<$bean.getDMLName()> p$bean.getName()List) {
 #if ($class.hasDataSourceName())
 		DataSourceProvider.setActiveDataSource(DATA_SOURCE_NAME);
 #end
-		typelessDMLProcessor.delete(p$bean.getShortName()List);
+		typelessDMLProcessor.delete(p$bean.getName()List);
 	}
 #end
 #end
