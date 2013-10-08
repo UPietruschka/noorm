@@ -16,7 +16,7 @@
     </table2SequenceMappings>
     <inlineSequenceTableFilter regex="(OPT_.*)"/>
     <columnNameMappings>
-        <mapping key="(OPT_)(.*)" value="$2"/>
+        <mapping key="(Opt)(.*)" value="$2"/>
     </columnNameMappings>
     <enumTable2DisplayColumnMappings>
         <mapping key="REGIONS" value="REGION_NAME"/>

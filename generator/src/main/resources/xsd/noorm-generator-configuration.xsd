@@ -93,7 +93,7 @@
                         </xs:documentation>
                     </xs:annotation>
                 </xs:element>
-                <xs:element name="tableNameMappings" type="mappingList" minOccurs="0">
+                <xs:element name="tableNameMappings" type="nameMappingList" minOccurs="0">
                     <xs:annotation>
                         <xs:documentation>
                             The default naming scheme for the generated classes follows standards and conventions
@@ -107,7 +107,7 @@
                         </xs:documentation>
                     </xs:annotation>
                 </xs:element>
-                <xs:element name="columnNameMappings" type="mappingList" minOccurs="0">
+                <xs:element name="columnNameMappings" type="nameMappingList" minOccurs="0">
                     <xs:annotation>
                         <xs:documentation>
                             The default naming scheme for the generated attributes follows standards and conventions
@@ -290,6 +290,13 @@
         <xs:sequence>
             <xs:element name="mapping" type="mapping" maxOccurs="unbounded"/>
         </xs:sequence>
+    </xs:complexType>
+
+    <xs:complexType name="nameMappingList">
+        <xs:sequence>
+            <xs:element name="mapping" type="mapping" maxOccurs="unbounded"/>
+        </xs:sequence>
+        <xs:attribute name="preApplyCamelCaseConversion" type="xs:boolean" default="true"/>
     </xs:complexType>
 
     <xs:complexType name="mapping">

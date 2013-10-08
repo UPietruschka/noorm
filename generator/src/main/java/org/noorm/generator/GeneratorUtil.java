@@ -3,6 +3,7 @@ package org.noorm.generator;
 import org.apache.velocity.Template;
 import org.apache.velocity.VelocityContext;
 import org.apache.velocity.app.Velocity;
+import org.noorm.generator.schema.NameMappingList;
 import org.noorm.generator.schema.TypeMapping;
 import org.noorm.generator.schema.GeneratorConfiguration;
 import org.noorm.generator.schema.Mapping;
@@ -66,16 +67,23 @@ public class GeneratorUtil {
 
     public static String convertDBName2JavaName(final String pDBName,
                                                 final boolean pCapitalizeFirst,
-                                                final List<Mapping> pDBNameMappings) {
+                                                final NameMappingList pNameMappingList) {
 
         String nameBaseColumnName = pDBName;
-        if (pDBNameMappings != null) {
-            final String mappedString = getMappedString(pDBName, pDBNameMappings);
+        if (pNameMappingList != null) {
+            if (pNameMappingList.isPreApplyCamelCaseConversion()) {
+                nameBaseColumnName = Utils.convertDBName2JavaName(pDBName, pCapitalizeFirst);
+            }
+            final String mappedString = getMappedString(nameBaseColumnName, pNameMappingList.getMapping());
             if (mappedString != null && !mappedString.isEmpty()) {
                 nameBaseColumnName = mappedString;
+            } else {
+                nameBaseColumnName = Utils.convertDBName2JavaName(pDBName, pCapitalizeFirst);
             }
+        } else {
+            nameBaseColumnName = Utils.convertDBName2JavaName(pDBName, pCapitalizeFirst);
         }
-        return Utils.convertDBName2JavaName(nameBaseColumnName, pCapitalizeFirst);
+        return nameBaseColumnName;
     }
 
     /**
@@ -84,20 +92,27 @@ public class GeneratorUtil {
      * database schema share a common name prefix, which should be visible in the generated code (e.g. "TBL_").
      *
      * @param pTableName the database table name
-     * @param pTableNameMappings optional list of table name mappings to define Java names
+     * @param pNameMappingList optional list of table name mappings to define Java names
      * @return the Java name
      */
     public static String convertTableName2JavaName(final String pTableName,
-                                                   final List<Mapping> pTableNameMappings) {
+                                                   final NameMappingList pNameMappingList) {
 
         String nameBaseTableName = pTableName;
-        if (pTableNameMappings != null) {
-            final String mappedString = getMappedString(pTableName, pTableNameMappings);
+        if (pNameMappingList != null) {
+            if (pNameMappingList.isPreApplyCamelCaseConversion()) {
+                nameBaseTableName = Utils.convertDBName2JavaName(pTableName, true);
+            }
+            final String mappedString = getMappedString(nameBaseTableName, pNameMappingList.getMapping());
             if (mappedString != null && !mappedString.isEmpty()) {
                 nameBaseTableName = mappedString;
+            } else {
+                nameBaseTableName = Utils.convertDBName2JavaName(pTableName, true);
             }
+        } else {
+            nameBaseTableName = Utils.convertDBName2JavaName(pTableName, true);
         }
-        return Utils.convertDBName2JavaName(nameBaseTableName, true);
+        return nameBaseTableName;
     }
 
     /**
@@ -251,12 +266,12 @@ public class GeneratorUtil {
 
         String mappedString = "";
         if (pMappings != null) {
-            for (final Mapping property : pMappings) {
-                final String searchPattern = property.getKey();
+            for (final Mapping mapping : pMappings) {
+                final String searchPattern = mapping.getKey();
                 final Pattern finder = Pattern.compile(searchPattern);
                 final Matcher matcher = finder.matcher(pInput);
                 if (matcher.matches()) {
-                    final String replacePattern = property.getValue();
+                    final String replacePattern = mapping.getValue();
                     mappedString = matcher.replaceFirst(replacePattern);
                     break;
                 }

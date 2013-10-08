@@ -12,8 +12,8 @@
     <table2SequenceMappings>
         <mapping key="(EMPLOYEES|LOCATIONS)" value="$1_SEQ"/>
     </table2SequenceMappings>
-    <tableNameMappings>
-        <mapping key="(JOB_)(.*)" value="$2"/>
+    <tableNameMappings preApplyCamelCaseConversion="false">
+        <mapping key="JOB_HISTORY" value="History"/>
     </tableNameMappings>
     <enumTable2DisplayColumnMappings>
         <mapping key="REGIONS" value="REGION_NAME"/>
