@@ -3,9 +3,9 @@
                         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
                         xsi:schemaLocation="http://www.noorm.org/generator-configuration/1.0.0 http://www.noorm.org/xsd/generator-configuration-1.0.0.xsd">
 
-    <beanPackage name="org.noorm.test.hr2.beans"/>
-    <servicePackage name="org.noorm.test.hr2.services.impl"/>
-    <serviceInterfacePackage name="org.noorm.test.hr2.services"/>
+    <beanJavaPackage name="org.noorm.test.hr2.beans"/>
+    <serviceJavaPackage name="org.noorm.test.hr2.services.impl"/>
+    <serviceInterfaceJavaPackage name="org.noorm.test.hr2.services"/>
     <beanTableFilter regex="DEPARTMENTS|EMPLOYEES"/>
     <packageFilter regex="--NO_MATCH_DESIRED--"/>
     <table2SequenceMappings>
@@ -14,7 +14,7 @@
     <generatePKBasedEqualsAndHashCode>false</generatePKBasedEqualsAndHashCode>
     <dataSource name="HR2"/>
     <queryDeclarations>
-        <queryDeclaration tableName="V_EMPLOYEES" baseTable="EMPLOYEES" methodName="findEmployees" className="EmployeeDAO">
+        <queryDeclaration tableName="V_EMPLOYEES" baseTable="EMPLOYEES" generatedMethodName="findEmployees" generatedClassName="EmployeeDAO">
             <queryColumn name="SALARY" operator="GREATER_THAN_OR_EQUAL_TO"/>
             <queryColumn name="COMMISSION_PCT" operator="LESS_THAN"/>
         </queryDeclaration>

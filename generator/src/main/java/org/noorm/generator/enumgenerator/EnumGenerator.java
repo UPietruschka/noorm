@@ -49,7 +49,7 @@ public class EnumGenerator {
 		}
 
 		ValidatorClassDescriptor validatorClassDescriptor = new ValidatorClassDescriptor();
-		validatorClassDescriptor.setPackageName(configuration.getEnumPackage().getName());
+		validatorClassDescriptor.setPackageName(configuration.getEnumJavaPackage().getName());
         if (GeneratorUtil.hasDataSourceName(configuration)) {
             validatorClassDescriptor.setDataSourceName(configuration.getDataSource().getName());
         }
@@ -60,7 +60,7 @@ public class EnumGenerator {
 
 		log.info("Generating NoORM Enum classes.");
 		final File enumPackageDir =	GeneratorUtil.createPackageDir
-                (parameters.getDestinationDirectory(), configuration.getEnumPackage().getName());
+                (parameters.getDestinationDirectory(), configuration.getEnumJavaPackage().getName());
 
 		for (final String tableName0 : tableColumnMap.keySet()) {
             final Regex enumTableFilter = configuration.getEnumTableFilter();
@@ -79,7 +79,7 @@ public class EnumGenerator {
 			enumClassDescriptor.setName(javaEnumName);
 			validatorClassDescriptor.getClassNames().add(javaEnumName);
 			enumClassDescriptor.setTableName(tableName0);
-			enumClassDescriptor.setPackageName(configuration.getEnumPackage().getName());
+			enumClassDescriptor.setPackageName(configuration.getEnumJavaPackage().getName());
 			String displayColumnName;
 			if (configuration.getEnumTable2DisplayColumnMappings() != null) {
 				displayColumnName =
@@ -98,7 +98,7 @@ public class EnumGenerator {
                 final String columnName = tableMetadataBean.getColumnName();
                 final String javaName = Utils.convertDBName2JavaName(columnName, false);
                 enumAttributeDescriptor.setName(javaName);
-                final String methodNamePostfix = GeneratorUtil.convertDBName2JavaName
+                final String methodNamePostfix = GeneratorUtil.convertColumnName2JavaName
                         (columnName, true, configuration.getColumnNameMappings());
                 enumAttributeDescriptor.setMethodNamePostfix(methodNamePostfix);
 				final String javaType = GeneratorUtil.convertOracleType2JavaType(tableMetadataBean.getDataType(),

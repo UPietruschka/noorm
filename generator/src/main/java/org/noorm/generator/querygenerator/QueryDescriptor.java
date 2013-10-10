@@ -31,7 +31,7 @@ public class QueryDescriptor {
     }
 
     public String getMethodName() {
-        return queryDeclaration.getMethodName();
+        return queryDeclaration.getGeneratedMethodName();
     }
 
     public boolean isSingleRowQuery() {

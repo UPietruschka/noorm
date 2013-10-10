@@ -3,9 +3,9 @@
                         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
                         xsi:schemaLocation="http://www.noorm.org/generator-configuration/1.0.0 http://www.noorm.org/xsd/generator-configuration-1.0.0.xsd">
 
-    <beanPackage name="org.noorm.test.hr.beans"/>
-    <enumPackage name="org.noorm.test.hr.enums"/>
-    <servicePackage name="org.noorm.test.hr.services"/>
+    <beanJavaPackage name="org.noorm.test.hr.beans"/>
+    <enumJavaPackage name="org.noorm.test.hr.enums"/>
+    <serviceJavaPackage name="org.noorm.test.hr.services"/>
     <enumTableFilter regex="REGIONS|OPT_VARIANTS"/>
     <packageFilter regex="(.*SERVICE|.*SEARCH)"/>
     <table2SequenceMappings>
@@ -31,32 +31,32 @@
     <viewName2PrimaryKeyMappings>
         <mapping key="V_DEPARTMENTS" value="DEPARTMENT_ID"/>
     </viewName2PrimaryKeyMappings>
-    <singleRowFinder regex="(.*_unique.*)"/>
+    <singleRowFinderProcedureFilter regex="(.*_unique.*)"/>
     <queryDeclarations>
         <queryDeclaration tableName="EMPLOYEES">
             <queryColumn name="COMMISSION_PCT" operator="EQUAL_TO"/>
         </queryDeclaration>
-        <queryDeclaration tableName="EMPLOYEES" methodName="findEmployeesWithCommission">
+        <queryDeclaration tableName="EMPLOYEES" generatedMethodName="findEmployeesWithCommission">
             <queryColumn name="COMMISSION_PCT" operator="IS_NOT_NULL"/>
         </queryDeclaration>
-        <queryDeclaration tableName="EMPLOYEES" methodName="findEmployeesWithoutCommission">
+        <queryDeclaration tableName="EMPLOYEES" generatedMethodName="findEmployeesWithoutCommission">
             <queryColumn name="COMMISSION_PCT" operator="IS_NULL"/>
         </queryDeclaration>
         <queryDeclaration tableName="DEPARTMENTS" singleRowQuery="true">
             <queryColumn name="DEPARTMENT_ID" operator="EQUAL_TO"/>
         </queryDeclaration>
-        <queryDeclaration tableName="JOBS_SYNONYM" methodName="findJobsSynonymsBySalary">
+        <queryDeclaration tableName="JOBS_SYNONYM" generatedMethodName="findJobsSynonymsBySalary">
             <queryColumn name="MIN_SALARY" operator="GREATER_THAN_OR_EQUAL_TO"/>
             <queryColumn name="MAX_SALARY" operator="LESS_THAN_OR_EQUAL_TO"/>
         </queryDeclaration>
         <queryDeclaration tableName="COUNTRIES" acquireLock="true">
             <queryColumn name="COUNTRY_ID" operator="EQUAL_TO"/>
         </queryDeclaration>
-        <queryDeclaration tableName="V_EMPLOYEES" baseTable="EMPLOYEES" methodName="findEmployeesByDepartmentCity" className="EmployeeFinder">
+        <queryDeclaration tableName="V_EMPLOYEES" baseTable="EMPLOYEES" generatedMethodName="findEmployeesByDepartmentCity" generatedClassName="EmployeeFinder">
             <queryColumn name="DEPARTMENT_NAME"/>
             <queryColumn name="CITY"/>
         </queryDeclaration>
-        <queryDeclaration tableName="V_EMPLOYEES" baseTable="EMPLOYEES" className="EmployeeFinder">
+        <queryDeclaration tableName="V_EMPLOYEES" baseTable="EMPLOYEES" generatedClassName="EmployeeFinder">
             <queryColumn name="DEPARTMENT_NAME" operator="LIKE"/>
         </queryDeclaration>
         <queryDeclaration tableName="case_sensitive_table"/>

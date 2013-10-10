@@ -65,23 +65,23 @@ public class GeneratorUtil {
 		return packageDir;
 	}
 
-    public static String convertDBName2JavaName(final String pDBName,
-                                                final boolean pCapitalizeFirst,
-                                                final NameMappingList pNameMappingList) {
+    public static String convertColumnName2JavaName(final String pColumnName,
+                                                    final boolean pCapitalizeFirst,
+                                                    final NameMappingList pNameMappingList) {
 
-        String nameBaseColumnName = pDBName;
+        String nameBaseColumnName = pColumnName;
         if (pNameMappingList != null) {
             if (pNameMappingList.isPreApplyCamelCaseConversion()) {
-                nameBaseColumnName = Utils.convertDBName2JavaName(pDBName, pCapitalizeFirst);
+                nameBaseColumnName = Utils.convertDBName2JavaName(pColumnName, pCapitalizeFirst);
             }
             final String mappedString = getMappedString(nameBaseColumnName, pNameMappingList.getMapping());
             if (mappedString != null && !mappedString.isEmpty()) {
                 nameBaseColumnName = mappedString;
             } else {
-                nameBaseColumnName = Utils.convertDBName2JavaName(pDBName, pCapitalizeFirst);
+                nameBaseColumnName = Utils.convertDBName2JavaName(pColumnName, pCapitalizeFirst);
             }
         } else {
-            nameBaseColumnName = Utils.convertDBName2JavaName(pDBName, pCapitalizeFirst);
+            nameBaseColumnName = Utils.convertDBName2JavaName(pColumnName, pCapitalizeFirst);
         }
         return nameBaseColumnName;
     }
@@ -282,10 +282,11 @@ public class GeneratorUtil {
 
     public static boolean hasBeanPackageName(final GeneratorConfiguration pConfiguration) {
 
-        if (pConfiguration.getBeanPackage() == null) {
+        if (pConfiguration.getBeanJavaPackage() == null) {
             return false;
         }
-        if (pConfiguration.getBeanPackage().getName() == null || pConfiguration.getBeanPackage().getName().isEmpty()) {
+        if (pConfiguration.getBeanJavaPackage().getName() == null
+                || pConfiguration.getBeanJavaPackage().getName().isEmpty()) {
             return false;
         }
         return true;
@@ -293,10 +294,11 @@ public class GeneratorUtil {
 
     public static boolean hasEnumPackageName(final GeneratorConfiguration pConfiguration) {
 
-        if (pConfiguration.getEnumPackage() == null) {
+        if (pConfiguration.getEnumJavaPackage() == null) {
             return false;
         }
-        if (pConfiguration.getEnumPackage().getName() == null || pConfiguration.getEnumPackage().getName().isEmpty()) {
+        if (pConfiguration.getEnumJavaPackage().getName() == null
+                || pConfiguration.getEnumJavaPackage().getName().isEmpty()) {
             return false;
         }
         return true;
@@ -304,11 +306,11 @@ public class GeneratorUtil {
 
     public static boolean hasServicePackageName(final GeneratorConfiguration pConfiguration) {
 
-        if (pConfiguration.getServicePackage() == null) {
+        if (pConfiguration.getServiceJavaPackage() == null) {
             return false;
         }
-        if (pConfiguration.getServicePackage().getName() == null
-                || pConfiguration.getServicePackage().getName().isEmpty()) {
+        if (pConfiguration.getServiceJavaPackage().getName() == null
+                || pConfiguration.getServiceJavaPackage().getName().isEmpty()) {
             return false;
         }
         return true;
@@ -316,11 +318,11 @@ public class GeneratorUtil {
 
     public static boolean hasServiceInterfacePackageName(final GeneratorConfiguration pConfiguration) {
 
-        if (pConfiguration.getServiceInterfacePackage() == null) {
+        if (pConfiguration.getServiceInterfaceJavaPackage() == null) {
             return false;
         }
-        if (pConfiguration.getServiceInterfacePackage().getName() == null
-                || pConfiguration.getServiceInterfacePackage().getName().isEmpty()) {
+        if (pConfiguration.getServiceInterfaceJavaPackage().getName() == null
+                || pConfiguration.getServiceInterfaceJavaPackage().getName().isEmpty()) {
             return false;
         }
         return true;

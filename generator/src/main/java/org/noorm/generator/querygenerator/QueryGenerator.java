@@ -55,11 +55,11 @@ public class QueryGenerator {
 
         log.info("Generating NoORM Query Declaration class.");
         final File servicePackageDir = GeneratorUtil.createPackageDir
-                (parameters.getDestinationDirectory(), configuration.getServicePackage().getName());
+                (parameters.getDestinationDirectory(), configuration.getServiceJavaPackage().getName());
         File serviceInterfacePackageDir = null;
         if (GeneratorUtil.hasServiceInterfacePackageName(configuration)) {
             serviceInterfacePackageDir = GeneratorUtil.createPackageDir
-                    (parameters.getDestinationDirectory(), configuration.getServiceInterfacePackage().getName());
+                    (parameters.getDestinationDirectory(), configuration.getServiceInterfaceJavaPackage().getName());
         }
 
         final MetadataService metadataService = MetadataService.getInstance();
@@ -84,9 +84,9 @@ public class QueryGenerator {
             }
             queryDescriptor.setQueryDeclaration(queryDeclaration);
             String beanName = GeneratorUtil.convertTableName2JavaName(t0, configuration.getTableNameMappings());
-            if (configuration.getExtendedBeans() != null) {
+            if (configuration.getExtendedBeanMappings() != null) {
                 final String extBeanName =
-                        GeneratorUtil.getMappedString(beanName, configuration.getExtendedBeans());
+                        GeneratorUtil.getMappedString(beanName, configuration.getExtendedBeanMappings());
                 if (!extBeanName.isEmpty()) {
                     beanName = extBeanName;
                 }
@@ -123,7 +123,7 @@ public class QueryGenerator {
                 }
                 queryDescriptor.addParameter(parameterDescriptor);
             }
-            String javaName = queryDeclaration.getClassName();
+            String javaName = queryDeclaration.getGeneratedClassName();
             if (javaName == null || javaName.isEmpty()) {
                 javaName = DECLARED_QUERIES_DEFAULT_CLASS_NAME;
             }
@@ -134,10 +134,11 @@ public class QueryGenerator {
                     queryClassDescriptor.setDataSourceName(configuration.getDataSource().getName());
                 }
                 if (GeneratorUtil.hasServiceInterfacePackageName(configuration)) {
-                    queryClassDescriptor.setInterfacePackageName(configuration.getServiceInterfacePackage().getName());
+                    queryClassDescriptor.setInterfacePackageName
+                            (configuration.getServiceInterfaceJavaPackage().getName());
                 }
-                queryClassDescriptor.setPackageName(configuration.getServicePackage().getName());
-                queryClassDescriptor.setBeanPackageName(configuration.getBeanPackage().getName());
+                queryClassDescriptor.setPackageName(configuration.getServiceJavaPackage().getName());
+                queryClassDescriptor.setBeanPackageName(configuration.getBeanJavaPackage().getName());
                 queryClassDescriptor.setJavaName(javaName);
                 queryClasses.put(javaName, queryClassDescriptor);
             }
@@ -156,7 +157,8 @@ public class QueryGenerator {
 
     private void generateMethodName(final QueryDeclaration pQueryDeclaration) {
 
-        if (pQueryDeclaration.getMethodName() == null || pQueryDeclaration.getMethodName().isEmpty()) {
+        if (pQueryDeclaration.getGeneratedMethodName() == null
+                || pQueryDeclaration.getGeneratedMethodName().isEmpty()) {
             final StringBuilder methodName = new StringBuilder();
             methodName.append(DEFAULT_METHOD_NAME_PREFIX);
             String t0 = pQueryDeclaration.getTableName();
@@ -180,7 +182,7 @@ public class QueryGenerator {
                     methodName.append(javaColumnName, 0, Math.min(substringLength, javaColumnName.length()));
                 }
             }
-            pQueryDeclaration.setMethodName(methodName.toString());
+            pQueryDeclaration.setGeneratedMethodName(methodName.toString());
         }
     }
 }

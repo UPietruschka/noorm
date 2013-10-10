@@ -3,10 +3,10 @@
                         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
                         xsi:schemaLocation="http://www.noorm.org/generator-configuration/1.0.0 http://www.noorm.org/xsd/generator-configuration-1.0.0.xsd">
 
-    <beanPackage name="org.noorm.test.hr1.beans"/>
-    <enumPackage name="org.noorm.test.hr1.enums"/>
-    <servicePackage name="org.noorm.test.hr1.services.impl"/>
-    <serviceInterfacePackage name="org.noorm.test.hr1.services"/>
+    <beanJavaPackage name="org.noorm.test.hr1.beans"/>
+    <enumJavaPackage name="org.noorm.test.hr1.enums"/>
+    <serviceJavaPackage name="org.noorm.test.hr1.services.impl"/>
+    <serviceInterfaceJavaPackage name="org.noorm.test.hr1.services"/>
     <beanTableFilter regex="(C.*|E.*|G.*|H.*|J.*|L.*|V.*|.*RECORD)"/>
     <enumTableFilter regex="REGIONS"/>
     <table2SequenceMappings>
@@ -18,10 +18,10 @@
     <enumTable2DisplayColumnMappings>
         <mapping key="REGIONS" value="REGION_NAME"/>
     </enumTable2DisplayColumnMappings>
-    <singleRowFinder regex="(find_unique.*)"/>
-    <extendedBeans>
+    <singleRowFinderProcedureFilter regex="(find_unique.*)"/>
+    <extendedBeanMappings>
         <mapping key="Jobs" value="org.noorm.test.JobsExt"/>
-    </extendedBeans>
+    </extendedBeanMappings>
     <dataSource name="HR1"/>
 
 </generatorConfiguration>

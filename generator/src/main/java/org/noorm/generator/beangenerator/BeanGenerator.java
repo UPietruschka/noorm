@@ -58,14 +58,14 @@ public class BeanGenerator {
 		}
 
 		final ValidatorClassDescriptor validatorClassDescriptor = new ValidatorClassDescriptor();
-		validatorClassDescriptor.setPackageName(configuration.getBeanPackage().getName());
+		validatorClassDescriptor.setPackageName(configuration.getBeanJavaPackage().getName());
 
 		final BeanDMLClassDescriptor beanDMLClassDescriptor = new BeanDMLClassDescriptor();
-		beanDMLClassDescriptor.setBeanPackageName(configuration.getBeanPackage().getName());
+		beanDMLClassDescriptor.setBeanPackageName(configuration.getBeanJavaPackage().getName());
         if (GeneratorUtil.hasServiceInterfacePackageName(configuration)) {
-            beanDMLClassDescriptor.setInterfacePackageName(configuration.getServiceInterfacePackage().getName());
+            beanDMLClassDescriptor.setInterfacePackageName(configuration.getServiceInterfaceJavaPackage().getName());
         }
-		beanDMLClassDescriptor.setPackageName(configuration.getServicePackage().getName());
+		beanDMLClassDescriptor.setPackageName(configuration.getServiceJavaPackage().getName());
 
         if (GeneratorUtil.hasDataSourceName(configuration)) {
             validatorClassDescriptor.setDataSourceName(configuration.getDataSource().getName());
@@ -88,13 +88,13 @@ public class BeanGenerator {
 
 		log.info("Generating NoORM Bean classes.");
 		final File beanPackageDir = GeneratorUtil.createPackageDir
-				(parameters.getDestinationDirectory(), configuration.getBeanPackage().getName());
+				(parameters.getDestinationDirectory(), configuration.getBeanJavaPackage().getName());
 		final File servicePackageDir = GeneratorUtil.createPackageDir
-				(parameters.getDestinationDirectory(), configuration.getServicePackage().getName());
+				(parameters.getDestinationDirectory(), configuration.getServiceJavaPackage().getName());
 		File serviceInterfacePackageDir = null;
         if (GeneratorUtil.hasServiceInterfacePackageName(configuration)) {
 			serviceInterfacePackageDir = GeneratorUtil.createPackageDir
-					(parameters.getDestinationDirectory(), configuration.getServiceInterfacePackage().getName());
+					(parameters.getDestinationDirectory(), configuration.getServiceInterfaceJavaPackage().getName());
 		}
 
 		for (final String tableName0 : tableColumnMap.keySet()) {
@@ -116,9 +116,9 @@ public class BeanGenerator {
 			final List<TableMetadataBean> tableMetadataBeanList1 = tableColumnMap.get(tableName0);
 			final BeanClassDescriptor beanClassDescriptor = new BeanClassDescriptor();
 			beanClassDescriptor.setName(javaBeanName);
-			if (configuration.getExtendedBeans() != null) {
+			if (configuration.getExtendedBeanMappings() != null) {
 				final String extJavaBeanName =
-                        GeneratorUtil.getMappedString(javaBeanName, configuration.getExtendedBeans());
+                        GeneratorUtil.getMappedString(javaBeanName, configuration.getExtendedBeanMappings());
 				if (!extJavaBeanName.isEmpty()) {
 					beanClassDescriptor.setExtendedName(extJavaBeanName);
 				}
@@ -136,7 +136,7 @@ public class BeanGenerator {
 			beanClassDescriptor.setPrimaryKeyColumnNames(primaryKeyColumnNames);
             final String[] primaryKeyJavaNames = new String[primaryKeyColumnNames.length];
             for (int i = 0; i < primaryKeyColumnNames.length; i++) {
-                primaryKeyJavaNames[i] = GeneratorUtil.convertDBName2JavaName(primaryKeyColumnNames[i],
+                primaryKeyJavaNames[i] = GeneratorUtil.convertColumnName2JavaName(primaryKeyColumnNames[i],
                         true, configuration.getColumnNameMappings());
             }
             beanClassDescriptor.setPrimaryKeyJavaNames(primaryKeyJavaNames);
@@ -162,7 +162,7 @@ public class BeanGenerator {
             }
 			final String versionColumnName = getVersionColumnName(tableName0, tableMetadataBeanList1);
 			beanClassDescriptor.setVersionColumnName(versionColumnName);
-			beanClassDescriptor.setPackageName(configuration.getBeanPackage().getName());
+			beanClassDescriptor.setPackageName(configuration.getBeanJavaPackage().getName());
 			// Use a unique seed for serialVersionUID generation to guarantee the generation of a reproducible
 			// serialVersionUID with every new source code generation cycle.
 			final Random random = new Random(javaBeanName.hashCode());
@@ -175,7 +175,7 @@ public class BeanGenerator {
                 final String columnName = tableMetadataBean.getColumnName();
 				final String javaName = Utils.convertDBName2JavaName(columnName, false);
 				beanAttributeDescriptor.setName(javaName);
-                final String methodNamePostfix = GeneratorUtil.convertDBName2JavaName
+                final String methodNamePostfix = GeneratorUtil.convertColumnName2JavaName
                         (columnName, true, configuration.getColumnNameMappings());
                 beanAttributeDescriptor.setMethodNamePostfix(methodNamePostfix);
                 final String dataType = tableMetadataBean.getDataType();
