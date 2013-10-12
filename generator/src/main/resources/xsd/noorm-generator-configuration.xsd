@@ -97,7 +97,7 @@
                     <xs:annotation>
                         <xs:documentation>
                             The default naming scheme for the generated classes follows standards and conventions
-                            for names used in databases and names used for Java classes.
+                            for names used in databases and names used for Java classes (upper CamelCase).
                             While database names are usually in upper-case, using the underscore as delimiter
                             between parts of the name (e.g. "ORDER_DETAIL"), Java names use a capitalized first
                             character of the name part without delimiter instead (e.g. "OrderDetail").
@@ -111,7 +111,7 @@
                     <xs:annotation>
                         <xs:documentation>
                             The default naming scheme for the generated attributes follows standards and conventions
-                            for names used in databases and names used for Java classes.
+                            for names used in databases and names used for Java classes (lower CamelCase).
                             While database names are usually in upper-case, using the underscore as delimiter
                             between parts of the name (e.g. "ORDER_ID"), Java names use a capitalized first
                             character of the name part without delimiter instead (e.g. "OrderId").
@@ -250,13 +250,14 @@
                 <xs:element name="typeMappings" type="typeMappings" minOccurs="0">
                     <xs:annotation>
                         <xs:documentation>
-                            The Java code generator defines for every database type a default Java type, which is used in
-                            the generated classes for attributes and method parameters (e.g. NUMBER -> java.lang.Long).
-                            However, this mapping may not be suitable for certain situations. This configuration parameter
-                            provides a flexible way to define custom type mappings.
-                            Note that the database type depends on the database system and is not checked for validity, but
-                            simply compared against the database types as retrieved from the database metadata. So, an
-                            invalid database type has simply no effect.
+                            The Java code generator defines for every database type a default Java type, which is
+                            used in the generated classes for attributes and method parameters (e.g. NUMBER ->
+                            java.lang.Long).
+                            However, this mapping may not be suitable for certain situations. This configuration
+                            parameter provides a flexible way to define custom type mappings.
+                            Note that the database type depends on the database system and is not checked for validity,
+                            but simply compared against the database types as retrieved from the database metadata.
+                            So, an invalid database type has simply no effect.
                             The specified Java type however is checked for existence by the code generator, but not for
                             validity with respect to a proper data conversion in the JDBC driver used.
                         </xs:documentation>
