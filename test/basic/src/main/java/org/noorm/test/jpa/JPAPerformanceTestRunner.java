@@ -14,7 +14,10 @@ import java.util.List;
  *         Date: 09.04.13
  *         Time: 14:43
  *         <p/>
- * Runner for the NoORM/JPA performance comparison
+ * Runner for the NoORM/JPA performance comparison.
+ * The utilization of the sequence associated with entity EmployeesEntity assumes a sequence increment of 100.
+ * The sample schema HR does not have this setting and must be adjusted accordingly to make this test running
+ * successfully.
  */
 public class JPAPerformanceTestRunner {
 
@@ -74,7 +77,6 @@ public class JPAPerformanceTestRunner {
         final Query query = em.createNativeQuery("SELECT * FROM employees WHERE last_name = ?", EmployeesEntity.class);
         query.setParameter(1, "Doe");
         final List<EmployeesEntity> employeesBeanList = query.getResultList();
-        System.out.println(">>>>>>>>>>>>>>>> "+employeesBeanList.size());
         return employeesBeanList;
     }
 
