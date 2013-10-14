@@ -32,6 +32,7 @@
         <mapping key="V_DEPARTMENTS" value="DEPARTMENT_ID"/>
     </viewName2PrimaryKeyMappings>
     <singleRowFinderProcedureFilter regex="(.*_unique.*)"/>
+    <pageableProcedureName regex="find_pageable_emps_by_idlist"/>
     <queryDeclarations>
         <queryDeclaration tableName="EMPLOYEES">
             <queryColumn name="COMMISSION_PCT" operator="EQUAL_TO"/>
