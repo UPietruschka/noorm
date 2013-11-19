@@ -446,7 +446,7 @@
                     <xs:documentation>
                         The scope of the custom type mapping can be specified on a per parameter basis using
                         regular expressions to identify the parameter(s) for the application of the custom
-                        type mapping..
+                        type mapping.
                     </xs:documentation>
                 </xs:annotation>
             </xs:attribute>
@@ -466,7 +466,7 @@
                     <xs:documentation>
                         The scope of the custom type mapping can be specified on a per column basis using
                         regular expressions to identify the column(s) for the application of the custom
-                        type mapping..
+                        type mapping.
                     </xs:documentation>
                 </xs:annotation>
             </xs:attribute>
