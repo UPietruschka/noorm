@@ -1,7 +1,6 @@
 package org.noorm.jdbc;
 
 import oracle.jdbc.OracleCallableStatement;
-import oracle.jdbc.OracleConnection;
 import oracle.jdbc.OraclePreparedStatement;
 import oracle.sql.ARRAY;
 import oracle.sql.ArrayDescriptor;
@@ -10,6 +9,7 @@ import org.slf4j.LoggerFactory;
 
 import javax.xml.bind.annotation.adapters.HexBinaryAdapter;
 import java.math.BigDecimal;
+import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
@@ -102,7 +102,7 @@ public class JDBCStatementProcessor<T> {
 		}
 
 		boolean success = true;
-		OracleConnection con = null;
+		Connection con = null;
 		OracleCallableStatement cstmt = null;
 		try {
 			con = DataSourceProvider.getConnection();
@@ -312,7 +312,7 @@ public class JDBCStatementProcessor<T> {
 
         boolean success = true;
         List<T> beanList;
-        OracleConnection con = null;
+        Connection con = null;
         OraclePreparedStatement pstmt = null;
         try {
             con = DataSourceProvider.getConnection();
@@ -399,7 +399,7 @@ public class JDBCStatementProcessor<T> {
 
 		boolean success = true;
 		List<T> beanList;
-		OracleConnection con = null;
+		Connection con = null;
 		OracleCallableStatement cstmt = null;
 		try {
 			con = DataSourceProvider.getConnection();
@@ -477,7 +477,7 @@ public class JDBCStatementProcessor<T> {
 
 		boolean success = true;
 		final List<Map<String, Object>> recordList = new ArrayList<Map<String, Object>>();
-		OracleConnection con = null;
+		Connection con = null;
 		OraclePreparedStatement pstmt = null;
 
 		try {
@@ -513,7 +513,7 @@ public class JDBCStatementProcessor<T> {
 		}
 	}
 
-	private void bindParameters(final OracleConnection pCon,
+	private void bindParameters(final Connection pCon,
 								final Map<String, Object> pInParameters,
 								final OracleCallableStatement pCstmt,
 								final int pParameterIndex) throws SQLException {

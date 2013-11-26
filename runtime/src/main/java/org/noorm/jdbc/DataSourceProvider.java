@@ -1,8 +1,5 @@
 package org.noorm.jdbc;
 
-import oracle.jdbc.OracleCallableStatement;
-import oracle.jdbc.OracleConnection;
-import oracle.jdbc.OraclePreparedStatement;
 import oracle.jdbc.pool.OracleDataSource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -11,6 +8,9 @@ import javax.naming.Context;
 import javax.naming.InitialContext;
 import javax.naming.NamingException;
 import javax.sql.DataSource;
+import java.sql.CallableStatement;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.HashMap;
@@ -270,7 +270,7 @@ public class DataSourceProvider {
 
 	static void returnConnection(final boolean pSuccess) {
 
-		OracleConnection con = getActiveConnectionData().getConnection();
+		Connection con = getActiveConnectionData().getConnection();
 		try {
             if (con == null || con.isClosed()) {
                 throw new DataAccessException(DataAccessException.Type.STALE_TRANSACTION);
@@ -311,7 +311,7 @@ public class DataSourceProvider {
 	 * @return the Oracle database connection currently managed by the DataSourceProvider.
 	 * @throws SQLException
 	 */
-	public static OracleConnection getConnection() throws SQLException {
+	public static Connection getConnection() throws SQLException {
 
 		return getConnection(false);
 	}
@@ -327,9 +327,9 @@ public class DataSourceProvider {
 	 * @return the acquired connection.
 	 * @throws SQLException
 	 */
-	private static OracleConnection getConnection(final boolean pRetain) throws SQLException {
+	private static Connection getConnection(final boolean pRetain) throws SQLException {
 
-		OracleConnection con = getActiveConnectionData().getConnection();
+		Connection con = getActiveConnectionData().getConnection();
 		if (getActiveConnectionData().getTsStack() == 0L) {
 			if (log.isDebugEnabled()) {
 				if (pRetain) {
@@ -347,7 +347,7 @@ public class DataSourceProvider {
 			if (dataSourceConn.isWrapperFor(oracle.jdbc.OracleConnection.class)) {
 				con = dataSourceConn.unwrap(oracle.jdbc.OracleConnection.class);
 			} else {
-				con = (OracleConnection) dataSourceConn;
+				con = dataSourceConn;
 			}
             if (log.isDebugEnabled()) {
                 log.debug("Acquired connection : ".concat(con.toString()));
@@ -414,7 +414,7 @@ public class DataSourceProvider {
 	 */
 	public static void commit() {
 
-		OracleConnection con = null;
+		Connection con = null;
 		try {
 			con = getActiveConnectionData().getConnection();
 			if (con == null || con.isClosed()) {
@@ -469,7 +469,7 @@ public class DataSourceProvider {
 	 */
 	public static void rollback() {
 
-		OracleConnection con = null;
+		Connection con = null;
 		try {
 			con = getActiveConnectionData().getConnection();
 			if (con == null || con.isClosed()) {
@@ -570,7 +570,7 @@ public class DataSourceProvider {
 
 	// There is no easy configurable way to control a clean disconnect for the established debug
 	// connection, thus clean-up of the associated socket is left the Connection, resp. Pool.
-	static private void enableDebugMode(final OracleConnection pCon) throws SQLException {
+	static private void enableDebugMode(final Connection pCon) throws SQLException {
 
 		StringBuilder logMessage = new StringBuilder();
 		logMessage.append("Enabling PL/SQL debugging. Connecting to host : ");
@@ -579,7 +579,7 @@ public class DataSourceProvider {
 		logMessage.append(getActiveConfiguration().getDebugJDWPPort());
 		log.debug(logMessage.toString());
 		final String plSQLCall = "{ call dbms_debug_jdwp.connect_tcp(host => :host, port => :port)";
-		final OracleCallableStatement cstmt = (OracleCallableStatement) pCon.prepareCall(plSQLCall);
+		final CallableStatement cstmt = pCon.prepareCall(plSQLCall);
 		cstmt.setString("host", getActiveConfiguration().getDebugJDWPHost());
 		cstmt.setString("port", getActiveConfiguration().getDebugJDWPPort());
 		cstmt.execute();
@@ -619,7 +619,7 @@ public class DataSourceProvider {
     static class ActiveConnectionData {
 
         private ActiveDataSource activeDataSource;
-        private OracleConnection connection;
+        private Connection connection;
         private Long tsStack = 0L;
         private Map<String, Number> lastSequenceDBValues = new HashMap<String, Number>();
         private Map<String, Number> sequenceCache = new HashMap<String, Number>();
@@ -632,11 +632,11 @@ public class DataSourceProvider {
             activeDataSource = pActiveDataSource;
         }
 
-        public OracleConnection getConnection() {
+        public Connection getConnection() {
             return connection;
         }
 
-        public void setConnection(final OracleConnection pConnection) {
+        public void setConnection(final Connection pConnection) {
             connection = pConnection;
         }
 
@@ -689,7 +689,7 @@ public class DataSourceProvider {
                 sequenceName = "\"".concat(pSequenceName).concat("\"");
             }
             final String sequenceQuery = "SELECT ".concat(sequenceName).concat(".NEXTVAL FROM DUAL");
-            OraclePreparedStatement pstmt = null;
+            PreparedStatement pstmt = null;
             boolean success = true;
             boolean conAlreadyEstablished = true;
 
@@ -701,7 +701,7 @@ public class DataSourceProvider {
                     DataSourceProvider.getConnection();
                     conAlreadyEstablished = false;
                 }
-                pstmt = (OraclePreparedStatement) connection.prepareStatement(sequenceQuery);
+                pstmt = connection.prepareStatement(sequenceQuery);
                 final ResultSet resultSet = pstmt.executeQuery();
                 resultSet.next();
                 Number sequenceValue = null;

@@ -1,6 +1,5 @@
 package org.noorm.jdbc;
 
-import oracle.jdbc.OracleConnection;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -41,7 +40,7 @@ public class LOBHelper {
             throw new DataAccessException(DataAccessException.Type.ISOLATED_LOB_CREATION);
         }
         boolean success = true;
-        OracleConnection con = null;
+        Connection con = null;
         try {
             con = DataSourceProvider.getConnection();
             if (pLOBType.equals(Clob.class)) {

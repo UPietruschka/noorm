@@ -1,11 +1,11 @@
 package org.noorm.jdbc;
 
-import oracle.jdbc.OracleConnection;
 import oracle.jdbc.OraclePreparedStatement;
 import org.noorm.metadata.BeanMetaDataUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Timestamp;
@@ -154,7 +154,7 @@ public class JDBCDMLProcessor<T> {
 
         boolean returnModifiedBean = false;
         boolean success = true;
-        OracleConnection con = null;
+        Connection con = null;
         OraclePreparedStatement pstmt = null;
 
         try {

@@ -1,10 +1,10 @@
 package org.noorm.jdbc;
 
-import oracle.jdbc.OracleConnection;
-import oracle.jdbc.OraclePreparedStatement;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.sql.Connection;
+import java.sql.PreparedStatement;
 import java.sql.SQLException;
 
 /**
@@ -36,11 +36,11 @@ public class TableLock {
         final String lockStmt = "LOCK TABLE ".concat(pBean.getTableName())
                 .concat(" IN ").concat(pLockMode.getMode()).concat(" MODE").concat(pWaitClause);
         boolean success = true;
-        OracleConnection con = null;
-        OraclePreparedStatement stmt = null;
+        Connection con = null;
+        PreparedStatement stmt = null;
         try {
             con = DataSourceProvider.getConnection();
-            stmt = (OraclePreparedStatement) con.prepareStatement(lockStmt);
+            stmt = con.prepareStatement(lockStmt);
             stmt.execute();
         } catch (Exception e) {
             log.error(DataAccessException.Type.COULD_NOT_ACQUIRE_TABLE_LOCK.getDescription(), e);
