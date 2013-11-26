@@ -1,7 +1,5 @@
 package org.noorm.jdbc;
 
-import java.util.List;
-
 /**
  * Utility methods to support JDBCStatementProcessor and the class generators.
  *
