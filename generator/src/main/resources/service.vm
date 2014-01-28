@@ -94,14 +94,14 @@ public class $class.JavaName implements IService {
 #end
 #if($proc.isPageableFinder())
 		return new PageableBeanList<${proc.getOutParamJavaType()}>
-				($proc.Parameters[0].JavaName, "${class.DatabasePackageName}.$proc.OracleName", "$proc.OutParamOracleName", "$proc.Parameters[0].OracleName", ${proc.getOutParamJavaType()}.class);
+				($proc.Parameters[0].JavaName, "${class.DatabasePackageName}.$proc.DbProcedureName", "$proc.OutDbParamName", "$proc.Parameters[0].DbParamName", ${proc.getOutParamJavaType()}.class);
 #else
 #if($proc.hasOutParam())
 		final JDBCStatementProcessor<$proc.getOutParamJavaType()> statementProcessor = JDBCStatementProcessor.getInstance();
 #end
 		final Map<String, Object> filterParameters = new HashMap<String, Object>();
 #foreach ($param in $proc.Parameters)
-		filterParameters.put("${param.OracleName}", ${param.JavaName});
+		filterParameters.put("${param.getDbParamName()}", ${param.getJavaName()});
 #end
 #if($proc.isOutParamRefCursor())
 #if($proc.isSingleRowFinder())
@@ -109,15 +109,15 @@ public class $class.JavaName implements IService {
 #else
 		return statementProcessor.getBeanListFromPLSQL
 #end
-				("${class.DatabasePackageName}.$proc.OracleName", "$proc.OutParamOracleName",
+				("${class.DatabasePackageName}.$proc.DbProcedureName", "$proc.OutDbParamName",
 						filterParameters, ${proc.getOutParamJavaType()}.class);
 #elseif($proc.isOutParamScalar())
 		return statementProcessor.callPLSQL
-				("${class.DatabasePackageName}.$proc.OracleName", "$proc.OutParamOracleName",
+				("${class.DatabasePackageName}.$proc.DbProcedureName", "$proc.OutDbParamName",
 						filterParameters, ${proc.getOutParamJavaType()}.class);
 #else
 		typelessStatementProcessor.callPLSQL
-				("${class.DatabasePackageName}.$proc.OracleName", filterParameters);
+				("${class.DatabasePackageName}.$proc.DbProcedureName", filterParameters);
 #end
 #end
 	}

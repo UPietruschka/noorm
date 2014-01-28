@@ -20,18 +20,18 @@ public interface IParameters {
     File getGeneratorConfiguration();
 
     /**
-	 * JDBC connection URL for the Oracle schema containing the tables, views and stored procedures
+	 * JDBC connection URL for the database schema containing the tables, views and stored procedures
 	 * subject to Java code generation.
 	 */
 	String getURL();
 
 	/**
-	 * Username for the Oracle schema.
+	 * Username for the database schema.
 	 */
 	String getUsername();
 
 	/**
-	 * Password for the Oracle schema.
+	 * Password for the database schema.
 	 */
 	String getPassword();
 }

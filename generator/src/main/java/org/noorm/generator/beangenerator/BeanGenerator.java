@@ -74,16 +74,16 @@ public class BeanGenerator {
 
         final MetadataService metadataService = MetadataService.getInstance();
 
-		log.info("Retrieving table metadata from Oracle database.");
+		log.info("Retrieving table metadata from database.");
 		final Map<String, List<TableMetadataBean>> tableColumnMap = metadataService.findTableMetadata();
-		log.info("Retrieving record metadata from Oracle database.");
+		log.info("Retrieving record metadata from database.");
 		final Map<String, List<TableMetadataBean>> recordColumnMap = metadataService.findRecordMetadata();
 		tableColumnMap.putAll(recordColumnMap);
 
-		log.info("Retrieving primary key metadata from Oracle database.");
+		log.info("Retrieving primary key metadata from database.");
 		final List<PrimaryKeyColumnBean> pkColumnNameList = metadataService.findPkColumns();
 
-		log.info("Retrieving sequence metadata from Oracle database.");
+		log.info("Retrieving sequence metadata from database.");
 		final List<SequenceBean> sequenceList = metadataService.findSequenceNames();
 
 		log.info("Generating NoORM Bean classes.");

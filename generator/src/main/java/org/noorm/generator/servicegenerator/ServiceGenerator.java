@@ -104,7 +104,7 @@ public class ServiceGenerator {
 			final List<NameBean> procedureNames = metadataService.findProcedureNames(packageName.getName());
 			for (NameBean procedureName : procedureNames) {
 				final ProcedureDescriptor procedureDescriptor = new ProcedureDescriptor();
-				procedureDescriptor.setOracleName(procedureName.getName().toLowerCase());
+				procedureDescriptor.setDbProcedureName(procedureName.getName().toLowerCase());
 				final String javaMethodName = Utils.convertDBName2JavaName(procedureName.getName(), false);
 				procedureDescriptor.setJavaName(javaMethodName);
 				final List<ParameterBean> parameterList =
@@ -112,7 +112,7 @@ public class ServiceGenerator {
 				for (final ParameterBean parameter : parameterList) {
 					if (parameter.getDirection().equals(INPUT_PARAMETER)) {
 						final ParameterDescriptor parameterDescriptor = new ParameterDescriptor();
-						parameterDescriptor.setOracleName(parameter.getName().toLowerCase());
+						parameterDescriptor.setDbParamName(parameter.getName().toLowerCase());
 						final String javaParameterName = Utils.convertDBName2JavaName(parameter.getName(), false);
 						parameterDescriptor.setJavaName(javaParameterName);
 						final String oracleType = parameter.getDataType();
@@ -122,7 +122,7 @@ public class ServiceGenerator {
 							parameterDescriptor.setJavaType(NOORM_ID_LIST_JAVA_TYPE_NAME);
 						} else {
 							final String javaType = GeneratorUtil.convertOracleType2JavaType (oracleType,
-                                    parameterDescriptor.getOracleName(), configuration.getTypeMappings());
+                                    parameterDescriptor.getDbParamName(), configuration.getTypeMappings());
 							parameterDescriptor.setJavaType(javaType);
 						}
 						procedureDescriptor.addParameter(parameterDescriptor);
@@ -138,7 +138,7 @@ public class ServiceGenerator {
 						}
 					} else { // OUT parameter
 						procedureDescriptor.setHasOutParam(true);
-						procedureDescriptor.setOutParamOracleName(parameter.getName().toLowerCase());
+						procedureDescriptor.setOutDbParamName(parameter.getName().toLowerCase());
 						if (parameter.getDataType().equals(ORACLE_REF_CURSOR_TYPE_NAME)) {
 							final String rowTypeName = metadataService.getParameterRowtype
 									(packageName.getName(), procedureName.getName(), parameter.getName());

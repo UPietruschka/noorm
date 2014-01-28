@@ -63,7 +63,7 @@ public class QueryGenerator {
         }
 
         final MetadataService metadataService = MetadataService.getInstance();
-        log.info("Retrieving table metadata from Oracle database.");
+        log.info("Retrieving table metadata from database.");
         final Map<String, List<TableMetadataBean>> tableColumnMap = metadataService.findTableMetadata();
 
         final Map<String, QueryClassDescriptor> queryClasses = new HashMap<String, QueryClassDescriptor>();
@@ -96,7 +96,7 @@ public class QueryGenerator {
                 final ParameterDescriptor parameterDescriptor = new ParameterDescriptor();
                 final String columnName = queryColumn.getName();
                 parameterDescriptor.setJavaName(PARAMETER_PREFIX + Utils.convertDBName2JavaName(columnName, true));
-                parameterDescriptor.setOracleName(columnName);
+                parameterDescriptor.setDbParamName(columnName);
                 String javaType = null;
                 for (final TableMetadataBean tableMetadataBean : tableMetadataBeanList) {
                     if (tableMetadataBean.getColumnName().equals(columnName)) {

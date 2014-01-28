@@ -13,9 +13,9 @@ import java.util.List;
 public class ProcedureDescriptor {
 
 	private String javaName;
-	private String oracleName;
+	private String dbProcedureName;
 	private final List<ParameterDescriptor> parameters = new ArrayList<ParameterDescriptor>();
-	private String outParamOracleName;
+	private String outDbParamName;
 	private String outParamJavaType;
 	private boolean hasOutParam;
 	private boolean isOutParamRefCursor = false;
@@ -31,12 +31,12 @@ public class ProcedureDescriptor {
 		return javaName;
 	}
 
-	public String getOracleName() {
-		return oracleName;
+	public String getDbProcedureName() {
+		return dbProcedureName;
 	}
 
-	public void setOracleName(final String pOracleName) {
-		oracleName = pOracleName;
+	public void setDbProcedureName(final String pDbProcedureName) {
+		dbProcedureName = pDbProcedureName;
 	}
 
 	public List<ParameterDescriptor> getParameters() {
@@ -47,12 +47,12 @@ public class ProcedureDescriptor {
 		parameters.add(pParameter);
 	}
 
-	public String getOutParamOracleName() {
-		return outParamOracleName;
+	public String getOutDbParamName() {
+		return outDbParamName;
 	}
 
-	public void setOutParamOracleName(final String pOutParamOracleName) {
-		outParamOracleName = pOutParamOracleName;
+	public void setOutDbParamName(final String pOutDbParamName) {
+		outDbParamName = pOutDbParamName;
 	}
 
 	public String getOutParamJavaType() {

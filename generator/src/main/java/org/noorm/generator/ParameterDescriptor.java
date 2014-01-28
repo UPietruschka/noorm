@@ -10,7 +10,7 @@ import org.noorm.generator.schema.OperatorName;
 public class ParameterDescriptor {
 
 	private String javaName;
-	private String oracleName;
+	private String dbParamName;
 	private String javaType;
     // The operator and the unaryOperator-indicator are only used for declared queries
     private OperatorName operator;
@@ -24,12 +24,12 @@ public class ParameterDescriptor {
 		return javaName;
 	}
 
-	public String getOracleName() {
-		return oracleName;
+	public String getDbParamName() {
+		return dbParamName;
 	}
 
-	public void setOracleName(final String pOracleName) {
-		oracleName = pOracleName;
+	public void setDbParamName(final String pDbParamName) {
+		dbParamName = pDbParamName;
 	}
 
 	public String getJavaType() {

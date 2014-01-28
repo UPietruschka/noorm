@@ -87,7 +87,7 @@ public class GeneratorUtil {
     }
 
     /**
-     * Converts an Oracle table name to a Java name. The optional list of ignored table name prefixes is used
+     * Converts a table name to a Java name. The optional list of ignored table name prefixes is used
      * to remove the table name prefix from the generated name. This is useful, when many or all tables in a
      * database schema share a common name prefix, which should be visible in the generated code (e.g. "TBL_").
      *

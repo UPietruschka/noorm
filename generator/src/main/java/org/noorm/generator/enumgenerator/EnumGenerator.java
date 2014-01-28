@@ -54,7 +54,7 @@ public class EnumGenerator {
             validatorClassDescriptor.setDataSourceName(configuration.getDataSource().getName());
         }
 
-        log.info("Retrieving table metadata from Oracle database.");
+        log.info("Retrieving table metadata from database.");
 		final MetadataService metadataService = MetadataService.getInstance();
 		final Map<String, List<TableMetadataBean>> tableColumnMap = metadataService.findTableMetadata();
 
