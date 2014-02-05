@@ -1,5 +1,6 @@
 package org.noorm.jdbc;
 
+import oracle.jdbc.OracleConnection;
 import oracle.jdbc.pool.OracleDataSource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -182,6 +183,9 @@ public class DataSourceProvider {
 			//	validationInfo.append(((PoolDataSource) dataSourceProvider.activeDataSource).getUser());
 			//} else {
 			if (dataSource instanceof OracleDataSource) {
+                final Properties connectionProperties = new Properties();
+                connectionProperties.setProperty(OracleConnection.CONNECTION_PROPERTY_FIXED_STRING, "true");
+                ((OracleDataSource) dataSource).setConnectionProperties(connectionProperties);
 				validationInfo.append("Connection parameters: ");
 				validationInfo.append(";URL: ");
 				validationInfo.append(((OracleDataSource) dataSource).getURL());

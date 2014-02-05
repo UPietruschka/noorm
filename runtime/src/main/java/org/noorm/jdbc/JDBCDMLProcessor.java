@@ -264,28 +264,30 @@ public class JDBCDMLProcessor<T> {
                             Object newVersion = buildVersionColumnValue(bean, pBatchType, value);
                             pstmt.setObject(parameterIndex, newVersion);
                         } else {
-                            if (isPKColumn && value instanceof String) {
+                            // Fixed CHAR handling now handled through global connection property
+                            // if (isPKColumn && value instanceof String) {
                                 // SQL CHAR comparison semantics by default uses padding, which causes some
                                 // confusion, since it does not even matter, whether the data has initially been
                                 // provided with or without padding. Using the following proprietary Oracle method
                                 // disabled this behaviour and turns off padding.
-                                pstmt.setFixedCHAR(parameterIndex, (String) value);
-                            } else {
+                                // pstmt.setFixedCHAR(parameterIndex, (String) value);
+                            // } else {
                                 pstmt.setObject(parameterIndex, value);
-                            }
+                            // }
                         }
                     }
                     if (pBatchType.equals(BatchType.DELETE)) {
                         if (isPKColumn) {
-                            if (value instanceof String) {
+                            // Fixed CHAR handling now handled through global connection property
+                            // if (value instanceof String) {
                                 // SQL CHAR comparison semantics by default uses padding, which causes some
                                 // confusion, since it does not even matter, whether the data has initially been
                                 // provided with or without padding. Using the following proprietary Oracle method
                                 // disabled this behaviour and turns off padding.
-                                pstmt.setFixedCHAR(parameterIndex, (String) value);
-                            } else {
+                                // pstmt.setFixedCHAR(parameterIndex, (String) value);
+                            // } else {
                                 pstmt.setObject(parameterIndex, value);
-                            }
+                            // }
                         }
                     }
                 }
@@ -320,15 +322,16 @@ public class JDBCDMLProcessor<T> {
                             if (!isPKColumn && value != null) {
                                 final String namedParameter = fieldName.concat(StatementBuilder.OLD_VERSION_APPENDIX);
                                 final int parameterIndex = fieldName2ParameterIndex.get(namedParameter);
-                                if (value instanceof String) {
+                                // Fixed CHAR handling now handled through global connection property
+                                // if (value instanceof String) {
                                     // SQL CHAR comparison semantics by default uses padding, which causes some
                                     // confusion, since it does not even matter, whether the data has initially been
                                     // provided with or without padding. Using the following proprietary Oracle method
                                     // disabled this behaviour and turns off padding.
-                                    pstmt.setFixedCHAR(parameterIndex, (String) value);
-                                } else {
+                                    // pstmt.setFixedCHAR(parameterIndex, (String) value);
+                                // } else {
                                     pstmt.setObject(parameterIndex, value);
-                                }
+                                // }
                             }
                         }
                         if (pBatchType.equals(BatchType.UPDATE)) {

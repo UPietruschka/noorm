@@ -221,7 +221,13 @@ public class GeneratorUtil {
             javaType = "byte[]";
         }
         if (pDatabaseType.equals("BLOB")) {
-            javaType = "byte[]";
+            javaType = "java.sql.Blob";
+        }
+        if (pDatabaseType.equals("CLOB")) {
+            javaType = "java.sql.Clob";
+        }
+        if (pDatabaseType.equals("NCLOB")) {
+            javaType = "java.sql.NClob";
         }
         if (pDatabaseType.equals("NUMBER")) {
             if (pDataPrecision != null && pDataPrecision > 0L && pDataScale != null && pDataScale > 0L) {
