@@ -179,8 +179,8 @@ public class BeanGenerator {
                         (columnName, true, configuration.getColumnNameMappings());
                 beanAttributeDescriptor.setMethodNamePostfix(methodNamePostfix);
                 final String dataType = tableMetadataBean.getDataType();
-				final String javaType = GeneratorUtil.convertOracleType2JavaType(dataType,
-						tableMetadataBean.getDataPrecision(), tableMetadataBean.getDataScale(),
+				final String javaType = GeneratorUtil.convertDatabaseType2JavaType(dataType,
+                        tableMetadataBean.getDataPrecision(), tableMetadataBean.getDataScale(),
                         tableMetadataBean.getTableName(), columnName, configuration.getTypeMappings());
 				if (tableMetadataBean.getUpdatable().equals(BeanMetaDataUtil.NOT_UPDATABLE) ||
 						tableMetadataBean.getInsertable().equals(BeanMetaDataUtil.NOT_UPDATABLE)) {

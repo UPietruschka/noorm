@@ -115,13 +115,13 @@ public class ServiceGenerator {
 						parameterDescriptor.setDbParamName(parameter.getName().toLowerCase());
 						final String javaParameterName = Utils.convertDBName2JavaName(parameter.getName(), false);
 						parameterDescriptor.setJavaName(javaParameterName);
-						final String oracleType = parameter.getDataType();
-						final String oracleTypeName = parameter.getTypeName();
-						if (oracleTypeName != null &&
-								oracleTypeName.equals(JDBCStatementProcessor.NOORM_ID_LIST_ORACLE_TYPE_NAME)) {
+						final String databaseType = parameter.getDataType();
+						final String databaseTypeName = parameter.getTypeName();
+						if (databaseTypeName != null &&
+								databaseTypeName.equals(JDBCStatementProcessor.NOORM_ID_LIST_ORACLE_TYPE_NAME)) {
 							parameterDescriptor.setJavaType(NOORM_ID_LIST_JAVA_TYPE_NAME);
 						} else {
-							final String javaType = GeneratorUtil.convertOracleType2JavaType (oracleType,
+							final String javaType = GeneratorUtil.convertDatabaseType2JavaType(databaseType,
                                     parameterDescriptor.getDbParamName(), configuration.getTypeMappings());
 							parameterDescriptor.setJavaType(javaType);
 						}
@@ -164,7 +164,7 @@ public class ServiceGenerator {
 								}
 							}
 						} else {
-							final String javaType = GeneratorUtil.convertOracleType2JavaType (parameter.getDataType(),
+							final String javaType = GeneratorUtil.convertDatabaseType2JavaType(parameter.getDataType(),
                                     parameter.getName(), configuration.getTypeMappings());
 							procedureDescriptor.setOutParamJavaType(javaType);
 							procedureDescriptor.setOutParamScalar(true);

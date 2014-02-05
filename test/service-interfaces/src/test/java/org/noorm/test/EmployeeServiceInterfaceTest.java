@@ -40,7 +40,7 @@ public class EmployeeServiceInterfaceTest {
 
         // Using explicit transaction handling is actually not required for this test case, but since we
         // do not use a connection pool here, the loop over all employees could easily exhaust the maximum
-        // number of available connections of the Oracle test database.
+        // number of available connections of the test database.
         try {
             DataSourceProvider.setActiveDataSource(HR1_DATA_SOURCE);
             DataSourceProvider.begin();
@@ -149,7 +149,7 @@ public class EmployeeServiceInterfaceTest {
         try {
             // Using explicit transaction handling is actually not required for this test case, but since we
             // do not use a connection pool here, the loop over all employees could easily exhaust the maximum
-            // number of available connections of the Oracle test database.
+            // number of available connections of the test database.
             DataSourceProvider.setActiveDataSource(HR1_DATA_SOURCE);
             DataSourceProvider.begin();
             final List<EmpDetailsView> empDetailsList = employeeService.findAllEmployeeDetails();

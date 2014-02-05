@@ -116,21 +116,21 @@ public class GeneratorUtil {
     }
 
     /**
-     * Maps the given Oracle type to the corresponding Java type, which represents the Oracle type in
+     * Maps the given database type to the corresponding Java type, which represents the database type in
      * the generated Java service class (e.g. "VARCHAR2" -> "String").
      *
-     * @param pOracleType the Oracle type name
+     * @param pDatabaseType the database type name
      * @param pParamName the parameter name (of a stored procedure)
      * @param pTypeMappings the custom type mapping
      * @return the Java type name
      */
-    public static String convertOracleType2JavaType(final String pOracleType,
-                                                    final String pParamName,
-                                                    final List<TypeMapping> pTypeMappings) {
+    public static String convertDatabaseType2JavaType(final String pDatabaseType,
+                                                      final String pParamName,
+                                                      final List<TypeMapping> pTypeMappings) {
 
         if (pTypeMappings != null) {
             for (final TypeMapping typeMapping : pTypeMappings) {
-                if (pOracleType.startsWith(typeMapping.getDatabaseType())) {
+                if (pDatabaseType.startsWith(typeMapping.getDatabaseType())) {
                     if (typeMapping.getParameterFilterRegex() != null) {
                         if (typeMapping.getColumnFilterRegex() != null || typeMapping.getTableFilterRegex() != null) {
                             throw new GeneratorException("Element 'parameterFilterRegex' must not be defined"
@@ -146,32 +146,32 @@ public class GeneratorUtil {
             }
         }
 
-        return convertOracleType2JavaType(pOracleType, 0L, 0L);
+        return convertDatabaseType2JavaType(pDatabaseType, 0L, 0L);
     }
 
     /**
-     * Maps the given Oracle type to the corresponding Java type, which represents the Oracle type in
+     * Maps the given database type to the corresponding Java type, which represents the database type in
      * the generated Java Bean class (e.g. "VARCHAR2" -> "String").
      *
-     * @param pOracleType the Oracle type name
-     * @param pDataPrecision the data precision of the Oracle type, if available
-     * @param pDataScale the data scale of the Oracle type, if available
+     * @param pDatabaseType the database type name
+     * @param pDataPrecision the data precision of the database type, if available
+     * @param pDataScale the data scale of the database type, if available
      * @param pTableName the table name
      * @param pColumnName the column name
      * @param pTypeMappings the custom type mapping
      * @return the Java type name
      */
 
-    public static String convertOracleType2JavaType(final String pOracleType,
-                                                    final Long pDataPrecision,
-                                                    final Long pDataScale,
-                                                    final String pTableName,
-                                                    final String pColumnName,
-                                                    final List<TypeMapping> pTypeMappings) {
+    public static String convertDatabaseType2JavaType(final String pDatabaseType,
+                                                      final Long pDataPrecision,
+                                                      final Long pDataScale,
+                                                      final String pTableName,
+                                                      final String pColumnName,
+                                                      final List<TypeMapping> pTypeMappings) {
 
         if (pTypeMappings != null) {
             for (final TypeMapping typeMapping : pTypeMappings) {
-                if (pOracleType.startsWith(typeMapping.getDatabaseType()) &&
+                if (pDatabaseType.startsWith(typeMapping.getDatabaseType()) &&
                         typeMapping.getParameterFilterRegex() == null) {
                     if (typeMapping.getColumnFilterRegex() == null && typeMapping.getTableFilterRegex() == null) {
                         // Though it is possible to specify attributes 'minOccurs' and 'maxOccurs' to a choice
@@ -210,39 +210,39 @@ public class GeneratorUtil {
             }
         }
 
-        return convertOracleType2JavaType(pOracleType, pDataPrecision, pDataScale);
+        return convertDatabaseType2JavaType(pDatabaseType, pDataPrecision, pDataScale);
     }
 
-    private static String convertOracleType2JavaType(final String pOracleType,
-                                                     final Long pDataPrecision,
-                                                     final Long pDataScale) {
+    private static String convertDatabaseType2JavaType(final String pDatabaseType,
+                                                       final Long pDataPrecision,
+                                                       final Long pDataScale) {
         String javaType = "String";
-        if (pOracleType.endsWith("RAW")) {
+        if (pDatabaseType.endsWith("RAW")) {
             javaType = "byte[]";
         }
-        if (pOracleType.equals("BLOB")) {
+        if (pDatabaseType.equals("BLOB")) {
             javaType = "byte[]";
         }
-        if (pOracleType.equals("NUMBER")) {
+        if (pDatabaseType.equals("NUMBER")) {
             if (pDataPrecision != null && pDataPrecision > 0L && pDataScale != null && pDataScale > 0L) {
                 javaType = "Double";
             } else {
                 javaType = "Long";
             }
         }
-        if (pOracleType.equals("BINARY_FLOAT")) {
+        if (pDatabaseType.equals("BINARY_FLOAT")) {
             javaType = "Float";
         }
-        if (pOracleType.equals("BINARY_DOUBLE")) {
+        if (pDatabaseType.equals("BINARY_DOUBLE")) {
             javaType = "Double";
         }
-        if (pOracleType.equals("FLOAT")) {
+        if (pDatabaseType.equals("FLOAT")) {
             javaType = "Double";
         }
-        if (pOracleType.equals("DATE")) {
+        if (pDatabaseType.equals("DATE")) {
             javaType = "java.util.Date";
         }
-        if (pOracleType.startsWith("TIMESTAMP")) {
+        if (pDatabaseType.startsWith("TIMESTAMP")) {
             javaType = "java.util.Date";
         }
         return javaType;

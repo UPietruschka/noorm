@@ -21,8 +21,8 @@ import java.sql.Timestamp;
 public class EmployeesEntity {
 
     @Id
-    // The allocation size parameter setting presumes that the increment for the Oracle sequence has (al least)
-    // the same value, since JPA just fetches one value from Oracle and calculates all other values internally
+    // The allocation size parameter setting presumes that the increment for the sequence has (al least)
+    // the same value, since JPA just fetches one value from the database and calculates all other values internally
     // with an increment of 1.
     @SequenceGenerator(name = "EMPLOYEES_EMPID_GENERATOR", sequenceName = "EMPLOYEES_SEQ", allocationSize = 100)
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "EMPLOYEES_EMPID_GENERATOR")

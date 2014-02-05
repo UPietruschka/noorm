@@ -173,20 +173,21 @@ public class JDBCDMLProcessor<T> {
             final String versionColumnName = firstBean.getVersionColumnName();
             String batch = null;
             final boolean useOptLockFullRowCompare = firstBean.getModifiedFieldsInitialValue() == null ? false : true;
+            final Map<String, Integer> fieldName2ParameterIndex = new HashMap<String, Integer>();
             if (pBatchType.equals(BatchType.INSERT)) {
-                batch = statementBuilder.buildInsert(firstBean);
+                batch = statementBuilder.buildInsert(firstBean, fieldName2ParameterIndex);
             }
             if (pBatchType.equals(BatchType.UPDATE)) {
                 if (primaryKeyColumnNames.length == 0) {
                     throw new DataAccessException(DataAccessException.Type.GENERIC_UPDATE_NOT_SUPPORTED_WITHOUT_PK);
                 }
-                batch = statementBuilder.buildUpdate(firstBean, useOptLockFullRowCompare);
+                batch = statementBuilder.buildUpdate(firstBean, useOptLockFullRowCompare, fieldName2ParameterIndex);
             }
             if (pBatchType.equals(BatchType.DELETE)) {
                 if (primaryKeyColumnNames.length == 0) {
                     throw new DataAccessException(DataAccessException.Type.GENERIC_DELETE_NOT_SUPPORTED_WITHOUT_PK);
                 }
-                batch = statementBuilder.buildDelete(firstBean, useOptLockFullRowCompare);
+                batch = statementBuilder.buildDelete(firstBean, useOptLockFullRowCompare, fieldName2ParameterIndex);
             }
             if (log.isDebugEnabled()) {
                 final String tableName = firstBean.getTableName();
@@ -212,12 +213,16 @@ public class JDBCDMLProcessor<T> {
             for (final IBean bean : pBeanList) {
 
                 final BeanMapper<IBean> mapper = BeanMapper.getInstance();
-                Map<String, Object> fieldMap = mapper.toMap(bean);
+                final Map<String, Object> fieldMap = mapper.toMap(bean);
                 if (fieldMap.isEmpty()) {
                     throw new DataAccessException(DataAccessException.Type.COULD_NOT_UPDATE_NON_UPDATABLE_BEAN);
                 }
                 for (final String fieldName : fieldMap.keySet()) {
 
+                    final Integer parameterIndex = fieldName2ParameterIndex.get(fieldName);
+                    if (parameterIndex == null) {
+                        continue;
+                    }
                     boolean isPKColumn = false;
                     for (final String pkColumnName : primaryKeyColumnNames) {
                         if (fieldName.equals(pkColumnName)) {
@@ -238,7 +243,7 @@ public class JDBCDMLProcessor<T> {
                                     value = buildVersionColumnValue(bean, pBatchType, value);
                                 }
                             }
-                            pstmt.setObjectAtName(fieldName, value);
+                            pstmt.setObject(parameterIndex, value);
                         } else {
                             if (!useInlineSequenceValueGeneration) {
                                 final Class primaryKeyType =
@@ -246,7 +251,7 @@ public class JDBCDMLProcessor<T> {
                                 final Number sequenceValue = DataSourceProvider
                                         .getNextSequenceValue(sequenceName, sequenceIncrement, primaryKeyType);
                                 BeanMetaDataUtil.setPrimaryKeyValue(firstBean, sequenceValue);
-                                pstmt.setObjectAtName(fieldName, sequenceValue);
+                                pstmt.setObject(parameterIndex, sequenceValue);
                             }
                         }
                     }
@@ -257,16 +262,16 @@ public class JDBCDMLProcessor<T> {
                                 throw new DataAccessException(DataAccessException.Type.VERSION_COLUMN_NULL);
                             }
                             Object newVersion = buildVersionColumnValue(bean, pBatchType, value);
-                            pstmt.setObjectAtName(fieldName, newVersion);
+                            pstmt.setObject(parameterIndex, newVersion);
                         } else {
                             if (isPKColumn && value instanceof String) {
                                 // SQL CHAR comparison semantics by default uses padding, which causes some
                                 // confusion, since it does not even matter, whether the data has initially been
                                 // provided with or without padding. Using the following proprietary Oracle method
                                 // disabled this behaviour and turns off padding.
-                                pstmt.setFixedCHARAtName(fieldName, (String) value);
+                                pstmt.setFixedCHAR(parameterIndex, (String) value);
                             } else {
-                                pstmt.setObjectAtName(fieldName, value);
+                                pstmt.setObject(parameterIndex, value);
                             }
                         }
                     }
@@ -277,9 +282,9 @@ public class JDBCDMLProcessor<T> {
                                 // confusion, since it does not even matter, whether the data has initially been
                                 // provided with or without padding. Using the following proprietary Oracle method
                                 // disabled this behaviour and turns off padding.
-                                pstmt.setFixedCHARAtName(fieldName, (String) value);
+                                pstmt.setFixedCHAR(parameterIndex, (String) value);
                             } else {
-                                pstmt.setObjectAtName(fieldName, value);
+                                pstmt.setObject(parameterIndex, value);
                             }
                         }
                     }
@@ -290,11 +295,12 @@ public class JDBCDMLProcessor<T> {
                 }
                 if (pBatchType.equals(BatchType.UPDATE) || pBatchType.equals(BatchType.DELETE)) {
                     if (versionColumnName != null && !versionColumnName.isEmpty()) {
-                        pstmt.setObjectAtName(versionColumnName.concat(StatementBuilder.OLD_VERSION_APPENDIX),
-                                fieldMap.get(versionColumnName));
+                        final int parameterIndex = fieldName2ParameterIndex.get
+                                (versionColumnName.concat(StatementBuilder.OLD_VERSION_APPENDIX));
+                        pstmt.setObject(parameterIndex, fieldMap.get(versionColumnName));
                     }
                     if (useOptLockFullRowCompare) {
-                        final HashMap<String, Object> modifiedFieldsInitialValue = bean.getModifiedFieldsInitialValue();
+                        final Map<String, Object> modifiedFieldsInitialValue = bean.getModifiedFieldsInitialValue();
                         for (final String fieldName : fieldMap.keySet()) {
                             boolean isPKColumn = false;
                             for (final String pkColumnName : primaryKeyColumnNames) {
@@ -313,14 +319,15 @@ public class JDBCDMLProcessor<T> {
                             }
                             if (!isPKColumn && value != null) {
                                 final String namedParameter = fieldName.concat(StatementBuilder.OLD_VERSION_APPENDIX);
+                                final int parameterIndex = fieldName2ParameterIndex.get(namedParameter);
                                 if (value instanceof String) {
                                     // SQL CHAR comparison semantics by default uses padding, which causes some
                                     // confusion, since it does not even matter, whether the data has initially been
                                     // provided with or without padding. Using the following proprietary Oracle method
                                     // disabled this behaviour and turns off padding.
-                                    pstmt.setFixedCHARAtName(namedParameter, (String) value);
+                                    pstmt.setFixedCHAR(parameterIndex, (String) value);
                                 } else {
-                                    pstmt.setObjectAtName(namedParameter, value);
+                                    pstmt.setObject(parameterIndex, value);
                                 }
                             }
                         }

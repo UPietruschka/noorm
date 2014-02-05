@@ -100,7 +100,7 @@ public class QueryGenerator {
                 String javaType = null;
                 for (final TableMetadataBean tableMetadataBean : tableMetadataBeanList) {
                     if (tableMetadataBean.getColumnName().equals(columnName)) {
-                        javaType = GeneratorUtil.convertOracleType2JavaType(
+                        javaType = GeneratorUtil.convertDatabaseType2JavaType(
                                 tableMetadataBean.getDataType(),
                                 tableMetadataBean.getDataPrecision(),
                                 tableMetadataBean.getDataScale(),

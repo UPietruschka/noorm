@@ -101,8 +101,8 @@ public class EnumGenerator {
                 final String methodNamePostfix = GeneratorUtil.convertColumnName2JavaName
                         (columnName, true, configuration.getColumnNameMappings());
                 enumAttributeDescriptor.setMethodNamePostfix(methodNamePostfix);
-				final String javaType = GeneratorUtil.convertOracleType2JavaType(tableMetadataBean.getDataType(),
-						tableMetadataBean.getDataPrecision(), tableMetadataBean.getDataScale(),
+				final String javaType = GeneratorUtil.convertDatabaseType2JavaType(tableMetadataBean.getDataType(),
+                        tableMetadataBean.getDataPrecision(), tableMetadataBean.getDataScale(),
                         tableMetadataBean.getTableName(), columnName, configuration.getTypeMappings());
 				enumAttributeDescriptor.setType(javaType);
 				enumAttributeDescriptor.setColumnName(columnName);

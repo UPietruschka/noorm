@@ -37,7 +37,7 @@ public class Utils {
 
     /**
      * Converts a database object name into a java name. Database names (table names, column names, etc.) are
-     * typically stored in the Oracle data dictionary in upper case. Most database modellers follow the convention
+     * typically stored in the data dictionary in upper case. Most database modellers follow the convention
      * to separate parts of the name by underscores, e.g. "FIRST_NAME", "ORDER_NUMBER", etc. In Java, a widely
      * used convention is to separate parts of the name by capitalizing the first name of the new part, e.g.
      * "firstName", "orderNumber".

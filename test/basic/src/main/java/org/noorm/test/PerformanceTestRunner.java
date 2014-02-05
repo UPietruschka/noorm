@@ -16,7 +16,7 @@ import java.util.List;
  *         <p/>
  * Performance tests.
  * Stand-alone test to simplify profiling load- and performance metrics.
- * Note that this test does not work without modifications to the original Oracle sample schema HR (The
+ * Note that this test does not work without modifications to the original sample schema HR (The
  * triggers should be disabled and, if the test is running multiple times, PK column EMPLOYEE_ID, which is
  * a NUMBER(6) field, may cause problems, when the sequence reaches larger numbers).
  */

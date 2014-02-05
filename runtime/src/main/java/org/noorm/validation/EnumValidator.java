@@ -28,7 +28,7 @@ public class EnumValidator {
 
 		final MetadataService metadataService = MetadataService.getInstance();
 
-		log.debug("Retrieving table metadata from Oracle database.");
+		log.debug("Retrieving table metadata from database.");
 		tableColumnMap = metadataService.findTableMetadata();
 	}
 

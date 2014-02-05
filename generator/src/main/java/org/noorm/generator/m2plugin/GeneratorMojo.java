@@ -65,20 +65,20 @@ public class GeneratorMojo extends AbstractMojo implements IParameters {
 	protected MavenProject project;
 
     /**
-	 * JDBC connection URL for the Oracle schema containing the tables, views and stored procedures
+	 * JDBC connection URL for the database schema containing the tables, views and stored procedures
 	 * subject to Java code generation.
 	 */
     @Parameter(required = true)
 	protected String url;
 
 	/**
-	 * Username for the Oracle schema.
+	 * Username for the database schema.
 	 */
     @Parameter(required = true)
 	protected String username;
 
 	/**
-	 * Password for the Oracle schema.
+	 * Password for the database schema.
 	 */
     @Parameter(required = true)
 	protected String password;
@@ -119,7 +119,7 @@ public class GeneratorMojo extends AbstractMojo implements IParameters {
             final String dataSourceName = Long.toString(System.currentTimeMillis());
 			DataSourceProvider.addDataSource(initializePoolDataSource(), dataSourceName, true);
 		} catch (SQLException e) {
-			throw new MojoExecutionException("Initializing Oracle PoolDataSource failed.", e);
+			throw new MojoExecutionException("Initializing DataSource failed.", e);
 		}
 
 		log.info("Creating destination directory for generated sources.");
