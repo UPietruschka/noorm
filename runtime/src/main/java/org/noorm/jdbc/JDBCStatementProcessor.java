@@ -1,7 +1,6 @@
 package org.noorm.jdbc;
 
 import oracle.jdbc.OracleCallableStatement;
-import oracle.jdbc.OraclePreparedStatement;
 import oracle.sql.ARRAY;
 import oracle.sql.ArrayDescriptor;
 import org.slf4j.Logger;
@@ -10,6 +9,7 @@ import org.slf4j.LoggerFactory;
 import javax.xml.bind.annotation.adapters.HexBinaryAdapter;
 import java.math.BigDecimal;
 import java.sql.Connection;
+import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
@@ -313,7 +313,7 @@ public class JDBCStatementProcessor<T> {
         boolean success = true;
         List<T> beanList;
         Connection con = null;
-        OraclePreparedStatement pstmt = null;
+        PreparedStatement pstmt = null;
         try {
             con = DataSourceProvider.getConnection();
             final String sqlStmt = statementBuilder.buildSQLStatement
@@ -322,22 +322,23 @@ public class JDBCStatementProcessor<T> {
                 log.debug("Preparing and executing SQL statement: ".concat(sqlStmt)
                         .concat("; using connection : ".concat(con.toString())));
             }
-            pstmt = (OraclePreparedStatement) con.prepareStatement(sqlStmt);
+            pstmt = con.prepareStatement(sqlStmt);
 
             int parameterIndex = 1;
             final Map<QueryColumn, Object> orderedParameters = new TreeMap<QueryColumn, Object>(pInParameters);
             for (final QueryColumn queryColumn : orderedParameters.keySet()) {
                 if (!queryColumn.getOperator().isUnary()) {
                     final Object value = orderedParameters.get(queryColumn);
-                    if (value instanceof String) {
+                    // Fixed CHAR handling now handled through global connection property
+                    // if (value instanceof String) {
                         // SQL CHAR comparison semantics by default uses padding, which causes some
                         // confusion, since it does not even matter, whether the data has initially been
                         // provided with or without padding. Using the following proprietary Oracle method
                         // disabled this behaviour and turns off padding.
-                        pstmt.setFixedCHAR(parameterIndex++, (String) value);
-                    } else {
+                        // pstmt.setFixedCHAR(parameterIndex++, (String) value);
+                    // } else {
                         pstmt.setObject(parameterIndex++, value);
-                    }
+                    // }
                 }
             }
             ResultSet rs = pstmt.executeQuery();
@@ -478,11 +479,11 @@ public class JDBCStatementProcessor<T> {
 		boolean success = true;
 		final List<Map<String, Object>> recordList = new ArrayList<Map<String, Object>>();
 		Connection con = null;
-		OraclePreparedStatement pstmt = null;
+		PreparedStatement pstmt = null;
 
 		try {
 			con = DataSourceProvider.getConnection();
-			pstmt = (OraclePreparedStatement) con.prepareStatement(pSelectStatement);
+			pstmt = con.prepareStatement(pSelectStatement);
 			final ResultSet resultSet = pstmt.executeQuery();
 			final ResultSetMetaData metaData = resultSet.getMetaData();
 			final int columnCount = metaData.getColumnCount();
