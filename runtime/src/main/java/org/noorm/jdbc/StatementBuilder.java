@@ -78,7 +78,6 @@ class StatementBuilder {
 	}
 
     private static final String SELECT_PREFIX = "SELECT * FROM ";
-    private static final String SELECT_ASG = "?";
     private static final String SELECT_LOCK = " FOR UPDATE";
 
     public String buildSQLStatement(final String pTableName,
@@ -103,7 +102,7 @@ class StatementBuilder {
                     if (pUseNamedParameters) {
                         pSQLStatement.append(ASG).append(queryColumn.getColumnName());
                     } else {
-                        pSQLStatement.append(SELECT_ASG);
+                        pSQLStatement.append(ASG2);
                     }
                 }
                 delim = AND;
@@ -122,7 +121,7 @@ class StatementBuilder {
 	private static final String INSERT_NEXT_PK_VAL = ".NEXTVAL";
 	private static final String INSERT_DELIM_3 = ")";
 
-	public String buildInsert(final IBean pBean, final Map pField2ParameterIndex) {
+	public String buildInsert(final IBean pBean, final Map pField2ParameterIndex, final boolean pUseNamedParameters) {
 
         final String tableName = pBean.getTableName();
         final String[] primaryKeyColumnNames = pBean.getPrimaryKeyColumnNames();
@@ -170,7 +169,11 @@ class StatementBuilder {
                     delim = INSERT_DELIM_2;
                 } else {
                     pField2ParameterIndex.put(colAnn.name(), parameterIndex++);
-                    insert.append(ASG).append(colAnn.name());
+                    if (pUseNamedParameters) {
+                        insert.append(ASG).append(colAnn.name());
+                    } else {
+                        insert.append(ASG2);
+                    }
                     delim = INSERT_DELIM_2;
                 }
             }
@@ -185,7 +188,8 @@ class StatementBuilder {
 
 	public String buildUpdate(final IBean pBean,
                               final boolean pUseOptLockFullRowCompare,
-                              final Map pField2ParameterIndex) {
+                              final Map pField2ParameterIndex,
+                              final boolean pUseNamedParameters) {
 
         final String tableName = pBean.getTableName();
         final String[] primaryKeyColumnNames = pBean.getPrimaryKeyColumnNames();
@@ -214,12 +218,18 @@ class StatementBuilder {
                         fieldName = "\"".concat(colAnn.name()).concat("\"");
                     }
                     pField2ParameterIndex.put(colAnn.name(), parameterIndex++);
-                    update.append(delim).append(fieldName).append(EQUALS).append(ASG).append(colAnn.name());
+                    update.append(delim).append(fieldName).append(EQUALS);
+                    if (pUseNamedParameters) {
+                        update.append(ASG).append(colAnn.name());
+                    } else {
+                        update.append(ASG2);
+                    }
                     delim = UPDATE_DELIM_2;
                 }
             }
 		}
-        buildWhereClause(pBean, update, pUseOptLockFullRowCompare, pField2ParameterIndex, parameterIndex);
+        buildWhereClause(pBean, update, pUseOptLockFullRowCompare,
+                pField2ParameterIndex, parameterIndex, pUseNamedParameters);
 		return update.toString();
 	}
 
@@ -227,7 +237,8 @@ class StatementBuilder {
 
 	public String buildDelete(final IBean pBean,
                               final boolean pUseOptLockFullRowCompare,
-                              final Map pField2ParameterIndex) {
+                              final Map pField2ParameterIndex,
+                              final boolean pUseNamedParameters) {
 
         final String tableName = pBean.getTableName();
 		final StringBuilder delete = new StringBuilder();
@@ -237,7 +248,8 @@ class StatementBuilder {
             delete.append(DELETE_PREFIX).append(tableName);
         }
         Integer parameterIndex = 1;
-        buildWhereClause(pBean, delete, pUseOptLockFullRowCompare, pField2ParameterIndex, parameterIndex);
+        buildWhereClause(pBean, delete, pUseOptLockFullRowCompare,
+                pField2ParameterIndex, parameterIndex, pUseNamedParameters);
 		return delete.toString();
 	}
 
@@ -245,13 +257,15 @@ class StatementBuilder {
     private static final String AND = " AND ";
     private static final String EQUALS = " = ";
     private static final String ASG = ":";
+    private static final String ASG2 = "?";
     private static final String IS_NULL = " IS NULL ";
 
     private StringBuilder buildWhereClause(final IBean pBean,
                                            final StringBuilder pDML,
                                            final boolean pUseOptLockFullRowCompare,
                                            final Map pField2ParameterIndex,
-                                           Integer pParameterIndex) {
+                                           Integer pParameterIndex,
+                                           final boolean pUseNamedParameters) {
 
         final String[] primaryKeyColumnNames = pBean.getPrimaryKeyColumnNames();
         final String versionColumnName = pBean.getVersionColumnName();
@@ -276,7 +290,11 @@ class StatementBuilder {
             }
             pDML.append(EQUALS);
             pField2ParameterIndex.put(pkColumnName, pParameterIndex++);
-            pDML.append(ASG).append(pkColumnName);
+            if (pUseNamedParameters) {
+                pDML.append(ASG).append(pkColumnName);
+            } else {
+                pDML.append(ASG2);
+            }
             delim = AND;
         }
         if (versionColumnName != null && !versionColumnName.isEmpty()) {
@@ -289,7 +307,11 @@ class StatementBuilder {
             pDML.append(EQUALS);
             final String parameterName = versionColumnName.concat(OLD_VERSION_APPENDIX);
             pField2ParameterIndex.put(parameterName, pParameterIndex++);
-            pDML.append(ASG).append(parameterName);
+            if (pUseNamedParameters) {
+                pDML.append(ASG).append(parameterName);
+            } else {
+                pDML.append(ASG2);
+            }
         }
         if (pUseOptLockFullRowCompare) {
             for (final String fieldName : fieldMap.keySet()) {
@@ -309,7 +331,12 @@ class StatementBuilder {
                     if (fieldMap.get(fieldName) != null) {
                         final String parameterName = fieldName.concat(OLD_VERSION_APPENDIX);
                         pField2ParameterIndex.put(parameterName, pParameterIndex++);
-                        pDML.append(EQUALS).append(ASG).append(parameterName);
+                        pDML.append(EQUALS);
+                        if (pUseNamedParameters) {
+                            pDML.append(ASG).append(parameterName);
+                        } else {
+                            pDML.append(ASG2);
+                        }
                     } else {
                         pDML.append(IS_NULL);
                     }

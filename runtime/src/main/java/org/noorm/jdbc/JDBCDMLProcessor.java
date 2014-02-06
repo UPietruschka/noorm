@@ -25,6 +25,7 @@ public class JDBCDMLProcessor<T> {
     private static final Logger log = LoggerFactory.getLogger(JDBCDMLProcessor.class);
 
     private static final Long VERSION_COLUMN_LONG_DEFAULT = 1L;
+    private static final boolean USE_NAMED_PARAMETERS = false;
 
     private static JDBCDMLProcessor dmlProcessor = new JDBCDMLProcessor();
     private final StatementBuilder statementBuilder = new StatementBuilder();
@@ -175,19 +176,21 @@ public class JDBCDMLProcessor<T> {
             final boolean useOptLockFullRowCompare = firstBean.getModifiedFieldsInitialValue() == null ? false : true;
             final Map<String, Integer> fieldName2ParameterIndex = new HashMap<String, Integer>();
             if (pBatchType.equals(BatchType.INSERT)) {
-                batch = statementBuilder.buildInsert(firstBean, fieldName2ParameterIndex);
+                batch = statementBuilder.buildInsert(firstBean, fieldName2ParameterIndex, USE_NAMED_PARAMETERS);
             }
             if (pBatchType.equals(BatchType.UPDATE)) {
                 if (primaryKeyColumnNames.length == 0) {
                     throw new DataAccessException(DataAccessException.Type.GENERIC_UPDATE_NOT_SUPPORTED_WITHOUT_PK);
                 }
-                batch = statementBuilder.buildUpdate(firstBean, useOptLockFullRowCompare, fieldName2ParameterIndex);
+                batch = statementBuilder.buildUpdate
+                        (firstBean, useOptLockFullRowCompare, fieldName2ParameterIndex, USE_NAMED_PARAMETERS);
             }
             if (pBatchType.equals(BatchType.DELETE)) {
                 if (primaryKeyColumnNames.length == 0) {
                     throw new DataAccessException(DataAccessException.Type.GENERIC_DELETE_NOT_SUPPORTED_WITHOUT_PK);
                 }
-                batch = statementBuilder.buildDelete(firstBean, useOptLockFullRowCompare, fieldName2ParameterIndex);
+                batch = statementBuilder.buildDelete
+                        (firstBean, useOptLockFullRowCompare, fieldName2ParameterIndex, USE_NAMED_PARAMETERS);
             }
             if (log.isDebugEnabled()) {
                 final String tableName = firstBean.getTableName();
