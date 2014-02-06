@@ -206,7 +206,8 @@ public class JDBCDMLProcessor<T> {
             }
 
             int batchCount = 0;
-            int updateCount = 0;
+            int updateCount0 = 0;
+            int updateCount1 = 0;
             for (final IBean bean : pBeanList) {
 
                 final BeanMapper<IBean> mapper = BeanMapper.getInstance();
@@ -339,8 +340,11 @@ public class JDBCDMLProcessor<T> {
 
                 pstmt.addBatch();
                 if (++batchCount % DataSourceProvider.getBatchUpdateSize() == 0) {
-                    pstmt.executeBatch();
-                    updateCount += pstmt.getUpdateCount();
+                    final int[] batchCounts = pstmt.executeBatch();
+                    for (int i = 0; i < batchCounts.length; i++) {
+                        updateCount1 += batchCounts[i];
+                    }
+                    updateCount0 += pstmt.getUpdateCount();
                 }
             }
             if (log.isDebugEnabled()) {
@@ -350,12 +354,21 @@ public class JDBCDMLProcessor<T> {
                                 .concat(" [").concat(batch).concat("] using connection : ".concat(con.toString()))));
             }
             if (batchCount % DataSourceProvider.getBatchUpdateSize() > 0) {
-                pstmt.executeBatch();
-                updateCount += pstmt.getUpdateCount();
+                final int[] batchCounts = pstmt.executeBatch();
+                for (int i = 0; i < batchCounts.length; i++) {
+                    updateCount1 += batchCounts[i];
+                }
+                updateCount0 += pstmt.getUpdateCount();
+            }
+            // Different JDBC drivers and databases return different values for the update count. Assuming that
+            // negative value are unusable, we switch to the alternative count then.
+            int updateCount = updateCount0;
+            if (updateCount0 < 0) {
+                updateCount = updateCount1;
             }
             if (updateCount != pBeanList.size()) {
                 if (pBatchType.equals(BatchType.INSERT)) {
-                    issueUpdateCountException(updateCount, pBeanList.size());
+                    issueUpdateCountException(updateCount0, pBeanList.size());
                 } else {
                     // When the number of affected records does not match the number of provided records,
                     // we can either have an optimistic lock conflict, or the record(s) have not been provided
