@@ -1,6 +1,6 @@
 package org.noorm.validation;
 
-import org.noorm.jdbc.JDBCStatementProcessor;
+import org.noorm.jdbc.JDBCProcedureProcessor;
 import org.noorm.metadata.MetadataService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -33,10 +33,10 @@ public class NoORMValidator {
 
         final String noormJavaVersion = getNoORMJavaVersion();
         // There is no explicit Java wrapper for the NOORM_DYNAMIC_SQL package, since this package is not to
-		// be used from Java directly. To retrieve the NoORM version, we use the JDBCStatementProcessor API.
+		// be used from Java directly. To retrieve the NoORM version, we use the JDBCProcedureProcessor API.
 		log.info("Validating NoORM runtime version [".concat(noormJavaVersion)
 				.concat("] against PL/SQL package NOORM_DYNAMIC_SQL."));
-		final JDBCStatementProcessor<String> statementProcessor = JDBCStatementProcessor.getInstance();
+		final JDBCProcedureProcessor<String> statementProcessor = JDBCProcedureProcessor.getInstance();
 		final Map<String, Object> filterParameters = new HashMap<String, Object>();
 		final String dynamicSQLNoORMVersion = statementProcessor.callPLSQL
 				("noorm_dynamic_sql.get_version", "p_version", filterParameters, String.class);

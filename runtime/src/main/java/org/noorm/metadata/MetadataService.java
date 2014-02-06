@@ -1,11 +1,11 @@
 package org.noorm.metadata;
 
+import org.noorm.jdbc.JDBCProcedureProcessor;
 import org.noorm.metadata.beans.NameBean;
 import org.noorm.metadata.beans.ParameterBean;
 import org.noorm.metadata.beans.PrimaryKeyColumnBean;
 import org.noorm.metadata.beans.SequenceBean;
 import org.noorm.metadata.beans.TableMetadataBean;
-import org.noorm.jdbc.JDBCStatementProcessor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -35,7 +35,7 @@ public class MetadataService {
 
 	public String getVersion() {
 
-		final JDBCStatementProcessor<String> statementProcessor = JDBCStatementProcessor.getInstance();
+		final JDBCProcedureProcessor<String> statementProcessor = JDBCProcedureProcessor.getInstance();
 		final Map<String, Object> filterParameters = new HashMap<String, Object>();
 		return statementProcessor.callPLSQL
 				("noorm_metadata.get_version", "p_version", filterParameters, String.class);
@@ -63,7 +63,7 @@ public class MetadataService {
 
 	private List<TableMetadataBean> findTableMetadata0() {
 
-		final JDBCStatementProcessor<TableMetadataBean> statementProcessor = JDBCStatementProcessor.getInstance();
+		final JDBCProcedureProcessor<TableMetadataBean> statementProcessor = JDBCProcedureProcessor.getInstance();
 		final Map<String, Object> filterParameters = new HashMap<String, Object>();
 		return statementProcessor.getBeanListFromPLSQL
 				("noorm_metadata.find_table_metadata", "p_table_metadata", filterParameters, TableMetadataBean.class);
@@ -71,7 +71,7 @@ public class MetadataService {
 
 	public List<NameBean> findPackageNames(final String pSearchRegex) {
 
-		final JDBCStatementProcessor<NameBean> statementProcessor = JDBCStatementProcessor.getInstance();
+		final JDBCProcedureProcessor<NameBean> statementProcessor = JDBCProcedureProcessor.getInstance();
 		final Map<String, Object> filterParameters = new HashMap<String, Object>();
 		filterParameters.put("p_search_regex", pSearchRegex);
 		return statementProcessor.getBeanListFromPLSQL
@@ -80,7 +80,7 @@ public class MetadataService {
 
 	public List<NameBean> findProcedureNames(final String pPackageName) {
 
-		final JDBCStatementProcessor<NameBean> statementProcessor = JDBCStatementProcessor.getInstance();
+		final JDBCProcedureProcessor<NameBean> statementProcessor = JDBCProcedureProcessor.getInstance();
 		final Map<String, Object> filterParameters = new HashMap<String, Object>();
 		filterParameters.put("p_package_name", pPackageName);
 		return statementProcessor.getBeanListFromPLSQL
@@ -89,7 +89,7 @@ public class MetadataService {
 
 	public List<SequenceBean> findSequenceNames() {
 
-		final JDBCStatementProcessor<SequenceBean> statementProcessor = JDBCStatementProcessor.getInstance();
+		final JDBCProcedureProcessor<SequenceBean> statementProcessor = JDBCProcedureProcessor.getInstance();
 		final Map<String, Object> filterParameters = new HashMap<String, Object>();
 		return statementProcessor.getBeanListFromPLSQL
 				("noorm_metadata.find_sequence_names", "p_sequence_names", filterParameters, SequenceBean.class);
@@ -97,7 +97,7 @@ public class MetadataService {
 
 	public List<PrimaryKeyColumnBean> findPkColumns() {
 
-		final JDBCStatementProcessor<PrimaryKeyColumnBean> statementProcessor = JDBCStatementProcessor.getInstance();
+		final JDBCProcedureProcessor<PrimaryKeyColumnBean> statementProcessor = JDBCProcedureProcessor.getInstance();
 		final Map<String, Object> filterParameters = new HashMap<String, Object>();
 		return statementProcessor.getBeanListFromPLSQL
 				("noorm_metadata.find_pk_columns", "p_pk_columns", filterParameters, PrimaryKeyColumnBean.class);
@@ -105,7 +105,7 @@ public class MetadataService {
 
 	public List<ParameterBean> findProcedureParameters(final String pPackageName, final String pProcedureName) {
 
-		final JDBCStatementProcessor<ParameterBean> statementProcessor = JDBCStatementProcessor.getInstance();
+		final JDBCProcedureProcessor<ParameterBean> statementProcessor = JDBCProcedureProcessor.getInstance();
 		final Map<String, Object> filterParameters = new HashMap<String, Object>();
 		filterParameters.put("p_package_name", pPackageName);
 		filterParameters.put("p_procedure_name", pProcedureName);
@@ -115,7 +115,7 @@ public class MetadataService {
 
 	public Integer getPackageHashValue(final String pPackageName) {
 
-		final JDBCStatementProcessor<Integer> statementProcessor = JDBCStatementProcessor.getInstance();
+		final JDBCProcedureProcessor<Integer> statementProcessor = JDBCProcedureProcessor.getInstance();
 		final Map<String, Object> filterParameters = new HashMap<String, Object>();
 		filterParameters.put("p_package_name", pPackageName);
 		return statementProcessor.callPLSQL
@@ -126,7 +126,7 @@ public class MetadataService {
 									  final String pProcedureName,
 									  final String pParameterName) {
 
-		final JDBCStatementProcessor<String> statementProcessor = JDBCStatementProcessor.getInstance();
+		final JDBCProcedureProcessor<String> statementProcessor = JDBCProcedureProcessor.getInstance();
 		final Map<String, Object> filterParameters = new HashMap<String, Object>();
 		filterParameters.put("p_package_name", pPackageName);
 		filterParameters.put("p_procedure_name", pProcedureName);
@@ -156,7 +156,7 @@ public class MetadataService {
 
 	private List<TableMetadataBean> findRecordMetadata0() {
 
-		final JDBCStatementProcessor<TableMetadataBean> statementProcessor = JDBCStatementProcessor.getInstance();
+		final JDBCProcedureProcessor<TableMetadataBean> statementProcessor = JDBCProcedureProcessor.getInstance();
 		final Map<String, Object> filterParameters = new HashMap<String, Object>();
 		return statementProcessor.getBeanListFromPLSQL
 				("noorm_metadata.find_record_metadata", "p_record_metadata", filterParameters, TableMetadataBean.class);

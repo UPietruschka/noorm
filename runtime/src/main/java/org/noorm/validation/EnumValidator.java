@@ -1,7 +1,7 @@
 package org.noorm.validation;
 
 import org.noorm.jdbc.IEnum;
-import org.noorm.jdbc.JDBCStatementProcessor;
+import org.noorm.jdbc.JDBCProcedureProcessor;
 import org.noorm.jdbc.Utils;
 import org.noorm.metadata.BeanMetaDataUtil;
 import org.noorm.metadata.MetadataService;
@@ -51,9 +51,9 @@ public class EnumValidator {
 		}
 		// We omit direct meta-data validation here (like we do in BeanValidator), since we do access
 		// the contained data, which would fail with non-validating meta-data anyway.
-		final JDBCStatementProcessor jdbcStatementProcessor = JDBCStatementProcessor.getInstance();
+		final JDBCProcedureProcessor jdbcProcedureProcessor = JDBCProcedureProcessor.getInstance();
 		final String query = "SELECT * FROM ".concat(tableName);
-		final List<Map<String, Object>> recordList = jdbcStatementProcessor.executeGenericSelect(query);
+		final List<Map<String, Object>> recordList = jdbcProcedureProcessor.executeGenericSelect(query);
 		if (recordList.isEmpty()) {
 			validationError(exceptionPrefix.concat(" Database table does not contain any data."));
 		}

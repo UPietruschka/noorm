@@ -6,14 +6,15 @@ import oracle.sql.ArrayDescriptor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.xml.bind.annotation.adapters.HexBinaryAdapter;
 import java.math.BigDecimal;
+import java.sql.CallableStatement;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
 import java.sql.Timestamp;
+import java.sql.Types;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -28,15 +29,15 @@ import java.util.TreeMap;
  *
  * @author Ulf Pietruschka / ulf.pietruschka@etenso.com
  */
-public class JDBCStatementProcessor<T> {
+public class JDBCProcedureProcessor<T> {
 
-	private static final Logger log = LoggerFactory.getLogger(JDBCStatementProcessor.class);
+	private static final Logger log = LoggerFactory.getLogger(JDBCProcedureProcessor.class);
 
-	private static JDBCStatementProcessor statementProcessor = new JDBCStatementProcessor();
+	private static JDBCProcedureProcessor statementProcessor = new JDBCProcedureProcessor();
 
 	private final StatementBuilder statementBuilder = new StatementBuilder();
 
-	public static final String NOORM_ID_LIST_ORACLE_TYPE_NAME = "NUM_ARRAY";
+	public static final String NOORM_ID_LIST_DB_TYPE_NAME = "NUM_ARRAY";
 
 	/*
 	 * Using named parameters for callable statements does not work consistently over the various supported
@@ -50,10 +51,10 @@ public class JDBCStatementProcessor<T> {
 	 */
 	private static final boolean USE_NAMED_PARAMETERS = false;
 
-	private JDBCStatementProcessor() {
+	private JDBCProcedureProcessor() {
 	}
 
-	public static <T> JDBCStatementProcessor<T> getInstance() {
+	public static <T> JDBCProcedureProcessor<T> getInstance() {
 
 		return statementProcessor;
 	}
@@ -103,7 +104,7 @@ public class JDBCStatementProcessor<T> {
 
 		boolean success = true;
 		Connection con = null;
-		OracleCallableStatement cstmt = null;
+		CallableStatement cstmt = null;
 		try {
 			con = DataSourceProvider.getConnection();
 			final String plSQLCall = statementBuilder.buildPLSQLCall
@@ -112,16 +113,16 @@ public class JDBCStatementProcessor<T> {
 				log.debug("Preparing and executing PL/SQL Call: ".concat(plSQLCall)
                         .concat("; using connection : ".concat(con.toString())));
 			}
-			cstmt = (OracleCallableStatement) con.prepareCall(plSQLCall);
+			cstmt = con.prepareCall(plSQLCall);
 
 			int parameterIndex = 1;
 			if (pOutParamName != null) {
-				int type = oracle.jdbc.OracleTypes.VARCHAR;
+				int type = Types.VARCHAR;
 				if (pOutClass.getSuperclass().equals(Number.class)) {
-					type = oracle.jdbc.OracleTypes.NUMBER;
+					type = Types.NUMERIC;
 				}
 				if (pOutClass.isAssignableFrom(java.util.Date.class)) {
-					type = oracle.jdbc.OracleTypes.TIMESTAMP;
+					type = Types.TIMESTAMP;
 				}
 
 				if (USE_NAMED_PARAMETERS) {
@@ -167,7 +168,7 @@ public class JDBCStatementProcessor<T> {
 
 	private T getOutParameter(final String pOutParamName,
 							  final Class<T> pOutClass,
-							  final OracleCallableStatement cstmt) throws SQLException {
+							  final CallableStatement cstmt) throws SQLException {
 
 		T outValue = null;
 		if (USE_NAMED_PARAMETERS) {
@@ -277,101 +278,6 @@ public class JDBCStatementProcessor<T> {
 		return getBeanListFromPLSQL(pPLSQLCallable, pRefCursorName, null, pBeanClass);
 	}
 
-    /**
-     * Executes a generic SQL statement for the given table (or view) name with the given query parameters.
-     * This functionality is designated to support the query declaration available in the Maven generator plugin.
-     * Any complex SQL like joins is expected to be encapsulated within a database view definition and is not
-     * supported here.
-     *
-     * @param pTableName the table or view name used for the SQL query
-     * @param pInParameters the parameters for the where-clause of the SQL query
-     * @param pBeanClass the return type
-     * @return a list containing the results of type pBeanClass
-     */
-    public List<T> getBeanListFromSQL(final String pTableName,
-                                      final Map<QueryColumn, Object> pInParameters,
-                                      final Class<T> pBeanClass,
-                                      final boolean pAcquireLock) {
-        try {
-            if (pTableName == null || pTableName.isEmpty()) {
-                throw new IllegalArgumentException("Parameter [pTableName] must not be null.");
-            }
-            if (pBeanClass == null) {
-                throw new IllegalArgumentException("Parameter [pBeanClass] must not be null.");
-            }
-            if (pInParameters == null) {
-                throw new IllegalArgumentException("Parameter [pInParameters] must not be null.");
-            }
-        } catch (IllegalArgumentException e) {
-            throw new DataAccessException(DataAccessException.Type.PARAMETERS_MUST_NOT_BE_NULL, e);
-        }
-
-        if (log.isDebugEnabled()) {
-            debugSQLCall(pTableName, pInParameters, pBeanClass);
-        }
-
-        boolean success = true;
-        List<T> beanList;
-        Connection con = null;
-        PreparedStatement pstmt = null;
-        try {
-            con = DataSourceProvider.getConnection();
-            final String sqlStmt = statementBuilder.buildSQLStatement
-                    (pTableName, pInParameters, USE_NAMED_PARAMETERS, pAcquireLock);
-            if (log.isDebugEnabled()) {
-                log.debug("Preparing and executing SQL statement: ".concat(sqlStmt)
-                        .concat("; using connection : ".concat(con.toString())));
-            }
-            pstmt = con.prepareStatement(sqlStmt);
-
-            int parameterIndex = 1;
-            final Map<QueryColumn, Object> orderedParameters = new TreeMap<QueryColumn, Object>(pInParameters);
-            for (final QueryColumn queryColumn : orderedParameters.keySet()) {
-                if (!queryColumn.getOperator().isUnary()) {
-                    final Object value = orderedParameters.get(queryColumn);
-                    // Fixed CHAR handling now handled through global connection property
-                    // if (value instanceof String) {
-                        // SQL CHAR comparison semantics by default uses padding, which causes some
-                        // confusion, since it does not even matter, whether the data has initially been
-                        // provided with or without padding. Using the following proprietary Oracle method
-                        // disabled this behaviour and turns off padding.
-                        // pstmt.setFixedCHAR(parameterIndex++, (String) value);
-                    // } else {
-                        pstmt.setObject(parameterIndex++, value);
-                    // }
-                }
-            }
-            ResultSet rs = pstmt.executeQuery();
-
-            final BeanMapper<T> mapper = BeanMapper.getInstance();
-            beanList = mapper.toBeanList(rs, pBeanClass);
-            if (beanList.isEmpty()) {
-                beanList = new ArrayList<T>();
-            }
-            rs.close();
-
-            if (log.isDebugEnabled()) {
-                debugSQLTermination(pTableName, beanList.size());
-            }
-
-            return beanList;
-        } catch (Exception e) {
-            log.error(DataAccessException.Type.COULD_NOT_ACCESS_DATA.getDescription(), e);
-            success = false;
-            throw new DataAccessException(DataAccessException.Type.COULD_NOT_ACCESS_DATA, e);
-        } finally {
-            try {
-                if (pstmt != null) {
-                    pstmt.close();
-                }
-                if (con != null && !con.isClosed()) {
-                    DataSourceProvider.returnConnection(success);
-                }
-            } catch (SQLException ignored) {
-            } // Nothing to do
-        }
-    }
-
 	public List<T> getBeanListFromPLSQL(final String pPLSQLCallable,
 										final String pRefCursorName,
 										final Map<String, Object> pInParameters,
@@ -401,7 +307,7 @@ public class JDBCStatementProcessor<T> {
 		boolean success = true;
 		List<T> beanList;
 		Connection con = null;
-		OracleCallableStatement cstmt = null;
+		CallableStatement cstmt = null;
 		try {
 			con = DataSourceProvider.getConnection();
 			final String plSQLCall = statementBuilder.buildPLSQLCall
@@ -410,7 +316,7 @@ public class JDBCStatementProcessor<T> {
                 log.debug("Preparing and executing PL/SQL Call: ".concat(plSQLCall)
                         .concat("; using connection : ".concat(con.toString())));
 			}
-			cstmt = (OracleCallableStatement) con.prepareCall(plSQLCall);
+			cstmt = con.prepareCall(plSQLCall);
 
 			int parameterIndex = 1;
 			if (USE_NAMED_PARAMETERS) {
@@ -516,7 +422,7 @@ public class JDBCStatementProcessor<T> {
 
 	private void bindParameters(final Connection pCon,
 								final Map<String, Object> pInParameters,
-								final OracleCallableStatement pCstmt,
+								final CallableStatement pCstmt,
 								final int pParameterIndex) throws SQLException {
 
 		int parameterIndex = pParameterIndex;
@@ -528,14 +434,14 @@ public class JDBCStatementProcessor<T> {
 			}
 			if (value instanceof Long[]) {
 				final ArrayDescriptor descriptor =
-						ArrayDescriptor.createDescriptor(NOORM_ID_LIST_ORACLE_TYPE_NAME, pCon);
+						ArrayDescriptor.createDescriptor(NOORM_ID_LIST_DB_TYPE_NAME, pCon);
 				final ARRAY arrayToPass = new ARRAY(descriptor, pCon, value);
 				if (USE_NAMED_PARAMETERS) {
 					// The following works for the Oracle JDBC 11.2.0.1.0 driver, but is actually not correct,
 					// since named parameter binding should use the setXXXAtName methods (which does NOT work).
-					pCstmt.setARRAY(paramName, arrayToPass);
+                    ((OracleCallableStatement) pCstmt).setARRAY(paramName, arrayToPass);
 				} else {
-					pCstmt.setARRAY(parameterIndex++, arrayToPass);
+                    ((OracleCallableStatement) pCstmt).setARRAY(parameterIndex++, arrayToPass);
 				}
 				continue;
 			}
@@ -574,7 +480,7 @@ public class JDBCStatementProcessor<T> {
 			String prefix = "\nInput parameters: ";
 			for (final String paramName : pInParameters.keySet()) {
                 final Object parameter = pInParameters.get(paramName);
-                String parameterToString = getParameter2String(parameter);
+                String parameterToString = Utils.getParameter2String(parameter);
 				formattedParameters.append(prefix).append(paramName).append(" : ").append(parameterToString);
 				prefix = "\n                  ";
 			}
@@ -584,59 +490,6 @@ public class JDBCStatementProcessor<T> {
 		}
 		log.debug(formattedParameters.toString());
 	}
-
-    private void debugSQLCall(final String pTableName,
-                              final Map<QueryColumn, Object> pInParameters,
-                              final Class<T> pBeanClass) {
-
-        final StringBuilder formattedParameters = new StringBuilder();
-        formattedParameters.append("Executing SQL statement on table ").append(pTableName);
-        if (pInParameters != null) {
-            String prefix = "\nInput parameters: ";
-            for (final QueryColumn queryColumn : pInParameters.keySet()) {
-                final String paramName = queryColumn.getColumnName();
-                final Object parameter = pInParameters.get(queryColumn);
-                String parameterToString = getParameter2String(parameter);
-                formattedParameters.append(prefix).append(paramName)
-                        .append(queryColumn.getOperator().getOperatorSyntax()).append(parameterToString);
-                prefix = "\n                  ";
-            }
-        }
-        if (pBeanClass != null) {
-            formattedParameters.append("\nBean Class:        ").append(pBeanClass.getName());
-        }
-        log.debug(formattedParameters.toString());
-    }
-
-    private String getParameter2String(final Object pParameter) {
-
-        String parameterToString;
-        if (pParameter instanceof byte[]) {
-            if (((byte[]) pParameter).length < 4096) {
-                final HexBinaryAdapter hexBinaryAdapter = new HexBinaryAdapter();
-                parameterToString = hexBinaryAdapter.marshal((byte[]) pParameter);
-            } else {
-                parameterToString = "Binary content too large for debug output.";
-            }
-        } else {
-            if (pParameter instanceof Long[]) {
-                final StringBuilder formattedIDList = new StringBuilder();
-                String delimiter = "";
-                for (final Long id : (Long[]) pParameter) {
-                    formattedIDList.append(delimiter).append(id);
-                    delimiter = ", ";
-                }
-                parameterToString = formattedIDList.toString();
-            } else {
-                if (pParameter != null) {
-                    parameterToString = pParameter.toString();
-                } else {
-                    parameterToString = "NULL";
-                }
-            }
-        }
-        return parameterToString;
-    }
 
     private void debugPLSQLTermination(final String pPLSQLCallable,
 									   final int pRowsProcessed) {
@@ -648,15 +501,4 @@ public class JDBCStatementProcessor<T> {
 		}
 		log.debug(logMessage.toString());
 	}
-
-    private void debugSQLTermination(final String pTableName,
-                                     final int pRowsProcessed) {
-
-        StringBuilder logMessage = new StringBuilder();
-        logMessage.append("SQL statement on table ").append(pTableName).append(" successfully terminated. ");
-        if (pRowsProcessed >= 0) {
-            logMessage.append(Integer.toString(pRowsProcessed)).append(" rows processed.");
-        }
-        log.debug(logMessage.toString());
-    }
 }

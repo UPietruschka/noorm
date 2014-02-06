@@ -6,11 +6,11 @@ import org.noorm.generator.ValidatorClassDescriptor;
 import org.noorm.generator.m2plugin.IParameters;
 import org.noorm.generator.schema.GeneratorConfiguration;
 import org.noorm.generator.schema.Regex;
-import org.noorm.metadata.MetadataService;
+import org.noorm.jdbc.JDBCProcedureProcessor;
 import org.noorm.jdbc.Utils;
+import org.noorm.metadata.MetadataService;
 import org.noorm.metadata.beans.NameBean;
 import org.noorm.metadata.beans.ParameterBean;
-import org.noorm.jdbc.JDBCStatementProcessor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -118,7 +118,7 @@ public class ServiceGenerator {
 						final String databaseType = parameter.getDataType();
 						final String databaseTypeName = parameter.getTypeName();
 						if (databaseTypeName != null &&
-								databaseTypeName.equals(JDBCStatementProcessor.NOORM_ID_LIST_ORACLE_TYPE_NAME)) {
+								databaseTypeName.equals(JDBCProcedureProcessor.NOORM_ID_LIST_DB_TYPE_NAME)) {
 							parameterDescriptor.setJavaType(NOORM_ID_LIST_JAVA_TYPE_NAME);
 						} else {
 							final String javaType = GeneratorUtil.convertDatabaseType2JavaType(databaseType,

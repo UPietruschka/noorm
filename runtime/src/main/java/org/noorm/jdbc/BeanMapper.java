@@ -14,7 +14,7 @@ import java.util.Map;
 
 /**
  * Generic mapper for mapping a JDBC ResultSet to a Bean or for mapping a Bean
- * to a parameter map. This class is primarily used by the JDBCStatementProcessor
+ * to a parameter map. This class is primarily used by the JDBCProcedureProcessor
  * to convert the JDBC ResultSets into Beans, resp. Lists of Beans.
  * Internally, the BeanMapper uses reflection to find the correct mapping with help
  * of the JDBCColumn annotations for the distinct attributes of the Beans.

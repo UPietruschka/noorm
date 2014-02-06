@@ -1,7 +1,9 @@
 package org.noorm.jdbc;
 
+import javax.xml.bind.annotation.adapters.HexBinaryAdapter;
+
 /**
- * Utility methods to support JDBCStatementProcessor and the class generators.
+ * Utility methods to support JDBCProcedureProcessor and the class generators.
  *
  * @author Ulf Pietruschka / ulf.pietruschka@etenso.com
  *         Date: 06.05.11
@@ -80,6 +82,42 @@ public class Utils {
             prefix = ENUM_UNSUPPORTED_REGEX_SUBSTITUTE;
         }
 		return prefix.concat(pDisplayNameValue.trim().toUpperCase().replaceAll
-				(ENUM_UNSUPPORTED_REGEX, ENUM_UNSUPPORTED_REGEX_SUBSTITUTE));
+                (ENUM_UNSUPPORTED_REGEX, ENUM_UNSUPPORTED_REGEX_SUBSTITUTE));
 	}
+
+    /**
+     * Formats a bind parameter for debug output.
+     *
+     * @param pParameter the parameter
+     * @return the parameter String representation
+     */
+    public static String getParameter2String(final Object pParameter) {
+
+        String parameterToString;
+        if (pParameter instanceof byte[]) {
+            if (((byte[]) pParameter).length < 4096) {
+                final HexBinaryAdapter hexBinaryAdapter = new HexBinaryAdapter();
+                parameterToString = hexBinaryAdapter.marshal((byte[]) pParameter);
+            } else {
+                parameterToString = "Binary content too large for debug output.";
+            }
+        } else {
+            if (pParameter instanceof Long[]) {
+                final StringBuilder formattedIDList = new StringBuilder();
+                String delimiter = "";
+                for (final Long id : (Long[]) pParameter) {
+                    formattedIDList.append(delimiter).append(id);
+                    delimiter = ", ";
+                }
+                parameterToString = formattedIDList.toString();
+            } else {
+                if (pParameter != null) {
+                    parameterToString = pParameter.toString();
+                } else {
+                    parameterToString = "NULL";
+                }
+            }
+        }
+        return parameterToString;
+    }
 }

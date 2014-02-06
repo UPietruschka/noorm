@@ -9,7 +9,7 @@ import java.util.Map;
 import java.util.TreeMap;
 
 /**
- * Helper class for JDBCStatementProcessor for the textual creation of SQL statements.
+ * Helper class for JDBCProcedureProcessor and JDBCQueryProcessor for the textual creation of SQL statements.
  *
  * @author Ulf Pietruschka / ulf.pietruschka@etenso.com
  *         Date: 02.06.11

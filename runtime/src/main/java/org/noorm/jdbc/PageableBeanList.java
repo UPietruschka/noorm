@@ -80,7 +80,7 @@ public class PageableBeanList<T extends IBean> implements Serializable, List<T> 
 		List<Long> idSubList = beanIds.subList(fromIndex, toIndex);
 		List<T> beanSubList = new ArrayList<T>();
 		if (!idSubList.isEmpty()) {
-			JDBCStatementProcessor<T> statementProcessor = JDBCStatementProcessor.getInstance();
+			JDBCProcedureProcessor<T> statementProcessor = JDBCProcedureProcessor.getInstance();
 			Long[] dataIdArray = idSubList.toArray(new Long[]{});
 			final Map<String, Object> filterParameters = new HashMap<String, Object>();
 			filterParameters.put(idListName, dataIdArray);

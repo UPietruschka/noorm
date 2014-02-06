@@ -6,10 +6,10 @@ import org.noorm.generator.ValidatorClassDescriptor;
 import org.noorm.generator.m2plugin.IParameters;
 import org.noorm.generator.schema.GeneratorConfiguration;
 import org.noorm.generator.schema.Regex;
-import org.noorm.metadata.MetadataService;
+import org.noorm.jdbc.JDBCProcedureProcessor;
 import org.noorm.jdbc.Utils;
+import org.noorm.metadata.MetadataService;
 import org.noorm.metadata.beans.TableMetadataBean;
-import org.noorm.jdbc.JDBCStatementProcessor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -108,9 +108,9 @@ public class EnumGenerator {
 				enumAttributeDescriptor.setColumnName(columnName);
 				enumClassDescriptor.addAttribute(enumAttributeDescriptor);
 			}
-			final JDBCStatementProcessor jdbcStatementProcessor = JDBCStatementProcessor.getInstance();
+			final JDBCProcedureProcessor jdbcProcedureProcessor = JDBCProcedureProcessor.getInstance();
 			final String query = "SELECT * FROM ".concat(tableName0);
-			final List<Map<String, Object>> recordList = jdbcStatementProcessor.executeGenericSelect(query);
+			final List<Map<String, Object>> recordList = jdbcProcedureProcessor.executeGenericSelect(query);
 			if (recordList.isEmpty()) {
                 String errMsg =
                         "Cannot generate enum: specified enum database table does not contain any data."

@@ -64,8 +64,8 @@ public class ${class.JavaName} {
 		parameters.put(new QueryColumn("$param.getDbParamName().toLowerCase()", new Operator(Operator.Name.$param.getOperator())), $param.JavaName);
 #end
 #end
-		final JDBCStatementProcessor<$query.getBeanName()> stmtProcessor = JDBCStatementProcessor.getInstance();
-		final List<$query.getBeanName()> results = stmtProcessor.getBeanListFromSQL("$query.getTableName()", parameters, ${query.getBeanName()}.class, $query.isAcquireLock());
+		final JDBCQueryProcessor<$query.getBeanName()> queryProcessor = JDBCQueryProcessor.getInstance();
+		final List<$query.getBeanName()> results = queryProcessor.getBeanListFromSQL("$query.getTableName()", parameters, ${query.getBeanName()}.class, $query.isAcquireLock());
 #if($query.isSingleRowQuery())
 		if (results.isEmpty()) {
 			return null;

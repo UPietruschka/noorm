@@ -32,7 +32,7 @@ public class $class.JavaName implements IService {
 #end
 	private static final int CODE_HASH_VALUE = $class.CodeHashValue;
 	private static final String DATABASE_PACKAGE_NAME = "$class.DatabasePackageName";
-	private final JDBCStatementProcessor typelessStatementProcessor = JDBCStatementProcessor.getInstance();
+	private final JDBCProcedureProcessor typelessProcedureProcessor = JDBCProcedureProcessor.getInstance();
 #if(!$class.hasInterface())
 	private static $class.JavaName $class.getFirstLowerName() = new $class.getJavaName()();
 #end
@@ -97,7 +97,7 @@ public class $class.JavaName implements IService {
 				($proc.Parameters[0].JavaName, "${class.DatabasePackageName}.$proc.DbProcedureName", "$proc.OutDbParamName", "$proc.Parameters[0].DbParamName", ${proc.getOutParamJavaType()}.class);
 #else
 #if($proc.hasOutParam())
-		final JDBCStatementProcessor<$proc.getOutParamJavaType()> statementProcessor = JDBCStatementProcessor.getInstance();
+		final JDBCProcedureProcessor<$proc.getOutParamJavaType()> procedureProcessor = JDBCProcedureProcessor.getInstance();
 #end
 		final Map<String, Object> filterParameters = new HashMap<String, Object>();
 #foreach ($param in $proc.Parameters)
@@ -105,18 +105,18 @@ public class $class.JavaName implements IService {
 #end
 #if($proc.isOutParamRefCursor())
 #if($proc.isSingleRowFinder())
-		return statementProcessor.getBeanFromPLSQL
+		return procedureProcessor.getBeanFromPLSQL
 #else
-		return statementProcessor.getBeanListFromPLSQL
+		return procedureProcessor.getBeanListFromPLSQL
 #end
 				("${class.DatabasePackageName}.$proc.DbProcedureName", "$proc.OutDbParamName",
 						filterParameters, ${proc.getOutParamJavaType()}.class);
 #elseif($proc.isOutParamScalar())
-		return statementProcessor.callPLSQL
+		return procedureProcessor.callPLSQL
 				("${class.DatabasePackageName}.$proc.DbProcedureName", "$proc.OutDbParamName",
 						filterParameters, ${proc.getOutParamJavaType()}.class);
 #else
-		typelessStatementProcessor.callPLSQL
+		typelessProcedureProcessor.callPLSQL
 				("${class.DatabasePackageName}.$proc.DbProcedureName", filterParameters);
 #end
 #end
