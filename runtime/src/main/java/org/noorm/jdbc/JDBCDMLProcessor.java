@@ -1,11 +1,11 @@
 package org.noorm.jdbc;
 
-import oracle.jdbc.OraclePreparedStatement;
 import org.noorm.metadata.BeanMetaDataUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.sql.Connection;
+import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Timestamp;
@@ -155,7 +155,7 @@ public class JDBCDMLProcessor<T> {
         boolean returnModifiedBean = false;
         boolean success = true;
         Connection con = null;
-        OraclePreparedStatement pstmt = null;
+        PreparedStatement pstmt = null;
 
         try {
             con = DataSourceProvider.getConnection();
@@ -197,19 +197,13 @@ public class JDBCDMLProcessor<T> {
                 if (primaryKeyColumnNames.length != 1) {
                     throw new DataAccessException(DataAccessException.Type.OPERATION_NOT_SUPPORTED_WITH_COMPOSITE_PK);
                 }
-                pstmt = (OraclePreparedStatement) con.prepareStatement(batch, new String[]{primaryKeyColumnNames[0]});
+                pstmt = con.prepareStatement(batch, new String[]{primaryKeyColumnNames[0]});
             } else {
-                pstmt = (OraclePreparedStatement) con.prepareStatement(batch);
+                pstmt = con.prepareStatement(batch);
             }
-            // We do "Oracle style" batching here, which is easier to implement and superior in performance
-            // as well. Through presetting the batch size (setExecuteBatch), we do not have to care for the
-            // regular database updates using "executeBatch". Note that "executeUpdate" does NOT issue a
-            // direct database update, but adds the given statement to the batch list (Neither "addBatch"
-            // nor "executeBatch" are needed for "Oracle style" batching).
-            if (!returnModifiedBean) {
-                pstmt.setExecuteBatch(DataSourceProvider.getBatchUpdateSize());
-            }
+
             int batchCount = 0;
+            int updateCount = 0;
             for (final IBean bean : pBeanList) {
 
                 final BeanMapper<IBean> mapper = BeanMapper.getInstance();
@@ -264,11 +258,11 @@ public class JDBCDMLProcessor<T> {
                             Object newVersion = buildVersionColumnValue(bean, pBatchType, value);
                             pstmt.setObject(parameterIndex, newVersion);
                         } else {
-                            // Fixed CHAR handling now handled through global connection property
+                            // Fixed CHAR semantics now handled through global connection property
                             // if (isPKColumn && value instanceof String) {
                                 // SQL CHAR comparison semantics by default uses padding, which causes some
                                 // confusion, since it does not even matter, whether the data has initially been
-                                // provided with or without padding. Using the following proprietary Oracle method
+                                // provided with or without padding. Using the following proprietary method
                                 // disabled this behaviour and turns off padding.
                                 // pstmt.setFixedCHAR(parameterIndex, (String) value);
                             // } else {
@@ -278,11 +272,11 @@ public class JDBCDMLProcessor<T> {
                     }
                     if (pBatchType.equals(BatchType.DELETE)) {
                         if (isPKColumn) {
-                            // Fixed CHAR handling now handled through global connection property
+                            // Fixed CHAR semantics now handled through global connection property
                             // if (value instanceof String) {
                                 // SQL CHAR comparison semantics by default uses padding, which causes some
                                 // confusion, since it does not even matter, whether the data has initially been
-                                // provided with or without padding. Using the following proprietary Oracle method
+                                // provided with or without padding. Using the following proprietary method
                                 // disabled this behaviour and turns off padding.
                                 // pstmt.setFixedCHAR(parameterIndex, (String) value);
                             // } else {
@@ -322,11 +316,11 @@ public class JDBCDMLProcessor<T> {
                             if (!isPKColumn && value != null) {
                                 final String namedParameter = fieldName.concat(StatementBuilder.OLD_VERSION_APPENDIX);
                                 final int parameterIndex = fieldName2ParameterIndex.get(namedParameter);
-                                // Fixed CHAR handling now handled through global connection property
+                                // Fixed CHAR semantics now handled through global connection property
                                 // if (value instanceof String) {
                                     // SQL CHAR comparison semantics by default uses padding, which causes some
                                     // confusion, since it does not even matter, whether the data has initially been
-                                    // provided with or without padding. Using the following proprietary Oracle method
+                                    // provided with or without padding. Using the following proprietary method
                                     // disabled this behaviour and turns off padding.
                                     // pstmt.setFixedCHAR(parameterIndex, (String) value);
                                 // } else {
@@ -340,8 +334,11 @@ public class JDBCDMLProcessor<T> {
                     }
                 }
 
-                int batchCount0 = pstmt.executeUpdate();
-                batchCount += batchCount0;
+                pstmt.addBatch();
+                if (++batchCount % DataSourceProvider.getBatchUpdateSize() == 0) {
+                    pstmt.executeBatch();
+                    updateCount += pstmt.getUpdateCount();
+                }
             }
             if (log.isDebugEnabled()) {
                 final String tableName = firstBean.getTableName();
@@ -349,10 +346,13 @@ public class JDBCDMLProcessor<T> {
                         "Executing DML statement for table/entity ".concat(tableName)
                                 .concat(" [").concat(batch).concat("] using connection : ".concat(con.toString()))));
             }
-            batchCount += pstmt.sendBatch();
-            if (batchCount != pBeanList.size()) {
+            if (batchCount % DataSourceProvider.getBatchUpdateSize() > 0) {
+                pstmt.executeBatch();
+                updateCount += pstmt.getUpdateCount();
+            }
+            if (updateCount != pBeanList.size()) {
                 if (pBatchType.equals(BatchType.INSERT)) {
-                    issueUpdateCountException(batchCount, pBeanList.size());
+                    issueUpdateCountException(updateCount, pBeanList.size());
                 } else {
                     // When the number of affected records does not match the number of provided records,
                     // we can either have an optimistic lock conflict, or the record(s) have not been provided
@@ -441,7 +441,7 @@ public class JDBCDMLProcessor<T> {
                 value = new Timestamp(calendar.getTimeInMillis());
             } else {
                 if (versionColumnType.equals(VersionColumnType.DATE)) {
-                    // The Oracle DATE type precision is limited to seconds only, so we have
+                    // The DATE type precision is limited to seconds only, so we have
                     // to truncate the fractions here to get consistent settings
                     calendar.set(Calendar.MILLISECOND, 0);
                     value = new Timestamp(calendar.getTimeInMillis());
