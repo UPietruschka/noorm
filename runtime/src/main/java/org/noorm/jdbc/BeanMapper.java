@@ -123,7 +123,7 @@ public class BeanMapper<T> {
 			return fieldMap;
 		}
 
-		String fieldName = null;
+		String fieldName;
 		for (final Field field : fields) {
 			// Ignore serialVersionUID
 			if (BeanMetaDataUtil.SERIAL_VERSION_UID.equals(field.getName())) {
@@ -154,8 +154,8 @@ public class BeanMapper<T> {
 	private void populateFields(final ResultSet pResultSet, final T pBean, final Field[] pFields)
 			throws IllegalAccessException, SQLException {
 
-		String fieldName = null;
-        String dataType = null;
+		String fieldName;
+        String dataType;
 		for (final Field field : pFields) {
 			// Ignore serialVersionUID
 			if (BeanMetaDataUtil.SERIAL_VERSION_UID.equals(field.getName())) {

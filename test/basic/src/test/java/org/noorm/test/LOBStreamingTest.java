@@ -178,7 +178,7 @@ public class LOBStreamingTest {
     private String readFully(final Reader pReader) throws IOException {
 
         final char[] cBuf = new char[64];
-        final StringBuffer sBuf = new StringBuffer();
+        final StringBuilder sBuf = new StringBuilder();
         int numChars;
         while ((numChars = pReader.read(cBuf, 0, cBuf.length)) > 0) {
             sBuf.append(cBuf, 0, numChars);

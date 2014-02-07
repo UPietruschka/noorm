@@ -23,7 +23,6 @@ import java.util.List;
 public class PerformanceTestRunner {
 
     private static BeanDML beanDML = BeanDML.getInstance();
-    private static int TEST_LOOP = 50000;
     private static String[] JOB_IDS = new String[] {"AC_ACCOUNT", "AC_MGR", "AD_ASST", "AD_PRES", "AD_VP",
             "FI_ACCOUNT", "FI_MGR", "HR_REP", "IT_PROG", "MK_MAN", "MK_REP", "PR_REP", "PU_CLERK", "PU_MAN",
             "SA_MAN", "SA_REP", "SH_CLERK", "ST_CLERK", "ST_MAN" };
@@ -57,6 +56,7 @@ public class PerformanceTestRunner {
     private static void testEmployeeInsert(final boolean pUseBatchMode) {
 
         final List<Employees> employeeList = new ArrayList<Employees>();
+        int TEST_LOOP = 50000;
         for (int i = 0; i < TEST_LOOP; i++) {
             final String lastName = "Doe";
             final String email = "JDOE" + i;

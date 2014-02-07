@@ -6,7 +6,9 @@ package $class.PackageName;
 #end
 
 import ${class.BeanPackageName}.*;
+#if(!$class.isInterface())
 import org.noorm.jdbc.*;
+#end
 import java.util.*;
 #if(!$class.isInterface() && $class.hasInterface())
 import ${class.InterfacePackageName}.${class.JavaInterfaceName};

@@ -173,7 +173,7 @@ public class JDBCDMLProcessor<T> {
             }
             final String versionColumnName = firstBean.getVersionColumnName();
             String batch = null;
-            final boolean useOptLockFullRowCompare = firstBean.getModifiedFieldsInitialValue() == null ? false : true;
+            final boolean useOptLockFullRowCompare = firstBean.getModifiedFieldsInitialValue() != null;
             final Map<String, Integer> fieldName2ParameterIndex = new HashMap<String, Integer>();
             if (pBatchType.equals(BatchType.INSERT)) {
                 batch = statementBuilder.buildInsert(firstBean, fieldName2ParameterIndex, USE_NAMED_PARAMETERS);
@@ -414,7 +414,6 @@ public class JDBCDMLProcessor<T> {
                     if (primaryKeyType.equals(Short.class)) {
                         final Short generatedKey = generatedKeyResultSet.getShort(1);
                         BeanMetaDataUtil.setPrimaryKeyValue(firstBean, generatedKey);
-                        continue;
                     }
                 }
             }

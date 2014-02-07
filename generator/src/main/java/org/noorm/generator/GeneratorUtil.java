@@ -291,11 +291,8 @@ public class GeneratorUtil {
         if (pConfiguration.getBeanJavaPackage() == null) {
             return false;
         }
-        if (pConfiguration.getBeanJavaPackage().getName() == null
-                || pConfiguration.getBeanJavaPackage().getName().isEmpty()) {
-            return false;
-        }
-        return true;
+        return !(pConfiguration.getBeanJavaPackage().getName() == null
+                || pConfiguration.getBeanJavaPackage().getName().isEmpty());
     }
 
     public static boolean hasEnumPackageName(final GeneratorConfiguration pConfiguration) {
@@ -303,11 +300,8 @@ public class GeneratorUtil {
         if (pConfiguration.getEnumJavaPackage() == null) {
             return false;
         }
-        if (pConfiguration.getEnumJavaPackage().getName() == null
-                || pConfiguration.getEnumJavaPackage().getName().isEmpty()) {
-            return false;
-        }
-        return true;
+        return !(pConfiguration.getEnumJavaPackage().getName() == null
+                || pConfiguration.getEnumJavaPackage().getName().isEmpty());
     }
 
     public static boolean hasServicePackageName(final GeneratorConfiguration pConfiguration) {
@@ -315,11 +309,8 @@ public class GeneratorUtil {
         if (pConfiguration.getServiceJavaPackage() == null) {
             return false;
         }
-        if (pConfiguration.getServiceJavaPackage().getName() == null
-                || pConfiguration.getServiceJavaPackage().getName().isEmpty()) {
-            return false;
-        }
-        return true;
+        return !(pConfiguration.getServiceJavaPackage().getName() == null
+                || pConfiguration.getServiceJavaPackage().getName().isEmpty());
     }
 
     public static boolean hasServiceInterfacePackageName(final GeneratorConfiguration pConfiguration) {
@@ -327,11 +318,8 @@ public class GeneratorUtil {
         if (pConfiguration.getServiceInterfaceJavaPackage() == null) {
             return false;
         }
-        if (pConfiguration.getServiceInterfaceJavaPackage().getName() == null
-                || pConfiguration.getServiceInterfaceJavaPackage().getName().isEmpty()) {
-            return false;
-        }
-        return true;
+        return !(pConfiguration.getServiceInterfaceJavaPackage().getName() == null
+                || pConfiguration.getServiceInterfaceJavaPackage().getName().isEmpty());
     }
 
     public static boolean hasDataSourceName(final GeneratorConfiguration pConfiguration) {

@@ -16,19 +16,21 @@ public enum $class.Name implements IEnum {
 	private static final String TABLE_NAME = "$class.TableName";
 	private static final String DISPLAY_COLUMN_NAME = "$class.DisplayColumnName";
 #foreach ($att in $class.Attributes)
-	private $att.Type $att.Name;
+	private final $att.Type $att.Name;
 #end
 
-	private $class.getName()(#foreach ($att in $class.Attributes)final $att.Type p$att.getMethodNamePostfix()#if($velocityCount<$class.Attributes.size()), #end#end) {
+	$class.getName()(#foreach ($att in $class.Attributes)final $att.Type p$att.getMethodNamePostfix()#if($velocityCount<$class.Attributes.size()), #end#end) {
 #foreach ($att in $class.Attributes)
 		$att.Name = p$att.getMethodNamePostfix();
 #end
 	}
 
+    @Override
 	public String getTableName() {
 		return TABLE_NAME;
 	}
 
+    @Override
 	public String getDisplayColumnName() {
 		return DISPLAY_COLUMN_NAME;
 	}
