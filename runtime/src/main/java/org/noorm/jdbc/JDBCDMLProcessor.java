@@ -1,6 +1,7 @@
 package org.noorm.jdbc;
 
 import org.noorm.metadata.BeanMetaDataUtil;
+import org.noorm.platform.IPlatform;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -206,8 +207,8 @@ public class JDBCDMLProcessor<T> {
             }
 
             int batchCount = 0;
-            int updateCount0 = 0;
-            int updateCount1 = 0;
+            int updateCount = 0;
+            final IPlatform platform = DataSourceProvider.getPlatform();
             for (final IBean bean : pBeanList) {
 
                 final BeanMapper<IBean> mapper = BeanMapper.getInstance();
@@ -340,11 +341,7 @@ public class JDBCDMLProcessor<T> {
 
                 pstmt.addBatch();
                 if (++batchCount % DataSourceProvider.getBatchUpdateSize() == 0) {
-                    final int[] batchCounts = pstmt.executeBatch();
-                    for (int i = 0; i < batchCounts.length; i++) {
-                        updateCount1 += batchCounts[i];
-                    }
-                    updateCount0 += pstmt.getUpdateCount();
+                    updateCount += platform.executeBatchWithReliableCount(pstmt);
                 }
             }
             if (log.isDebugEnabled()) {
@@ -354,21 +351,11 @@ public class JDBCDMLProcessor<T> {
                                 .concat(" [").concat(batch).concat("] using connection : ".concat(con.toString()))));
             }
             if (batchCount % DataSourceProvider.getBatchUpdateSize() > 0) {
-                final int[] batchCounts = pstmt.executeBatch();
-                for (int i = 0; i < batchCounts.length; i++) {
-                    updateCount1 += batchCounts[i];
-                }
-                updateCount0 += pstmt.getUpdateCount();
-            }
-            // Different JDBC drivers and databases return different values for the update count. Assuming that
-            // negative value are unusable, we switch to the alternative count then.
-            int updateCount = updateCount0;
-            if (updateCount0 < 0) {
-                updateCount = updateCount1;
+                updateCount += platform.executeBatchWithReliableCount(pstmt);
             }
             if (updateCount != pBeanList.size()) {
                 if (pBatchType.equals(BatchType.INSERT)) {
-                    issueUpdateCountException(updateCount0, pBeanList.size());
+                    issueUpdateCountException(updateCount, pBeanList.size());
                 } else {
                     // When the number of affected records does not match the number of provided records,
                     // we can either have an optimistic lock conflict, or the record(s) have not been provided

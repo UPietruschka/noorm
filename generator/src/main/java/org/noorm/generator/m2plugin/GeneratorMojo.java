@@ -20,6 +20,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xml.sax.SAXException;
 
+import javax.sql.DataSource;
 import javax.xml.XMLConstants;
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
@@ -83,7 +84,7 @@ public class GeneratorMojo extends AbstractMojo implements IParameters {
     @Parameter(required = true)
 	protected String password;
 
-	private OracleDataSource initializePoolDataSource() throws SQLException {
+	private DataSource initializePoolDataSource() throws SQLException {
 
 		final OracleDataSource oracleDataSource = new OracleDataSource();
 		oracleDataSource.setURL(url);

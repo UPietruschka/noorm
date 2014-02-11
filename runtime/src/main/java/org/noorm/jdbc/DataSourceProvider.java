@@ -2,6 +2,8 @@ package org.noorm.jdbc;
 
 import oracle.jdbc.OracleConnection;
 import oracle.jdbc.pool.OracleDataSource;
+import org.noorm.platform.IPlatform;
+import org.noorm.platform.PlatformFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -11,6 +13,7 @@ import javax.naming.NamingException;
 import javax.sql.DataSource;
 import java.sql.CallableStatement;
 import java.sql.Connection;
+import java.sql.DatabaseMetaData;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -51,6 +54,7 @@ public class DataSourceProvider {
     private static final Map<String, ActiveDataSource> activeDataSourceMap = new HashMap<String, ActiveDataSource>();
     private static final ThreadLocal<ActiveConnectionData> activeConThreadDta = new ThreadLocal<ActiveConnectionData>();
     private static final DataSourceProvider dataSourceProvider = new DataSourceProvider();
+    private static IPlatform platform;
 
 	private DataSourceProvider() {
 
@@ -199,11 +203,18 @@ public class DataSourceProvider {
 			//}
 			log.info(validationInfo.toString());
             java.sql.Connection con = dataSource.getConnection();
+            final DatabaseMetaData metaData = con.getMetaData();
+            final String databaseProductName = metaData.getDatabaseProductName();
+            platform = PlatformFactory.createPlatform(databaseProductName);
             con.close();
 		} catch (Exception e) {
 			throw new DataAccessException(DataAccessException.Type.COULD_NOT_ESTABLISH_CONNECTION, e);
 		}
 	}
+
+    public static IPlatform getPlatform() {
+        return platform;
+    }
 
 	private static DataSource getDataSource() throws SQLException {
 
@@ -692,7 +703,7 @@ public class DataSourceProvider {
             if (!pSequenceName.equals(pSequenceName.toUpperCase())) {
                 sequenceName = "\"".concat(pSequenceName).concat("\"");
             }
-            final String sequenceQuery = "SELECT ".concat(sequenceName).concat(".NEXTVAL FROM DUAL");
+            final String sequenceQuery = platform.getSequenceQuery(sequenceName);
             PreparedStatement pstmt = null;
             boolean success = true;
             boolean conAlreadyEstablished = true;
