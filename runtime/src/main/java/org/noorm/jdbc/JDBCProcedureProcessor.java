@@ -364,62 +364,6 @@ public class JDBCProcedureProcessor<T> {
 		}
 	}
 
-	/**
-	 * Convenience method to a provide some minimal SQL functionality for the application. Usage of this method
-	 * is discouraged, but maybe helpful under some circumstances.
-	 *
-	 * @param pSelectStatement The SELECT statement for generic execution.
-	 * @return A list containing a map for each record with a column-name to object mapping.
-	 */
-	public List<Map<String, Object>> executeGenericSelect(final String pSelectStatement) {
-
-
-		try {
-			if (pSelectStatement == null || pSelectStatement.isEmpty()) {
-				throw new IllegalArgumentException("Parameter [pSelectStatement] must not be null or empty.");
-			}
-		} catch (IllegalArgumentException e) {
-			throw new DataAccessException(DataAccessException.Type.PARAMETERS_MUST_NOT_BE_NULL, e);
-		}
-
-		boolean success = true;
-		final List<Map<String, Object>> recordList = new ArrayList<Map<String, Object>>();
-		Connection con = null;
-		PreparedStatement pstmt = null;
-
-		try {
-			con = DataSourceProvider.getConnection();
-			pstmt = con.prepareStatement(pSelectStatement);
-			final ResultSet resultSet = pstmt.executeQuery();
-			final ResultSetMetaData metaData = resultSet.getMetaData();
-			final int columnCount = metaData.getColumnCount();
-			while (resultSet.next()) {
-				final Map<String, Object> record = new HashMap<String, Object>();
-				for (int i = 1; i <= columnCount; i++) {
-					final String columnName = metaData.getColumnName(i);
-					final Object value = resultSet.getObject(columnName);
-					record.put(columnName, value);
-				}
-				recordList.add(record);
-			}
-			return recordList;
-		} catch (Exception e) {
-			log.error(DataAccessException.Type.COULD_NOT_ACCESS_DATA.getDescription(), e);
-			success = false;
-			throw new DataAccessException(DataAccessException.Type.COULD_NOT_ACCESS_DATA, e);
-		} finally {
-			try {
-				if (pstmt != null) {
-					pstmt.close();
-				}
-				if (con != null && !con.isClosed()) {
-					DataSourceProvider.returnConnection(success);
-				}
-			} catch (SQLException ignored) {
-			} // Nothing to do
-		}
-	}
-
 	private void bindParameters(final Connection pCon,
 								final Map<String, Object> pInParameters,
 								final CallableStatement pCstmt,

@@ -163,6 +163,7 @@ public class JDBCDMLProcessor<T> {
             con = DataSourceProvider.getConnection();
             final IBean firstBean = pBeanList.get(0);
             final String[] primaryKeyColumnNames = firstBean.getPrimaryKeyColumnNames();
+            final String[] primaryKeyJavaNames = firstBean.getPrimaryKeyJavaNames();
             // There is currently no full support for returning generated keys in batch operation
             // Thus we support this for single-row inserts only, which use a sequence for ID generation
             final String sequenceName = firstBean.getSequenceName();
@@ -246,7 +247,7 @@ public class JDBCDMLProcessor<T> {
                         } else {
                             if (!useInlineSequenceValueGeneration) {
                                 final Class primaryKeyType =
-                                        BeanMetaDataUtil.getBeanPropertyType(firstBean, primaryKeyColumnNames[0]);
+                                        BeanMetaDataUtil.getBeanPropertyType(firstBean, primaryKeyJavaNames[0]);
                                 final Number sequenceValue = DataSourceProvider
                                         .getNextSequenceValue(sequenceName, sequenceIncrement, primaryKeyType);
                                 BeanMetaDataUtil.setPrimaryKeyValue(firstBean, sequenceValue);
@@ -365,7 +366,7 @@ public class JDBCDMLProcessor<T> {
                     // have an optimistic lock conflict, but null values in the PK for another bean, though this
                     // scenario is considered unlikely.
                     boolean firstBeanHasNullPK = false;
-                    for (final String pkColumn : primaryKeyColumnNames) {
+                    for (final String pkColumn : primaryKeyJavaNames) {
                         if (BeanMetaDataUtil.getBeanPropertyByName(firstBean, pkColumn) == null) {
                             firstBeanHasNullPK = true;
                         }
@@ -387,7 +388,7 @@ public class JDBCDMLProcessor<T> {
                     // Generated keys are supported for a numeric primary key only. For other data-types we
                     // assume that the primary has already been set by the caller.
                     final Class primaryKeyType =
-                            BeanMetaDataUtil.getBeanPropertyType(firstBean, primaryKeyColumnNames[0]);
+                            BeanMetaDataUtil.getBeanPropertyType(firstBean, primaryKeyJavaNames[0]);
                     if (primaryKeyType.equals(Long.class)) {
                         final Long generatedKey = generatedKeyResultSet.getLong(1);
                         BeanMetaDataUtil.setPrimaryKeyValue(firstBean, generatedKey);

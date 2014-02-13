@@ -24,6 +24,7 @@ public class BeanClassDescriptor {
     private Long sequenceIncrement;
     private boolean useInlineSequenceValueGeneration = false;
     private String versionColumnName;
+    private String versionColumnJavaName = "";
     private String versionColumnType;
 	private String packageName;
 	private final List<BeanAttributeDescriptor> attributes = new ArrayList<BeanAttributeDescriptor>();
@@ -130,6 +131,14 @@ public class BeanClassDescriptor {
 	public void setVersionColumnName(final String pVersionColumnName) {
 		versionColumnName = pVersionColumnName;
 	}
+
+    public String getVersionColumnJavaName() {
+        return versionColumnJavaName;
+    }
+
+    public void setVersionColumnJavaName(final String pVersionColumnJavaName) {
+        versionColumnJavaName = pVersionColumnJavaName;
+    }
 
     public String getVersionColumnType() {
         return versionColumnType;

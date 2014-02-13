@@ -49,6 +49,12 @@ public interface IBean<T> {
 	 */
 	String[] getPrimaryKeyColumnNames();
 
+    /**
+     * The name of the primary key Java attributes.
+     * @return the primary key column names.
+     */
+    String[] getPrimaryKeyJavaNames();
+
 	/**
 	 * The sequence name used to generate numeric primary keys for this table or view.
 	 * @return the sequence name.
@@ -73,6 +79,12 @@ public interface IBean<T> {
 	 * @return the version column name.
 	 */
 	String getVersionColumnName();
+
+    /**
+     * The name of the Java instance variable holding the version column.
+     * @return the version column name.
+     */
+    String getVersionColumnJavaName();
 
     /**
      * The table column type used for modification checking for optimistic locking.

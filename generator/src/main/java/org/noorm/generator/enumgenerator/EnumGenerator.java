@@ -6,8 +6,7 @@ import org.noorm.generator.ValidatorClassDescriptor;
 import org.noorm.generator.m2plugin.IParameters;
 import org.noorm.generator.schema.GeneratorConfiguration;
 import org.noorm.generator.schema.Regex;
-import org.noorm.jdbc.JDBCProcedureProcessor;
-import org.noorm.jdbc.Utils;
+import org.noorm.jdbc.JDBCQueryProcessor;
 import org.noorm.metadata.MetadataService;
 import org.noorm.metadata.beans.TableMetadataBean;
 import org.slf4j.Logger;
@@ -96,7 +95,8 @@ public class EnumGenerator {
 			for (TableMetadataBean tableMetadataBean : tableMetadataBeanList1) {
 				final EnumAttributeDescriptor enumAttributeDescriptor = new EnumAttributeDescriptor();
                 final String columnName = tableMetadataBean.getColumnName();
-                final String javaName = Utils.convertDBName2JavaName(columnName, false);
+                final String javaName = GeneratorUtil.convertColumnName2JavaName
+                        (columnName, false, configuration.getColumnNameMappings());
                 enumAttributeDescriptor.setName(javaName);
                 final String methodNamePostfix = GeneratorUtil.convertColumnName2JavaName
                         (columnName, true, configuration.getColumnNameMappings());
@@ -108,9 +108,9 @@ public class EnumGenerator {
 				enumAttributeDescriptor.setColumnName(columnName);
 				enumClassDescriptor.addAttribute(enumAttributeDescriptor);
 			}
-			final JDBCProcedureProcessor jdbcProcedureProcessor = JDBCProcedureProcessor.getInstance();
+			final JDBCQueryProcessor jdbcQueryProcessor = JDBCQueryProcessor.getInstance();
 			final String query = "SELECT * FROM ".concat(tableName0);
-			final List<Map<String, Object>> recordList = jdbcProcedureProcessor.executeGenericSelect(query);
+			final List<Map<String, Object>> recordList = jdbcQueryProcessor.executeGenericSelect(query);
 			if (recordList.isEmpty()) {
                 String errMsg =
                         "Cannot generate enum: specified enum database table does not contain any data."

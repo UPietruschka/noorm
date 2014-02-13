@@ -141,8 +141,8 @@ public class BeanMetaDataUtil {
 		if (pBean.getPrimaryKeyColumnNames().length != 1) {
 			throw new DataAccessException(DataAccessException.Type.OPERATION_NOT_SUPPORTED_WITH_COMPOSITE_PK);
 		}
-		final String primaryKeyColumnName = pBean.getPrimaryKeyColumnNames()[0];
-		final Object property = getBeanPropertyByName(pBean, primaryKeyColumnName);
+		final String primaryKeyJavaName = pBean.getPrimaryKeyJavaNames()[0];
+		final Object property = getBeanPropertyByName(pBean, primaryKeyJavaName);
 		if (!(property instanceof Long)) {
 			throw new DataAccessException(DataAccessException.Type.UNSUPPORTED_DATATYPE);
 		}
@@ -177,8 +177,8 @@ public class BeanMetaDataUtil {
 			throw new DataAccessException(DataAccessException.Type.OPERATION_NOT_SUPPORTED_WITH_COMPOSITE_PK);
 		}
         log.debug("Generated key value " + pPKValue + " retrieved for table " + pBean.getTableName());
-		final String primaryKeyColumnName = pBean.getPrimaryKeyColumnNames()[0];
-		setBeanPropertyByName(pBean, primaryKeyColumnName, pPKValue);
+		final String primaryKeyJavaName = pBean.getPrimaryKeyJavaNames()[0];
+        setBeanPropertyByName(pBean, primaryKeyJavaName, pPKValue);
 	}
 
 	/**
@@ -189,8 +189,8 @@ public class BeanMetaDataUtil {
 	 */
 	public static void setVersionColumnValue(final IBean pBean, final Object pVersionColumnValue) {
 
-		final String versionColumnName = pBean.getVersionColumnName();
-		setBeanPropertyByName(pBean, versionColumnName, pVersionColumnValue);
+		final String versionColumnJavaName = pBean.getVersionColumnJavaName();
+        setBeanPropertyByName(pBean, versionColumnJavaName, pVersionColumnValue);
 	}
 
 	private static void setBeanPropertyByName(final IBean pBean, final String pPropertyName, final Object pValue) {
@@ -206,16 +206,15 @@ public class BeanMetaDataUtil {
     private static Field getDeclaredFieldInclParent(final Object pObject, final String pPropertyName) {
 
         final Field[] fields = getDeclaredFieldsInclParent(pObject.getClass());
-        final String javaPropertyName = Utils.convertDBName2JavaName(pPropertyName, false);
         Field property = null;
         for (final Field field : fields) {
-            if (field.getName().equals(javaPropertyName)) {
+            if (field.getName().equals(pPropertyName)) {
                 property = field;
             }
         }
         if (property == null) {
             throw new DataAccessException(DataAccessException.Type.COULD_NOT_ACCESS_PROPERTY_BY_REFLECTION,
-                    pObject.getClass().getName().concat(".").concat(javaPropertyName));
+                    pObject.getClass().getName().concat(".").concat(pPropertyName));
         }
         property.setAccessible(true);
         return property;

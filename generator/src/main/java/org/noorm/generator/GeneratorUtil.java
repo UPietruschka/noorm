@@ -76,7 +76,13 @@ public class GeneratorUtil {
             }
             final String mappedString = getMappedString(nameBaseColumnName, pNameMappingList.getMapping());
             if (mappedString != null && !mappedString.isEmpty()) {
-                nameBaseColumnName = mappedString;
+                char firstChar;
+                if (pCapitalizeFirst) {
+                    firstChar = mappedString.toUpperCase().charAt(0);
+                } else {
+                    firstChar = mappedString.toLowerCase().charAt(0);
+                }
+                nameBaseColumnName = firstChar + mappedString.substring(1, mappedString.length());
             } else {
                 nameBaseColumnName = Utils.convertDBName2JavaName(pColumnName, pCapitalizeFirst);
             }

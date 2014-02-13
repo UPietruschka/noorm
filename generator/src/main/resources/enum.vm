@@ -2,6 +2,7 @@
 package $class.PackageName;
 
 import org.noorm.jdbc.IEnum;
+import org.noorm.jdbc.JDBCColumn;
 
 /**
  * Enum class for database table $class.TableName
@@ -16,6 +17,7 @@ public enum $class.Name implements IEnum {
 	private static final String TABLE_NAME = "$class.TableName";
 	private static final String DISPLAY_COLUMN_NAME = "$class.DisplayColumnName";
 #foreach ($att in $class.Attributes)
+	@JDBCColumn(name="$att.ColumnName")
 	private final $att.Type $att.Name;
 #end
 

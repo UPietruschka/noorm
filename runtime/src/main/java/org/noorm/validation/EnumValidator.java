@@ -1,7 +1,8 @@
 package org.noorm.validation;
 
 import org.noorm.jdbc.IEnum;
-import org.noorm.jdbc.JDBCProcedureProcessor;
+import org.noorm.jdbc.JDBCColumn;
+import org.noorm.jdbc.JDBCQueryProcessor;
 import org.noorm.jdbc.Utils;
 import org.noorm.metadata.BeanMetaDataUtil;
 import org.noorm.metadata.MetadataService;
@@ -9,6 +10,7 @@ import org.noorm.metadata.beans.TableMetadataBean;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.lang.reflect.Field;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -51,9 +53,9 @@ public class EnumValidator {
 		}
 		// We omit direct meta-data validation here (like we do in BeanValidator), since we do access
 		// the contained data, which would fail with non-validating meta-data anyway.
-		final JDBCProcedureProcessor jdbcProcedureProcessor = JDBCProcedureProcessor.getInstance();
+		final JDBCQueryProcessor jdbcQueryProcessor = JDBCQueryProcessor.getInstance();
 		final String query = "SELECT * FROM ".concat(tableName);
-		final List<Map<String, Object>> recordList = jdbcProcedureProcessor.executeGenericSelect(query);
+		final List<Map<String, Object>> recordList = jdbcQueryProcessor.executeGenericSelect(query);
 		if (recordList.isEmpty()) {
 			validationError(exceptionPrefix.concat(" Database table does not contain any data."));
 		}
@@ -82,11 +84,25 @@ public class EnumValidator {
 						.concat(enum0.toString())).concat("."));
 			}
 			// Iterate over the remaining fields and validate enum against database content
+            final Field[] fields = BeanMetaDataUtil.getDeclaredFieldsInclParent(pEnumClass);
+            final Map<String, String> columnName2JavaName = new HashMap<String, String>();
+            for (final Field field : fields) {
+                final JDBCColumn colAnn = BeanMetaDataUtil.getJDBCColumnAnnotation(field);
+                if (colAnn != null) {
+                    final String javaName = field.getName();
+                    columnName2JavaName.put(colAnn.name(), javaName);
+                }
+            }
 			for (Map.Entry<String, Object> columnMap : record.entrySet()) {
 				final String columnName = columnMap.getKey();
 				if (!columnName.equals((displayColumnName))) {
 					final Object columnValue = columnMap.getValue();
-					final Object enumValue = BeanMetaDataUtil.getBeanPropertyByName(enum0, columnName);
+                    final String javaPropertyName = columnName2JavaName.get(columnName);
+                    if (javaPropertyName == null) {
+                        validationError(exceptionPrefix
+                                .concat(" No Java attribute found for column ").concat(columnName).concat("."));
+                    }
+					final Object enumValue = BeanMetaDataUtil.getBeanPropertyByName(enum0, javaPropertyName);
 					log.debug("Validating Enum value against database value for column [".concat(columnName)
 							.concat("]; ").concat(enumValue.toString()).concat(" / ")
 							.concat(columnValue.toString()).concat("."));

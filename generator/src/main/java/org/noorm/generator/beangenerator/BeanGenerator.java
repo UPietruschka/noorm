@@ -137,7 +137,7 @@ public class BeanGenerator {
             final String[] primaryKeyJavaNames = new String[primaryKeyColumnNames.length];
             for (int i = 0; i < primaryKeyColumnNames.length; i++) {
                 primaryKeyJavaNames[i] = GeneratorUtil.convertColumnName2JavaName(primaryKeyColumnNames[i],
-                        true, configuration.getColumnNameMappings());
+                        false, configuration.getColumnNameMappings());
             }
             beanClassDescriptor.setPrimaryKeyJavaNames(primaryKeyJavaNames);
             beanClassDescriptor.setGeneratePKBasedEqualsAndHashCode(configuration.isGeneratePKBasedEqualsAndHashCode());
@@ -173,7 +173,8 @@ public class BeanGenerator {
 			for (final TableMetadataBean tableMetadataBean : tableMetadataBeanList1) {
 				final BeanAttributeDescriptor beanAttributeDescriptor = new BeanAttributeDescriptor();
                 final String columnName = tableMetadataBean.getColumnName();
-				final String javaName = Utils.convertDBName2JavaName(columnName, false);
+                final String javaName = GeneratorUtil.convertColumnName2JavaName
+                        (columnName, false, configuration.getColumnNameMappings());
 				beanAttributeDescriptor.setName(javaName);
                 final String methodNamePostfix = GeneratorUtil.convertColumnName2JavaName
                         (columnName, true, configuration.getColumnNameMappings());
@@ -197,6 +198,7 @@ public class BeanGenerator {
 				beanAttributeDescriptor.setColumnName(columnName);
                 if (versionColumnName.equals(columnName)) {
                     versionColumnType = dataType;
+                    beanClassDescriptor.setVersionColumnJavaName(javaName);
                 }
 				beanAttributeDescriptor.setMaxLength(tableMetadataBean.getCharLength().intValue());
 				if (tableMetadataBean.getNullable().equals(BeanMetaDataUtil.NOT_NULLABLE)) {
