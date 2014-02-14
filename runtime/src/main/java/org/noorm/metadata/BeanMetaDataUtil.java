@@ -3,7 +3,6 @@ package org.noorm.metadata;
 import org.noorm.jdbc.DataAccessException;
 import org.noorm.jdbc.IBean;
 import org.noorm.jdbc.JDBCColumn;
-import org.noorm.jdbc.Utils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -122,7 +121,7 @@ public class BeanMetaDataUtil {
 			if (annotations != null && annotations.length > 0) {
 				if (annotations[0].annotationType() == JDBCColumn.class) {
 					final JDBCColumn colAnn = (JDBCColumn) annotations[0];
-					columnMetaDataMap.put(field.getName(), colAnn);
+					columnMetaDataMap.put(colAnn.name(), colAnn);
 				}
 			}
 			// Ignore fields without JDBCColumn annotation (interpreted transient)

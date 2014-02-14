@@ -11,7 +11,6 @@ import org.noorm.metadata.MetadataService;
 import org.noorm.metadata.beans.PrimaryKeyColumnBean;
 import org.noorm.metadata.beans.SequenceBean;
 import org.noorm.metadata.beans.TableMetadataBean;
-import org.noorm.jdbc.Utils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -188,7 +187,54 @@ public class BeanGenerator {
 					beanAttributeDescriptor.setUpdatable(false);
 				}
 				beanAttributeDescriptor.setType(javaType);
-				beanAttributeDescriptor.setDataType(dataType);
+
+                /* Preliminary, to be replaced by JDBC metadata access --> */
+                String jdbcType = "Types.VARCHAR";
+                if (dataType.endsWith("CHAR")) {
+                    jdbcType = "999";
+                    // TODO: Respect DB specifics
+                    //jdbcType = "Types.CHAR";
+                }
+                if (dataType.endsWith("RAW")) {
+                    jdbcType = "Types.BINARY";
+                }
+                if (dataType.equals("BLOB")) {
+                    jdbcType = "Types.BLOB";
+                }
+                if (dataType.equals("CLOB")) {
+                    jdbcType = "Types.CLOB";
+                }
+                if (dataType.equals("NCLOB")) {
+                    jdbcType = "Types.NCLOB";
+                }
+                if (dataType.equals("NUMBER")) {
+                    final Long dataPrecision = tableMetadataBean.getDataPrecision();
+                    final Long dataScale = tableMetadataBean.getDataScale();
+                    if (dataPrecision != null && dataPrecision > 0L && dataScale != null && dataScale > 0L) {
+                        jdbcType = "Types.DOUBLE";
+                    } else {
+                        jdbcType = "Types.NUMERIC";
+                    }
+                }
+                if (dataType.equals("BINARY_FLOAT")) {
+                    jdbcType = "Types.FLOAT";
+                }
+                if (dataType.equals("BINARY_DOUBLE")) {
+                    jdbcType = "Types.DOUBLE";
+                }
+                if (dataType.equals("FLOAT")) {
+                    jdbcType = "Types.DOUBLE";
+                }
+                if (dataType.equals("DATE")) {
+                    jdbcType = "Types.DATE";
+                }
+                if (dataType.startsWith("TIMESTAMP")) {
+                    jdbcType = "Types.TIMESTAMP";
+                }
+                beanAttributeDescriptor.setDataType(jdbcType);
+                /* Preliminary, to be replaced by JDBC metadata access <-- */
+
+				//beanAttributeDescriptor.setDataType(dataType);
                 if (dataType.equals("CLOB") || dataType.equals("BLOB") || dataType.equals("XMLTYPE")) {
                     unsupportedOptLockFullRowCompareTypes = true;
                 }

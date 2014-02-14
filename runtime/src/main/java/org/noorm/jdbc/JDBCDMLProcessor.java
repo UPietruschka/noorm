@@ -164,6 +164,7 @@ public class JDBCDMLProcessor<T> {
             final IBean firstBean = pBeanList.get(0);
             final String[] primaryKeyColumnNames = firstBean.getPrimaryKeyColumnNames();
             final String[] primaryKeyJavaNames = firstBean.getPrimaryKeyJavaNames();
+            final Map<String, JDBCColumn> beanJDBCMetaData = BeanMetaDataUtil.getColumnMetaData(firstBean.getClass());
             // There is currently no full support for returning generated keys in batch operation
             // Thus we support this for single-row inserts only, which use a sequence for ID generation
             final String sequenceName = firstBean.getSequenceName();
@@ -219,6 +220,8 @@ public class JDBCDMLProcessor<T> {
                 }
                 for (final String fieldName : fieldMap.keySet()) {
 
+                    final JDBCColumn jdbcColumn = beanJDBCMetaData.get(fieldName);
+
                     final Integer parameterIndex = fieldName2ParameterIndex.get(fieldName);
                     if (parameterIndex == null) {
                         continue;
@@ -243,7 +246,7 @@ public class JDBCDMLProcessor<T> {
                                     value = buildVersionColumnValue(bean, pBatchType, value);
                                 }
                             }
-                            pstmt.setObject(parameterIndex, value);
+                            setObject(pstmt, value, parameterIndex, jdbcColumn.dataType());
                         } else {
                             if (!useInlineSequenceValueGeneration) {
                                 final Class primaryKeyType =
@@ -251,7 +254,7 @@ public class JDBCDMLProcessor<T> {
                                 final Number sequenceValue = DataSourceProvider
                                         .getNextSequenceValue(sequenceName, sequenceIncrement, primaryKeyType);
                                 BeanMetaDataUtil.setPrimaryKeyValue(firstBean, sequenceValue);
-                                pstmt.setObject(parameterIndex, sequenceValue);
+                                setObject(pstmt, sequenceValue, parameterIndex, jdbcColumn.dataType());
                             }
                         }
                     }
@@ -262,7 +265,7 @@ public class JDBCDMLProcessor<T> {
                                 throw new DataAccessException(DataAccessException.Type.VERSION_COLUMN_NULL);
                             }
                             Object newVersion = buildVersionColumnValue(bean, pBatchType, value);
-                            pstmt.setObject(parameterIndex, newVersion);
+                            setObject(pstmt, newVersion, parameterIndex, jdbcColumn.dataType());
                         } else {
                             // Fixed CHAR semantics now handled through global connection property
                             // if (isPKColumn && value instanceof String) {
@@ -272,7 +275,7 @@ public class JDBCDMLProcessor<T> {
                                 // disabled this behaviour and turns off padding.
                                 // pstmt.setFixedCHAR(parameterIndex, (String) value);
                             // } else {
-                                pstmt.setObject(parameterIndex, value);
+                            setObject(pstmt, value, parameterIndex, jdbcColumn.dataType());
                             // }
                         }
                     }
@@ -286,7 +289,7 @@ public class JDBCDMLProcessor<T> {
                                 // disabled this behaviour and turns off padding.
                                 // pstmt.setFixedCHAR(parameterIndex, (String) value);
                             // } else {
-                                pstmt.setObject(parameterIndex, value);
+                            setObject(pstmt, value, parameterIndex, jdbcColumn.dataType());
                             // }
                         }
                     }
@@ -297,13 +300,15 @@ public class JDBCDMLProcessor<T> {
                 }
                 if (pBatchType.equals(BatchType.UPDATE) || pBatchType.equals(BatchType.DELETE)) {
                     if (versionColumnName != null && !versionColumnName.isEmpty()) {
+                        final JDBCColumn jdbcColumn = beanJDBCMetaData.get(versionColumnName);
                         final int parameterIndex = fieldName2ParameterIndex.get
                                 (versionColumnName.concat(StatementBuilder.OLD_VERSION_APPENDIX));
-                        pstmt.setObject(parameterIndex, fieldMap.get(versionColumnName));
+                        setObject(pstmt, fieldMap.get(versionColumnName), parameterIndex, jdbcColumn.dataType());
                     }
                     if (useOptLockFullRowCompare) {
                         final Map<String, Object> modifiedFieldsInitialValue = bean.getModifiedFieldsInitialValue();
                         for (final String fieldName : fieldMap.keySet()) {
+                            final JDBCColumn jdbcColumn = beanJDBCMetaData.get(fieldName);
                             boolean isPKColumn = false;
                             for (final String pkColumnName : primaryKeyColumnNames) {
                                 if (fieldName.equals(pkColumnName)) {
@@ -330,7 +335,7 @@ public class JDBCDMLProcessor<T> {
                                     // disabled this behaviour and turns off padding.
                                     // pstmt.setFixedCHAR(parameterIndex, (String) value);
                                 // } else {
-                                    pstmt.setObject(parameterIndex, value);
+                                setObject(pstmt, value, parameterIndex, jdbcColumn.dataType());
                                 // }
                             }
                         }
@@ -425,6 +430,18 @@ public class JDBCDMLProcessor<T> {
                 }
             } catch (SQLException ignored) {
             } // Nothing to do
+        }
+    }
+
+    private void setObject(final PreparedStatement pStmt,
+                           final Object pValue,
+                           final int pParameterIndex,
+                           final int pSQLType) throws SQLException {
+
+        if (pValue == null) {
+            pStmt.setNull(pParameterIndex, pSQLType);
+        } else {
+            pStmt.setObject(pParameterIndex, pValue, pSQLType);
         }
     }
 

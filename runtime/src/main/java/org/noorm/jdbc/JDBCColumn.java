@@ -14,7 +14,7 @@ import java.lang.annotation.Target;
 public @interface JDBCColumn {
 
 	String name() default "";
-	String dataType() default "";
+	int dataType() default 0;
 	boolean updatable() default true;
 	boolean nullable() default true;
     boolean caseSensitiveName() default false;

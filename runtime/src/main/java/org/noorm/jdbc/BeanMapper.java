@@ -155,7 +155,7 @@ public class BeanMapper<T> {
 			throws IllegalAccessException, SQLException {
 
 		String fieldName;
-        String dataType;
+        int dataType;
 		for (final Field field : pFields) {
 			// Ignore serialVersionUID
 			if (BeanMetaDataUtil.SERIAL_VERSION_UID.equals(field.getName())) {
@@ -198,7 +198,7 @@ public class BeanMapper<T> {
                 // so version 11.2.0.3.0 is known to be buggy and does not work with the standard access
                 // mechanisms used here.
                 String value = null;
-                if (dataType.equals(XMLTYPE)) {
+                if (dataType == Types.SQLXML) {
                     final SQLXML sqlxml = pResultSet.getSQLXML(fieldName);
                     if (sqlxml != null) {
                         value = sqlxml.getString();

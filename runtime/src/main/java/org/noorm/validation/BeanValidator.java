@@ -69,11 +69,12 @@ public class BeanValidator {
 				final JDBCColumn jdbcColumn = beanMetaDataEntry.getValue();
 				if (jdbcColumn.name().equals(columnName)) {
 					// Validating annotated data-type against database metadata.
-					if (!jdbcColumn.dataType().equals(tableMetadataBean.getDataType())) {
-						validationError(exceptionPrefix.concat("Data-type mismatch: [")
-								.concat(tableMetadataBean.getDataType()).concat(" / ")
-								.concat(jdbcColumn.dataType().concat("].")));
-					}
+// TODO: re-enable validation
+//					if (!jdbcColumn.dataType().equals(tableMetadataBean.getDataType())) {
+//						validationError(exceptionPrefix.concat("Data-type mismatch: [")
+//								.concat(tableMetadataBean.getDataType()).concat(" / ")
+//								.concat(jdbcColumn.dataType().concat("].")));
+//					}
 					// Validating annotated nullable-attribute against database metadata.
 					boolean isNullable = true;
 					if (tableMetadataBean.getNullable().equals(BeanMetaDataUtil.NOT_NULLABLE)) {

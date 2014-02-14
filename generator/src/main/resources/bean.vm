@@ -2,6 +2,7 @@
 package $class.PackageName;
 
 import java.io.Serializable;
+import java.sql.Types;
 import java.util.HashMap;
 import org.noorm.jdbc.IBean;
 import org.noorm.jdbc.JDBCColumn;
@@ -29,7 +30,7 @@ public class $class.Name<T> implements IBean<T>, Serializable {
 	private static final VersionColumnType VERSION_COLUMN_TYPE = VersionColumnType.$class.VersionColumnType;
 #end
 #foreach ($att in $class.Attributes)
-	@JDBCColumn(name="$att.ColumnName", dataType="$att.DataType"#if(!$att.Updatable), updatable=false#end#if(!$att.Nullable), nullable=false#end#if($att.CaseSensitiveName), caseSensitiveName=true#end#if($att.MaxLength>0), maxLength=$att.MaxLength#end)
+	@JDBCColumn(name="$att.ColumnName", dataType=$att.DataType#if(!$att.Updatable), updatable=false#end#if(!$att.Nullable), nullable=false#end#if($att.CaseSensitiveName), caseSensitiveName=true#end#if($att.MaxLength>0), maxLength=$att.MaxLength#end)
 	protected $att.Type $att.Name;
 #end
 	private transient T auxiliaryData;
