@@ -43,4 +43,26 @@ public class MSSQLPlatform implements IPlatform {
         }
         return updateCount;
     }
+
+    /**
+     * Sets an object value for an DML statement (INSERT, UPDATE, DELETE).
+     *
+     * @param pStmt           the prepared SQL statement
+     * @param pValue          the parameter value to be set
+     * @param pParameterIndex the index of the parameter
+     * @param pSQLType        the SQL type. Usually one type specified in java.sql.Types or a proprietary type
+     * @throws java.sql.SQLException
+     */
+    @Override
+    public void setObject(final PreparedStatement pStmt,
+                          final Object pValue,
+                          final int pParameterIndex,
+                          final int pSQLType) throws SQLException {
+
+        if (pValue == null) {
+            pStmt.setNull(pParameterIndex, pSQLType);
+        } else {
+            pStmt.setObject(pParameterIndex, pValue, pSQLType);
+        }
+    }
 }

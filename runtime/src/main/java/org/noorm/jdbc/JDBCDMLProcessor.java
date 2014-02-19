@@ -246,7 +246,7 @@ public class JDBCDMLProcessor<T> {
                                     value = buildVersionColumnValue(bean, pBatchType, value);
                                 }
                             }
-                            setObject(pstmt, value, parameterIndex, jdbcColumn.dataType());
+                            platform.setObject(pstmt, value, parameterIndex, jdbcColumn.dataType());
                         } else {
                             if (!useInlineSequenceValueGeneration) {
                                 final Class primaryKeyType =
@@ -254,7 +254,7 @@ public class JDBCDMLProcessor<T> {
                                 final Number sequenceValue = DataSourceProvider
                                         .getNextSequenceValue(sequenceName, sequenceIncrement, primaryKeyType);
                                 BeanMetaDataUtil.setPrimaryKeyValue(firstBean, sequenceValue);
-                                setObject(pstmt, sequenceValue, parameterIndex, jdbcColumn.dataType());
+                                platform.setObject(pstmt, sequenceValue, parameterIndex, jdbcColumn.dataType());
                             }
                         }
                     }
@@ -265,7 +265,7 @@ public class JDBCDMLProcessor<T> {
                                 throw new DataAccessException(DataAccessException.Type.VERSION_COLUMN_NULL);
                             }
                             Object newVersion = buildVersionColumnValue(bean, pBatchType, value);
-                            setObject(pstmt, newVersion, parameterIndex, jdbcColumn.dataType());
+                            platform.setObject(pstmt, newVersion, parameterIndex, jdbcColumn.dataType());
                         } else {
                             // Fixed CHAR semantics now handled through global connection property
                             // if (isPKColumn && value instanceof String) {
@@ -275,7 +275,7 @@ public class JDBCDMLProcessor<T> {
                                 // disabled this behaviour and turns off padding.
                                 // pstmt.setFixedCHAR(parameterIndex, (String) value);
                             // } else {
-                            setObject(pstmt, value, parameterIndex, jdbcColumn.dataType());
+                            platform.setObject(pstmt, value, parameterIndex, jdbcColumn.dataType());
                             // }
                         }
                     }
@@ -289,7 +289,7 @@ public class JDBCDMLProcessor<T> {
                                 // disabled this behaviour and turns off padding.
                                 // pstmt.setFixedCHAR(parameterIndex, (String) value);
                             // } else {
-                            setObject(pstmt, value, parameterIndex, jdbcColumn.dataType());
+                            platform.setObject(pstmt, value, parameterIndex, jdbcColumn.dataType());
                             // }
                         }
                     }
@@ -303,7 +303,7 @@ public class JDBCDMLProcessor<T> {
                         final JDBCColumn jdbcColumn = beanJDBCMetaData.get(versionColumnName);
                         final int parameterIndex = fieldName2ParameterIndex.get
                                 (versionColumnName.concat(StatementBuilder.OLD_VERSION_APPENDIX));
-                        setObject(pstmt, fieldMap.get(versionColumnName), parameterIndex, jdbcColumn.dataType());
+                        platform.setObject(pstmt, fieldMap.get(versionColumnName), parameterIndex, jdbcColumn.dataType());
                     }
                     if (useOptLockFullRowCompare) {
                         final Map<String, Object> modifiedFieldsInitialValue = bean.getModifiedFieldsInitialValue();
@@ -335,7 +335,7 @@ public class JDBCDMLProcessor<T> {
                                     // disabled this behaviour and turns off padding.
                                     // pstmt.setFixedCHAR(parameterIndex, (String) value);
                                 // } else {
-                                setObject(pstmt, value, parameterIndex, jdbcColumn.dataType());
+                                platform.setObject(pstmt, value, parameterIndex, jdbcColumn.dataType());
                                 // }
                             }
                         }
@@ -430,18 +430,6 @@ public class JDBCDMLProcessor<T> {
                 }
             } catch (SQLException ignored) {
             } // Nothing to do
-        }
-    }
-
-    private void setObject(final PreparedStatement pStmt,
-                           final Object pValue,
-                           final int pParameterIndex,
-                           final int pSQLType) throws SQLException {
-
-        if (pValue == null) {
-            pStmt.setNull(pParameterIndex, pSQLType);
-        } else {
-            pStmt.setObject(pParameterIndex, pValue, pSQLType);
         }
     }
 

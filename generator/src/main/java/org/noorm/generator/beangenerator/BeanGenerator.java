@@ -191,12 +191,15 @@ public class BeanGenerator {
                 /* Preliminary, to be replaced by JDBC metadata access --> */
                 String jdbcType = "Types.VARCHAR";
                 if (dataType.endsWith("CHAR")) {
-                    jdbcType = "999";
+                    jdbcType = "999";      // Oracle.FIXED_CHAR
                     // TODO: Respect DB specifics
                     //jdbcType = "Types.CHAR";
                 }
                 if (dataType.endsWith("RAW")) {
                     jdbcType = "Types.BINARY";
+                }
+                if (dataType.equals("XMLTYPE")) {
+                    jdbcType = "Types.SQLXML";
                 }
                 if (dataType.equals("BLOB")) {
                     jdbcType = "Types.BLOB";

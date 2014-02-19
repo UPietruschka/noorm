@@ -29,4 +29,18 @@ public interface IPlatform {
      * @return the reliable update count for the platform in use
      */
     int executeBatchWithReliableCount(final PreparedStatement pPreparedStatement) throws SQLException;
+
+    /**
+     * Sets an object value for an DML statement (INSERT, UPDATE, DELETE).
+     *
+     * @param pStmt the prepared SQL statement
+     * @param pValue the parameter value to be set
+     * @param pParameterIndex the index of the parameter
+     * @param pSQLType the SQL type. Usually one type specified in java.sql.Types or a proprietary type
+     * @throws SQLException
+     */
+    void setObject(final PreparedStatement pStmt,
+                   final Object pValue,
+                   final int pParameterIndex,
+                   final int pSQLType) throws SQLException;
 }

@@ -2,6 +2,7 @@ package org.noorm.platform;
 
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
+import java.sql.Types;
 
 /**
  * @author Ulf Pietruschka / ulf.pietruschka@ext.secunet.com
@@ -38,5 +39,23 @@ public class OraclePlatform implements IPlatform {
 
         pPreparedStatement.executeBatch();
         return pPreparedStatement.getUpdateCount();
+    }
+
+    /**
+     * Sets an object value for an DML statement (INSERT, UPDATE, DELETE).
+     *
+     * @param pStmt           the prepared SQL statement
+     * @param pValue          the parameter value to be set
+     * @param pParameterIndex the index of the parameter
+     * @param pSQLType        the SQL type. Usually one type specified in java.sql.Types or a proprietary type
+     * @throws java.sql.SQLException
+     */
+    @Override
+    public void setObject(final PreparedStatement pStmt,
+                          final Object pValue,
+                          final int pParameterIndex,
+                          final int pSQLType) throws SQLException {
+
+        pStmt.setObject(pParameterIndex, pValue);
     }
 }
