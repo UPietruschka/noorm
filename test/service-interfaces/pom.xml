@@ -39,6 +39,7 @@
                             <goal>generate-noorm</goal>
                         </goals>
                         <configuration>
+                            <platformName>Oracle</platformName>
                             <url>${jdbc.url}</url>
                             <username>${jdbc.username}</username>
                             <password>${jdbc.password}</password>
@@ -52,6 +53,7 @@
                             <goal>generate-noorm</goal>
                         </goals>
                         <configuration>
+                            <platformName>Oracle</platformName>
                             <url>${jdbc.url}</url>
                             <username>${jdbc.username}</username>
                             <password>${jdbc.password}</password>

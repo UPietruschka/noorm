@@ -20,6 +20,11 @@ public interface IParameters {
     File getGeneratorConfiguration();
 
     /**
+     * The database platform
+     */
+    String getPlatformName();
+
+    /**
 	 * JDBC connection URL for the database schema containing the tables, views and stored procedures
 	 * subject to Java code generation.
 	 */

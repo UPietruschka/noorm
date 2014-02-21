@@ -24,9 +24,10 @@ public class ConfigurationInitializer {
     public static final String NOORM_XML_FILENAME = "/META-INF/noorm.xml";
     public static final String DATASOURCE_NAMES = "datasource.names";
     public static final String DATABASE_JNDINAME = "database.jndiname";
-    public static final String DATABASE_PASSWORD = "database.password";
+    public static final String DATABASE_PLATFORM = "database.platform";
     public static final String DATABASE_URL = "database.url";
     public static final String DATABASE_USERNAME = "database.username";
+    public static final String DATABASE_PASSWORD = "database.password";
     public static final String DATABASE_BATCH_UPDATE_SIZE = "database.batch_update_size";
     public static final String DEBUG_MODE = "debug.mode";
     public static final String DEBUG_JDWP_HOST = "debug.host";
@@ -126,6 +127,13 @@ public class ConfigurationInitializer {
         if (databaseJNDIName != null && !databaseJNDIName.isEmpty()) {
             dataSourceConfiguration.setDatabaseJNDIName(databaseJNDIName);
             log.info("Setting ".concat(key).concat(" = ").concat(databaseJNDIName));
+        }
+
+        key = pKeyPrefix.concat(DATABASE_PLATFORM);
+        final String databasePlatform = pNoORMFileProperties.getProperty(key);
+        if (databasePlatform != null && !databasePlatform.isEmpty()) {
+            dataSourceConfiguration.setDatabasePlatform(databasePlatform);
+            log.info("Setting ".concat(key).concat(" = ").concat(databasePlatform));
         }
 
         key = pKeyPrefix.concat(DATABASE_URL);

@@ -14,9 +14,10 @@ public class DataSourceConfiguration {
     private static final Logger log = LoggerFactory.getLogger(DataSourceConfiguration.class);
 
     private String databaseJNDIName;
+    private String databasePlatform;
+    private String databaseURL;
     private String databaseUsername;
     private String databasePassword;
-    private String databaseURL;
     private int databaseBatchUpdateSize = 100;
     private boolean debugMode = false;
     private String debugJDWPPort = "4000";
@@ -33,6 +34,11 @@ public class DataSourceConfiguration {
         if (databaseJNDIName == null || databaseJNDIName.isEmpty() ) {
             final String noJNDIConfig = "Either provide a JNDI data source configuration or provide all required" +
                     " parameters for explicit data source instantiation. ";
+            if (databasePlatform == null || databasePlatform.isEmpty()) {
+                final String errMsg = "JDBC data source platform not properly configured. ".concat(noJNDIConfig);
+                log.error(errMsg);
+                throw new DataAccessException(DataAccessException.Type.INITIALIZATION_FAILURE, errMsg);
+            }
             if (databaseURL == null || databaseURL.isEmpty()) {
                 final String errMsg = "JDBC data source URL not properly configured. ".concat(noJNDIConfig);
                 log.error(errMsg);
@@ -73,6 +79,14 @@ public class DataSourceConfiguration {
 
     public void setDatabasePassword(final String pDatabasePassword) {
         databasePassword = pDatabasePassword;
+    }
+
+    public String getDatabasePlatform() {
+        return databasePlatform;
+    }
+
+    public void setDatabasePlatform(final String pDatabasePlatform) {
+        databasePlatform = pDatabasePlatform;
     }
 
     public String getDatabaseURL() {

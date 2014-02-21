@@ -21,8 +21,6 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Properties;
 
-//import oracle.ucp.jdbc.PoolDataSource;
-
 /**
  * DataSourceProvider manages data sources and controls transactions in the NoORM runtime engine.
  * Data sources are typically configured in the NoORM configuration file ("noorm.xml" or "noorm.properties").
@@ -30,7 +28,7 @@ import java.util.Properties;
  * database resource handling in a running system, data sources, which have been added to the system cannot
  * be removed.
  * DataSourceProvider is a Java singleton, which takes over full control over the database connections. Direct
- * usage of database connections is possible for dedicated purposes (e.g. integration with Oracle AQ), but
+ * usage of database connections is possible for dedicated purposes (e.g. integration with AQ), but
  * discouraged for typical database access operations. The public API for DataSourceProvider is simple to use
  * and primarily provides the required functionality for explicit transaction handling using the methods begin(),
  * commit() and rollback(). Without explicit transaction handling, DataSourceProvider manages transactions
@@ -173,19 +171,6 @@ public class DataSourceProvider {
 		final StringBuilder validationInfo = new StringBuilder();
 		validationInfo.append("Validating data source. ");
 		try {
-			//		To provide information for a failed data source validation in case of an UCP
-			//		(Oracle Universal Connection Pool) PoolDataSource, we need to include UCP into
-			//		the list of dependencies for NoORM as well as for the projects using NoORM.
-			//		The typically undesired dependency for a specific connection pool implementation
-			//		outweighs the advantage of a proper reporting for a mis-configured data source.
-			//		Thus, UCP is no longer considered within NoORM.
-			//if (dataSourceProvider.activeDataSource instanceof PoolDataSource) {
-			//	validationInfo.append("Connection parameters: ");
-			//	validationInfo.append(";URL: ");
-			//	validationInfo.append(((PoolDataSource) dataSourceProvider.activeDataSource).getURL());
-			//	validationInfo.append(";Username: ");
-			//	validationInfo.append(((PoolDataSource) dataSourceProvider.activeDataSource).getUser());
-			//} else {
 			if (dataSource instanceof OracleDataSource) {
                 final Properties connectionProperties = new Properties();
                 connectionProperties.setProperty(OracleConnection.CONNECTION_PROPERTY_FIXED_STRING, "true");
@@ -203,9 +188,11 @@ public class DataSourceProvider {
 			//}
 			log.info(validationInfo.toString());
             java.sql.Connection con = dataSource.getConnection();
-            final DatabaseMetaData metaData = con.getMetaData();
-            final String databaseProductName = metaData.getDatabaseProductName();
-            platform = PlatformFactory.createPlatform(databaseProductName);
+            if (platform == null) {
+                final DatabaseMetaData metaData = con.getMetaData();
+                final String databaseProductName = metaData.getDatabaseProductName();
+                platform = PlatformFactory.createPlatform(databaseProductName);
+            }
             con.close();
 		} catch (Exception e) {
 			throw new DataAccessException(DataAccessException.Type.COULD_NOT_ESTABLISH_CONNECTION, e);
@@ -231,7 +218,7 @@ public class DataSourceProvider {
 
 	/*
      * The data source parameters in the NoORM properties can either be specified using JNDI or directly
-	 * by providing the required parameters for setting up an OracleDataSource. When both types of
+	 * by providing the required parameters for setting up an DataSource. When both types of
 	 * configuration settings are available, the JNDI configuration has precedence.
 	 */
 	private DataSource initDataSource(final DataSourceConfiguration pDataSourceConfiguration) throws SQLException {
@@ -255,28 +242,11 @@ public class DataSourceProvider {
 		} else {
 
             log.info("Trying to establish data source using NoORM configuration.");
-            final OracleDataSource oracleDataSource = new OracleDataSource();
-			oracleDataSource.setURL(pDataSourceConfiguration.getDatabaseURL());
-			oracleDataSource.setUser(pDataSourceConfiguration.getDatabaseUsername());
-			oracleDataSource.setPassword(pDataSourceConfiguration.getDatabasePassword());
-            // We enable the Oracle connection cache integrated with the Oracle JDBC driver.
-            // Even for single-threaded stand-alone applications using a connection pool/cache makes sense.
-            // Like any other ORM tool, NoORM does not manage data sources, but simply uses the JDBC API.
-            // When transactions are not handled explicitly by the calling application, the implicit
-            // auto-commit mode will cause connections to be closed with every single database call. Though
-            // DataSourceProvider could retain connections for some time, its primary function is not the
-            // maintenance of a connection cache or pool, so this job is delegated to the used data source,
-            // which should provide some caching functionality for any usage scenario.
-            // Unfortunately, Oracle stopped development of the build-in connection cache, so, starting with
-            // Oracle 11.2, the build-in cache is deprecated. We still use it here, since explicit data source
-            // initialization as performed here is not to be used in production systems anyway.
-            oracleDataSource.setConnectionCachingEnabled(true);
-            Properties cacheProps = new Properties();
-            cacheProps.setProperty("MinLimit", "1");
-            cacheProps.setProperty("MaxLimit", "8");
-            cacheProps.setProperty("InitialLimit", "1");
-            oracleDataSource.setConnectionCacheProperties(cacheProps);
-            dataSource = oracleDataSource;
+            platform = PlatformFactory.createPlatform(pDataSourceConfiguration.getDatabasePlatform());
+            final String url = pDataSourceConfiguration.getDatabaseURL();
+            final String username = pDataSourceConfiguration.getDatabaseUsername();
+            final String password = pDataSourceConfiguration.getDatabasePassword();
+            dataSource = platform.getDataSource(url, username, password);
 		}
 
 		validateDataSource(dataSource);
@@ -299,7 +269,7 @@ public class DataSourceProvider {
 				// scope beyond this point in time.
 				// Committing even in case of a read only transaction may incur some additional
 				// cost, since from a technical perspective, the commit is not necessary. On
-				// the other hand, Oracle reduces the cost in this case to a minimum, so that
+				// the other hand, the DB reduces the cost in this case to a minimum, so that
 				// the advantage of this way of transaction automation outweighs a possible
 				// minimal performance reduction.
 				if (pSuccess) {
@@ -315,15 +285,15 @@ public class DataSourceProvider {
 	}
 
 	/**
-	 * Returns the Oracle database connection currently managed by the DataSourceProvider.
+	 * Returns the database connection currently managed by the DataSourceProvider.
 	 * Note that the life-cycle of the connection is managed by the DataSourceProvider, i.e. acquiring a
 	 * connection, closing a connection, resp. returning a connection to the connection pool and managing
 	 * transaction boundaries SHOULD NOT BE DONE in the application code. Providing the database connection
-	 * directly by this method has the sole purpose to support additional Oracle Java client software, which
-	 * requires access to the connection (e.g. Oracle Streams Advanced Queueing, which requires the Oracle
+	 * directly by this method has the sole purpose to support additional Java client software, which
+	 * requires access to the connection (e.g. Streams Advanced Queueing, which requires the
 	 * connection to create an AQSession).
 	 *
-	 * @return the Oracle database connection currently managed by the DataSourceProvider.
+	 * @return the database connection currently managed by the DataSourceProvider.
 	 * @throws SQLException
 	 */
 	public static Connection getConnection() throws SQLException {
@@ -404,8 +374,8 @@ public class DataSourceProvider {
 	 * To control transactions in the calling application, the connection in use must not
 	 * turned back to the connection pool, but should be preserved in a ThreadLocal variable.
 	 * This method is used to indicate that the calling application intends to broaden the
-	 * transaction boundaries beyond the scope of a single PL/SQL or DML call. Oracle does not know
-	 * about the classical "begin" call, since an Oracle session has always an active
+	 * transaction boundaries beyond the scope of a single PL/SQL or DML call. JDBC does not know
+	 * about the classical "begin" call, since a database session has always an active
 	 * transaction (after issuing a "commit" or "rollback", a new transaction is started
 	 * implicitly).
 	 */

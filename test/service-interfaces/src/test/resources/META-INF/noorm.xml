@@ -3,6 +3,7 @@
 <properties>
     <comment>NoORM property file</comment>
     <entry key="datasource.names">HR1, HR2</entry>
+    <entry key="HR1.database.platform">Oracle</entry>
     <entry key="HR1.database.url">jdbc:oracle:thin:@
         (DESCRIPTION =
         (ADDRESS_LIST = (ADDRESS = (PROTOCOL = TCP)(HOST = localhost)(PORT = 1521)))
@@ -15,6 +16,7 @@
     <entry key="HR1.debug.mode">false</entry>
     <entry key="HR1.debug.host">localhost</entry>
     <entry key="HR1.debug.port">4000</entry>
+    <entry key="HR2.database.platform">Oracle</entry>
     <entry key="HR2.database.url">jdbc:oracle:thin:@
         (DESCRIPTION =
         (ADDRESS_LIST = (ADDRESS = (PROTOCOL = TCP)(HOST = localhost)(PORT = 1521)))

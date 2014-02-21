@@ -1,6 +1,5 @@
 package org.noorm.generator.m2plugin;
 
-import oracle.jdbc.pool.OracleDataSource;
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
@@ -16,6 +15,8 @@ import org.noorm.generator.querygenerator.QueryGenerator;
 import org.noorm.generator.schema.*;
 import org.noorm.generator.servicegenerator.ServiceGenerator;
 import org.noorm.jdbc.DataSourceProvider;
+import org.noorm.platform.IPlatform;
+import org.noorm.platform.PlatformFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xml.sax.SAXException;
@@ -31,7 +32,6 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.sql.SQLException;
-import java.util.*;
 
 /**
  * Maven plugin base class for the NoORM class generator.
@@ -66,6 +66,12 @@ public class GeneratorMojo extends AbstractMojo implements IParameters {
 	protected MavenProject project;
 
     /**
+     * The platform to use for metadata retrieval
+     */
+    @Parameter(required = true)
+    protected String platformName;
+
+    /**
 	 * JDBC connection URL for the database schema containing the tables, views and stored procedures
 	 * subject to Java code generation.
 	 */
@@ -84,30 +90,11 @@ public class GeneratorMojo extends AbstractMojo implements IParameters {
     @Parameter(required = true)
 	protected String password;
 
-	private DataSource initializePoolDataSource() throws SQLException {
+	private DataSource initializeDataSource() throws SQLException {
 
-		final OracleDataSource oracleDataSource = new OracleDataSource();
-		oracleDataSource.setURL(url);
-		oracleDataSource.setUser(username);
-		oracleDataSource.setPassword(password);
-        // We enable the Oracle connection cache integrated with the Oracle JDBC driver.
-        // Even for single-threaded stand-alone applications using a connection pool/cache makes sense.
-        // Like any other ORM tool, NoORM does not manage data sources, but simply uses the JDBC API.
-        // When transactions are not handled explicitly by the calling application, the implicit
-        // auto-commit mode will cause connections to be closed with every single database call. Though
-        // DataSourceProvider could retain connections for some time, its primary function is not the
-        // maintenance of a connection cache or pool, so this job is delegated to the used data source,
-        // which should provide some caching functionality for any usage scenario.
-        // Unfortunately, Oracle stopped development of the build-in connection cache, so, starting with
-        // Oracle 11.2, the build-in cache is deprecated. We still use it here, since explicit data source
-        // initialization as performed here is not to be used in production systems anyway.
-        oracleDataSource.setConnectionCachingEnabled(true);
-        Properties cacheProps = new Properties();
-        cacheProps.setProperty("MinLimit", "1");
-        cacheProps.setProperty("MaxLimit", "4");
-        cacheProps.setProperty("InitialLimit", "1");
-        oracleDataSource.setConnectionCacheProperties(cacheProps);
-        return oracleDataSource;
+        final IPlatform platform = PlatformFactory.createPlatform(platformName);
+        final DataSource dataSource = platform.getDataSource(url, username, password);
+        return dataSource;
 	}
 
 	@Override
@@ -118,7 +105,7 @@ public class GeneratorMojo extends AbstractMojo implements IParameters {
             // a single Maven build, we should at least generate a unique name, since DataSourceProvider does
             // not allow to replace an already added data source (with the same name).
             final String dataSourceName = Long.toString(System.currentTimeMillis());
-			DataSourceProvider.addDataSource(initializePoolDataSource(), dataSourceName, true);
+			DataSourceProvider.addDataSource(initializeDataSource(), dataSourceName, true);
 		} catch (SQLException e) {
 			throw new MojoExecutionException("Initializing DataSource failed.", e);
 		}
@@ -208,6 +195,11 @@ public class GeneratorMojo extends AbstractMojo implements IParameters {
     @Override
     public File getGeneratorConfiguration() {
         return generatorConfiguration;
+    }
+
+    @Override
+    public String getPlatformName() {
+        return platformName;
     }
 
 	@Override

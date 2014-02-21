@@ -141,6 +141,7 @@
                     </execution>
                 </executions>
                 <configuration>
+                    <platformName>Oracle</platformName>
                     <url>${jdbc.url}</url>
                     <username>${jdbc.username}</username>
                     <password>${jdbc.password}</password>
