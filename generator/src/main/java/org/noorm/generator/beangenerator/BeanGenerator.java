@@ -6,8 +6,9 @@ import org.noorm.generator.ValidatorClassDescriptor;
 import org.noorm.generator.m2plugin.IParameters;
 import org.noorm.generator.schema.GeneratorConfiguration;
 import org.noorm.generator.schema.Regex;
+import org.noorm.jdbc.DataSourceProvider;
 import org.noorm.metadata.BeanMetaDataUtil;
-import org.noorm.metadata.MetadataService;
+import org.noorm.platform.IMetadata;
 import org.noorm.metadata.beans.PrimaryKeyColumnBean;
 import org.noorm.metadata.beans.SequenceBean;
 import org.noorm.metadata.beans.TableMetadataBean;
@@ -71,19 +72,19 @@ public class BeanGenerator {
             beanDMLClassDescriptor.setDataSourceName(configuration.getDataSource().getName());
         }
 
-        final MetadataService metadataService = MetadataService.getInstance();
+        final IMetadata metadata = DataSourceProvider.getPlatform().getMetadata();
 
 		log.info("Retrieving table metadata from database.");
-		final Map<String, List<TableMetadataBean>> tableColumnMap = metadataService.findTableMetadata();
+		final Map<String, List<TableMetadataBean>> tableColumnMap = metadata.findTableMetadata();
 		log.info("Retrieving record metadata from database.");
-		final Map<String, List<TableMetadataBean>> recordColumnMap = metadataService.findRecordMetadata();
+		final Map<String, List<TableMetadataBean>> recordColumnMap = metadata.findRecordMetadata();
 		tableColumnMap.putAll(recordColumnMap);
 
 		log.info("Retrieving primary key metadata from database.");
-		final List<PrimaryKeyColumnBean> pkColumnNameList = metadataService.findPkColumns();
+		final List<PrimaryKeyColumnBean> pkColumnNameList = metadata.findPkColumns();
 
 		log.info("Retrieving sequence metadata from database.");
-		final List<SequenceBean> sequenceList = metadataService.findSequenceNames();
+		final List<SequenceBean> sequenceList = metadata.findSequenceNames();
 
 		log.info("Generating NoORM Bean classes.");
 		final File beanPackageDir = GeneratorUtil.createPackageDir

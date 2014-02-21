@@ -1,7 +1,7 @@
 package org.noorm.validation;
 
 import org.noorm.jdbc.JDBCProcedureProcessor;
-import org.noorm.metadata.MetadataService;
+import org.noorm.platform.oracle.MetadataService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

@@ -6,9 +6,10 @@ import org.noorm.generator.ValidatorClassDescriptor;
 import org.noorm.generator.m2plugin.IParameters;
 import org.noorm.generator.schema.GeneratorConfiguration;
 import org.noorm.generator.schema.Regex;
+import org.noorm.jdbc.DataSourceProvider;
 import org.noorm.jdbc.JDBCProcedureProcessor;
 import org.noorm.jdbc.Utils;
-import org.noorm.metadata.MetadataService;
+import org.noorm.platform.IMetadata;
 import org.noorm.metadata.beans.NameBean;
 import org.noorm.metadata.beans.ParameterBean;
 import org.slf4j.Logger;
@@ -78,8 +79,8 @@ public class ServiceGenerator {
 		if (packageFilter != null && packageFilter.getRegex() != null) {
 			packageFilterRegex = packageFilter.getRegex();
 		}
-		final MetadataService metadataService = MetadataService.getInstance();
-		final List<NameBean> packageNames = metadataService.findPackageNames(packageFilterRegex);
+        final IMetadata metadata = DataSourceProvider.getPlatform().getMetadata();
+		final List<NameBean> packageNames = metadata.findPackageNames(packageFilterRegex);
 		for (final NameBean packageName : packageNames) {
 			if (packageName.getName().matches(IGNORE_PACKAGE_FILTER_REGEX)) {
 				// Ignore the NoORM packages
@@ -98,17 +99,17 @@ public class ServiceGenerator {
             }
 			serviceClassDescriptor.setPackageName(configuration.getServiceJavaPackage().getName());
 			serviceClassDescriptor.setBeanPackageName(configuration.getBeanJavaPackage().getName());
-			final Integer codeHashValue = metadataService.getPackageHashValue(packageName.getName());
+			final Integer codeHashValue = metadata.getPackageHashValue(packageName.getName());
 			serviceClassDescriptor.setCodeHashValue(codeHashValue);
 			validatorClassDescriptor.getClassNames().add(javaClassName);
-			final List<NameBean> procedureNames = metadataService.findProcedureNames(packageName.getName());
+			final List<NameBean> procedureNames = metadata.findProcedureNames(packageName.getName());
 			for (NameBean procedureName : procedureNames) {
 				final ProcedureDescriptor procedureDescriptor = new ProcedureDescriptor();
 				procedureDescriptor.setDbProcedureName(procedureName.getName().toLowerCase());
 				final String javaMethodName = Utils.convertDBName2JavaName(procedureName.getName(), false);
 				procedureDescriptor.setJavaName(javaMethodName);
 				final List<ParameterBean> parameterList =
-						metadataService.findProcedureParameters(packageName.getName(), procedureName.getName());
+                        metadata.findProcedureParameters(packageName.getName(), procedureName.getName());
 				for (final ParameterBean parameter : parameterList) {
 					if (parameter.getDirection().equals(INPUT_PARAMETER)) {
 						final ParameterDescriptor parameterDescriptor = new ParameterDescriptor();
@@ -140,7 +141,7 @@ public class ServiceGenerator {
 						procedureDescriptor.setHasOutParam(true);
 						procedureDescriptor.setOutDbParamName(parameter.getName().toLowerCase());
 						if (parameter.getDataType().equals(ORACLE_REF_CURSOR_TYPE_NAME)) {
-							final String rowTypeName = metadataService.getParameterRowtype
+							final String rowTypeName = metadata.getParameterRowtype
 									(packageName.getName(), procedureName.getName(), parameter.getName());
 							if (rowTypeName.equals(NOORM_METADATA_ID_RECORD)) {
 								procedureDescriptor.setOutParamJavaType(Long.class.getSimpleName());

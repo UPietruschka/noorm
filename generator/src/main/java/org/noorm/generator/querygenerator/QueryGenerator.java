@@ -8,8 +8,9 @@ import org.noorm.generator.schema.GeneratorConfiguration;
 import org.noorm.generator.schema.OperatorName;
 import org.noorm.generator.schema.QueryColumn;
 import org.noorm.generator.schema.QueryDeclaration;
+import org.noorm.jdbc.DataSourceProvider;
 import org.noorm.jdbc.Utils;
-import org.noorm.metadata.MetadataService;
+import org.noorm.platform.IMetadata;
 import org.noorm.metadata.beans.TableMetadataBean;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -62,9 +63,9 @@ public class QueryGenerator {
                     (parameters.getDestinationDirectory(), configuration.getServiceInterfaceJavaPackage().getName());
         }
 
-        final MetadataService metadataService = MetadataService.getInstance();
+        final IMetadata metadata = DataSourceProvider.getPlatform().getMetadata();
         log.info("Retrieving table metadata from database.");
-        final Map<String, List<TableMetadataBean>> tableColumnMap = metadataService.findTableMetadata();
+        final Map<String, List<TableMetadataBean>> tableColumnMap = metadata.findTableMetadata();
 
         final Map<String, QueryClassDescriptor> queryClasses = new HashMap<String, QueryClassDescriptor>();
         for (final QueryDeclaration queryDeclaration : configuration.getQueryDeclarations()) {

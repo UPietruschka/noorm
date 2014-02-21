@@ -6,8 +6,9 @@ import org.noorm.generator.ValidatorClassDescriptor;
 import org.noorm.generator.m2plugin.IParameters;
 import org.noorm.generator.schema.GeneratorConfiguration;
 import org.noorm.generator.schema.Regex;
+import org.noorm.jdbc.DataSourceProvider;
 import org.noorm.jdbc.JDBCQueryProcessor;
-import org.noorm.metadata.MetadataService;
+import org.noorm.platform.IMetadata;
 import org.noorm.metadata.beans.TableMetadataBean;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -54,8 +55,8 @@ public class EnumGenerator {
         }
 
         log.info("Retrieving table metadata from database.");
-		final MetadataService metadataService = MetadataService.getInstance();
-		final Map<String, List<TableMetadataBean>> tableColumnMap = metadataService.findTableMetadata();
+        final IMetadata metadata = DataSourceProvider.getPlatform().getMetadata();
+		final Map<String, List<TableMetadataBean>> tableColumnMap = metadata.findTableMetadata();
 
 		log.info("Generating NoORM Enum classes.");
 		final File enumPackageDir =	GeneratorUtil.createPackageDir

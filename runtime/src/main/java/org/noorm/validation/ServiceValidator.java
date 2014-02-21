@@ -1,7 +1,8 @@
 package org.noorm.validation;
 
+import org.noorm.jdbc.DataSourceProvider;
 import org.noorm.jdbc.IService;
-import org.noorm.metadata.MetadataService;
+import org.noorm.platform.IMetadata;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -16,11 +17,11 @@ public class ServiceValidator {
 
 	public void validateService(final IService pService) {
 
-		final MetadataService metadataService = MetadataService.getInstance();
+        final IMetadata metadata = DataSourceProvider.getPlatform().getMetadata();
 
 		final String databasePackageName = pService.getDatabasePackageName().toUpperCase();
 		log.debug("Retrieving PL/SQL package code checksum (hash) from database.");
-		final int codeHashValue = metadataService.getPackageHashValue(databasePackageName);
+		final int codeHashValue = metadata.getPackageHashValue(databasePackageName);
 		if (codeHashValue == -1) {
 			validationError("Service ".concat(pService.getClass().getName())
 					.concat(" could not be validated against PL/SQL package code for ")

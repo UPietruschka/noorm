@@ -43,4 +43,11 @@ public interface IPlatform {
                    final Object pValue,
                    final int pParameterIndex,
                    final int pSQLType) throws SQLException;
+
+    /**
+     * Provides database metadata for code generation and validation of generated code.
+     *
+     * @return the platform specific implementation of the metadata retrieval functionality
+     */
+    IMetadata getMetadata();
 }

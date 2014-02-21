@@ -1,9 +1,10 @@
 package org.noorm.validation;
 
+import org.noorm.jdbc.DataSourceProvider;
 import org.noorm.jdbc.IBean;
 import org.noorm.jdbc.JDBCColumn;
 import org.noorm.metadata.BeanMetaDataUtil;
-import org.noorm.metadata.MetadataService;
+import org.noorm.platform.IMetadata;
 import org.noorm.metadata.beans.PrimaryKeyColumnBean;
 import org.noorm.metadata.beans.SequenceBean;
 import org.noorm.metadata.beans.TableMetadataBean;
@@ -30,16 +31,16 @@ public class BeanValidator {
 
 	public void loadMetadata() {
 
-		final MetadataService metadataService = MetadataService.getInstance();
+        final IMetadata metadata = DataSourceProvider.getPlatform().getMetadata();
 
 		log.debug("Retrieving table metadata from database.");
-		tableColumnMap = metadataService.findTableMetadata();
+		tableColumnMap = metadata.findTableMetadata();
 
 		log.debug("Retrieving primary key metadata from database.");
-		allPKColumnNameList = metadataService.findPkColumns();
+		allPKColumnNameList = metadata.findPkColumns();
 
 		log.debug("Retrieving sequence metadata from database.");
-		sequenceDBNameList = metadataService.findSequenceNames();
+		sequenceDBNameList = metadata.findSequenceNames();
 	}
 
 	public void validateBean(final IBean pBean) {

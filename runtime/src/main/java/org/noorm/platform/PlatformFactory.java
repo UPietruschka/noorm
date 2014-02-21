@@ -1,6 +1,8 @@
 package org.noorm.platform;
 
 import org.noorm.jdbc.DataAccessException;
+import org.noorm.platform.mssql.MSSQLPlatform;
+import org.noorm.platform.oracle.OraclePlatform;
 
 /**
  * @author Ulf Pietruschka / ulf.pietruschka@ext.secunet.com
