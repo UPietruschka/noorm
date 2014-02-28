@@ -28,7 +28,25 @@ public class MSSQLPlatform implements IPlatform {
      */
     @Override
     public DataSource getDataSource(String pURL, String pUsername, String pPassword) throws SQLException {
+
         throw new UnsupportedOperationException();
+//        SQLServerDataSource ds = new SQLServerDataSource();
+//        ds.setUser("MyUserName");
+//        ds.setPassword("*****");
+//        ds.setServerName("localhost");
+//        ds.setPortNumber(1433);
+//        ds.setDatabaseName("AdventureWorks");
+    }
+
+    /**
+     * Validates the platform specific data source
+     *
+     * @param pDataSource the data source
+     * @return a textual summary of the data source validation
+     */
+    @Override
+    public String validateDataSource(DataSource pDataSource) throws SQLException {
+        return "";
     }
 
     /**

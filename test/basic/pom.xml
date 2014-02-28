@@ -160,26 +160,25 @@
     </repositories>
 
     <dependencies>
+
         <dependency>
             <groupId>org.eclipse.persistence</groupId>
             <artifactId>org.eclipse.persistence.jpa</artifactId>
             <version>2.5.1</version>
         </dependency>
-        <dependency>
-            <groupId>${oracle.groupId}</groupId>
-            <artifactId>${oracle.driver.artifactId}</artifactId>
-            <version>${oracle.version}</version>
-        </dependency>
+
         <dependency>
             <groupId>ch.qos.logback</groupId>
             <artifactId>logback-classic</artifactId>
             <version>1.0.13</version>
         </dependency>
+
         <dependency>
             <groupId>org.eclipse.persistence</groupId>
             <artifactId>javax.persistence</artifactId>
             <version>2.1.0</version>
         </dependency>
+
     </dependencies>
 
 </project>

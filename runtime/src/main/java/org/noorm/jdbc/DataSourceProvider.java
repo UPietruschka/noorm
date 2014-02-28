@@ -1,7 +1,5 @@
 package org.noorm.jdbc;
 
-import oracle.jdbc.OracleConnection;
-import oracle.jdbc.pool.OracleDataSource;
 import org.noorm.platform.IPlatform;
 import org.noorm.platform.PlatformFactory;
 import org.slf4j.Logger;
@@ -19,7 +17,6 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Properties;
 
 /**
  * DataSourceProvider manages data sources and controls transactions in the NoORM runtime engine.
@@ -168,31 +165,14 @@ public class DataSourceProvider {
 	 */
 	private static void validateDataSource(final DataSource dataSource) {
 
-		final StringBuilder validationInfo = new StringBuilder();
-		validationInfo.append("Validating data source. ");
 		try {
-			if (dataSource instanceof OracleDataSource) {
-                final Properties connectionProperties = new Properties();
-                connectionProperties.setProperty(OracleConnection.CONNECTION_PROPERTY_FIXED_STRING, "true");
-                ((OracleDataSource) dataSource).setConnectionProperties(connectionProperties);
-				validationInfo.append("Connection parameters: ");
-				validationInfo.append(";URL: ");
-				validationInfo.append(((OracleDataSource) dataSource).getURL());
-				validationInfo.append(";Username: ");
-				validationInfo.append(((OracleDataSource) dataSource).getUser());
-			} else {
-				validationInfo.append("Unable to retrieve connection parameters from data source. [");
-				validationInfo.append(dataSource.getClass().getName());
-				validationInfo.append("]");
-			}
-			//}
-			log.info(validationInfo.toString());
             java.sql.Connection con = dataSource.getConnection();
             if (platform == null) {
                 final DatabaseMetaData metaData = con.getMetaData();
                 final String databaseProductName = metaData.getDatabaseProductName();
                 platform = PlatformFactory.createPlatform(databaseProductName);
             }
+            log.info(platform.validateDataSource(dataSource));
             con.close();
 		} catch (Exception e) {
 			throw new DataAccessException(DataAccessException.Type.COULD_NOT_ESTABLISH_CONNECTION, e);
@@ -324,16 +304,8 @@ public class DataSourceProvider {
 				}
 			}
 
-			// JDBC resources provided by an application server may wrap the native connection with some
-			// proprietary connection implementation. This prevents the usage of vendor specific features,
-			// in particular Oracle specific features used here. Thus, the provided connection is checked
-			// for a wrapped native connection and this connection is then unwrapped and used instead.
 			java.sql.Connection dataSourceConn = getDataSource().getConnection();
-			if (dataSourceConn.isWrapperFor(oracle.jdbc.OracleConnection.class)) {
-				con = dataSourceConn.unwrap(oracle.jdbc.OracleConnection.class);
-			} else {
-				con = dataSourceConn;
-			}
+		    con = dataSourceConn;
             if (log.isDebugEnabled()) {
                 log.debug("Acquired connection : ".concat(con.toString()));
             }

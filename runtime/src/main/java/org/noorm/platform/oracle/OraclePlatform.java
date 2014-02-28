@@ -1,5 +1,6 @@
 package org.noorm.platform.oracle;
 
+import oracle.jdbc.OracleConnection;
 import oracle.jdbc.pool.OracleDataSource;
 import org.noorm.platform.IMetadata;
 import org.noorm.platform.IPlatform;
@@ -55,6 +56,34 @@ public class OraclePlatform implements IPlatform {
         oracleDataSource.setConnectionCacheProperties(cacheProps);
 
         return oracleDataSource;
+    }
+
+    /**
+     * Validates the platform specific data source
+     *
+     * @param pDataSource the data source
+     * @return a textual summary of the data source validation
+     */
+    @Override
+    public String validateDataSource(DataSource pDataSource) throws SQLException {
+
+        final StringBuilder validationInfo = new StringBuilder();
+        validationInfo.append("Validating data source. ");
+        if (pDataSource instanceof OracleDataSource) {
+            final Properties connectionProperties = new Properties();
+            connectionProperties.setProperty(OracleConnection.CONNECTION_PROPERTY_FIXED_STRING, "true");
+            ((OracleDataSource) pDataSource).setConnectionProperties(connectionProperties);
+            validationInfo.append("Connection parameters: ");
+            validationInfo.append(";URL: ");
+            validationInfo.append(((OracleDataSource) pDataSource).getURL());
+            validationInfo.append(";Username: ");
+            validationInfo.append(((OracleDataSource) pDataSource).getUser());
+        } else {
+            validationInfo.append("Unable to retrieve connection parameters from data source. [");
+            validationInfo.append(pDataSource.getClass().getName());
+            validationInfo.append("]");
+        }
+        return validationInfo.toString();
     }
 
     /**

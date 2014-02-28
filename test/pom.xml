@@ -19,6 +19,11 @@
     </modules>
 
     <properties>
+        <oracle.groupId>com.oracle</oracle.groupId>
+        <oracle.version>11.2.0.2.0</oracle.version>
+        <oracle.driver.artifactId>ojdbc6</oracle.driver.artifactId>
+        <oracle.xdb.artifactId>xdb</oracle.xdb.artifactId>
+        <oracle.xmlparser.artifactId>xmlparserv2</oracle.xmlparser.artifactId>
         <jdbc.driver.name>oracle.jdbc.OracleDriver</jdbc.driver.name>
         <jdbc.url>jdbc:oracle:thin:@
             (DESCRIPTION =
@@ -64,6 +69,12 @@
     </profiles>
 
     <dependencies>
+
+        <dependency>
+            <groupId>${oracle.groupId}</groupId>
+            <artifactId>${oracle.driver.artifactId}</artifactId>
+            <version>${oracle.version}</version>
+        </dependency>
 
         <dependency>
             <groupId>org.noorm</groupId>

@@ -30,11 +30,6 @@
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <oracle.groupId>com.oracle</oracle.groupId>
-        <oracle.version>11.2.0.2.0</oracle.version>
-        <oracle.driver.artifactId>ojdbc6</oracle.driver.artifactId>
-        <oracle.xdb.artifactId>xdb</oracle.xdb.artifactId>
-        <oracle.xmlparser.artifactId>xmlparserv2</oracle.xmlparser.artifactId>
     </properties>
 
     <developers>
@@ -119,13 +114,6 @@
     </build>
 
     <dependencies>
-
-        <dependency>
-            <groupId>${oracle.groupId}</groupId>
-            <artifactId>${oracle.driver.artifactId}</artifactId>
-            <version>${oracle.version}</version>
-            <scope>provided</scope>
-        </dependency>
 
         <dependency>
             <groupId>org.slf4j</groupId>
