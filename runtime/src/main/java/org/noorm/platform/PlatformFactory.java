@@ -13,15 +13,23 @@ import org.noorm.platform.oracle.OraclePlatform;
  */
 public class PlatformFactory {
 
-    private static final String ORACLE_PRODUCT_NAME = "Oracle";
-    private static final String MSSQL_PRODUCT_NAME = "Microsoft SQL Server";
+    public static IPlatform createPlatform(final Class pDataSourceClass) {
+
+        if (pDataSourceClass.getName().contains("Oracle")) {
+            return new OraclePlatform();
+        }
+        if (pDataSourceClass.getName().contains("SQLServer")) {
+            return new MSSQLPlatform();
+        }
+        throw new DataAccessException(DataAccessException.Type.UNSUPPORTED_PLATFORM, pDataSourceClass.getName());
+    }
 
     public static IPlatform createPlatform(final String pDatabaseProductName) {
 
-        if (ORACLE_PRODUCT_NAME.equals(pDatabaseProductName)) {
+        if (pDatabaseProductName.equals("Oracle")) {
             return new OraclePlatform();
         }
-        if (MSSQL_PRODUCT_NAME.equals(pDatabaseProductName)) {
+        if (pDatabaseProductName.equals("Microsoft SQL Server")) {
             return new MSSQLPlatform();
         }
         throw new DataAccessException(DataAccessException.Type.UNSUPPORTED_PLATFORM, pDatabaseProductName);

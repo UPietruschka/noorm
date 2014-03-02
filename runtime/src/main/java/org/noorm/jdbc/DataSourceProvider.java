@@ -166,13 +166,11 @@ public class DataSourceProvider {
 	private static void validateDataSource(final DataSource dataSource) {
 
 		try {
-            java.sql.Connection con = dataSource.getConnection();
             if (platform == null) {
-                final DatabaseMetaData metaData = con.getMetaData();
-                final String databaseProductName = metaData.getDatabaseProductName();
-                platform = PlatformFactory.createPlatform(databaseProductName);
+                platform = PlatformFactory.createPlatform(dataSource.getClass());
             }
             log.info(platform.validateDataSource(dataSource));
+            java.sql.Connection con = dataSource.getConnection();
             con.close();
 		} catch (Exception e) {
 			throw new DataAccessException(DataAccessException.Type.COULD_NOT_ESTABLISH_CONNECTION, e);
