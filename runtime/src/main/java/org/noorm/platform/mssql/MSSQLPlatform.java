@@ -1,5 +1,6 @@
 package org.noorm.platform.mssql;
 
+import com.microsoft.sqlserver.jdbc.SQLServerDataSource;
 import org.noorm.platform.IMetadata;
 import org.noorm.platform.IPlatform;
 
@@ -29,13 +30,11 @@ public class MSSQLPlatform implements IPlatform {
     @Override
     public DataSource getDataSource(String pURL, String pUsername, String pPassword) throws SQLException {
 
-        throw new UnsupportedOperationException();
-//        SQLServerDataSource ds = new SQLServerDataSource();
-//        ds.setUser("MyUserName");
-//        ds.setPassword("*****");
-//        ds.setServerName("localhost");
-//        ds.setPortNumber(1433);
-//        ds.setDatabaseName("AdventureWorks");
+        final SQLServerDataSource dataSource = new SQLServerDataSource();
+        dataSource.setUser(pUsername);
+        dataSource.setPassword(pPassword);
+        dataSource.setURL(pURL);
+        return dataSource;
     }
 
     /**
@@ -46,7 +45,21 @@ public class MSSQLPlatform implements IPlatform {
      */
     @Override
     public String validateDataSource(DataSource pDataSource) throws SQLException {
-        return "";
+
+        final StringBuilder validationInfo = new StringBuilder();
+        validationInfo.append("Validating data source. ");
+        if (pDataSource instanceof SQLServerDataSource) {
+            validationInfo.append("Connection parameters: ");
+            validationInfo.append(";URL: ");
+            validationInfo.append(((SQLServerDataSource) pDataSource).getURL());
+            validationInfo.append(";Username: ");
+            validationInfo.append(((SQLServerDataSource) pDataSource).getUser());
+        } else {
+            validationInfo.append("Unable to retrieve connection parameters from data source. [");
+            validationInfo.append(pDataSource.getClass().getName());
+            validationInfo.append("]");
+        }
+        return validationInfo.toString();
     }
 
     /**

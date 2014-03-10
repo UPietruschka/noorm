@@ -35,5 +35,11 @@
             <version>${oracle.version}</version>
             <scope>provided</scope>
         </dependency>
+        <dependency>
+            <groupId>com.microsoft</groupId>
+            <artifactId>sqljdbc4</artifactId>
+            <version>2012</version>
+            <scope>provided</scope>
+        </dependency>
     </dependencies>
 </project>
