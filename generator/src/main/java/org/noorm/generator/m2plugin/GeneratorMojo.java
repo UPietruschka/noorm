@@ -105,7 +105,7 @@ public class GeneratorMojo extends AbstractMojo implements IParameters {
             // a single Maven build, we should at least generate a unique name, since DataSourceProvider does
             // not allow to replace an already added data source (with the same name).
             final String dataSourceName = Long.toString(System.currentTimeMillis());
-			DataSourceProvider.addDataSource(initializeDataSource(), dataSourceName, true);
+			DataSourceProvider.addDataSource(initializeDataSource(), dataSourceName, platformName, true);
 		} catch (SQLException e) {
 			throw new MojoExecutionException("Initializing DataSource failed.", e);
 		}

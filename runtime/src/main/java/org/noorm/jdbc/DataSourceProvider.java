@@ -11,7 +11,6 @@ import javax.naming.NamingException;
 import javax.sql.DataSource;
 import java.sql.CallableStatement;
 import java.sql.Connection;
-import java.sql.DatabaseMetaData;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -136,17 +135,19 @@ public class DataSourceProvider {
      *
      * @param pDataSource the pre-configured data source.
      * @param pDataSourceName the name of the data source. Used by method setActiveDataSource.
+     * @param pPlatformName the database platform name
      * @param pActivate determines, whether the data source should be activated right after it has been added.
      */
 	public static void addDataSource(final DataSource pDataSource,
                                      final String pDataSourceName,
+                                     final String pPlatformName,
                                      final boolean pActivate) {
 
         ActiveDataSource activeDataSource = activeDataSourceMap.get(pDataSourceName);
         if (activeDataSource != null) {
             throw new DataAccessException(DataAccessException.Type.DATA_SOURCE_ALREADY_ADDED);
         }
-        validateDataSource(pDataSource);
+        validateDataSource(pDataSource, pPlatformName);
         activeDataSource = new ActiveDataSource();
         final DataSourceConfiguration configuration = new DataSourceConfiguration();
         activeDataSource.setName(pDataSourceName);
@@ -163,11 +164,11 @@ public class DataSourceProvider {
 	 * data source constructed using the NoORM properties, a connection is established to validate
 	 * the data source.
 	 */
-	private static void validateDataSource(final DataSource dataSource) {
+	private static void validateDataSource(final DataSource dataSource, final String pPlatform) {
 
 		try {
             if (platform == null) {
-                platform = PlatformFactory.createPlatform(dataSource.getClass());
+                platform = PlatformFactory.createPlatform(dataSource.getClass(), pPlatform);
             }
             log.info(platform.validateDataSource(dataSource));
             java.sql.Connection con = dataSource.getConnection();
@@ -227,7 +228,7 @@ public class DataSourceProvider {
             dataSource = platform.getDataSource(url, username, password);
 		}
 
-		validateDataSource(dataSource);
+		validateDataSource(dataSource, pDataSourceConfiguration.getDatabasePlatform());
         return dataSource;
 	}
 
