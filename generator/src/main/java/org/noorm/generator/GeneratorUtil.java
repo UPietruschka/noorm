@@ -152,7 +152,7 @@ public class GeneratorUtil {
             }
         }
 
-        return convertDatabaseType2JavaType(pDatabaseType, 0L, 0L);
+        return convertDatabaseType2JavaType(pDatabaseType, 0);
     }
 
     /**
@@ -160,8 +160,7 @@ public class GeneratorUtil {
      * the generated Java Bean class (e.g. "VARCHAR2" / "String").
      *
      * @param pDatabaseType the database type name
-     * @param pDataPrecision the data precision of the database type, if available
-     * @param pDataScale the data scale of the database type, if available
+     * @param pDecimalDigits the data scale of the database type, if available
      * @param pTableName the table name
      * @param pColumnName the column name
      * @param pTypeMappings the custom type mapping
@@ -169,8 +168,7 @@ public class GeneratorUtil {
      */
 
     public static String convertDatabaseType2JavaType(final String pDatabaseType,
-                                                      final Long pDataPrecision,
-                                                      final Long pDataScale,
+                                                      final int pDecimalDigits,
                                                       final String pTableName,
                                                       final String pColumnName,
                                                       final List<TypeMapping> pTypeMappings) {
@@ -216,12 +214,11 @@ public class GeneratorUtil {
             }
         }
 
-        return convertDatabaseType2JavaType(pDatabaseType, pDataPrecision, pDataScale);
+        return convertDatabaseType2JavaType(pDatabaseType, pDecimalDigits);
     }
 
     private static String convertDatabaseType2JavaType(final String pDatabaseType,
-                                                       final Long pDataPrecision,
-                                                       final Long pDataScale) {
+                                                       final int pDecimalDigits) {
         String javaType = "String";
         if (pDatabaseType.endsWith("RAW")) {
             javaType = "byte[]";
@@ -236,7 +233,7 @@ public class GeneratorUtil {
             javaType = "java.sql.NClob";
         }
         if (pDatabaseType.equals("NUMBER")) {
-            if (pDataPrecision != null && pDataPrecision > 0L && pDataScale != null && pDataScale > 0L) {
+            if (pDecimalDigits > 0) {
                 javaType = "Double";
             } else {
                 javaType = "Long";

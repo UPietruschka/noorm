@@ -7,7 +7,7 @@ import org.noorm.metadata.BeanMetaDataUtil;
 import org.noorm.platform.IMetadata;
 import org.noorm.metadata.beans.PrimaryKeyColumnBean;
 import org.noorm.metadata.beans.SequenceBean;
-import org.noorm.metadata.beans.TableMetadataBean;
+import org.noorm.platform.TableMetadata;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -25,7 +25,7 @@ public class BeanValidator {
 
 	private static final Logger log = LoggerFactory.getLogger(BeanValidator.class);
 
-	protected Map<String, List<TableMetadataBean>> tableColumnMap;
+	protected Map<String, List<TableMetadata>> tableColumnMap;
 	protected List<PrimaryKeyColumnBean> allPKColumnNameList;
 	protected List<SequenceBean> sequenceDBNameList;
 
@@ -48,13 +48,13 @@ public class BeanValidator {
 		final String tableName = pBean.getTableName();
 		final String javaBeanName = pBean.getClass().getName();
 		log.info("Validating Java Bean ".concat(javaBeanName).concat(" against database table ".concat(tableName)));
-		final List<TableMetadataBean> tableMetadataBeanList = tableColumnMap.get(tableName);
-		if (tableMetadataBeanList == null || tableMetadataBeanList.isEmpty()) {
+		final List<TableMetadata> tableMetadataList = tableColumnMap.get(tableName);
+		if (tableMetadataList == null || tableMetadataList.isEmpty()) {
 			validationError("Cannot find table ".concat(tableName).concat(" in connected DB schema."));
 		}
 		final Map<String, JDBCColumn> beanMetadata = BeanMetaDataUtil.getColumnMetaData(pBean.getClass());
-		for (final TableMetadataBean tableMetadataBean : tableMetadataBeanList) {
-			final String columnName = tableMetadataBean.getColumnName();
+		for (final TableMetadata tableMetadata : tableMetadataList) {
+			final String columnName = tableMetadata.getColumnName();
 			final StringBuilder msgBuilder = new StringBuilder();
 			msgBuilder.append("Table column ");
 			msgBuilder.append(tableName);
@@ -71,14 +71,14 @@ public class BeanValidator {
 				if (jdbcColumn.name().equals(columnName)) {
 					// Validating annotated data-type against database metadata.
 // TODO: re-enable validation
-//					if (!jdbcColumn.dataType().equals(tableMetadataBean.getDataType())) {
+//					if (!jdbcColumn.dataType().equals(tableMetadata.getDataType())) {
 //						validationError(exceptionPrefix.concat("Data-type mismatch: [")
-//								.concat(tableMetadataBean.getDataType()).concat(" / ")
+//								.concat(tableMetadata.getDataType()).concat(" / ")
 //								.concat(jdbcColumn.dataType().concat("].")));
 //					}
 					// Validating annotated nullable-attribute against database metadata.
 					boolean isNullable = true;
-					if (tableMetadataBean.getNullable().equals(BeanMetaDataUtil.NOT_NULLABLE)) {
+					if (!tableMetadata.getNullable()) {
 						isNullable = false;
 					}
 					if (jdbcColumn.nullable() != isNullable) {
@@ -86,14 +86,14 @@ public class BeanValidator {
 					}
 					// Validating annotated updatable-attribute against database metadata.
 					boolean isUpdatable = true;
-					if (tableMetadataBean.getUpdatable().equals(BeanMetaDataUtil.NOT_UPDATABLE)) {
+					if (!tableMetadata.getUpdatable()) {
 						isUpdatable = false;
 					}
 					if (jdbcColumn.updatable() != isUpdatable) {
 						validationError(exceptionPrefix.concat("Updatable indicator mismatch"));
 					}
 					// Validating annotated max-length against database metadata.
-					if (jdbcColumn.maxLength() > 0 && (jdbcColumn.maxLength() != tableMetadataBean.getCharLength())) {
+					if (jdbcColumn.maxLength() > 0 && (jdbcColumn.maxLength() != tableMetadata.getColumnSize())) {
 						validationError(exceptionPrefix.concat("Data length mismatch"));
 					}
 					log.debug("Table column ".concat(tableName).concat(".")

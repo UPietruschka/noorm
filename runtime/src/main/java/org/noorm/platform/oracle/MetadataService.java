@@ -5,8 +5,8 @@ import org.noorm.metadata.beans.NameBean;
 import org.noorm.metadata.beans.ParameterBean;
 import org.noorm.metadata.beans.PrimaryKeyColumnBean;
 import org.noorm.metadata.beans.SequenceBean;
-import org.noorm.metadata.beans.TableMetadataBean;
 import org.noorm.platform.IMetadata;
+import org.noorm.platform.TableMetadata;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -24,6 +24,8 @@ public class MetadataService implements IMetadata {
 
 	private static final Logger log = LoggerFactory.getLogger(MetadataService.class);
 
+    public static final String UPDATABLE = "YES";
+    public static final String NULLABLE = "Y";
 	private static MetadataService metadataService = new MetadataService();
 
 	protected MetadataService() {
@@ -45,21 +47,31 @@ public class MetadataService implements IMetadata {
 	}
 
 	@Override
-    public Map<String, List<TableMetadataBean>> findTableMetadata() {
+    public Map<String, List<TableMetadata>> findTableMetadata() {
 
 		final List<TableMetadataBean> tableMetadataBeanList = findTableMetadata0();
-		final Map<String, List<TableMetadataBean>> tableColumnMap = new HashMap<String, List<TableMetadataBean>>();
+		final Map<String, List<TableMetadata>> tableColumnMap = new HashMap<String, List<TableMetadata>>();
 		String tableName = "";
-		List<TableMetadataBean> tableMetadataBeanList0 = null;
+		List<TableMetadata> tableMetadataList0 = null;
 		for (TableMetadataBean tableMetadataBean : tableMetadataBeanList) {
 			// Filter out duplicates
 			if (!tableName.equals(tableMetadataBean.getTableName())) {
 				tableName = tableMetadataBean.getTableName();
 				log.debug("Collecting table metadata for table ".concat(tableName));
-				tableMetadataBeanList0 = new ArrayList<TableMetadataBean>();
-				tableColumnMap.put(tableName, tableMetadataBeanList0);
+				tableMetadataList0 = new ArrayList<TableMetadata>();
+				tableColumnMap.put(tableName, tableMetadataList0);
 			}
-			tableMetadataBeanList0.add(tableMetadataBean);
+            final TableMetadata tableMetadata = new TableMetadata();
+            tableMetadata.setTableName(tableMetadataBean.getTableName());
+            tableMetadata.setColumnName(tableMetadataBean.getColumnName());
+            tableMetadata.setTypeName(tableMetadataBean.getDataType());
+            tableMetadata.setColumnSize(tableMetadataBean.getCharLength().intValue());
+            if (tableMetadataBean.getDataScale() != null) {
+                tableMetadata.setDecimalDigits(tableMetadataBean.getDataScale().intValue());
+            }
+            tableMetadata.setNullable(tableMetadataBean.getNullable().equals(NULLABLE));
+            tableMetadata.setUpdatable(tableMetadataBean.getUpdatable().equals(UPDATABLE));
+			tableMetadataList0.add(tableMetadata);
 		}
 		return tableColumnMap;
 	}
@@ -146,21 +158,31 @@ public class MetadataService implements IMetadata {
 	}
 
 	@Override
-    public Map<String, List<TableMetadataBean>> findRecordMetadata() {
+    public Map<String, List<TableMetadata>> findRecordMetadata() {
 
 		final List<TableMetadataBean> recordMetadataBeanList = findRecordMetadata0();
-		final Map<String, List<TableMetadataBean>> recordColumnMap = new HashMap<String, List<TableMetadataBean>>();
+		final Map<String, List<TableMetadata>> recordColumnMap = new HashMap<String, List<TableMetadata>>();
 		String recordName = "";
-		List<TableMetadataBean> recordMetadataBeanList0 = null;
+		List<TableMetadata> recordMetadataList0 = null;
 		for (TableMetadataBean recordMetadataBean : recordMetadataBeanList) {
 			// Filter out duplicates
 			if (!recordName.equals(recordMetadataBean.getTableName())) {
 				recordName = recordMetadataBean.getTableName();
 				log.debug("Collecting record metadata for record ".concat(recordName));
-				recordMetadataBeanList0 = new ArrayList<TableMetadataBean>();
-				recordColumnMap.put(recordName, recordMetadataBeanList0);
+				recordMetadataList0 = new ArrayList<TableMetadata>();
+				recordColumnMap.put(recordName, recordMetadataList0);
 			}
-			recordMetadataBeanList0.add(recordMetadataBean);
+            final TableMetadata recordMetadata = new TableMetadata();
+            recordMetadata.setTableName(recordMetadataBean.getTableName());
+            recordMetadata.setColumnName(recordMetadataBean.getColumnName());
+            recordMetadata.setTypeName(recordMetadataBean.getDataType());
+            recordMetadata.setColumnSize(recordMetadataBean.getCharLength().intValue());
+            if (recordMetadataBean.getDataScale() != null) {
+                recordMetadata.setDecimalDigits(recordMetadataBean.getDataScale().intValue());
+            }
+            recordMetadata.setNullable(recordMetadataBean.getNullable().equals(NULLABLE));
+            recordMetadata.setUpdatable(recordMetadataBean.getUpdatable().equals(UPDATABLE));
+			recordMetadataList0.add(recordMetadata);
 		}
 		return recordColumnMap;
 	}

@@ -1,19 +1,13 @@
 package org.noorm.platform.mssql;
 
-import org.noorm.jdbc.DataAccessException;
-import org.noorm.jdbc.DataSourceProvider;
 import org.noorm.jdbc.JDBCQueryProcessor;
 import org.noorm.metadata.beans.NameBean;
 import org.noorm.metadata.beans.ParameterBean;
 import org.noorm.metadata.beans.PrimaryKeyColumnBean;
 import org.noorm.metadata.beans.SequenceBean;
-import org.noorm.metadata.beans.TableMetadataBean;
 import org.noorm.platform.IMetadata;
+import org.noorm.platform.TableMetadata;
 
-import java.sql.Connection;
-import java.sql.DatabaseMetaData;
-import java.sql.ResultSet;
-import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -53,7 +47,7 @@ public class JDBCMetadata implements IMetadata {
      * @return the requested
      */
     @Override
-    public Map<String, List<TableMetadataBean>> findTableMetadata() {
+    public Map<String, List<TableMetadata>> findTableMetadata() {
 
         throw new UnsupportedOperationException();
 //        final Map<String, List<TableMetadataBean>> tableMetaData = new HashMap<String, List<TableMetadataBean>>();
@@ -267,9 +261,9 @@ public class JDBCMetadata implements IMetadata {
      * @return the list of record metadata
      */
     @Override
-    public Map<String, List<TableMetadataBean>> findRecordMetadata() {
+    public Map<String, List<TableMetadata>> findRecordMetadata() {
 
-        final Map<String, List<TableMetadataBean>> recordMetadata = new HashMap<String, List<TableMetadataBean>>();
+        final Map<String, List<TableMetadata>> recordMetadata = new HashMap<String, List<TableMetadata>>();
         return recordMetadata;
     }
 }

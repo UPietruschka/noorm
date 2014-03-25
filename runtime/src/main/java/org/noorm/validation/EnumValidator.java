@@ -7,7 +7,7 @@ import org.noorm.jdbc.JDBCQueryProcessor;
 import org.noorm.jdbc.Utils;
 import org.noorm.metadata.BeanMetaDataUtil;
 import org.noorm.platform.IMetadata;
-import org.noorm.metadata.beans.TableMetadataBean;
+import org.noorm.platform.TableMetadata;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -25,7 +25,7 @@ public class EnumValidator {
 
 	private static final Logger log = LoggerFactory.getLogger(EnumValidator.class);
 
-	protected Map<String, List<TableMetadataBean>> tableColumnMap;
+	protected Map<String, List<TableMetadata>> tableColumnMap;
 
 	public void loadMetadata() {
 
@@ -48,8 +48,8 @@ public class EnumValidator {
 		msgBuilder.append(" failed.");
 		final String exceptionPrefix = msgBuilder.toString();
 		final String displayColumnName = enumArray[0].getDisplayColumnName();
-		final List<TableMetadataBean> tableMetadataBeanList = tableColumnMap.get(tableName);
-		if (tableMetadataBeanList == null || tableMetadataBeanList.isEmpty()) {
+		final List<TableMetadata> tableMetadataList = tableColumnMap.get(tableName);
+		if (tableMetadataList == null || tableMetadataList.isEmpty()) {
 			validationError(exceptionPrefix.concat(" Cannot find database table."));
 		}
 		// We omit direct meta-data validation here (like we do in BeanValidator), since we do access

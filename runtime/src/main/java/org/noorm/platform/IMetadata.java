@@ -4,10 +4,7 @@ import org.noorm.metadata.beans.NameBean;
 import org.noorm.metadata.beans.ParameterBean;
 import org.noorm.metadata.beans.PrimaryKeyColumnBean;
 import org.noorm.metadata.beans.SequenceBean;
-import org.noorm.metadata.beans.TableMetadataBean;
 
-import java.sql.PreparedStatement;
-import java.sql.SQLException;
 import java.util.List;
 import java.util.Map;
 
@@ -30,7 +27,7 @@ public interface IMetadata {
      *
      * @return the requested
      */
-    Map<String, List<TableMetadataBean>> findTableMetadata();
+    Map<String, List<TableMetadata>> findTableMetadata();
 
     /**
      * Returns the list of packages of stored procedures subject to Java code generation.
@@ -96,5 +93,5 @@ public interface IMetadata {
      *
      * @return the list of record metadata
      */
-    Map<String, List<TableMetadataBean>> findRecordMetadata();
+    Map<String, List<TableMetadata>> findRecordMetadata();
 }

@@ -1,4 +1,4 @@
-package org.noorm.metadata.beans;
+package org.noorm.platform.oracle;
 
 import org.noorm.jdbc.JDBCColumn;
 

@@ -7,11 +7,10 @@ import org.noorm.generator.m2plugin.IParameters;
 import org.noorm.generator.schema.GeneratorConfiguration;
 import org.noorm.generator.schema.Regex;
 import org.noorm.jdbc.DataSourceProvider;
-import org.noorm.metadata.BeanMetaDataUtil;
 import org.noorm.platform.IMetadata;
 import org.noorm.metadata.beans.PrimaryKeyColumnBean;
 import org.noorm.metadata.beans.SequenceBean;
-import org.noorm.metadata.beans.TableMetadataBean;
+import org.noorm.platform.TableMetadata;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -75,9 +74,9 @@ public class BeanGenerator {
         final IMetadata metadata = DataSourceProvider.getPlatform().getMetadata();
 
 		log.info("Retrieving table metadata from database.");
-		final Map<String, List<TableMetadataBean>> tableColumnMap = metadata.findTableMetadata();
+		final Map<String, List<TableMetadata>> tableColumnMap = metadata.findTableMetadata();
 		log.info("Retrieving record metadata from database.");
-		final Map<String, List<TableMetadataBean>> recordColumnMap = metadata.findRecordMetadata();
+		final Map<String, List<TableMetadata>> recordColumnMap = metadata.findRecordMetadata();
 		tableColumnMap.putAll(recordColumnMap);
 
 		log.info("Retrieving primary key metadata from database.");
@@ -113,7 +112,7 @@ public class BeanGenerator {
 			}
 			final String javaBeanName =
                     GeneratorUtil.convertTableName2JavaName(tableName0, configuration.getTableNameMappings());
-			final List<TableMetadataBean> tableMetadataBeanList1 = tableColumnMap.get(tableName0);
+			final List<TableMetadata> tableMetadataList1 = tableColumnMap.get(tableName0);
 			final BeanClassDescriptor beanClassDescriptor = new BeanClassDescriptor();
 			beanClassDescriptor.setName(javaBeanName);
 			if (configuration.getExtendedBeanMappings() != null) {
@@ -160,7 +159,7 @@ public class BeanGenerator {
                     && tableName0.matches(inlineSequenceTableFilter.getRegex())) {
                 beanClassDescriptor.setUseInlineSequenceValueGeneration(true);
             }
-			final String versionColumnName = getVersionColumnName(tableName0, tableMetadataBeanList1);
+			final String versionColumnName = getVersionColumnName(tableName0, tableMetadataList1);
 			beanClassDescriptor.setVersionColumnName(versionColumnName);
 			beanClassDescriptor.setPackageName(configuration.getBeanJavaPackage().getName());
 			// Use a unique seed for serialVersionUID generation to guarantee the generation of a reproducible
@@ -170,74 +169,72 @@ public class BeanGenerator {
 			beanClassDescriptor.setSerialVersionUID(serialVersionUID);
             boolean unsupportedOptLockFullRowCompareTypes = false;
             String versionColumnType = "";
-			for (final TableMetadataBean tableMetadataBean : tableMetadataBeanList1) {
+			for (final TableMetadata tableMetadata : tableMetadataList1) {
 				final BeanAttributeDescriptor beanAttributeDescriptor = new BeanAttributeDescriptor();
-                final String columnName = tableMetadataBean.getColumnName();
+                final String columnName = tableMetadata.getColumnName();
                 final String javaName = GeneratorUtil.convertColumnName2JavaName
                         (columnName, false, configuration.getColumnNameMappings());
 				beanAttributeDescriptor.setName(javaName);
                 final String methodNamePostfix = GeneratorUtil.convertColumnName2JavaName
                         (columnName, true, configuration.getColumnNameMappings());
                 beanAttributeDescriptor.setMethodNamePostfix(methodNamePostfix);
-                final String dataType = tableMetadataBean.getDataType();
-				final String javaType = GeneratorUtil.convertDatabaseType2JavaType(dataType,
-                        tableMetadataBean.getDataPrecision(), tableMetadataBean.getDataScale(),
-                        tableMetadataBean.getTableName(), columnName, configuration.getTypeMappings());
-				if (tableMetadataBean.getUpdatable().equals(BeanMetaDataUtil.NOT_UPDATABLE) ||
-						tableMetadataBean.getInsertable().equals(BeanMetaDataUtil.NOT_UPDATABLE)) {
+                final String typeName = tableMetadata.getTypeName();
+				final String javaType = GeneratorUtil.convertDatabaseType2JavaType(typeName,
+                        tableMetadata.getDecimalDigits(), tableMetadata.getTableName(),
+                        columnName, configuration.getTypeMappings());
+				if (!tableMetadata.getUpdatable()) {
 					beanAttributeDescriptor.setUpdatable(false);
 				}
 				beanAttributeDescriptor.setType(javaType);
 
                 /* Preliminary, to be replaced by JDBC metadata access --> */
                 String jdbcType = "Types.VARCHAR";
-                if (dataType.equals("CHAR")) {
+                if (typeName.equals("CHAR")) {
                     jdbcType = "Types.CHAR";
                 }
-                if (dataType.endsWith("RAW")) {
+                if (typeName.endsWith("RAW")) {
                     jdbcType = "Types.BINARY";
                 }
-                if (dataType.equals("XMLTYPE")) {
+                if (typeName.equals("XMLTYPE")) {
                     jdbcType = "Types.SQLXML";
                 }
-                if (dataType.equals("BLOB")) {
+                if (typeName.equals("BLOB")) {
                     jdbcType = "Types.BLOB";
                 }
-                if (dataType.equals("CLOB")) {
+                if (typeName.equals("CLOB")) {
                     jdbcType = "Types.CLOB";
                 }
-                if (dataType.equals("NCLOB")) {
+                if (typeName.equals("NCLOB")) {
                     jdbcType = "Types.NCLOB";
                 }
-                if (dataType.equals("NUMBER")) {
-                    final Long dataPrecision = tableMetadataBean.getDataPrecision();
-                    final Long dataScale = tableMetadataBean.getDataScale();
-                    if (dataPrecision != null && dataPrecision > 0L && dataScale != null && dataScale > 0L) {
+                if (typeName.equals("NUMBER")) {
+                    final int decimalDigits = tableMetadata.getDecimalDigits();
+                    if (decimalDigits > 0) {
                         jdbcType = "Types.DOUBLE";
                     } else {
                         jdbcType = "Types.NUMERIC";
                     }
                 }
-                if (dataType.equals("BINARY_FLOAT")) {
+                if (typeName.equals("BINARY_FLOAT")) {
                     jdbcType = "Types.FLOAT";
                 }
-                if (dataType.equals("BINARY_DOUBLE")) {
+                if (typeName.equals("BINARY_DOUBLE")) {
                     jdbcType = "Types.DOUBLE";
                 }
-                if (dataType.equals("FLOAT")) {
+                if (typeName.equals("FLOAT")) {
                     jdbcType = "Types.DOUBLE";
                 }
-                if (dataType.equals("DATE")) {
+                if (typeName.equals("DATE")) {
                     jdbcType = "Types.DATE";
                 }
-                if (dataType.startsWith("TIMESTAMP")) {
+                if (typeName.startsWith("TIMESTAMP")) {
                     jdbcType = "Types.TIMESTAMP";
                 }
                 beanAttributeDescriptor.setDataType(jdbcType);
                 /* Preliminary, to be replaced by JDBC metadata access <-- */
 
 				//beanAttributeDescriptor.setDataType(dataType);
-                if (dataType.equals("CLOB") || dataType.equals("BLOB") || dataType.equals("XMLTYPE")) {
+                if (typeName.equals("CLOB") || typeName.equals("BLOB") || typeName.equals("XMLTYPE")) {
                     unsupportedOptLockFullRowCompareTypes = true;
                 }
                 if (!columnName.equals(columnName.toUpperCase())) {
@@ -245,11 +242,11 @@ public class BeanGenerator {
                 }
 				beanAttributeDescriptor.setColumnName(columnName);
                 if (versionColumnName.equals(columnName)) {
-                    versionColumnType = dataType;
+                    versionColumnType = typeName;
                     beanClassDescriptor.setVersionColumnJavaName(javaName);
                 }
-				beanAttributeDescriptor.setMaxLength(tableMetadataBean.getCharLength().intValue());
-				if (tableMetadataBean.getNullable().equals(BeanMetaDataUtil.NOT_NULLABLE)) {
+				beanAttributeDescriptor.setMaxLength(tableMetadata.getColumnSize());
+				if (!tableMetadata.getNullable()) {
 					beanAttributeDescriptor.setNullable(false);
 				}
 				beanClassDescriptor.addAttribute(beanAttributeDescriptor);
@@ -332,7 +329,7 @@ public class BeanGenerator {
 	}
 
 	private String getVersionColumnName(final String pTableName,
-										final List<TableMetadataBean> pTableMetadataBeanList) {
+										final List<TableMetadata> pTableMetadataList) {
 
 		String versionColumnName = "";
 		if (configuration.getOptLockVersionColumnMappings() != null) {
@@ -344,8 +341,8 @@ public class BeanGenerator {
 			return versionColumnName;
 		}
 		// Check the matched version column name against the column names of this table
-		for (final TableMetadataBean tableMetadataBean : pTableMetadataBeanList) {
-			if (versionColumnName.equals(tableMetadataBean.getColumnName())) {
+		for (final TableMetadata tableMetadata : pTableMetadataList) {
+			if (versionColumnName.equals(tableMetadata.getColumnName())) {
 				return versionColumnName;
 			}
 		}

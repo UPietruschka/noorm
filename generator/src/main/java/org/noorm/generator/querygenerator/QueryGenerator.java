@@ -11,7 +11,7 @@ import org.noorm.generator.schema.QueryDeclaration;
 import org.noorm.jdbc.DataSourceProvider;
 import org.noorm.jdbc.Utils;
 import org.noorm.platform.IMetadata;
-import org.noorm.metadata.beans.TableMetadataBean;
+import org.noorm.platform.TableMetadata;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -65,21 +65,21 @@ public class QueryGenerator {
 
         final IMetadata metadata = DataSourceProvider.getPlatform().getMetadata();
         log.info("Retrieving table metadata from database.");
-        final Map<String, List<TableMetadataBean>> tableColumnMap = metadata.findTableMetadata();
+        final Map<String, List<TableMetadata>> tableColumnMap = metadata.findTableMetadata();
 
         final Map<String, QueryClassDescriptor> queryClasses = new HashMap<String, QueryClassDescriptor>();
         for (final QueryDeclaration queryDeclaration : configuration.getQueryDeclarations()) {
             generateMethodName(queryDeclaration);
             final QueryDescriptor queryDescriptor = new QueryDescriptor();
             String t0 = queryDeclaration.getTableName();
-            final List<TableMetadataBean> tableMetadataBeanList = tableColumnMap.get(t0);
+            final List<TableMetadata> tableMetadataList = tableColumnMap.get(t0);
             if (queryDeclaration.getBaseTable() != null && !queryDeclaration.getBaseTable().isEmpty()) {
                 t0 = queryDeclaration.getBaseTable();
                 if (tableColumnMap.get(t0) == null) {
                     throw new GeneratorException("Illegal query declaration: no metadata found for table ".concat(t0));
                 }
             }
-            if (tableMetadataBeanList == null) {
+            if (tableMetadataList == null) {
                 throw new GeneratorException("Illegal query declaration: no metadata found for table "
                         .concat(queryDeclaration.getTableName()));
             }
@@ -99,14 +99,13 @@ public class QueryGenerator {
                 parameterDescriptor.setJavaName(PARAMETER_PREFIX + Utils.convertDBName2JavaName(columnName, true));
                 parameterDescriptor.setDbParamName(columnName);
                 String javaType = null;
-                for (final TableMetadataBean tableMetadataBean : tableMetadataBeanList) {
-                    if (tableMetadataBean.getColumnName().equals(columnName)) {
+                for (final TableMetadata tableMetadata : tableMetadataList) {
+                    if (tableMetadata.getColumnName().equals(columnName)) {
                         javaType = GeneratorUtil.convertDatabaseType2JavaType(
-                                tableMetadataBean.getDataType(),
-                                tableMetadataBean.getDataPrecision(),
-                                tableMetadataBean.getDataScale(),
-                                tableMetadataBean.getTableName(),
-                                tableMetadataBean.getColumnName(),
+                                tableMetadata.getTypeName(),
+                                tableMetadata.getDecimalDigits(),
+                                tableMetadata.getTableName(),
+                                tableMetadata.getColumnName(),
                                 configuration.getTypeMappings());
                     }
                 }

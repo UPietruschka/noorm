@@ -9,7 +9,7 @@ import org.noorm.generator.schema.Regex;
 import org.noorm.jdbc.DataSourceProvider;
 import org.noorm.jdbc.JDBCQueryProcessor;
 import org.noorm.platform.IMetadata;
-import org.noorm.metadata.beans.TableMetadataBean;
+import org.noorm.platform.TableMetadata;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -56,7 +56,7 @@ public class EnumGenerator {
 
         log.info("Retrieving table metadata from database.");
         final IMetadata metadata = DataSourceProvider.getPlatform().getMetadata();
-		final Map<String, List<TableMetadataBean>> tableColumnMap = metadata.findTableMetadata();
+		final Map<String, List<TableMetadata>> tableColumnMap = metadata.findTableMetadata();
 
 		log.info("Generating NoORM Enum classes.");
 		final File enumPackageDir =	GeneratorUtil.createPackageDir
@@ -74,7 +74,7 @@ public class EnumGenerator {
 			}
 			final String javaEnumName =
 					GeneratorUtil.convertTableName2JavaName(tableName0, configuration.getTableNameMappings());
-			final List<TableMetadataBean> tableMetadataBeanList1 = tableColumnMap.get(tableName0);
+			final List<TableMetadata> tableMetadataList1 = tableColumnMap.get(tableName0);
 			final EnumClassDescriptor enumClassDescriptor = new EnumClassDescriptor();
 			enumClassDescriptor.setName(javaEnumName);
 			validatorClassDescriptor.getClassNames().add(javaEnumName);
@@ -93,18 +93,18 @@ public class EnumGenerator {
 						("Could not resolve the enum display column name using [enumTable2DisplayColumnMapping].");
 			}
 			enumClassDescriptor.setDisplayColumnName(displayColumnName);
-			for (TableMetadataBean tableMetadataBean : tableMetadataBeanList1) {
+			for (TableMetadata tableMetadata : tableMetadataList1) {
 				final EnumAttributeDescriptor enumAttributeDescriptor = new EnumAttributeDescriptor();
-                final String columnName = tableMetadataBean.getColumnName();
+                final String columnName = tableMetadata.getColumnName();
                 final String javaName = GeneratorUtil.convertColumnName2JavaName
                         (columnName, false, configuration.getColumnNameMappings());
                 enumAttributeDescriptor.setName(javaName);
                 final String methodNamePostfix = GeneratorUtil.convertColumnName2JavaName
                         (columnName, true, configuration.getColumnNameMappings());
                 enumAttributeDescriptor.setMethodNamePostfix(methodNamePostfix);
-				final String javaType = GeneratorUtil.convertDatabaseType2JavaType(tableMetadataBean.getDataType(),
-                        tableMetadataBean.getDataPrecision(), tableMetadataBean.getDataScale(),
-                        tableMetadataBean.getTableName(), columnName, configuration.getTypeMappings());
+				final String javaType = GeneratorUtil.convertDatabaseType2JavaType(tableMetadata.getTypeName(),
+                        tableMetadata.getDecimalDigits(), tableMetadata.getTableName(),
+                        columnName, configuration.getTypeMappings());
 				enumAttributeDescriptor.setType(javaType);
 				enumAttributeDescriptor.setColumnName(columnName);
 				enumClassDescriptor.addAttribute(enumAttributeDescriptor);

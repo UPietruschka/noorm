@@ -28,8 +28,6 @@ public class BeanMetaDataUtil {
 
 	private static final Logger log = LoggerFactory.getLogger(BeanMetaDataUtil.class);
 
-	public static final String NOT_UPDATABLE = "NO";
-	public static final String NOT_NULLABLE = "N";
 	public static final String SERIAL_VERSION_UID = "serialVersionUID";
 
     private static Map<Field, JDBCColumn> jdbcColumnAnnotationCache = new HashMap<Field, JDBCColumn>();
