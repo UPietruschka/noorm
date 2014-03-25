@@ -6,6 +6,7 @@ import org.noorm.metadata.beans.ParameterBean;
 import org.noorm.metadata.beans.PrimaryKeyColumnBean;
 import org.noorm.metadata.beans.SequenceBean;
 import org.noorm.platform.IMetadata;
+import org.noorm.platform.JDBCType;
 import org.noorm.platform.TableMetadata;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -61,14 +62,16 @@ public class MetadataService implements IMetadata {
 				tableMetadataList0 = new ArrayList<TableMetadata>();
 				tableColumnMap.put(tableName, tableMetadataList0);
 			}
+            int decimalDigits = 0;
+            if (tableMetadataBean.getDataScale() != null) {
+                decimalDigits = tableMetadataBean.getDataScale().intValue();
+            }
             final TableMetadata tableMetadata = new TableMetadata();
             tableMetadata.setTableName(tableMetadataBean.getTableName());
             tableMetadata.setColumnName(tableMetadataBean.getColumnName());
-            tableMetadata.setTypeName(tableMetadataBean.getDataType());
+            tableMetadata.setJDBCType(convertOracleType2JDBCType(tableMetadataBean.getDataType(), decimalDigits));
             tableMetadata.setColumnSize(tableMetadataBean.getCharLength().intValue());
-            if (tableMetadataBean.getDataScale() != null) {
-                tableMetadata.setDecimalDigits(tableMetadataBean.getDataScale().intValue());
-            }
+            tableMetadata.setDecimalDigits(decimalDigits);
             tableMetadata.setNullable(tableMetadataBean.getNullable().equals(NULLABLE));
             tableMetadata.setUpdatable(tableMetadataBean.getUpdatable().equals(UPDATABLE));
 			tableMetadataList0.add(tableMetadata);
@@ -172,14 +175,16 @@ public class MetadataService implements IMetadata {
 				recordMetadataList0 = new ArrayList<TableMetadata>();
 				recordColumnMap.put(recordName, recordMetadataList0);
 			}
+            int decimalDigits = 0;
+            if (recordMetadataBean.getDataScale() != null) {
+                decimalDigits = recordMetadataBean.getDataScale().intValue();
+            }
             final TableMetadata recordMetadata = new TableMetadata();
             recordMetadata.setTableName(recordMetadataBean.getTableName());
             recordMetadata.setColumnName(recordMetadataBean.getColumnName());
-            recordMetadata.setTypeName(recordMetadataBean.getDataType());
+            recordMetadata.setJDBCType(convertOracleType2JDBCType(recordMetadataBean.getDataType(), decimalDigits));
             recordMetadata.setColumnSize(recordMetadataBean.getCharLength().intValue());
-            if (recordMetadataBean.getDataScale() != null) {
-                recordMetadata.setDecimalDigits(recordMetadataBean.getDataScale().intValue());
-            }
+            recordMetadata.setDecimalDigits(decimalDigits);
             recordMetadata.setNullable(recordMetadataBean.getNullable().equals(NULLABLE));
             recordMetadata.setUpdatable(recordMetadataBean.getUpdatable().equals(UPDATABLE));
 			recordMetadataList0.add(recordMetadata);
@@ -194,4 +199,50 @@ public class MetadataService implements IMetadata {
 		return statementProcessor.getBeanListFromPLSQL
 				("noorm_metadata.find_record_metadata", "p_record_metadata", filterParameters, TableMetadataBean.class);
 	}
+
+    private JDBCType convertOracleType2JDBCType(final String pOracleTypeName, final int pDecimalDigits) {
+
+        JDBCType jdbcType = JDBCType.VARCHAR;
+        if (pOracleTypeName.equals("CHAR")) {
+            jdbcType = JDBCType.CHAR;
+        }
+        if (pOracleTypeName.endsWith("RAW")) {
+            jdbcType = JDBCType.BINARY;
+        }
+        if (pOracleTypeName.equals("XMLTYPE")) {
+            jdbcType = JDBCType.SQLXML;
+        }
+        if (pOracleTypeName.equals("BLOB")) {
+            jdbcType = JDBCType.BLOB;
+        }
+        if (pOracleTypeName.equals("CLOB")) {
+            jdbcType = JDBCType.CLOB;
+        }
+        if (pOracleTypeName.equals("NCLOB")) {
+            jdbcType = JDBCType.NCLOB;
+        }
+        if (pOracleTypeName.equals("NUMBER")) {
+            if (pDecimalDigits > 0) {
+                jdbcType = JDBCType.DOUBLE;
+            } else {
+                jdbcType = JDBCType.NUMERIC;
+            }
+        }
+        if (pOracleTypeName.equals("BINARY_FLOAT")) {
+            jdbcType = JDBCType.FLOAT;
+        }
+        if (pOracleTypeName.equals("BINARY_DOUBLE")) {
+            jdbcType = JDBCType.DOUBLE;
+        }
+        if (pOracleTypeName.equals("FLOAT")) {
+            jdbcType = JDBCType.DOUBLE;
+        }
+        if (pOracleTypeName.equals("DATE")) {
+            jdbcType = JDBCType.DATE;
+        }
+        if (pOracleTypeName.startsWith("TIMESTAMP")) {
+            jdbcType = JDBCType.TIMESTAMP;
+        }
+        return jdbcType;
+    }
 }

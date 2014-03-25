@@ -102,7 +102,7 @@ public class EnumGenerator {
                 final String methodNamePostfix = GeneratorUtil.convertColumnName2JavaName
                         (columnName, true, configuration.getColumnNameMappings());
                 enumAttributeDescriptor.setMethodNamePostfix(methodNamePostfix);
-				final String javaType = GeneratorUtil.convertDatabaseType2JavaType(tableMetadata.getTypeName(),
+				final String javaType = GeneratorUtil.convertDatabaseType2JavaType(tableMetadata.getJDBCType(),
                         tableMetadata.getDecimalDigits(), tableMetadata.getTableName(),
                         columnName, configuration.getTypeMappings());
 				enumAttributeDescriptor.setType(javaType);

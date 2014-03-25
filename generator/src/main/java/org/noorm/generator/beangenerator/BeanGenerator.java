@@ -10,6 +10,7 @@ import org.noorm.jdbc.DataSourceProvider;
 import org.noorm.platform.IMetadata;
 import org.noorm.metadata.beans.PrimaryKeyColumnBean;
 import org.noorm.metadata.beans.SequenceBean;
+import org.noorm.platform.JDBCType;
 import org.noorm.platform.TableMetadata;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -178,8 +179,9 @@ public class BeanGenerator {
                 final String methodNamePostfix = GeneratorUtil.convertColumnName2JavaName
                         (columnName, true, configuration.getColumnNameMappings());
                 beanAttributeDescriptor.setMethodNamePostfix(methodNamePostfix);
-                final String typeName = tableMetadata.getTypeName();
-				final String javaType = GeneratorUtil.convertDatabaseType2JavaType(typeName,
+
+                final JDBCType jdbcType = tableMetadata.getJDBCType();
+				final String javaType = GeneratorUtil.convertDatabaseType2JavaType(jdbcType,
                         tableMetadata.getDecimalDigits(), tableMetadata.getTableName(),
                         columnName, configuration.getTypeMappings());
 				if (!tableMetadata.getUpdatable()) {
@@ -187,54 +189,11 @@ public class BeanGenerator {
 				}
 				beanAttributeDescriptor.setType(javaType);
 
-                /* Preliminary, to be replaced by JDBC metadata access --> */
-                String jdbcType = "Types.VARCHAR";
-                if (typeName.equals("CHAR")) {
-                    jdbcType = "Types.CHAR";
-                }
-                if (typeName.endsWith("RAW")) {
-                    jdbcType = "Types.BINARY";
-                }
-                if (typeName.equals("XMLTYPE")) {
-                    jdbcType = "Types.SQLXML";
-                }
-                if (typeName.equals("BLOB")) {
-                    jdbcType = "Types.BLOB";
-                }
-                if (typeName.equals("CLOB")) {
-                    jdbcType = "Types.CLOB";
-                }
-                if (typeName.equals("NCLOB")) {
-                    jdbcType = "Types.NCLOB";
-                }
-                if (typeName.equals("NUMBER")) {
-                    final int decimalDigits = tableMetadata.getDecimalDigits();
-                    if (decimalDigits > 0) {
-                        jdbcType = "Types.DOUBLE";
-                    } else {
-                        jdbcType = "Types.NUMERIC";
-                    }
-                }
-                if (typeName.equals("BINARY_FLOAT")) {
-                    jdbcType = "Types.FLOAT";
-                }
-                if (typeName.equals("BINARY_DOUBLE")) {
-                    jdbcType = "Types.DOUBLE";
-                }
-                if (typeName.equals("FLOAT")) {
-                    jdbcType = "Types.DOUBLE";
-                }
-                if (typeName.equals("DATE")) {
-                    jdbcType = "Types.DATE";
-                }
-                if (typeName.startsWith("TIMESTAMP")) {
-                    jdbcType = "Types.TIMESTAMP";
-                }
-                beanAttributeDescriptor.setDataType(jdbcType);
-                /* Preliminary, to be replaced by JDBC metadata access <-- */
+                String jdbcTypeDeclaration = "Types.".concat(jdbcType.getName());
+                beanAttributeDescriptor.setDataType(jdbcTypeDeclaration);
 
-				//beanAttributeDescriptor.setDataType(dataType);
-                if (typeName.equals("CLOB") || typeName.equals("BLOB") || typeName.equals("XMLTYPE")) {
+                if (jdbcType.equals(JDBCType.CLOB) || jdbcType.equals(JDBCType.BLOB)
+                    || jdbcType.equals(JDBCType.NCLOB) || jdbcType.equals(JDBCType.SQLXML)) {
                     unsupportedOptLockFullRowCompareTypes = true;
                 }
                 if (!columnName.equals(columnName.toUpperCase())) {

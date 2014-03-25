@@ -102,7 +102,7 @@ public class QueryGenerator {
                 for (final TableMetadata tableMetadata : tableMetadataList) {
                     if (tableMetadata.getColumnName().equals(columnName)) {
                         javaType = GeneratorUtil.convertDatabaseType2JavaType(
-                                tableMetadata.getTypeName(),
+                                tableMetadata.getJDBCType(),
                                 tableMetadata.getDecimalDigits(),
                                 tableMetadata.getTableName(),
                                 tableMetadata.getColumnName(),

@@ -10,8 +10,7 @@ public class TableMetadata {
 
 	private String tableName;
 	private String columnName;
-	private int dataType;
-    private String typeName;
+    private JDBCType jdbcType;
 	private int decimalDigits;
 	private int columnSize;
 	private boolean nullable;
@@ -33,20 +32,12 @@ public class TableMetadata {
 		columnName = pColumnName;
 	}
 
-	public int getDataType() {
-		return dataType;
-	}
-
-	public void setDataType(final int pDataType) {
-		dataType = pDataType;
-	}
-
-    public String getTypeName() {
-        return typeName;
+    public JDBCType getJDBCType() {
+        return jdbcType;
     }
 
-    public void setTypeName(final String pTypeName) {
-        typeName = pTypeName;
+    public void setJDBCType(final JDBCType pJDBCType) {
+        jdbcType = pJDBCType;
     }
 
     public int getDecimalDigits() {

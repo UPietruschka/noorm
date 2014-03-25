@@ -8,6 +8,7 @@ import org.noorm.generator.schema.TypeMapping;
 import org.noorm.generator.schema.GeneratorConfiguration;
 import org.noorm.generator.schema.Mapping;
 import org.noorm.jdbc.Utils;
+import org.noorm.platform.JDBCType;
 
 import java.io.BufferedWriter;
 import java.io.File;
@@ -125,18 +126,18 @@ public class GeneratorUtil {
      * Maps the given database type to the corresponding Java type, which represents the database type in
      * the generated Java service class (e.g. "VARCHAR2" / "String").
      *
-     * @param pDatabaseType the database type name
+     * @param pJDBCType the database type
      * @param pParamName the parameter name (of a stored procedure)
      * @param pTypeMappings the custom type mapping
      * @return the Java type name
      */
-    public static String convertDatabaseType2JavaType(final String pDatabaseType,
+    public static String convertDatabaseType2JavaType(final JDBCType pJDBCType,
                                                       final String pParamName,
                                                       final List<TypeMapping> pTypeMappings) {
 
         if (pTypeMappings != null) {
             for (final TypeMapping typeMapping : pTypeMappings) {
-                if (pDatabaseType.startsWith(typeMapping.getDatabaseType())) {
+                if (pJDBCType.startsWith(typeMapping.getDatabaseType())) {
                     if (typeMapping.getParameterFilterRegex() != null) {
                         if (typeMapping.getColumnFilterRegex() != null || typeMapping.getTableFilterRegex() != null) {
                             throw new GeneratorException("Element 'parameterFilterRegex' must not be defined"
@@ -152,14 +153,14 @@ public class GeneratorUtil {
             }
         }
 
-        return convertDatabaseType2JavaType(pDatabaseType, 0);
+        return convertDatabaseType2JavaType(pJDBCType, 0);
     }
 
     /**
      * Maps the given database type to the corresponding Java type, which represents the database type in
      * the generated Java Bean class (e.g. "VARCHAR2" / "String").
      *
-     * @param pDatabaseType the database type name
+     * @param pJDBCType the database type
      * @param pDecimalDigits the data scale of the database type, if available
      * @param pTableName the table name
      * @param pColumnName the column name
@@ -167,7 +168,7 @@ public class GeneratorUtil {
      * @return the Java type name
      */
 
-    public static String convertDatabaseType2JavaType(final String pDatabaseType,
+    public static String convertDatabaseType2JavaType(final JDBCType pJDBCType,
                                                       final int pDecimalDigits,
                                                       final String pTableName,
                                                       final String pColumnName,
@@ -214,44 +215,44 @@ public class GeneratorUtil {
             }
         }
 
-        return convertDatabaseType2JavaType(pDatabaseType, pDecimalDigits);
+        return convertDatabaseType2JavaType(pJDBCType, pDecimalDigits);
     }
 
-    private static String convertDatabaseType2JavaType(final String pDatabaseType,
+    private static String convertDatabaseType2JavaType(final JDBCType pJDBCType,
                                                        final int pDecimalDigits) {
         String javaType = "String";
-        if (pDatabaseType.endsWith("RAW")) {
+        if (pJDBCType.equals(JDBCType.BINARY)) {
             javaType = "byte[]";
         }
-        if (pDatabaseType.equals("BLOB")) {
+        if (pJDBCType.equals(JDBCType.VARBINARY)) {
+            javaType = "byte[]";
+        }
+        if (pJDBCType.equals(JDBCType.BLOB)) {
             javaType = "java.sql.Blob";
         }
-        if (pDatabaseType.equals("CLOB")) {
+        if (pJDBCType.equals(JDBCType.CLOB)) {
             javaType = "java.sql.Clob";
         }
-        if (pDatabaseType.equals("NCLOB")) {
+        if (pJDBCType.equals(JDBCType.NCLOB)) {
             javaType = "java.sql.NClob";
         }
-        if (pDatabaseType.equals("NUMBER")) {
+        if (pJDBCType.equals(JDBCType.NUMERIC)) {
             if (pDecimalDigits > 0) {
                 javaType = "Double";
             } else {
                 javaType = "Long";
             }
         }
-        if (pDatabaseType.equals("BINARY_FLOAT")) {
+        if (pJDBCType.equals(JDBCType.FLOAT)) {
             javaType = "Float";
         }
-        if (pDatabaseType.equals("BINARY_DOUBLE")) {
+        if (pJDBCType.equals(JDBCType.DOUBLE)) {
             javaType = "Double";
         }
-        if (pDatabaseType.equals("FLOAT")) {
-            javaType = "Double";
-        }
-        if (pDatabaseType.equals("DATE")) {
+        if (pJDBCType.equals(JDBCType.DATE)) {
             javaType = "java.util.Date";
         }
-        if (pDatabaseType.startsWith("TIMESTAMP")) {
+        if (pJDBCType.equals(JDBCType.TIMESTAMP)) {
             javaType = "java.util.Date";
         }
         return javaType;
