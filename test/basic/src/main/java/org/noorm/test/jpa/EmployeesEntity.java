@@ -13,7 +13,7 @@ import java.sql.Timestamp;
  * @author Ulf Pietruschka / ulf.pietruschka@etenso.com
  *         Date: 09.04.13
  *         Time: 14:33
- *         <p/>
+ *
  * JPA entity for the EMPLOYEES table used for the NoORM/JPA performance comparison
  */
 @Entity

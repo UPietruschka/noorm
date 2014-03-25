@@ -1,7 +1,7 @@
 package org.noorm.generator;
 
 /**
- * Java source generator exception.<br/>
+ * Java source generator exception.
  * @author Ulf Pietruschka / ulf.pietruschka@etenso.com
  */
 public final class GeneratorException extends RuntimeException {

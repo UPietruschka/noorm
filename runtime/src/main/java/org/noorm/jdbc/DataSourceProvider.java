@@ -273,7 +273,7 @@ public class DataSourceProvider {
 	 * connection to create an AQSession).
 	 *
 	 * @return the database connection currently managed by the DataSourceProvider.
-	 * @throws SQLException
+	 * @throws SQLException JDBC driver exception
 	 */
 	public static Connection getConnection() throws SQLException {
 
@@ -495,7 +495,7 @@ public class DataSourceProvider {
 	/**
 	 * Sets the size of JDBC update and insert batches. The default is 100.
 	 *
-	 * @param pBatchUpdateSize
+	 * @param pBatchUpdateSize the number of records processed in one DML batch operation
 	 */
 	public static void setBatchUpdateSize(final int pBatchUpdateSize) {
 

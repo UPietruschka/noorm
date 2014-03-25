@@ -13,7 +13,7 @@ import java.util.List;
  * @author Ulf Pietruschka / ulf.pietruschka@etenso.com
  *         Date: 09.04.13
  *         Time: 14:43
- *         <p/>
+ *
  * Runner for the NoORM/JPA performance comparison.
  * The utilization of the sequence associated with entity EmployeesEntity assumes a sequence increment of 100.
  * The sample schema HR does not have this setting and must be adjusted accordingly to make this test running

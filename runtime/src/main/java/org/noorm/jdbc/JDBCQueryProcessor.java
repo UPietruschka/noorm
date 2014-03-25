@@ -47,6 +47,7 @@ public class JDBCQueryProcessor<T> {
      * @param pTableName the table or view name used for the SQL query
      * @param pInParameters the parameters for the where-clause of the SQL query
      * @param pBeanClass the return type
+     * @param pAcquireLock flag to indicate, whether a write lock should be acquired for the retrieved records
      * @return a list containing the results of type pBeanClass
      */
     public List<T> getBeanListFromSQL(final String pTableName,

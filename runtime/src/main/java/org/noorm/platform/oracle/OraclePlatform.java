@@ -14,8 +14,6 @@ import java.util.Properties;
  * @author Ulf Pietruschka / ulf.pietruschka@ext.secunet.com
  *         Date: 11.02.14
  *         Time: 13:52
- *         <p/>
- *         Project class implementation
  */
 public class OraclePlatform implements IPlatform {
 
@@ -121,7 +119,7 @@ public class OraclePlatform implements IPlatform {
      * @param pValue          the parameter value to be set
      * @param pParameterIndex the index of the parameter
      * @param pSQLType        the SQL type. Usually one type specified in java.sql.Types or a proprietary type
-     * @throws java.sql.SQLException
+     * @throws SQLException JDBC driver exception
      */
     @Override
     public void setObject(final PreparedStatement pStmt,

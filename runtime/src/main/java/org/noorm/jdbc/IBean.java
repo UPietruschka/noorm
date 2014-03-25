@@ -17,7 +17,7 @@ public interface IBean<T> {
 
 	/**
 	 * Generic object to enrich the Bean with additional information.
-	 * @param pAuxiliaryData
+	 * @param pAuxiliaryData the generic object
 	 */
 	void setAuxiliaryData(final T pAuxiliaryData);
 

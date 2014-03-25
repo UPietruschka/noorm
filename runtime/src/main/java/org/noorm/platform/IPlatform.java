@@ -8,8 +8,6 @@ import java.sql.SQLException;
  * @author Ulf Pietruschka / ulf.pietruschka@ext.secunet.com
  *         Date: 11.02.14
  *         Time: 13:48
- *         <p/>
- *         Project class implementation
  */
 public interface IPlatform {
 
@@ -20,6 +18,7 @@ public interface IPlatform {
      * @param pUsername the username
      * @param pPassword the password
      * @return the established data source
+     * @throws SQLException JDBC driver exception
      */
     DataSource getDataSource(final String pURL, final String pUsername, final String pPassword) throws SQLException;
 
@@ -28,6 +27,7 @@ public interface IPlatform {
      *
      * @param pDataSource the data source
      * @return a textual summary of the data source validation
+     * @throws SQLException JDBC driver exception
      */
     String validateDataSource(final DataSource pDataSource) throws SQLException;
 
@@ -46,6 +46,7 @@ public interface IPlatform {
      *
      * @param pPreparedStatement the prepared statement ready for executing the next batch
      * @return the reliable update count for the platform in use
+     * @throws SQLException JDBC driver exception
      */
     int executeBatchWithReliableCount(final PreparedStatement pPreparedStatement) throws SQLException;
 
@@ -56,7 +57,7 @@ public interface IPlatform {
      * @param pValue the parameter value to be set
      * @param pParameterIndex the index of the parameter
      * @param pSQLType the SQL type. Usually one type specified in java.sql.Types or a proprietary type
-     * @throws SQLException
+     * @throws SQLException JDBC driver exception
      */
     void setObject(final PreparedStatement pStmt,
                    final Object pValue,

@@ -123,7 +123,7 @@ public class GeneratorUtil {
 
     /**
      * Maps the given database type to the corresponding Java type, which represents the database type in
-     * the generated Java service class (e.g. "VARCHAR2" -> "String").
+     * the generated Java service class (e.g. "VARCHAR2" / "String").
      *
      * @param pDatabaseType the database type name
      * @param pParamName the parameter name (of a stored procedure)
@@ -157,7 +157,7 @@ public class GeneratorUtil {
 
     /**
      * Maps the given database type to the corresponding Java type, which represents the database type in
-     * the generated Java Bean class (e.g. "VARCHAR2" -> "String").
+     * the generated Java Bean class (e.g. "VARCHAR2" / "String").
      *
      * @param pDatabaseType the database type name
      * @param pDataPrecision the data precision of the database type, if available
@@ -266,7 +266,7 @@ public class GeneratorUtil {
      * replacement patterns for string replacement in the input string. For the first search pattern, which
      * matches the input string, the replacement pattern is applied. The simplest form of string replacement
      * is a direct replacement of the search pattern with the replacement pattern without any usage of
-     * regular expressions (e.g. "CUSTOMER" -> "CUSTOMER_SEQ"). Regular expressions allow for a compact
+     * regular expressions (e.g. "CUSTOMER" / "CUSTOMER_SEQ"). Regular expressions allow for a compact
      * representation of more generic replacements (e.g. search/replace expressions "(.*)" / "$1_SEQ" also
      * results in the replacement string "CUSTOMER_SEQ" for input string "CUSTOMER").
      *

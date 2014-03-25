@@ -15,8 +15,6 @@ import java.util.Map;
  * @author Ulf Pietruschka / ulf.pietruschka@ext.secunet.com
  *         Date: 11.02.14
  *         Time: 13:48
- *         <p/>
- *         Project class implementation
  */
 public interface IMetadata {
 

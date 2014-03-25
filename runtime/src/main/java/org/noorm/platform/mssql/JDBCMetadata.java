@@ -23,8 +23,6 @@ import java.util.Map;
  * @author Ulf Pietruschka / ulf.pietruschka@ext.secunet.com
  *         Date: 21.02.14
  *         Time: 13:44
- *         <p/>
- *         Project class implementation
  */
 public class JDBCMetadata implements IMetadata {
 

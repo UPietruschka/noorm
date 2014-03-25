@@ -8,7 +8,7 @@ import org.noorm.platform.oracle.OraclePlatform;
  * @author Ulf Pietruschka / ulf.pietruschka@ext.secunet.com
  *         Date: 11.02.14
  *         Time: 14:06
- *         <p/>
+ *
  * Instantiates the database platform specific implementation.
  * When the data source is passed as an argument, the factory first tries to derive the platform from the data
  * source, i.e., the potentially valid platform name is ignored in this case. Giving the data source analysis

@@ -43,7 +43,7 @@ public class BeanMapper<T> {
 	 * @param pResultSet the ResultSet subject to conversion to a Bean
 	 * @param pBeanClass the type of the Bean
 	 * @return the Bean filled with the data from the ResultSet
-	 * @throws SQLException
+	 * @throws SQLException JDBC driver exception
 	 */
 	public T toBean(final ResultSet pResultSet, final Class<T> pBeanClass) throws SQLException {
 
@@ -72,7 +72,7 @@ public class BeanMapper<T> {
 	 * @param pResultSet the ResultSet subject to conversion to a Bean list
 	 * @param pBeanClass the type of the Bean
 	 * @return the Bean list filled with the data from the ResultSet
-	 * @throws SQLException
+	 * @throws SQLException JDBC driver exception
 	 */
 	public List<T> toBeanList(final ResultSet pResultSet, final Class<T> pBeanClass) throws SQLException {
 

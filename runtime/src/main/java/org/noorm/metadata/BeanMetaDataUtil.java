@@ -39,7 +39,7 @@ public class BeanMetaDataUtil {
 	 * Using Class.getDeclaredFields does not return fields declared in a potentially existing super-class.
 	 * This method extends the retrieval of declared fields to the super-class, if any. Note that there is
 	 * no recursive mechanism to detect declarations of the super-class of the super-class.
-	 * @param pClass
+	 * @param pClass the class
 	 * @return all declared fields of the provided class and its super-class, if any.
 	 */
 	public static Field[] getDeclaredFieldsInclParent(final Class pClass) {
