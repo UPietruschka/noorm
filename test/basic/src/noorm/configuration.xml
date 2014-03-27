@@ -63,18 +63,17 @@
         <queryDeclaration tableName="case_sensitive_table"/>
     </queryDeclarations>
     <typeMappings>
-        <typeMapping tableFilterRegex="COMPLEX_DATA_TYPES" columnFilterRegex="CONVERTED_NUMBER" databaseType="NUMBER" javaType="String"/>
-        <typeMapping columnFilterRegex="COMMISSION_PCT" databaseType="NUMBER" javaType="java.math.BigDecimal"/>
-        <typeMapping columnFilterRegex="REGION_ID|DEPARTMENT_ID|OPT_ID|LOCATION_ID" databaseType="NUMBER" javaType="Integer"/>
-        <typeMapping parameterFilterRegex="P_DEPARTMENT_ID" databaseType="NUMBER" javaType="Integer"/>
-        <typeMapping tableFilterRegex="COUNTRIES" databaseType="NUMBER" javaType="Integer"/>
-        <typeMapping columnFilterRegex="BOOLEAN_FLAG" databaseType="NUMBER" javaType="Boolean"/>
+        <typeMapping tableFilterRegex="COMPLEX_DATA_TYPES" columnFilterRegex="CONVERTED_NUMBER" databaseType="NUMERIC" javaType="String"/>
+        <typeMapping columnFilterRegex="COMMISSION_PCT" databaseType="DOUBLE" javaType="java.math.BigDecimal"/>
+        <typeMapping columnFilterRegex="REGION_ID|DEPARTMENT_ID|OPT_ID|LOCATION_ID" databaseType="NUMERIC" javaType="Integer"/>
+        <typeMapping parameterFilterRegex="P_DEPARTMENT_ID" databaseType="NUMERIC" javaType="Integer"/>
+        <typeMapping tableFilterRegex="COUNTRIES" databaseType="NUMERIC" javaType="Integer"/>
+        <typeMapping columnFilterRegex="BOOLEAN_FLAG" databaseType="NUMERIC" javaType="Boolean"/>
         <typeMapping columnFilterRegex="CONVERTED_DATE" databaseType="DATE" javaType="java.sql.Date"/>
         <typeMapping columnFilterRegex="CONVERTED_TIMESTAMP" databaseType="TIMESTAMP" javaType="java.sql.Timestamp"/>
         <typeMapping columnFilterRegex="CONVERTED_CLOB_COLUMN" databaseType="CLOB" javaType="java.sql.Clob"/>
         <typeMapping columnFilterRegex="CONVERTED_NCLOB_COLUMN" databaseType="NCLOB" javaType="java.sql.NClob"/>
         <typeMapping columnFilterRegex="CONVERTED_BLOB_COLUMN" databaseType="BLOB" javaType="java.sql.Blob"/>
-        <typeMapping columnFilterRegex="CONVERTED_XMLTYPE" databaseType="XMLTYPE" javaType="java.sql.SQLXML"/>
     </typeMappings>
 
 </generatorConfiguration>

@@ -1,5 +1,7 @@
 package org.noorm.jdbc;
 
+import org.noorm.platform.JDBCType;
+
 import java.util.HashMap;
 
 /**
@@ -90,5 +92,5 @@ public interface IBean<T> {
      * The table column type used for modification checking for optimistic locking.
      * @return the version column type.
      */
-    VersionColumnType getVersionColumnType();
+    JDBCType getVersionColumnType();
 }

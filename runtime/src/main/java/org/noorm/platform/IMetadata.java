@@ -1,7 +1,6 @@
 package org.noorm.platform;
 
 import org.noorm.metadata.beans.NameBean;
-import org.noorm.metadata.beans.ParameterBean;
 import org.noorm.metadata.beans.PrimaryKeyColumnBean;
 import org.noorm.metadata.beans.SequenceBean;
 
@@ -66,7 +65,7 @@ public interface IMetadata {
      * @param pProcedureName the procedure name
      * @return the list of parameters for the given procedure
      */
-    List<ParameterBean> findProcedureParameters(final String pPackageName, final String pProcedureName);
+    List<Parameter> findProcedureParameters(final String pPackageName, final String pProcedureName);
 
     /**
      * Returns the hash value for the source code of a given stored procedure package.

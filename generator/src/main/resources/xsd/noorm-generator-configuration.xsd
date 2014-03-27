@@ -470,7 +470,7 @@
                     </xs:documentation>
                 </xs:annotation>
             </xs:attribute>
-            <xs:attribute name="databaseType" type="xs:string" use="required">
+            <xs:attribute name="databaseType" type="databaseType" use="required">
                 <xs:annotation>
                     <xs:documentation>
                         The database (source) type of the custom type mapping. This is the SQL standard or
@@ -491,6 +491,58 @@
             </xs:attribute>
         </xs:complexType>
     </xs:element>
+
+    <xs:simpleType name="databaseType">
+        <xs:annotation>
+            <xs:documentation>
+                The database (source) type of a custom mapping. This is the type used in the generated
+                Java code for the column annotation of the bean attributes.
+                The available types resemble the types declared in java.sql.Types.
+                With Java 8, type handling has become more comfortable by introducing enum JDBCTypes.
+                Since this enum is not available in earlier Java versions, it has been copied for the
+                current NoORM release.
+            </xs:documentation>
+        </xs:annotation>
+        <xs:restriction base="xs:string">
+            <xs:enumeration value="BIT"/>
+            <xs:enumeration value="TINYINT"/>
+            <xs:enumeration value="SMALLINT"/>
+            <xs:enumeration value="INTEGER"/>
+            <xs:enumeration value="BIGINT"/>
+            <xs:enumeration value="FLOAT"/>
+            <xs:enumeration value="REAL"/>
+            <xs:enumeration value="DOUBLE"/>
+            <xs:enumeration value="NUMERIC"/>
+            <xs:enumeration value="DECIMAL"/>
+            <xs:enumeration value="CHAR"/>
+            <xs:enumeration value="VARCHAR"/>
+            <xs:enumeration value="LONGVARCHAR"/>
+            <xs:enumeration value="DATE"/>
+            <xs:enumeration value="TIME"/>
+            <xs:enumeration value="TIMESTAMP"/>
+            <xs:enumeration value="BINARY"/>
+            <xs:enumeration value="VARBINARY"/>
+            <xs:enumeration value="LONGVARBINARY"/>
+            <xs:enumeration value="NULL"/>
+            <xs:enumeration value="OTHER"/>
+            <xs:enumeration value="JAVA_OBJECT"/>
+            <xs:enumeration value="DISTINCT"/>
+            <xs:enumeration value="STRUCT"/>
+            <xs:enumeration value="ARRAY"/>
+            <xs:enumeration value="BLOB"/>
+            <xs:enumeration value="CLOB"/>
+            <xs:enumeration value="REF"/>
+            <xs:enumeration value="DATALINK"/>
+            <xs:enumeration value="BOOLEAN"/>
+            <xs:enumeration value="ROWID"/>
+            <xs:enumeration value="NCHAR"/>
+            <xs:enumeration value="NVARCHAR"/>
+            <xs:enumeration value="LONGNVARCHAR"/>
+            <xs:enumeration value="NCLOB"/>
+            <xs:enumeration value="SQLXML"/>
+            <xs:enumeration value="REF_CURSOR"/>
+        </xs:restriction>
+    </xs:simpleType>
 
     <xs:simpleType name="javaType">
         <xs:annotation>

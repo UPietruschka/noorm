@@ -2,10 +2,10 @@ package org.noorm.platform.mssql;
 
 import org.noorm.jdbc.JDBCQueryProcessor;
 import org.noorm.metadata.beans.NameBean;
-import org.noorm.metadata.beans.ParameterBean;
 import org.noorm.metadata.beans.PrimaryKeyColumnBean;
 import org.noorm.metadata.beans.SequenceBean;
 import org.noorm.platform.IMetadata;
+import org.noorm.platform.Parameter;
 import org.noorm.platform.TableMetadata;
 
 import java.util.ArrayList;
@@ -224,10 +224,10 @@ public class JDBCMetadata implements IMetadata {
      * @return the list of parameters for the given procedure
      */
     @Override
-    public List<ParameterBean> findProcedureParameters(String pPackageName, String pProcedureName) {
+    public List<Parameter> findProcedureParameters(String pPackageName, String pProcedureName) {
 
-        final List<ParameterBean> parameterBeans = new ArrayList<ParameterBean>();
-        return parameterBeans;
+        final List<Parameter> parameters = new ArrayList<Parameter>();
+        return parameters;
     }
 
     /**

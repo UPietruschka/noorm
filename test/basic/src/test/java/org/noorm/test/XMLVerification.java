@@ -31,33 +31,6 @@ public class XMLVerification {
     private ComplexDataService complexDataService = ComplexDataService.getInstance();
 
     @Test
-    public void testXMLTypeCRUD() {
-
-        DataSourceProvider.begin();
-        try {
-            final ComplexDataTypes complexDataTypes = new ComplexDataTypes();
-            complexDataTypes.setXmlColumn(SOME_XML);
-            final JDBCDMLProcessor<ComplexDataTypes> dmlProcessor = JDBCDMLProcessor.getInstance();
-            final ComplexDataTypes inserted = dmlProcessor.insert(complexDataTypes);
-            final ComplexDataTypes inserted0 = complexDataService.findUniqueCdtById(inserted.getId());
-            assertEquals(inserted, inserted0);
-            // The XML is returned from the database with a different formatting, which causes a simple
-            // compare to fail. Thus, we remove all whitespace prior to comparison
-            final String normalizedSOME_XML = SOME_XML.replaceAll("\\s","");
-            final String normalizedOracleValues = inserted0.getXmlColumn().replaceAll("\\s","");
-            assertEquals(normalizedSOME_XML, normalizedOracleValues);
-            inserted.setXmlColumn(SOME_NEW_XML);
-            dmlProcessor.update(inserted0);
-            dmlProcessor.delete(inserted0);
-            DataSourceProvider.commit();
-        } catch (Throwable e) {
-            DataSourceProvider.rollback();
-            e.printStackTrace();
-            fail(e.getMessage());
-        }
-    }
-
-    @Test
     public void testSQLXMLCRUD() {
 
         DataSourceProvider.begin();

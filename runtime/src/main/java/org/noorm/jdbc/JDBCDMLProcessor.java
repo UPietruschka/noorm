@@ -2,6 +2,7 @@ package org.noorm.jdbc;
 
 import org.noorm.metadata.BeanMetaDataUtil;
 import org.noorm.platform.IPlatform;
+import org.noorm.platform.JDBCType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -436,8 +437,8 @@ public class JDBCDMLProcessor<T> {
     private Object buildVersionColumnValue(final IBean pBean, final BatchType pBatchType, final Object pOldValue) {
 
         Object value;
-        final VersionColumnType versionColumnType = pBean.getVersionColumnType();
-        if (versionColumnType.equals(VersionColumnType.NUMBER)) {
+        final JDBCType versionColumnType = pBean.getVersionColumnType();
+        if (versionColumnType.equals(JDBCType.NUMERIC)) {
             if (pBatchType.equals(BatchType.INSERT)) {
                 value = VERSION_COLUMN_LONG_DEFAULT;
             } else { // BatchType.UPDATE
@@ -445,10 +446,10 @@ public class JDBCDMLProcessor<T> {
             }
         } else {
             final Calendar calendar = Calendar.getInstance();
-            if (versionColumnType.equals(VersionColumnType.TIMESTAMP)) {
+            if (versionColumnType.equals(JDBCType.TIMESTAMP)) {
                 value = new Timestamp(calendar.getTimeInMillis());
             } else {
-                if (versionColumnType.equals(VersionColumnType.DATE)) {
+                if (versionColumnType.equals(JDBCType.DATE)) {
                     // The DATE type precision is limited to seconds only, so we have
                     // to truncate the fractions here to get consistent settings
                     calendar.set(Calendar.MILLISECOND, 0);

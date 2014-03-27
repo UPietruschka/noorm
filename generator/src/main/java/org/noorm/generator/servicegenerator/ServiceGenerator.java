@@ -11,7 +11,8 @@ import org.noorm.jdbc.JDBCProcedureProcessor;
 import org.noorm.jdbc.Utils;
 import org.noorm.platform.IMetadata;
 import org.noorm.metadata.beans.NameBean;
-import org.noorm.metadata.beans.ParameterBean;
+import org.noorm.platform.JDBCType;
+import org.noorm.platform.Parameter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -29,7 +30,6 @@ public class ServiceGenerator {
 
 	private static final Logger log = LoggerFactory.getLogger(ServiceGenerator.class);
 	private static final String INPUT_PARAMETER = "IN";
-	private static final String ORACLE_REF_CURSOR_TYPE_NAME = "REF CURSOR";
 	private static final String NOORM_ID_LIST_JAVA_TYPE_NAME = "Long[]";
 	private static final String NOORM_METADATA_ID_RECORD = "NOORM_METADATA_ID_RECORD";
 	private static final String SERVICE_VM_TEMPLATE_FILE = "/service.vm";
@@ -108,21 +108,21 @@ public class ServiceGenerator {
 				procedureDescriptor.setDbProcedureName(procedureName.getName().toLowerCase());
 				final String javaMethodName = Utils.convertDBName2JavaName(procedureName.getName(), false);
 				procedureDescriptor.setJavaName(javaMethodName);
-				final List<ParameterBean> parameterList =
+				final List<Parameter> parameterList =
                         metadata.findProcedureParameters(packageName.getName(), procedureName.getName());
-				for (final ParameterBean parameter : parameterList) {
+				for (final Parameter parameter : parameterList) {
 					if (parameter.getDirection().equals(INPUT_PARAMETER)) {
 						final ParameterDescriptor parameterDescriptor = new ParameterDescriptor();
 						parameterDescriptor.setDbParamName(parameter.getName().toLowerCase());
 						final String javaParameterName = Utils.convertDBName2JavaName(parameter.getName(), false);
 						parameterDescriptor.setJavaName(javaParameterName);
-						final String databaseType = parameter.getDataType();
+						final JDBCType jdbcType = parameter.getJDBCType();
 						final String databaseTypeName = parameter.getTypeName();
 						if (databaseTypeName != null &&
 								databaseTypeName.equals(JDBCProcedureProcessor.NOORM_ID_LIST_DB_TYPE_NAME)) {
 							parameterDescriptor.setJavaType(NOORM_ID_LIST_JAVA_TYPE_NAME);
 						} else {
-							final String javaType = GeneratorUtil.convertDatabaseType2JavaType(databaseType,
+							final String javaType = GeneratorUtil.convertDatabaseType2JavaType(jdbcType,
                                     parameterDescriptor.getDbParamName(), configuration.getTypeMappings());
 							parameterDescriptor.setJavaType(javaType);
 						}
@@ -140,7 +140,7 @@ public class ServiceGenerator {
 					} else { // OUT parameter
 						procedureDescriptor.setHasOutParam(true);
 						procedureDescriptor.setOutDbParamName(parameter.getName().toLowerCase());
-						if (parameter.getDataType().equals(ORACLE_REF_CURSOR_TYPE_NAME)) {
+						if (parameter.getJDBCType().equals(JDBCType.REF_CURSOR)) {
 							final String rowTypeName = metadata.getParameterRowtype
 									(packageName.getName(), procedureName.getName(), parameter.getName());
 							if (rowTypeName.equals(NOORM_METADATA_ID_RECORD)) {
@@ -165,7 +165,7 @@ public class ServiceGenerator {
 								}
 							}
 						} else {
-							final String javaType = GeneratorUtil.convertDatabaseType2JavaType(parameter.getDataType(),
+							final String javaType = GeneratorUtil.convertDatabaseType2JavaType(parameter.getJDBCType(),
                                     parameter.getName(), configuration.getTypeMappings());
 							procedureDescriptor.setOutParamJavaType(javaType);
 							procedureDescriptor.setOutParamScalar(true);

@@ -2,11 +2,11 @@ package org.noorm.platform.oracle;
 
 import org.noorm.jdbc.JDBCProcedureProcessor;
 import org.noorm.metadata.beans.NameBean;
-import org.noorm.metadata.beans.ParameterBean;
 import org.noorm.metadata.beans.PrimaryKeyColumnBean;
 import org.noorm.metadata.beans.SequenceBean;
 import org.noorm.platform.IMetadata;
 import org.noorm.platform.JDBCType;
+import org.noorm.platform.Parameter;
 import org.noorm.platform.TableMetadata;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -43,7 +43,7 @@ public class MetadataService implements IMetadata {
 		final JDBCProcedureProcessor<String> statementProcessor = JDBCProcedureProcessor.getInstance();
 		final Map<String, Object> filterParameters = new HashMap<String, Object>();
 		return statementProcessor.callPLSQL
-				("noorm_metadata.get_version", "p_version", filterParameters, String.class);
+                ("noorm_metadata.get_version", "p_version", filterParameters, String.class);
 
 	}
 
@@ -122,18 +122,28 @@ public class MetadataService implements IMetadata {
 		final JDBCProcedureProcessor<PrimaryKeyColumnBean> statementProcessor = JDBCProcedureProcessor.getInstance();
 		final Map<String, Object> filterParameters = new HashMap<String, Object>();
 		return statementProcessor.getBeanListFromPLSQL
-				("noorm_metadata.find_pk_columns", "p_pk_columns", filterParameters, PrimaryKeyColumnBean.class);
+                ("noorm_metadata.find_pk_columns", "p_pk_columns", filterParameters, PrimaryKeyColumnBean.class);
 	}
 
 	@Override
-    public List<ParameterBean> findProcedureParameters(final String pPackageName, final String pProcedureName) {
+    public List<Parameter> findProcedureParameters(final String pPackageName, final String pProcedureName) {
 
 		final JDBCProcedureProcessor<ParameterBean> statementProcessor = JDBCProcedureProcessor.getInstance();
 		final Map<String, Object> filterParameters = new HashMap<String, Object>();
 		filterParameters.put("p_package_name", pPackageName);
 		filterParameters.put("p_procedure_name", pProcedureName);
-		return statementProcessor.getBeanListFromPLSQL
-				("noorm_metadata.find_procedure_parameters", "p_parameters", filterParameters, ParameterBean.class);
+		final List<ParameterBean> parameterBeanList = statementProcessor.getBeanListFromPLSQL
+                ("noorm_metadata.find_procedure_parameters", "p_parameters", filterParameters, ParameterBean.class);
+        final List<Parameter> parameters = new ArrayList<Parameter>();
+        for (final ParameterBean parameterBean : parameterBeanList) {
+            final Parameter parameter = new Parameter();
+            parameter.setName(parameterBean.getName());
+            parameter.setDirection(parameterBean.getDirection());
+            parameter.setTypeName(parameterBean.getTypeName());
+            parameter.setJDBCType(convertOracleType2JDBCType(parameterBean.getDataType(), 0));
+            parameters.add(parameter);
+        }
+        return parameters;
 	}
 
 	@Override
@@ -209,7 +219,7 @@ public class MetadataService implements IMetadata {
         if (pOracleTypeName.endsWith("RAW")) {
             jdbcType = JDBCType.BINARY;
         }
-        if (pOracleTypeName.equals("XMLTYPE")) {
+        if (pOracleTypeName.contains("XMLTYPE")) {
             jdbcType = JDBCType.SQLXML;
         }
         if (pOracleTypeName.equals("BLOB")) {
@@ -242,6 +252,9 @@ public class MetadataService implements IMetadata {
         }
         if (pOracleTypeName.startsWith("TIMESTAMP")) {
             jdbcType = JDBCType.TIMESTAMP;
+        }
+        if (pOracleTypeName.equals("REF CURSOR")) {
+            jdbcType = JDBCType.REF_CURSOR;
         }
         return jdbcType;
     }

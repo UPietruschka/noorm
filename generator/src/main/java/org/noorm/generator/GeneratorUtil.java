@@ -137,7 +137,8 @@ public class GeneratorUtil {
 
         if (pTypeMappings != null) {
             for (final TypeMapping typeMapping : pTypeMappings) {
-                if (pJDBCType.startsWith(typeMapping.getDatabaseType())) {
+                final JDBCType mapType = JDBCType.valueOf(typeMapping.getDatabaseType().value());
+                if (pJDBCType.equals(mapType)) {
                     if (typeMapping.getParameterFilterRegex() != null) {
                         if (typeMapping.getColumnFilterRegex() != null || typeMapping.getTableFilterRegex() != null) {
                             throw new GeneratorException("Element 'parameterFilterRegex' must not be defined"
@@ -176,7 +177,8 @@ public class GeneratorUtil {
 
         if (pTypeMappings != null) {
             for (final TypeMapping typeMapping : pTypeMappings) {
-                if (pDatabaseType.startsWith(typeMapping.getDatabaseType()) &&
+                final JDBCType mapType = JDBCType.valueOf(typeMapping.getDatabaseType().value());
+                if (pJDBCType.equals(mapType) &&
                         typeMapping.getParameterFilterRegex() == null) {
                     if (typeMapping.getColumnFilterRegex() == null && typeMapping.getTableFilterRegex() == null) {
                         // Though it is possible to specify attributes 'minOccurs' and 'maxOccurs' to a choice
@@ -235,6 +237,9 @@ public class GeneratorUtil {
         }
         if (pJDBCType.equals(JDBCType.NCLOB)) {
             javaType = "java.sql.NClob";
+        }
+        if (pJDBCType.equals(JDBCType.SQLXML)) {
+            javaType = "java.sql.SQLXML";
         }
         if (pJDBCType.equals(JDBCType.NUMERIC)) {
             if (pDecimalDigits > 0) {

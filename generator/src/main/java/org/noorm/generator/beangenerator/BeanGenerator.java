@@ -201,7 +201,7 @@ public class BeanGenerator {
                 }
 				beanAttributeDescriptor.setColumnName(columnName);
                 if (versionColumnName.equals(columnName)) {
-                    versionColumnType = typeName;
+                    versionColumnType = jdbcType.getName();
                     beanClassDescriptor.setVersionColumnJavaName(javaName);
                 }
 				beanAttributeDescriptor.setMaxLength(tableMetadata.getColumnSize());

@@ -159,7 +159,7 @@ public enum JDBCType {
     /**
      * Identifies the generic SQL type {@code SQLXML}.
      */
-    SQLXML(Types.SQLXML);
+    SQLXML(Types.SQLXML),
 
     /* JDBC 4.2 Types */
 
@@ -168,6 +168,9 @@ public enum JDBCType {
      * Java 8 only
      */
     //REF_CURSOR(Types.REF_CURSOR),
+
+    // Since we need the REF_CURSOR, we introduce it with a proprietary ID
+    REF_CURSOR(8888);
 
     /**
      * Identifies the generic SQL type {@code TIME_WITH_TIMEZONE}.
