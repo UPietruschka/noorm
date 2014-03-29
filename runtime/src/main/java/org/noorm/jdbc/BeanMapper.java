@@ -189,21 +189,7 @@ public class BeanMapper<T> {
 			// Bean specification.
 
 			if (fieldType == String.class) {
-                // Handling includes CHAR, VARCHAR2, NCHAR and NVHARCHAR2, but also for complex data-type
-                // CLOB. Things are more complicated for XML types (Oracle proprietary type XMLTYPE and
-                // standard JDBC 4.0 type java.sql.SQLXML). Oracle has limited support for the SQLXML prior
-                // to Oracle 11.2. Even with Oracle 11.2, the behaviour may depend on the Oracle JDBC driver,
-                // so version 11.2.0.3.0 is known to be buggy and does not work with the standard access
-                // mechanisms used here.
-                String value = null;
-                if (dataType == Types.SQLXML) {
-                    final SQLXML sqlxml = pResultSet.getSQLXML(fieldName);
-                    if (sqlxml != null) {
-                        value = sqlxml.getString();
-                    }
-                } else {
-                    value = pResultSet.getString(fieldName);
-                }
+                final String value = pResultSet.getString(fieldName);
                 if (value != null) {
                     field.set(pBean, value.trim());
                 }
@@ -233,11 +219,6 @@ public class BeanMapper<T> {
 				}
                 continue;
 			}
-
-			// Oracle has no data-type representing a date only (without time). Oracle data-types DATE and
-			// TIMESTAMP differ in precision, but both have a time included. Since the time part of the Java
-			// type is stored in the database unchanged, we should retrieve it unchanged, i.e., we do not
-			// make use of JDBC method getDate, which omits the time part, but use always getTimestamp.
 			if (fieldType == java.util.Date.class || fieldType == Timestamp.class) {
 				field.set(pBean, pResultSet.getTimestamp(fieldName));
                 continue;
@@ -278,30 +259,7 @@ public class BeanMapper<T> {
 			}
 
 			if (fieldType == byte[].class) {
-                // Handling for the Oracle RAW type, but also for complex data-type BLOB, which are mapped
-                // to byte arrays. For large BLOBs, using the stream-based getters in the ResultSet API may
-                // be suitable (getBinaryStream), but the driver uses streaming behind the scenes anyway,
-                // so we do not need to use it here. An alternative explicit usage of streaming has been
-                // commented out and is similar in performance.
                 field.set(pBean, pResultSet.getBytes(fieldName));
-                // if (dataType.equals("BLOB")) {
-                //     final Blob blob = pResultSet.getBlob(fieldName);
-                //     if (blob != null) {
-                //         field.set(pBean, pResultSet.getBytes(fieldName));
-                //         final InputStream inputStream = blob.getBinaryStream();
-                //         final ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
-                //         try {
-                //             final byte[] buffer = new byte[DEFAULT_BUFFER_SIZE];
-                //             int n;
-                //             while (-1 != (n = inputStream.read(buffer))) {
-                //                 byteArrayOutputStream.write(buffer, 0, n);
-                //             }
-                //             field.set(pBean, byteArrayOutputStream.toByteArray());
-                //         } catch (IOException ex) {
-                //             throw new DataAccessException(ex);
-                //         }
-                //     }
-                // }
                 continue;
 			}
             if (fieldType == Clob.class) {
