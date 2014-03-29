@@ -3,11 +3,7 @@ package org.noorm.platform.oracle;
 import org.noorm.jdbc.JDBCProcedureProcessor;
 import org.noorm.metadata.beans.NameBean;
 import org.noorm.metadata.beans.PrimaryKeyColumnBean;
-import org.noorm.metadata.beans.SequenceBean;
-import org.noorm.platform.IMetadata;
-import org.noorm.platform.JDBCType;
-import org.noorm.platform.Parameter;
-import org.noorm.platform.TableMetadata;
+import org.noorm.platform.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -108,12 +104,20 @@ public class MetadataService implements IMetadata {
 	}
 
 	@Override
-    public List<SequenceBean> findSequenceNames() {
+    public List<Sequence> findSequences() {
 
 		final JDBCProcedureProcessor<SequenceBean> statementProcessor = JDBCProcedureProcessor.getInstance();
 		final Map<String, Object> filterParameters = new HashMap<String, Object>();
-		return statementProcessor.getBeanListFromPLSQL
+		final List<SequenceBean> sequenceBeanList = statementProcessor.getBeanListFromPLSQL
 				("noorm_metadata.find_sequence_names", "p_sequence_names", filterParameters, SequenceBean.class);
+        final List<Sequence> sequenceList = new ArrayList<Sequence>();
+        for (final SequenceBean sequenceBean : sequenceBeanList) {
+            final Sequence sequence = new Sequence();
+            sequence.setName(sequenceBean.getName());
+            sequence.setIncrementBy(sequenceBean.getIncrementBy());
+            sequenceList.add(sequence);
+        }
+        return sequenceList;
 	}
 
 	@Override

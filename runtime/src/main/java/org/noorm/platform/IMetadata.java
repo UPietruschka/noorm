@@ -2,7 +2,6 @@ package org.noorm.platform;
 
 import org.noorm.metadata.beans.NameBean;
 import org.noorm.metadata.beans.PrimaryKeyColumnBean;
-import org.noorm.metadata.beans.SequenceBean;
 
 import java.util.List;
 import java.util.Map;
@@ -49,7 +48,7 @@ public interface IMetadata {
      *
      * @return the list of sequence names
      */
-    List<SequenceBean> findSequenceNames();
+    List<Sequence> findSequences();
 
     /**
      * Returns all primary key columns.

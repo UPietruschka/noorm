@@ -3,9 +3,9 @@ package org.noorm.platform.mssql;
 import org.noorm.jdbc.JDBCQueryProcessor;
 import org.noorm.metadata.beans.NameBean;
 import org.noorm.metadata.beans.PrimaryKeyColumnBean;
-import org.noorm.metadata.beans.SequenceBean;
 import org.noorm.platform.IMetadata;
 import org.noorm.platform.Parameter;
+import org.noorm.platform.Sequence;
 import org.noorm.platform.TableMetadata;
 
 import java.util.ArrayList;
@@ -190,16 +190,16 @@ public class JDBCMetadata implements IMetadata {
      * @return the list of sequence names
      */
     @Override
-    public List<SequenceBean> findSequenceNames() {
+    public List<Sequence> findSequences() {
 
         final String sequenceQuery = "SELECT name, CONVERT(int, increment) FROM sys.sequences";
         final List<Map<String, Object>> results = queryProcessor.executeGenericSelect(sequenceQuery);
-        final List<SequenceBean> sequences = new ArrayList<SequenceBean>();
-        for (final Map<String, Object> sequence : results) {
-            final SequenceBean sequenceBean = new SequenceBean();
-            sequenceBean.setName((String) sequence.get("name"));
-            sequenceBean.setIncrementBy((Long) sequence.get("increment"));
-            sequences.add(sequenceBean);
+        final List<Sequence> sequences = new ArrayList<Sequence>();
+        for (final Map<String, Object> result : results) {
+            final Sequence sequence = new Sequence();
+            sequence.setName((String) result.get("name"));
+            sequence.setIncrementBy((Long) result.get("increment"));
+            sequences.add(sequence);
         }
         return sequences;
     }

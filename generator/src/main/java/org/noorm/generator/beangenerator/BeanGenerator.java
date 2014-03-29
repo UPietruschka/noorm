@@ -9,8 +9,8 @@ import org.noorm.generator.schema.Regex;
 import org.noorm.jdbc.DataSourceProvider;
 import org.noorm.platform.IMetadata;
 import org.noorm.metadata.beans.PrimaryKeyColumnBean;
-import org.noorm.metadata.beans.SequenceBean;
 import org.noorm.platform.JDBCType;
+import org.noorm.platform.Sequence;
 import org.noorm.platform.TableMetadata;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -84,7 +84,7 @@ public class BeanGenerator {
 		final List<PrimaryKeyColumnBean> pkColumnNameList = metadata.findPkColumns();
 
 		log.info("Retrieving sequence metadata from database.");
-		final List<SequenceBean> sequenceList = metadata.findSequenceNames();
+		final List<Sequence> sequenceList = metadata.findSequences();
 
 		log.info("Generating NoORM Bean classes.");
 		final File beanPackageDir = GeneratorUtil.createPackageDir
@@ -141,7 +141,7 @@ public class BeanGenerator {
             }
             beanClassDescriptor.setPrimaryKeyJavaNames(primaryKeyJavaNames);
             beanClassDescriptor.setGeneratePKBasedEqualsAndHashCode(configuration.isGeneratePKBasedEqualsAndHashCode());
-			final SequenceBean sequence = getSequence(tableName0, sequenceList);
+			final Sequence sequence = getSequence(tableName0, sequenceList);
             if (sequence != null) {
                 final String sequenceName = sequence.getName();
                 if (primaryKeyColumnNames.length != 1) {
@@ -239,8 +239,8 @@ public class BeanGenerator {
 		}
 	}
 
-	private SequenceBean getSequence(final String pTableName,
-                                     final List<SequenceBean> pSequenceList) {
+	private Sequence getSequence(final String pTableName,
+                                 final List<Sequence> pSequenceList) {
 
 		final String sequenceName =
                 GeneratorUtil.getMappedString(pTableName, configuration.getTable2SequenceMappings());
@@ -249,7 +249,7 @@ public class BeanGenerator {
 			return null;
 		}
 		// Check the matched sequence name against the sequence names retrieved from the database
-		for (final SequenceBean sequence : pSequenceList) {
+		for (final Sequence sequence : pSequenceList) {
 			if (sequenceName.equals(sequence.getName())) {
 				return sequence;
 			}

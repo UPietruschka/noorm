@@ -48,7 +48,7 @@ public class JDBCDMLProcessor<T> {
      */
     public T insert(final IBean pBean) {
 
-        List<IBean> beanList = new ArrayList<IBean>();
+        final List<IBean> beanList = new ArrayList<IBean>();
         beanList.add(pBean);
         return batch(beanList, BatchType.INSERT);
     }
@@ -74,7 +74,7 @@ public class JDBCDMLProcessor<T> {
      */
     public T update(final IBean pBean) {
 
-        List<IBean> beanList = new ArrayList<IBean>();
+        final List<IBean> beanList = new ArrayList<IBean>();
         beanList.add(pBean);
         return batch(beanList, BatchType.UPDATE);
     }
@@ -110,7 +110,7 @@ public class JDBCDMLProcessor<T> {
      */
     public void delete(final IBean pBean) {
 
-        List<IBean> beanList = new ArrayList<IBean>();
+        final List<IBean> beanList = new ArrayList<IBean>();
         beanList.add(pBean);
         delete(beanList);
     }
@@ -466,7 +466,7 @@ public class JDBCDMLProcessor<T> {
 
     private void issueUpdateCountException(final int pUpdateCount, final int pPassedRows) {
 
-        StringBuilder message = new StringBuilder();
+        final StringBuilder message = new StringBuilder();
         message.append("Number of rows processed by database does not match number of passed rows. [");
         message.append(pUpdateCount);
         message.append(", ");
@@ -477,7 +477,7 @@ public class JDBCDMLProcessor<T> {
 
     private void debugDML(final String pTableName, final String pSequenceName, final String pStatement) {
 
-        StringBuilder logMessage = new StringBuilder();
+        final StringBuilder logMessage = new StringBuilder();
         if (pStatement.toUpperCase().startsWith("INSERT")) {
             logMessage.append("Inserting into ").append(pTableName);
             logMessage.append(" with sequence ").append(pSequenceName);

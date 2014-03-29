@@ -6,7 +6,7 @@ import org.noorm.jdbc.JDBCColumn;
 import org.noorm.metadata.BeanMetaDataUtil;
 import org.noorm.platform.IMetadata;
 import org.noorm.metadata.beans.PrimaryKeyColumnBean;
-import org.noorm.metadata.beans.SequenceBean;
+import org.noorm.platform.Sequence;
 import org.noorm.platform.TableMetadata;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -27,7 +27,7 @@ public class BeanValidator {
 
 	protected Map<String, List<TableMetadata>> tableColumnMap;
 	protected List<PrimaryKeyColumnBean> allPKColumnNameList;
-	protected List<SequenceBean> sequenceDBNameList;
+	protected List<Sequence> sequenceDBNameList;
 
 	public void loadMetadata() {
 
@@ -40,7 +40,7 @@ public class BeanValidator {
 		allPKColumnNameList = metadata.findPkColumns();
 
 		log.debug("Retrieving sequence metadata from database.");
-		sequenceDBNameList = metadata.findSequenceNames();
+		sequenceDBNameList = metadata.findSequences();
 	}
 
 	public void validateBean(final IBean pBean) {
@@ -156,7 +156,7 @@ public class BeanValidator {
 
 		if (!pBean.getSequenceName().isEmpty()) {
 			boolean sequenceFound = false;
-			for (final SequenceBean sequenceName : sequenceDBNameList) {
+			for (final Sequence sequenceName : sequenceDBNameList) {
 				if (sequenceName.getName().equals(pBean.getSequenceName())) {
 					sequenceFound = true;
 				}
