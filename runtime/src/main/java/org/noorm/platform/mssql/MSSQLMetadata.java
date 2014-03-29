@@ -13,17 +13,17 @@ import java.util.Map;
  *         Date: 21.02.14
  *         Time: 13:44
  */
-public class JDBCMetadata implements IMetadata {
+public class MSSQLMetadata implements IMetadata {
 
     private JDBCQueryProcessor queryProcessor = JDBCQueryProcessor.getInstance();
 
-    private static JDBCMetadata ourInstance = new JDBCMetadata();
+    private static MSSQLMetadata ourInstance = new MSSQLMetadata();
 
-    public static JDBCMetadata getInstance() {
+    public static MSSQLMetadata getInstance() {
         return ourInstance;
     }
 
-    private JDBCMetadata() { }
+    private MSSQLMetadata() { }
 
 
     /**

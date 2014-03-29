@@ -15,20 +15,20 @@ import java.util.Map;
  *         Date: 19.04.11
  *         Time: 14:48
  */
-public class MetadataService implements IMetadata {
+public class OracleMetadata implements IMetadata {
 
-	private static final Logger log = LoggerFactory.getLogger(MetadataService.class);
+	private static final Logger log = LoggerFactory.getLogger(OracleMetadata.class);
 
     public static final String UPDATABLE = "YES";
     public static final String NULLABLE = "Y";
-	private static MetadataService metadataService = new MetadataService();
+	private static OracleMetadata oracleMetadata = new OracleMetadata();
 
-	protected MetadataService() {
+	protected OracleMetadata() {
 	}
 
-	public static MetadataService getInstance() {
+	public static OracleMetadata getInstance() {
 
-		return metadataService;
+		return oracleMetadata;
 	}
 
 	@Override

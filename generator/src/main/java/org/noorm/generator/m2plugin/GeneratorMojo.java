@@ -157,7 +157,7 @@ public class GeneratorMojo extends AbstractMojo implements IParameters {
 		Velocity.setProperty("class.resource.loader.class", "org.apache.velocity.runtime.resource.loader.ClasspathResourceLoader");
 		Velocity.init();
 
-		// To avoid acquiring a new database connection for every single access to the MetadataService, the generators
+		// To avoid acquiring a new database connection for every single access to the Metadata, the generators
 		// run in one single transaction. Exception handling with clean rollback handling has been omitted, since all
 		// database operations are read-only.
 		DataSourceProvider.begin();

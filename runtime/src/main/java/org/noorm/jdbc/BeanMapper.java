@@ -26,7 +26,6 @@ public class BeanMapper<T> {
 
 	private static BeanMapper mapper = new BeanMapper();
 	private static final Logger log = LoggerFactory.getLogger(BeanMapper.class);
-    private static final String XMLTYPE = "XMLTYPE";
 
 	public static <T> BeanMapper<T> getInstance() {
 

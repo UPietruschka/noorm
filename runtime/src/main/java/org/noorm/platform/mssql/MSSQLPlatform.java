@@ -15,7 +15,7 @@ import java.sql.SQLException;
  */
 public class MSSQLPlatform implements IPlatform {
 
-    private final JDBCMetadata jdbcMetadata = JDBCMetadata.getInstance();
+    private final MSSQLMetadata msSQLMetadata = MSSQLMetadata.getInstance();
 
     /**
      * Creates a platform specific data source.
@@ -122,6 +122,6 @@ public class MSSQLPlatform implements IPlatform {
     @Override
     public IMetadata getMetadata() {
 
-        return jdbcMetadata;
+        return msSQLMetadata;
     }
 }

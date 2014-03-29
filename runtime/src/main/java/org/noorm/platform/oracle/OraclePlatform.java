@@ -17,7 +17,7 @@ import java.util.Properties;
  */
 public class OraclePlatform implements IPlatform {
 
-    private final MetadataService metadataService = MetadataService.getInstance();
+    private final OracleMetadata oracleMetadata = OracleMetadata.getInstance();
 
     /**
      * Creates a platform specific data source.
@@ -138,6 +138,6 @@ public class OraclePlatform implements IPlatform {
     @Override
     public IMetadata getMetadata() {
 
-        return metadataService;
+        return oracleMetadata;
     }
 }
