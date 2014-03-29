@@ -44,53 +44,53 @@ public class OracleMetadata implements IMetadata {
 	@Override
     public Map<String, List<TableMetadata>> findTableMetadata() {
 
-		final List<TableMetadataBean> tableMetadataBeanList = findTableMetadata0();
+		final List<OracleTableMetadata> oracleTableMetadataList = findTableMetadata0();
 		final Map<String, List<TableMetadata>> tableColumnMap = new HashMap<String, List<TableMetadata>>();
 		String tableName = "";
 		List<TableMetadata> tableMetadataList0 = null;
-		for (TableMetadataBean tableMetadataBean : tableMetadataBeanList) {
+		for (OracleTableMetadata oracleTableMetadata : oracleTableMetadataList) {
 			// Filter out duplicates
-			if (!tableName.equals(tableMetadataBean.getTableName())) {
-				tableName = tableMetadataBean.getTableName();
+			if (!tableName.equals(oracleTableMetadata.getTableName())) {
+				tableName = oracleTableMetadata.getTableName();
 				log.debug("Collecting table metadata for table ".concat(tableName));
 				tableMetadataList0 = new ArrayList<TableMetadata>();
 				tableColumnMap.put(tableName, tableMetadataList0);
 			}
             int decimalDigits = 0;
-            if (tableMetadataBean.getDataScale() != null) {
-                decimalDigits = tableMetadataBean.getDataScale().intValue();
+            if (oracleTableMetadata.getDataScale() != null) {
+                decimalDigits = oracleTableMetadata.getDataScale().intValue();
             }
             final TableMetadata tableMetadata = new TableMetadata();
-            tableMetadata.setTableName(tableMetadataBean.getTableName());
-            tableMetadata.setColumnName(tableMetadataBean.getColumnName());
-            tableMetadata.setJDBCType(convertOracleType2JDBCType(tableMetadataBean.getDataType(), decimalDigits));
-            tableMetadata.setColumnSize(tableMetadataBean.getCharLength().intValue());
+            tableMetadata.setTableName(oracleTableMetadata.getTableName());
+            tableMetadata.setColumnName(oracleTableMetadata.getColumnName());
+            tableMetadata.setJDBCType(convertOracleType2JDBCType(oracleTableMetadata.getDataType(), decimalDigits));
+            tableMetadata.setColumnSize(oracleTableMetadata.getCharLength().intValue());
             tableMetadata.setDecimalDigits(decimalDigits);
-            tableMetadata.setNullable(tableMetadataBean.getNullable().equals(NULLABLE));
-            tableMetadata.setUpdatable(tableMetadataBean.getUpdatable().equals(UPDATABLE));
+            tableMetadata.setNullable(oracleTableMetadata.getNullable().equals(NULLABLE));
+            tableMetadata.setUpdatable(oracleTableMetadata.getUpdatable().equals(UPDATABLE));
 			tableMetadataList0.add(tableMetadata);
 		}
 		return tableColumnMap;
 	}
 
-	private List<TableMetadataBean> findTableMetadata0() {
+	private List<OracleTableMetadata> findTableMetadata0() {
 
-		final JDBCProcedureProcessor<TableMetadataBean> statementProcessor = JDBCProcedureProcessor.getInstance();
+		final JDBCProcedureProcessor<OracleTableMetadata> statementProcessor = JDBCProcedureProcessor.getInstance();
 		final Map<String, Object> filterParameters = new HashMap<String, Object>();
 		return statementProcessor.getBeanListFromPLSQL
-				("noorm_metadata.find_table_metadata", "p_table_metadata", filterParameters, TableMetadataBean.class);
+				("noorm_metadata.find_table_metadata", "p_table_metadata", filterParameters, OracleTableMetadata.class);
 	}
 
 	@Override
     public List<String> findPackageNames(final String pSearchRegex) {
 
-		final JDBCProcedureProcessor<NameBean> statementProcessor = JDBCProcedureProcessor.getInstance();
+		final JDBCProcedureProcessor<OracleName> statementProcessor = JDBCProcedureProcessor.getInstance();
 		final Map<String, Object> filterParameters = new HashMap<String, Object>();
 		filterParameters.put("p_search_regex", pSearchRegex);
-		final List<NameBean> names = statementProcessor.getBeanListFromPLSQL
-				("noorm_metadata.find_package_names", "p_package_names", filterParameters, NameBean.class);
+		final List<OracleName> names = statementProcessor.getBeanListFromPLSQL
+				("noorm_metadata.find_package_names", "p_package_names", filterParameters, OracleName.class);
         final List<String> nameList = new ArrayList<String>();
-        for (final NameBean name : names) {
+        for (final OracleName name : names) {
             nameList.add(name.getName());
         }
         return nameList;
@@ -99,13 +99,13 @@ public class OracleMetadata implements IMetadata {
 	@Override
     public List<String> findProcedureNames(final String pPackageName) {
 
-		final JDBCProcedureProcessor<NameBean> statementProcessor = JDBCProcedureProcessor.getInstance();
+		final JDBCProcedureProcessor<OracleName> statementProcessor = JDBCProcedureProcessor.getInstance();
 		final Map<String, Object> filterParameters = new HashMap<String, Object>();
 		filterParameters.put("p_package_name", pPackageName);
-        final List<NameBean> names = statementProcessor.getBeanListFromPLSQL
-				("noorm_metadata.find_procedure_names", "p_procedure_names", filterParameters, NameBean.class);
+        final List<OracleName> names = statementProcessor.getBeanListFromPLSQL
+				("noorm_metadata.find_procedure_names", "p_procedure_names", filterParameters, OracleName.class);
         final List<String> nameList = new ArrayList<String>();
-        for (final NameBean name : names) {
+        for (final OracleName name : names) {
             nameList.add(name.getName());
         }
         return nameList;
@@ -114,15 +114,15 @@ public class OracleMetadata implements IMetadata {
 	@Override
     public List<Sequence> findSequences() {
 
-		final JDBCProcedureProcessor<SequenceBean> statementProcessor = JDBCProcedureProcessor.getInstance();
+		final JDBCProcedureProcessor<OracleSequence> statementProcessor = JDBCProcedureProcessor.getInstance();
 		final Map<String, Object> filterParameters = new HashMap<String, Object>();
-		final List<SequenceBean> sequenceBeanList = statementProcessor.getBeanListFromPLSQL
-				("noorm_metadata.find_sequence_names", "p_sequence_names", filterParameters, SequenceBean.class);
+		final List<OracleSequence> oracleSequenceList = statementProcessor.getBeanListFromPLSQL
+				("noorm_metadata.find_sequence_names", "p_sequence_names", filterParameters, OracleSequence.class);
         final List<Sequence> sequenceList = new ArrayList<Sequence>();
-        for (final SequenceBean sequenceBean : sequenceBeanList) {
+        for (final OracleSequence oracleSequence : oracleSequenceList) {
             final Sequence sequence = new Sequence();
-            sequence.setName(sequenceBean.getName());
-            sequence.setIncrementBy(sequenceBean.getIncrementBy());
+            sequence.setName(oracleSequence.getName());
+            sequence.setIncrementBy(oracleSequence.getIncrementBy());
             sequenceList.add(sequence);
         }
         return sequenceList;
@@ -131,12 +131,12 @@ public class OracleMetadata implements IMetadata {
 	@Override
     public List<PrimaryKeyColumn> findPkColumns() {
 
-		final JDBCProcedureProcessor<PrimaryKeyColumnBean> statementProcessor = JDBCProcedureProcessor.getInstance();
+		final JDBCProcedureProcessor<OraclePrimaryKeyColumn> statementProcessor = JDBCProcedureProcessor.getInstance();
 		final Map<String, Object> filterParameters = new HashMap<String, Object>();
-		final List<PrimaryKeyColumnBean> pkColumnBeans = statementProcessor.getBeanListFromPLSQL
-                ("noorm_metadata.find_pk_columns", "p_pk_columns", filterParameters, PrimaryKeyColumnBean.class);
+		final List<OraclePrimaryKeyColumn> pkColumnBeans = statementProcessor.getBeanListFromPLSQL
+                ("noorm_metadata.find_pk_columns", "p_pk_columns", filterParameters, OraclePrimaryKeyColumn.class);
         final List<PrimaryKeyColumn> pkColumns = new ArrayList<PrimaryKeyColumn>();
-        for (final PrimaryKeyColumnBean pkColumnBean : pkColumnBeans) {
+        for (final OraclePrimaryKeyColumn pkColumnBean : pkColumnBeans) {
             final PrimaryKeyColumn pkColumn = new PrimaryKeyColumn();
             pkColumn.setTableName(pkColumnBean.getTableName());
             pkColumn.setColumnName(pkColumnBean.getColumnName());
@@ -148,19 +148,19 @@ public class OracleMetadata implements IMetadata {
 	@Override
     public List<Parameter> findProcedureParameters(final String pPackageName, final String pProcedureName) {
 
-		final JDBCProcedureProcessor<ParameterBean> statementProcessor = JDBCProcedureProcessor.getInstance();
+		final JDBCProcedureProcessor<OracleParameter> statementProcessor = JDBCProcedureProcessor.getInstance();
 		final Map<String, Object> filterParameters = new HashMap<String, Object>();
 		filterParameters.put("p_package_name", pPackageName);
 		filterParameters.put("p_procedure_name", pProcedureName);
-		final List<ParameterBean> parameterBeanList = statementProcessor.getBeanListFromPLSQL
-                ("noorm_metadata.find_procedure_parameters", "p_parameters", filterParameters, ParameterBean.class);
+		final List<OracleParameter> oracleParameterList = statementProcessor.getBeanListFromPLSQL
+                ("noorm_metadata.find_procedure_parameters", "p_parameters", filterParameters, OracleParameter.class);
         final List<Parameter> parameters = new ArrayList<Parameter>();
-        for (final ParameterBean parameterBean : parameterBeanList) {
+        for (final OracleParameter oracleParameter : oracleParameterList) {
             final Parameter parameter = new Parameter();
-            parameter.setName(parameterBean.getName());
-            parameter.setDirection(parameterBean.getDirection());
-            parameter.setTypeName(parameterBean.getTypeName());
-            parameter.setJDBCType(convertOracleType2JDBCType(parameterBean.getDataType(), 0));
+            parameter.setName(oracleParameter.getName());
+            parameter.setDirection(oracleParameter.getDirection());
+            parameter.setTypeName(oracleParameter.getTypeName());
+            parameter.setJDBCType(convertOracleType2JDBCType(oracleParameter.getDataType(), 0));
             parameters.add(parameter);
         }
         return parameters;
@@ -193,11 +193,11 @@ public class OracleMetadata implements IMetadata {
 	@Override
     public Map<String, List<TableMetadata>> findRecordMetadata() {
 
-		final List<TableMetadataBean> recordMetadataBeanList = findRecordMetadata0();
+		final List<OracleTableMetadata> recordMetadataBeanList = findRecordMetadata0();
 		final Map<String, List<TableMetadata>> recordColumnMap = new HashMap<String, List<TableMetadata>>();
 		String recordName = "";
 		List<TableMetadata> recordMetadataList0 = null;
-		for (TableMetadataBean recordMetadataBean : recordMetadataBeanList) {
+		for (OracleTableMetadata recordMetadataBean : recordMetadataBeanList) {
 			// Filter out duplicates
 			if (!recordName.equals(recordMetadataBean.getTableName())) {
 				recordName = recordMetadataBean.getTableName();
@@ -222,12 +222,12 @@ public class OracleMetadata implements IMetadata {
 		return recordColumnMap;
 	}
 
-	private List<TableMetadataBean> findRecordMetadata0() {
+	private List<OracleTableMetadata> findRecordMetadata0() {
 
-		final JDBCProcedureProcessor<TableMetadataBean> statementProcessor = JDBCProcedureProcessor.getInstance();
+		final JDBCProcedureProcessor<OracleTableMetadata> statementProcessor = JDBCProcedureProcessor.getInstance();
 		final Map<String, Object> filterParameters = new HashMap<String, Object>();
 		return statementProcessor.getBeanListFromPLSQL
-				("noorm_metadata.find_record_metadata", "p_record_metadata", filterParameters, TableMetadataBean.class);
+				("noorm_metadata.find_record_metadata", "p_record_metadata", filterParameters, OracleTableMetadata.class);
 	}
 
     private JDBCType convertOracleType2JDBCType(final String pOracleTypeName, final int pDecimalDigits) {

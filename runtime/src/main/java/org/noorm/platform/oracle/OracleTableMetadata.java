@@ -8,7 +8,7 @@ import org.noorm.jdbc.JDBCColumn;
  *         Date: 16.04.11
  *         Time: 18:10
  */
-public class TableMetadataBean {
+public class OracleTableMetadata {
 
 	@JDBCColumn(name="TABLE_NAME", updatable=false)
 	private String tableName;

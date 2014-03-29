@@ -7,7 +7,7 @@ import org.noorm.jdbc.JDBCColumn;
  *         Date: 04.09.11
  *         Time: 14:55
  */
-public class PrimaryKeyColumnBean {
+public class OraclePrimaryKeyColumn {
 
 	@JDBCColumn(name="TABLE_NAME", updatable=false)
 	private String tableName;

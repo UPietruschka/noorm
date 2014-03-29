@@ -7,7 +7,7 @@ import org.noorm.jdbc.JDBCColumn;
  *         Date: 15.05.11
  *         Time: 17:47
  */
-public class ParameterBean {
+public class OracleParameter {
 
 	@JDBCColumn(name="NAME", updatable=false)
 	private String name;

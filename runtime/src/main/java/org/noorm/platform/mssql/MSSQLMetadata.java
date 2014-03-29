@@ -45,7 +45,7 @@ public class MSSQLMetadata implements IMetadata {
     public Map<String, List<TableMetadata>> findTableMetadata() {
 
         throw new UnsupportedOperationException();
-//        final Map<String, List<TableMetadataBean>> tableMetaData = new HashMap<String, List<TableMetadataBean>>();
+//        final Map<String, List<OracleTableMetadata>> tableMetaData = new HashMap<String, List<OracleTableMetadata>>();
 //        boolean success = true;
 //        Connection con = null;
 //        try {
@@ -91,9 +91,9 @@ public class MSSQLMetadata implements IMetadata {
 //            final String columnQuery = "SELECT name, column_id, system_type_id, max_length, precision, scale, is_nullable "
 //                                     + "FROM sys.columns WHERE object_id = " + objectIdS;
 //            final List<Map<String, Object>> results0 = queryProcessor.executeGenericSelect(columnQuery);
-//            final List<TableMetadataBean> metadataBeanList = new ArrayList<TableMetadataBean>();
+//            final List<OracleTableMetadata> metadataBeanList = new ArrayList<OracleTableMetadata>();
 //            for (final Map<String, Object> column : results0) {
-//                final TableMetadataBean metadataBean = new TableMetadataBean();
+//                final OracleTableMetadata metadataBean = new OracleTableMetadata();
 //                metadataBean.setTableName(tableName);
 //                metadataBean.setColumnName((String) column.get("name"));
 //                metadataBean.setColumnId((Long) column.get("column_id"));
