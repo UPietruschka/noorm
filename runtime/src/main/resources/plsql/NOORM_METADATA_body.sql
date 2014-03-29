@@ -74,8 +74,7 @@ PACKAGE BODY noorm_metadata AS
   BEGIN
     OPEN p_pk_columns FOR
     SELECT cc.table_name,
-           cc.column_name,
-           cc.position
+           cc.column_name
     FROM   user_constraints uc,
            user_cons_columns cc
     WHERE  uc.table_name      = cc.table_name
@@ -83,8 +82,7 @@ PACKAGE BODY noorm_metadata AS
     AND    uc.constraint_type = 'P'
     UNION
     SELECT us.synonym_name table_name,
-           cc.column_name,
-           cc.position
+           cc.column_name
     FROM   all_constraints ac,
            all_cons_columns cc,
            user_synonyms us

@@ -3,9 +3,9 @@ package org.noorm.validation;
 import org.noorm.jdbc.DataSourceProvider;
 import org.noorm.jdbc.IBean;
 import org.noorm.jdbc.JDBCColumn;
-import org.noorm.metadata.BeanMetaDataUtil;
+import org.noorm.jdbc.BeanMetaDataUtil;
 import org.noorm.platform.IMetadata;
-import org.noorm.metadata.beans.PrimaryKeyColumnBean;
+import org.noorm.platform.PrimaryKeyColumn;
 import org.noorm.platform.Sequence;
 import org.noorm.platform.TableMetadata;
 import org.slf4j.Logger;
@@ -26,7 +26,7 @@ public class BeanValidator {
 	private static final Logger log = LoggerFactory.getLogger(BeanValidator.class);
 
 	protected Map<String, List<TableMetadata>> tableColumnMap;
-	protected List<PrimaryKeyColumnBean> allPKColumnNameList;
+	protected List<PrimaryKeyColumn> allPKColumnNameList;
 	protected List<Sequence> sequenceDBNameList;
 
 	public void loadMetadata() {
@@ -127,11 +127,11 @@ public class BeanValidator {
 
 		final List<String> beanPKColumnList = Arrays.asList(pBean.getPrimaryKeyColumnNames());
 		final ArrayList<String> databasePKColumnList = new ArrayList<String>();
-		for (final PrimaryKeyColumnBean primaryKeyColumnBean : allPKColumnNameList) {
-			if (tableName.equals(primaryKeyColumnBean.getTableName())) {
-				databasePKColumnList.add(primaryKeyColumnBean.getColumnName());
-				if (!beanPKColumnList.contains(primaryKeyColumnBean.getColumnName())) {
-					validationError("Primary key column ".concat(primaryKeyColumnBean.getColumnName())
+		for (final PrimaryKeyColumn primaryKeyColumn : allPKColumnNameList) {
+			if (tableName.equals(primaryKeyColumn.getTableName())) {
+				databasePKColumnList.add(primaryKeyColumn.getColumnName());
+				if (!beanPKColumnList.contains(primaryKeyColumn.getColumnName())) {
+					validationError("Primary key column ".concat(primaryKeyColumn.getColumnName())
 							.concat(" of database table ".concat(tableName)
 									.concat(" is not configured in Java Bean ").concat(javaBeanName)));
 				}

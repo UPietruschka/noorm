@@ -10,7 +10,6 @@ import org.noorm.jdbc.DataSourceProvider;
 import org.noorm.jdbc.JDBCProcedureProcessor;
 import org.noorm.jdbc.Utils;
 import org.noorm.platform.IMetadata;
-import org.noorm.metadata.beans.NameBean;
 import org.noorm.platform.JDBCType;
 import org.noorm.platform.Parameter;
 import org.slf4j.Logger;
@@ -80,36 +79,36 @@ public class ServiceGenerator {
 			packageFilterRegex = packageFilter.getRegex();
 		}
         final IMetadata metadata = DataSourceProvider.getPlatform().getMetadata();
-		final List<NameBean> packageNames = metadata.findPackageNames(packageFilterRegex);
-		for (final NameBean packageName : packageNames) {
-			if (packageName.getName().matches(IGNORE_PACKAGE_FILTER_REGEX)) {
+		final List<String> packageNames = metadata.findPackageNames(packageFilterRegex);
+		for (final String packageName : packageNames) {
+			if (packageName.matches(IGNORE_PACKAGE_FILTER_REGEX)) {
 				// Ignore the NoORM packages
 				continue;
 			}
 			final ServiceClassDescriptor serviceClassDescriptor = new ServiceClassDescriptor();
-			final String javaClassName = Utils.convertDBName2JavaName(packageName.getName(), true);
+			final String javaClassName = Utils.convertDBName2JavaName(packageName, true);
             if (GeneratorUtil.hasDataSourceName(configuration)) {
                 serviceClassDescriptor.setDataSourceName(configuration.getDataSource().getName());
             }
             serviceClassDescriptor.setJavaName(javaClassName);
-			serviceClassDescriptor.setDatabasePackageName(packageName.getName().toLowerCase());
+			serviceClassDescriptor.setDatabasePackageName(packageName.toLowerCase());
             if (GeneratorUtil.hasServiceInterfacePackageName(configuration)) {
                 serviceClassDescriptor.setInterfacePackageName
                         (configuration.getServiceInterfaceJavaPackage().getName());
             }
 			serviceClassDescriptor.setPackageName(configuration.getServiceJavaPackage().getName());
 			serviceClassDescriptor.setBeanPackageName(configuration.getBeanJavaPackage().getName());
-			final Integer codeHashValue = metadata.getPackageHashValue(packageName.getName());
+			final Integer codeHashValue = metadata.getPackageHashValue(packageName);
 			serviceClassDescriptor.setCodeHashValue(codeHashValue);
 			validatorClassDescriptor.getClassNames().add(javaClassName);
-			final List<NameBean> procedureNames = metadata.findProcedureNames(packageName.getName());
-			for (NameBean procedureName : procedureNames) {
+			final List<String> procedureNames = metadata.findProcedureNames(packageName);
+			for (String procedureName : procedureNames) {
 				final ProcedureDescriptor procedureDescriptor = new ProcedureDescriptor();
-				procedureDescriptor.setDbProcedureName(procedureName.getName().toLowerCase());
-				final String javaMethodName = Utils.convertDBName2JavaName(procedureName.getName(), false);
+				procedureDescriptor.setDbProcedureName(procedureName.toLowerCase());
+				final String javaMethodName = Utils.convertDBName2JavaName(procedureName, false);
 				procedureDescriptor.setJavaName(javaMethodName);
 				final List<Parameter> parameterList =
-                        metadata.findProcedureParameters(packageName.getName(), procedureName.getName());
+                        metadata.findProcedureParameters(packageName, procedureName);
 				for (final Parameter parameter : parameterList) {
 					if (parameter.getDirection().equals(INPUT_PARAMETER)) {
 						final ParameterDescriptor parameterDescriptor = new ParameterDescriptor();
@@ -129,11 +128,11 @@ public class ServiceGenerator {
 						procedureDescriptor.addParameter(parameterDescriptor);
                         final Regex pageableProcedureName = configuration.getPageableProcedureName();
 						if (pageableProcedureName != null && pageableProcedureName.getRegex() != null) {
-							if (procedureName.getName().toLowerCase().matches(pageableProcedureName.getRegex())) {
+							if (procedureName.toLowerCase().matches(pageableProcedureName.getRegex())) {
 								procedureDescriptor.setPageableFinder(true);
 							}
 						} else {
-							if (procedureName.getName().toLowerCase().matches(DEFAULT_PAGEABLE_PROC_NAME_REGEX)) {
+							if (procedureName.toLowerCase().matches(DEFAULT_PAGEABLE_PROC_NAME_REGEX)) {
 								procedureDescriptor.setPageableFinder(true);
 							}
 						}
@@ -142,7 +141,7 @@ public class ServiceGenerator {
 						procedureDescriptor.setOutDbParamName(parameter.getName().toLowerCase());
 						if (parameter.getJDBCType().equals(JDBCType.REF_CURSOR)) {
 							final String rowTypeName = metadata.getParameterRowtype
-									(packageName.getName(), procedureName.getName(), parameter.getName());
+									(packageName, procedureName, parameter.getName());
 							if (rowTypeName.equals(NOORM_METADATA_ID_RECORD)) {
 								procedureDescriptor.setOutParamJavaType(Long.class.getSimpleName());
 							} else {
@@ -160,7 +159,7 @@ public class ServiceGenerator {
 							procedureDescriptor.setOutParamRefCursor(true);
                             final Regex singleRowFinder = configuration.getSingleRowFinderProcedureFilter();
 							if (singleRowFinder != null) {
-								if (procedureName.getName().toLowerCase().matches(singleRowFinder.getRegex())) {
+								if (procedureName.toLowerCase().matches(singleRowFinder.getRegex())) {
 									procedureDescriptor.setSingleRowFinder(true);
 								}
 							}

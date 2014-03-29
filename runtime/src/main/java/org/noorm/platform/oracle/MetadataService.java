@@ -1,8 +1,6 @@
 package org.noorm.platform.oracle;
 
 import org.noorm.jdbc.JDBCProcedureProcessor;
-import org.noorm.metadata.beans.NameBean;
-import org.noorm.metadata.beans.PrimaryKeyColumnBean;
 import org.noorm.platform.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -84,23 +82,33 @@ public class MetadataService implements IMetadata {
 	}
 
 	@Override
-    public List<NameBean> findPackageNames(final String pSearchRegex) {
+    public List<String> findPackageNames(final String pSearchRegex) {
 
 		final JDBCProcedureProcessor<NameBean> statementProcessor = JDBCProcedureProcessor.getInstance();
 		final Map<String, Object> filterParameters = new HashMap<String, Object>();
 		filterParameters.put("p_search_regex", pSearchRegex);
-		return statementProcessor.getBeanListFromPLSQL
+		final List<NameBean> names = statementProcessor.getBeanListFromPLSQL
 				("noorm_metadata.find_package_names", "p_package_names", filterParameters, NameBean.class);
+        final List<String> nameList = new ArrayList<String>();
+        for (final NameBean name : names) {
+            nameList.add(name.getName());
+        }
+        return nameList;
 	}
 
 	@Override
-    public List<NameBean> findProcedureNames(final String pPackageName) {
+    public List<String> findProcedureNames(final String pPackageName) {
 
 		final JDBCProcedureProcessor<NameBean> statementProcessor = JDBCProcedureProcessor.getInstance();
 		final Map<String, Object> filterParameters = new HashMap<String, Object>();
 		filterParameters.put("p_package_name", pPackageName);
-		return statementProcessor.getBeanListFromPLSQL
+        final List<NameBean> names = statementProcessor.getBeanListFromPLSQL
 				("noorm_metadata.find_procedure_names", "p_procedure_names", filterParameters, NameBean.class);
+        final List<String> nameList = new ArrayList<String>();
+        for (final NameBean name : names) {
+            nameList.add(name.getName());
+        }
+        return nameList;
 	}
 
 	@Override
@@ -121,12 +129,20 @@ public class MetadataService implements IMetadata {
 	}
 
 	@Override
-    public List<PrimaryKeyColumnBean> findPkColumns() {
+    public List<PrimaryKeyColumn> findPkColumns() {
 
 		final JDBCProcedureProcessor<PrimaryKeyColumnBean> statementProcessor = JDBCProcedureProcessor.getInstance();
 		final Map<String, Object> filterParameters = new HashMap<String, Object>();
-		return statementProcessor.getBeanListFromPLSQL
+		final List<PrimaryKeyColumnBean> pkColumnBeans = statementProcessor.getBeanListFromPLSQL
                 ("noorm_metadata.find_pk_columns", "p_pk_columns", filterParameters, PrimaryKeyColumnBean.class);
+        final List<PrimaryKeyColumn> pkColumns = new ArrayList<PrimaryKeyColumn>();
+        for (final PrimaryKeyColumnBean pkColumnBean : pkColumnBeans) {
+            final PrimaryKeyColumn pkColumn = new PrimaryKeyColumn();
+            pkColumn.setTableName(pkColumnBean.getTableName());
+            pkColumn.setColumnName(pkColumnBean.getColumnName());
+            pkColumns.add(pkColumn);
+        }
+        return pkColumns;
 	}
 
 	@Override

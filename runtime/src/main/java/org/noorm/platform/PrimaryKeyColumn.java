@@ -1,20 +1,14 @@
-package org.noorm.metadata.beans;
-
-import org.noorm.jdbc.JDBCColumn;
+package org.noorm.platform;
 
 /**
  * @author Ulf Pietruschka / ulf.pietruschka@etenso.com
- *         Date: 04.09.11
+ *         Date: 29.03.14
  *         Time: 14:55
  */
-public class PrimaryKeyColumnBean {
+public class PrimaryKeyColumn {
 
-	@JDBCColumn(name="TABLE_NAME", updatable=false)
 	private String tableName;
-	@JDBCColumn(name="COLUMN_NAME", updatable=false)
 	private String columnName;
-	@JDBCColumn(name="POSITION", updatable=false)
-	private Long position;
 
 	public String getTableName() {
 		return tableName;
@@ -30,13 +24,5 @@ public class PrimaryKeyColumnBean {
 
 	public void setColumnName(final String pColumnName) {
 		columnName = pColumnName;
-	}
-
-	public Long getPosition() {
-		return position;
-	}
-
-	public void setPosition(final Long pPosition) {
-		position = pPosition;
 	}
 }

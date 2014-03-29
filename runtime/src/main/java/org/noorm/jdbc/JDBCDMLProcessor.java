@@ -1,6 +1,5 @@
 package org.noorm.jdbc;
 
-import org.noorm.metadata.BeanMetaDataUtil;
 import org.noorm.platform.IPlatform;
 import org.noorm.platform.JDBCType;
 import org.slf4j.Logger;

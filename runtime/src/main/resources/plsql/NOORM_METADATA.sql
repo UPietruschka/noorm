@@ -42,8 +42,7 @@ PACKAGE noorm_metadata AS
   TYPE pk_record IS RECORD
     (
     table_name  VARCHAR2(30),
-    column_name VARCHAR2(30),
-    position NUMBER
+    column_name VARCHAR2(30)
     );
   TYPE pk_refcur IS REF CURSOR RETURN pk_record;
 

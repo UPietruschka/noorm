@@ -1,12 +1,7 @@
 package org.noorm.platform.mssql;
 
 import org.noorm.jdbc.JDBCQueryProcessor;
-import org.noorm.metadata.beans.NameBean;
-import org.noorm.metadata.beans.PrimaryKeyColumnBean;
-import org.noorm.platform.IMetadata;
-import org.noorm.platform.Parameter;
-import org.noorm.platform.Sequence;
-import org.noorm.platform.TableMetadata;
+import org.noorm.platform.*;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -165,9 +160,9 @@ public class JDBCMetadata implements IMetadata {
      * @return the list of packages
      */
     @Override
-    public List<NameBean> findPackageNames(String pSearchRegex) {
+    public List<String> findPackageNames(String pSearchRegex) {
 
-        final List<NameBean> packageNames = new ArrayList<NameBean>();
+        final List<String> packageNames = new ArrayList<String>();
         return packageNames;
     }
 
@@ -178,9 +173,9 @@ public class JDBCMetadata implements IMetadata {
      * @return the list of procedures
      */
     @Override
-    public List<NameBean> findProcedureNames(String pPackageName) {
+    public List<String> findProcedureNames(String pPackageName) {
 
-        final List<NameBean> procedureNames = new ArrayList<NameBean>();
+        final List<String> procedureNames = new ArrayList<String>();
         return procedureNames;
     }
 
@@ -210,9 +205,9 @@ public class JDBCMetadata implements IMetadata {
      * @return the list of primary key columns
      */
     @Override
-    public List<PrimaryKeyColumnBean> findPkColumns() {
+    public List<PrimaryKeyColumn> findPkColumns() {
 
-        final List<PrimaryKeyColumnBean> pkColumns = new ArrayList<PrimaryKeyColumnBean>();
+        final List<PrimaryKeyColumn> pkColumns = new ArrayList<PrimaryKeyColumn>();
         return pkColumns;
     }
 

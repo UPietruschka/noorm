@@ -7,11 +7,7 @@ import org.noorm.generator.m2plugin.IParameters;
 import org.noorm.generator.schema.GeneratorConfiguration;
 import org.noorm.generator.schema.Regex;
 import org.noorm.jdbc.DataSourceProvider;
-import org.noorm.platform.IMetadata;
-import org.noorm.metadata.beans.PrimaryKeyColumnBean;
-import org.noorm.platform.JDBCType;
-import org.noorm.platform.Sequence;
-import org.noorm.platform.TableMetadata;
+import org.noorm.platform.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -81,7 +77,7 @@ public class BeanGenerator {
 		tableColumnMap.putAll(recordColumnMap);
 
 		log.info("Retrieving primary key metadata from database.");
-		final List<PrimaryKeyColumnBean> pkColumnNameList = metadata.findPkColumns();
+		final List<PrimaryKeyColumn> pkColumnNameList = metadata.findPkColumns();
 
 		log.info("Retrieving sequence metadata from database.");
 		final List<Sequence> sequenceList = metadata.findSequences();
@@ -260,10 +256,10 @@ public class BeanGenerator {
 	}
 
 	private String[] getPrimaryKeyColumnNames(final String pTableName,
-										      final List<PrimaryKeyColumnBean> pPrimaryKeyColumnList) {
+										      final List<PrimaryKeyColumn> pPrimaryKeyColumnList) {
 
 		final List<String> pkColumnNames = new ArrayList<String>();
-		for (final PrimaryKeyColumnBean primaryKeyBean : pPrimaryKeyColumnList) {
+		for (final PrimaryKeyColumn primaryKeyBean : pPrimaryKeyColumnList) {
 			if (pTableName.equals(primaryKeyBean.getTableName())) {
 				log.info("Primary key column ".concat(primaryKeyBean.getColumnName())
 						.concat(" found for table ").concat(pTableName));

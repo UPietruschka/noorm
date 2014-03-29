@@ -1,8 +1,5 @@
 package org.noorm.platform;
 
-import org.noorm.metadata.beans.NameBean;
-import org.noorm.metadata.beans.PrimaryKeyColumnBean;
-
 import java.util.List;
 import java.util.Map;
 
@@ -33,7 +30,7 @@ public interface IMetadata {
      * @param pSearchRegex a regular expression to filter the list of packages
      * @return the list of packages
      */
-    List<NameBean> findPackageNames(final String pSearchRegex);
+    List<String> findPackageNames(final String pSearchRegex);
 
     /**
      * Returns the list of procedures contained in the given package.
@@ -41,7 +38,7 @@ public interface IMetadata {
      * @param pPackageName the package name
      * @return the list of procedures
      */
-    List<NameBean> findProcedureNames(final String pPackageName);
+    List<String> findProcedureNames(final String pPackageName);
 
     /**
      * Returns all accessible sequences.
@@ -55,7 +52,7 @@ public interface IMetadata {
      *
      * @return the list of primary key columns
      */
-    List<PrimaryKeyColumnBean> findPkColumns();
+    List<PrimaryKeyColumn> findPkColumns();
 
     /**
      * Returns the parameters for a given stored procedure.
