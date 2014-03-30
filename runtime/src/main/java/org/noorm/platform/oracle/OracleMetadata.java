@@ -232,24 +232,12 @@ public class OracleMetadata implements IMetadata {
 
     private JDBCType convertOracleType2JDBCType(final String pOracleTypeName, final int pDecimalDigits) {
 
-        JDBCType jdbcType = JDBCType.VARCHAR;
-        if (pOracleTypeName.equals("CHAR")) {
-            jdbcType = JDBCType.CHAR;
-        }
+        JDBCType jdbcType = null;
         if (pOracleTypeName.endsWith("RAW")) {
             jdbcType = JDBCType.BINARY;
         }
         if (pOracleTypeName.contains("XMLTYPE")) {
             jdbcType = JDBCType.SQLXML;
-        }
-        if (pOracleTypeName.equals("BLOB")) {
-            jdbcType = JDBCType.BLOB;
-        }
-        if (pOracleTypeName.equals("CLOB")) {
-            jdbcType = JDBCType.CLOB;
-        }
-        if (pOracleTypeName.equals("NCLOB")) {
-            jdbcType = JDBCType.NCLOB;
         }
         if (pOracleTypeName.equals("NUMBER")) {
             if (pDecimalDigits > 0) {
@@ -267,14 +255,18 @@ public class OracleMetadata implements IMetadata {
         if (pOracleTypeName.equals("FLOAT")) {
             jdbcType = JDBCType.DOUBLE;
         }
-        if (pOracleTypeName.equals("DATE")) {
-            jdbcType = JDBCType.DATE;
-        }
         if (pOracleTypeName.startsWith("TIMESTAMP")) {
             jdbcType = JDBCType.TIMESTAMP;
         }
         if (pOracleTypeName.equals("REF CURSOR")) {
             jdbcType = JDBCType.REF_CURSOR;
+        }
+        if (jdbcType == null) {
+            try {
+                jdbcType = JDBCType.valueOf(pOracleTypeName);
+            } catch (IllegalArgumentException e) {
+                jdbcType = JDBCType.VARCHAR;
+            }
         }
         return jdbcType;
     }
