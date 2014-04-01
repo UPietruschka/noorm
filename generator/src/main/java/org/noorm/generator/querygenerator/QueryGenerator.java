@@ -3,7 +3,7 @@ package org.noorm.generator.querygenerator;
 import org.noorm.generator.GeneratorException;
 import org.noorm.generator.GeneratorUtil;
 import org.noorm.generator.ParameterDescriptor;
-import org.noorm.generator.m2plugin.IParameters;
+import org.noorm.generator.IParameters;
 import org.noorm.generator.schema.GeneratorConfiguration;
 import org.noorm.generator.schema.OperatorName;
 import org.noorm.generator.schema.QueryColumn;

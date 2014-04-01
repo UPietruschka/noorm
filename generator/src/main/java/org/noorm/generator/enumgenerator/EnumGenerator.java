@@ -3,7 +3,7 @@ package org.noorm.generator.enumgenerator;
 import org.noorm.generator.GeneratorException;
 import org.noorm.generator.GeneratorUtil;
 import org.noorm.generator.ValidatorClassDescriptor;
-import org.noorm.generator.m2plugin.IParameters;
+import org.noorm.generator.IParameters;
 import org.noorm.generator.schema.GeneratorConfiguration;
 import org.noorm.generator.schema.Regex;
 import org.noorm.jdbc.DataSourceProvider;

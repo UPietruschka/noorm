@@ -3,7 +3,7 @@ package org.noorm.generator.servicegenerator;
 import org.noorm.generator.GeneratorUtil;
 import org.noorm.generator.ParameterDescriptor;
 import org.noorm.generator.ValidatorClassDescriptor;
-import org.noorm.generator.m2plugin.IParameters;
+import org.noorm.generator.IParameters;
 import org.noorm.generator.schema.GeneratorConfiguration;
 import org.noorm.generator.schema.Regex;
 import org.noorm.jdbc.DataSourceProvider;

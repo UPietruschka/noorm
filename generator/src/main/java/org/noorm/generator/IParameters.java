@@ -1,4 +1,4 @@
-package org.noorm.generator.m2plugin;
+package org.noorm.generator;
 
 import java.io.File;
 

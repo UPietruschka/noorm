@@ -9,6 +9,7 @@ import org.apache.maven.plugins.annotations.Parameter;
 import org.apache.maven.project.MavenProject;
 import org.apache.velocity.app.Velocity;
 import org.noorm.generator.GeneratorUtil;
+import org.noorm.generator.IParameters;
 import org.noorm.generator.beangenerator.BeanGenerator;
 import org.noorm.generator.enumgenerator.EnumGenerator;
 import org.noorm.generator.querygenerator.QueryGenerator;
