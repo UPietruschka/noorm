@@ -7,7 +7,7 @@ import org.noorm.generator.IParameters;
 import org.noorm.generator.schema.GeneratorConfiguration;
 import org.noorm.generator.schema.Regex;
 import org.noorm.jdbc.DataSourceProvider;
-import org.noorm.platform.*;
+import org.noorm.jdbc.platform.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

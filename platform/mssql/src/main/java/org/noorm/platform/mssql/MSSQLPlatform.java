@@ -1,8 +1,8 @@
 package org.noorm.platform.mssql;
 
 import com.microsoft.sqlserver.jdbc.SQLServerDataSource;
-import org.noorm.platform.IMetadata;
-import org.noorm.platform.IPlatform;
+import org.noorm.jdbc.platform.IMetadata;
+import org.noorm.jdbc.platform.IPlatform;
 
 import javax.sql.DataSource;
 import java.sql.PreparedStatement;

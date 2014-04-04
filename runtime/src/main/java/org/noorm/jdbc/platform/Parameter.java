@@ -1,4 +1,4 @@
-package org.noorm.platform;
+package org.noorm.jdbc.platform;
 
 /**
  * @author Ulf Pietruschka / ulf.pietruschka@etenso.com

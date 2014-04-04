@@ -6,7 +6,7 @@ import java.sql.Types;
 import java.util.HashMap;
 import org.noorm.jdbc.IBean;
 import org.noorm.jdbc.JDBCColumn;
-import org.noorm.platform.JDBCType;
+import org.noorm.jdbc.platform.JDBCType;
 
 /**
  * Bean class for database table $class.TableName

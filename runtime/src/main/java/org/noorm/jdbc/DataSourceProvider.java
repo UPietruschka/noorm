@@ -1,7 +1,7 @@
 package org.noorm.jdbc;
 
-import org.noorm.platform.IPlatform;
-import org.noorm.platform.PlatformFactory;
+import org.noorm.jdbc.platform.IPlatform;
+import org.noorm.jdbc.platform.PlatformFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

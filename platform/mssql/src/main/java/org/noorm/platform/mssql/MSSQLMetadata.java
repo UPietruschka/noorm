@@ -1,7 +1,7 @@
 package org.noorm.platform.mssql;
 
 import org.noorm.jdbc.JDBCQueryProcessor;
-import org.noorm.platform.*;
+import org.noorm.jdbc.platform.*;
 
 import java.util.ArrayList;
 import java.util.HashMap;

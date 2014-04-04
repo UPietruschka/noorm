@@ -10,8 +10,8 @@ import org.noorm.generator.schema.QueryColumn;
 import org.noorm.generator.schema.QueryDeclaration;
 import org.noorm.jdbc.DataSourceProvider;
 import org.noorm.jdbc.Utils;
-import org.noorm.platform.IMetadata;
-import org.noorm.platform.TableMetadata;
+import org.noorm.jdbc.platform.IMetadata;
+import org.noorm.jdbc.platform.TableMetadata;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

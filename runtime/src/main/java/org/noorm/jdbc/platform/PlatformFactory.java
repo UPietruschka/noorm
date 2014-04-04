@@ -1,4 +1,4 @@
-package org.noorm.platform;
+package org.noorm.jdbc.platform;
 
 import org.noorm.jdbc.DataAccessException;
 import org.slf4j.Logger;

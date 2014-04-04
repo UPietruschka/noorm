@@ -2,7 +2,7 @@ package org.noorm.validation;
 
 import org.noorm.jdbc.DataSourceProvider;
 import org.noorm.jdbc.IService;
-import org.noorm.platform.IMetadata;
+import org.noorm.jdbc.platform.IMetadata;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

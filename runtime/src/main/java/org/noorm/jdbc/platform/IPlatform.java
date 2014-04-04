@@ -1,4 +1,4 @@
-package org.noorm.platform;
+package org.noorm.jdbc.platform;
 
 import javax.sql.DataSource;
 import java.sql.PreparedStatement;

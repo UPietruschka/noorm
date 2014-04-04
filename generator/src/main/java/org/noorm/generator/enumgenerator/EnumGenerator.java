@@ -8,8 +8,8 @@ import org.noorm.generator.schema.GeneratorConfiguration;
 import org.noorm.generator.schema.Regex;
 import org.noorm.jdbc.DataSourceProvider;
 import org.noorm.jdbc.JDBCQueryProcessor;
-import org.noorm.platform.IMetadata;
-import org.noorm.platform.TableMetadata;
+import org.noorm.jdbc.platform.IMetadata;
+import org.noorm.jdbc.platform.TableMetadata;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

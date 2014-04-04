@@ -2,8 +2,8 @@ package org.noorm.platform.oracle;
 
 import oracle.jdbc.OracleConnection;
 import oracle.jdbc.pool.OracleDataSource;
-import org.noorm.platform.IMetadata;
-import org.noorm.platform.IPlatform;
+import org.noorm.jdbc.platform.IMetadata;
+import org.noorm.jdbc.platform.IPlatform;
 
 import javax.sql.DataSource;
 import java.sql.PreparedStatement;

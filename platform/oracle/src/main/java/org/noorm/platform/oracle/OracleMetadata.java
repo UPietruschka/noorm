@@ -1,7 +1,7 @@
 package org.noorm.platform.oracle;
 
 import org.noorm.jdbc.JDBCProcedureProcessor;
-import org.noorm.platform.*;
+import org.noorm.jdbc.platform.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

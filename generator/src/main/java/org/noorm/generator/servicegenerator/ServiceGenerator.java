@@ -9,9 +9,9 @@ import org.noorm.generator.schema.Regex;
 import org.noorm.jdbc.DataSourceProvider;
 import org.noorm.jdbc.JDBCProcedureProcessor;
 import org.noorm.jdbc.Utils;
-import org.noorm.platform.IMetadata;
-import org.noorm.platform.JDBCType;
-import org.noorm.platform.Parameter;
+import org.noorm.jdbc.platform.IMetadata;
+import org.noorm.jdbc.platform.JDBCType;
+import org.noorm.jdbc.platform.Parameter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

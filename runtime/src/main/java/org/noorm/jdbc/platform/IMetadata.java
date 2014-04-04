@@ -1,4 +1,4 @@
-package org.noorm.platform;
+package org.noorm.jdbc.platform;
 
 import java.util.List;
 import java.util.Map;

@@ -6,8 +6,8 @@ import org.noorm.jdbc.JDBCColumn;
 import org.noorm.jdbc.JDBCQueryProcessor;
 import org.noorm.jdbc.Utils;
 import org.noorm.jdbc.BeanMetaDataUtil;
-import org.noorm.platform.IMetadata;
-import org.noorm.platform.TableMetadata;
+import org.noorm.jdbc.platform.IMetadata;
+import org.noorm.jdbc.platform.TableMetadata;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

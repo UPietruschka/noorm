@@ -8,7 +8,7 @@ import org.noorm.generator.schema.TypeMapping;
 import org.noorm.generator.schema.GeneratorConfiguration;
 import org.noorm.generator.schema.Mapping;
 import org.noorm.jdbc.Utils;
-import org.noorm.platform.JDBCType;
+import org.noorm.jdbc.platform.JDBCType;
 
 import java.io.BufferedWriter;
 import java.io.File;
