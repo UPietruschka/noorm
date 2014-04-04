@@ -59,32 +59,32 @@ public class JDBCProcedureProcessor<T> {
 	/**
 	 * Call a PL/SQL procedure without OUT parameter.
 	 *
-	 * @param pPLSQLCallable the name of PL/SQL procedure or the notation PACKAGENAME.PROCEDURE.
+	 * @param pCallable the name of PL/SQL procedure or the notation PACKAGENAME.PROCEDURE.
 	 * @param pInParameters  the map containing all IN parameters.
 	 */
-	public void callPLSQL(final String pPLSQLCallable,
-						  final Map<String, Object> pInParameters) {
+	public void callProcedure(final String pCallable,
+                              final Map<String, Object> pInParameters) {
 
-		callPLSQL(pPLSQLCallable, null, pInParameters, null);
+		callProcedure(pCallable, null, pInParameters, null);
 	}
 
 	/**
 	 * Call a PL/SQL procedure with a scalar OUT parameter or without OUT parameter.
 	 *
-	 * @param pPLSQLCallable the name of PL/SQL procedure or the notation PACKAGENAME.PROCEDURE.
+	 * @param pCallable the name of PL/SQL procedure or the notation PACKAGENAME.PROCEDURE.
 	 * @param pOutParamName  the name of the scalar OUT parameter.
 	 * @param pInParameters  the map containing all IN parameters.
 	 * @param pOutClass	  the type of the scalar OUT parameter.
 	 * @return The scalar data-type returned by the PL/SQL procedure, if any.
 	 */
-	public T callPLSQL(final String pPLSQLCallable,
-					   final String pOutParamName,
-					   final Map<String, Object> pInParameters,
-					   final Class<T> pOutClass) {
+	public T callProcedure(final String pCallable,
+                           final String pOutParamName,
+                           final Map<String, Object> pInParameters,
+                           final Class<T> pOutClass) {
 
 		try {
-			if (pPLSQLCallable == null || pPLSQLCallable.isEmpty()) {
-				throw new IllegalArgumentException("Parameter [pPLSQLCallable] must not be null.");
+			if (pCallable == null || pCallable.isEmpty()) {
+				throw new IllegalArgumentException("Parameter [pCallable] must not be null.");
 			}
 			if (pOutParamName == null) {
 				if (!(pOutClass == null)) {
@@ -96,7 +96,7 @@ public class JDBCProcedureProcessor<T> {
 		}
 
 		if (log.isDebugEnabled()) {
-			debugPLSQLCall(pPLSQLCallable, pInParameters, null);
+			debugProcedureCall(pCallable, pInParameters, null);
 		}
 
 		boolean success = true;
@@ -104,13 +104,13 @@ public class JDBCProcedureProcessor<T> {
 		CallableStatement cstmt = null;
 		try {
 			con = DataSourceProvider.getConnection();
-			final String plSQLCall = statementBuilder.buildPLSQLCall
-					(pPLSQLCallable, pOutParamName, pInParameters, USE_NAMED_PARAMETERS);
+			final String procedureCall = statementBuilder.buildProcedureCall
+                    (pCallable, pOutParamName, pInParameters, USE_NAMED_PARAMETERS);
 			if (log.isDebugEnabled()) {
-				log.debug("Preparing and executing PL/SQL Call: ".concat(plSQLCall)
+				log.debug("Preparing and executing PL/SQL Call: ".concat(procedureCall)
                         .concat("; using connection : ".concat(con.toString())));
 			}
-			cstmt = con.prepareCall(plSQLCall);
+			cstmt = con.prepareCall(procedureCall);
 
 			int parameterIndex = 1;
 			if (pOutParamName != null) {
@@ -141,7 +141,7 @@ public class JDBCProcedureProcessor<T> {
 			}
 
 			if (log.isDebugEnabled()) {
-				debugPLSQLTermination(pPLSQLCallable, -1);
+				debugProcedureTermination(pCallable, -1);
 			}
 
 			return outValue;
@@ -238,19 +238,19 @@ public class JDBCProcedureProcessor<T> {
 	 * a single record or no record as a result. In case of multiple records matching the given
 	 * parameter map, a DataAccessException is thrown.
 	 *
-	 * @param pPLSQLCallable the name of PL/SQL procedure or the notation PACKAGENAME.PROCEDURE.
+	 * @param pCallable the name of PL/SQL procedure or the notation PACKAGENAME.PROCEDURE.
 	 * @param pRefCursorName the parameter name of the procedure out parameter ref cursor.
 	 * @param pInParameters  the map containing all IN parameters.
 	 * @param pBeanClass	 the type of the Bean matching the fields of the ResultSet.
 	 * @return The Beans containing the retrieved data.
 	 */
-	public T getBeanFromPLSQL(final String pPLSQLCallable,
-							  final String pRefCursorName,
-							  final Map<String, Object> pInParameters,
-							  final Class<T> pBeanClass) {
+	public T getBeanFromProcedure(final String pCallable,
+                                  final String pRefCursorName,
+                                  final Map<String, Object> pInParameters,
+                                  final Class<T> pBeanClass) {
 
-		final List<T> beanList = getBeanListFromPLSQL
-				(pPLSQLCallable, pRefCursorName, pInParameters, pBeanClass);
+		final List<T> beanList = getBeanListFromProcedure
+                (pCallable, pRefCursorName, pInParameters, pBeanClass);
 		if (beanList.isEmpty()) {
 			return null;
 		}
@@ -263,26 +263,26 @@ public class JDBCProcedureProcessor<T> {
 	/**
 	 * Calls a PL/SQL procedure with a ref cursor as OUT parameter.
 	 *
-	 * @param pPLSQLCallable the name of PL/SQL procedure or the notation PACKAGENAME.PROCEDURE.
+	 * @param pCallable the name of PL/SQL procedure or the notation PACKAGENAME.PROCEDURE.
 	 * @param pRefCursorName the parameter name of the procedure out parameter ref cursor.
 	 * @param pBeanClass	 the type of the Bean matching the fields of the ResultSet.
 	 * @return The list of Beans containing the retrieved data.
 	 */
-	public List<T> getBeanListFromPLSQL(final String pPLSQLCallable,
-										final String pRefCursorName,
-										final Class<T> pBeanClass) {
+	public List<T> getBeanListFromProcedure(final String pCallable,
+                                            final String pRefCursorName,
+                                            final Class<T> pBeanClass) {
 
-		return getBeanListFromPLSQL(pPLSQLCallable, pRefCursorName, null, pBeanClass);
+		return getBeanListFromProcedure(pCallable, pRefCursorName, null, pBeanClass);
 	}
 
-	public List<T> getBeanListFromPLSQL(final String pPLSQLCallable,
-										final String pRefCursorName,
-										final Map<String, Object> pInParameters,
-										final Class<T> pBeanClass) {
+	public List<T> getBeanListFromProcedure(final String pCallable,
+                                            final String pRefCursorName,
+                                            final Map<String, Object> pInParameters,
+                                            final Class<T> pBeanClass) {
 
 		try {
-			if (pPLSQLCallable == null || pPLSQLCallable.isEmpty()) {
-				throw new IllegalArgumentException("Parameter [pPLSQLCallable] must not be null.");
+			if (pCallable == null || pCallable.isEmpty()) {
+				throw new IllegalArgumentException("Parameter [pCallable] must not be null.");
 			}
 			if (pRefCursorName == null || pRefCursorName.isEmpty()) {
 				throw new IllegalArgumentException("Parameter [pRefCursorName] must not be null.");
@@ -298,7 +298,7 @@ public class JDBCProcedureProcessor<T> {
 		}
 
 		if (log.isDebugEnabled()) {
-			debugPLSQLCall(pPLSQLCallable, pInParameters, pBeanClass);
+			debugProcedureCall(pCallable, pInParameters, pBeanClass);
 		}
 
 		boolean success = true;
@@ -307,13 +307,13 @@ public class JDBCProcedureProcessor<T> {
 		CallableStatement cstmt = null;
 		try {
 			con = DataSourceProvider.getConnection();
-			final String plSQLCall = statementBuilder.buildPLSQLCall
-					(pPLSQLCallable, pRefCursorName, pInParameters, USE_NAMED_PARAMETERS);
+			final String procedureCall = statementBuilder.buildProcedureCall
+                    (pCallable, pRefCursorName, pInParameters, USE_NAMED_PARAMETERS);
 			if (log.isDebugEnabled()) {
-                log.debug("Preparing and executing PL/SQL Call: ".concat(plSQLCall)
+                log.debug("Preparing and executing PL/SQL Call: ".concat(procedureCall)
                         .concat("; using connection : ".concat(con.toString())));
 			}
-			cstmt = con.prepareCall(plSQLCall);
+			cstmt = con.prepareCall(procedureCall);
 
 			int parameterIndex = 1;
 			if (USE_NAMED_PARAMETERS) {
@@ -340,7 +340,7 @@ public class JDBCProcedureProcessor<T> {
 			rs.close();
 
 			if (log.isDebugEnabled()) {
-				debugPLSQLTermination(pPLSQLCallable, beanList.size());
+				debugProcedureTermination(pCallable, beanList.size());
 			}
 
 			return beanList;
@@ -411,12 +411,12 @@ public class JDBCProcedureProcessor<T> {
 		}
 	}
 
-	public void debugPLSQLCall(final String pPLSQLCallable,
-								final Map<String, Object> pInParameters,
-								final Class<T> pBeanClass) {
+	public void debugProcedureCall(final String pCallable,
+                                   final Map<String, Object> pInParameters,
+                                   final Class<T> pBeanClass) {
 
 		final StringBuilder formattedParameters = new StringBuilder();
-		formattedParameters.append("Calling PL/SQL procedure ").append(pPLSQLCallable);
+		formattedParameters.append("Calling PL/SQL procedure ").append(pCallable);
 		if (pInParameters != null) {
 			String prefix = "\nInput parameters: ";
 			for (final String paramName : pInParameters.keySet()) {
@@ -432,11 +432,11 @@ public class JDBCProcedureProcessor<T> {
 		log.debug(formattedParameters.toString());
 	}
 
-    private void debugPLSQLTermination(final String pPLSQLCallable,
-									   final int pRowsProcessed) {
+    private void debugProcedureTermination(final String pCallable,
+                                           final int pRowsProcessed) {
 
 		StringBuilder logMessage = new StringBuilder();
-		logMessage.append("PL/SQL procedure ").append(pPLSQLCallable).append(" successfully terminated. ");
+		logMessage.append("PL/SQL procedure ").append(pCallable).append(" successfully terminated. ");
 		if (pRowsProcessed >= 0) {
 			logMessage.append(Integer.toString(pRowsProcessed)).append(" rows processed.");
 		}

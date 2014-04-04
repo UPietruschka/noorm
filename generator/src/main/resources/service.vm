@@ -107,18 +107,18 @@ public class $class.JavaName implements IService {
 #end
 #if($proc.isOutParamRefCursor())
 #if($proc.isSingleRowFinder())
-		return procedureProcessor.getBeanFromPLSQL
+		return procedureProcessor.getBeanFromProcedure
 #else
-		return procedureProcessor.getBeanListFromPLSQL
+		return procedureProcessor.getBeanListFromProcedure
 #end
 				("${class.DatabasePackageName}.$proc.DbProcedureName", "$proc.OutDbParamName",
 						filterParameters, ${proc.getOutParamJavaType()}.class);
 #elseif($proc.isOutParamScalar())
-		return procedureProcessor.callPLSQL
+		return procedureProcessor.callProcedure
 				("${class.DatabasePackageName}.$proc.DbProcedureName", "$proc.OutDbParamName",
 						filterParameters, ${proc.getOutParamJavaType()}.class);
 #else
-		typelessProcedureProcessor.callPLSQL
+		typelessProcedureProcessor.callProcedure
 				("${class.DatabasePackageName}.$proc.DbProcedureName", filterParameters);
 #end
 #end

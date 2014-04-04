@@ -39,8 +39,8 @@ public class NoORMValidator {
 				.concat("] against PL/SQL package NOORM_DYNAMIC_SQL."));
 		final JDBCProcedureProcessor<String> statementProcessor = JDBCProcedureProcessor.getInstance();
 		final Map<String, Object> filterParameters = new HashMap<String, Object>();
-		final String dynamicSQLNoORMVersion = statementProcessor.callPLSQL
-				("noorm_dynamic_sql.get_version", "p_version", filterParameters, String.class);
+		final String dynamicSQLNoORMVersion = statementProcessor.callProcedure
+                ("noorm_dynamic_sql.get_version", "p_version", filterParameters, String.class);
 		if (!dynamicSQLNoORMVersion.equals(noormJavaVersion)) {
 			final String errMsg = "NoORM Java runtime version ".concat(noormJavaVersion)
 					.concat(" does not match version ").concat(dynamicSQLNoORMVersion)

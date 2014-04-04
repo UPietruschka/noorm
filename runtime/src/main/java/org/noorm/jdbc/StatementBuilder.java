@@ -21,23 +21,23 @@ class StatementBuilder {
 	private static final String CALL_DELIM_1 = "(";
 	private static final String CALL_DELIM_2 = ",";
 	private static final String CALL_DELIM_3 = ")";
-	private static final String CALL_PLSQL_ASG = " => :";
-	private static final String CALL_PLSQL_ASG2 = " => ?";
+	private static final String CALL_ASG = " => :";
+	private static final String CALL_ASG2 = " => ?";
 	private static final String CALL_POSTFIX = " }";
 
-	public String buildPLSQLCall(final String pPLSQLCallable,
-								 final String pOutParamName,
-								 final Map<String, Object> pInParameters,
-								 final boolean useNamedParameters) {
+	public String buildProcedureCall(final String pCallable,
+                                     final String pOutParamName,
+                                     final Map<String, Object> pInParameters,
+                                     final boolean useNamedParameters) {
 
-		final StringBuilder plSQLCall = new StringBuilder();
-		plSQLCall.append(CALL_PREFIX).append(pPLSQLCallable);
+		final StringBuilder call = new StringBuilder();
+		call.append(CALL_PREFIX).append(pCallable);
 		String delim = CALL_DELIM_1;
 		if (pOutParamName != null) {
 			if (useNamedParameters) {
-				plSQLCall.append(delim).append(pOutParamName).append(CALL_PLSQL_ASG).append(pOutParamName);
+				call.append(delim).append(pOutParamName).append(CALL_ASG).append(pOutParamName);
 			} else {
-				plSQLCall.append(delim).append(pOutParamName).append(CALL_PLSQL_ASG2);
+				call.append(delim).append(pOutParamName).append(CALL_ASG2);
 			}
 			delim = CALL_DELIM_2;
 		}
@@ -59,9 +59,9 @@ class StatementBuilder {
 					}
 				}
 				if (useNamedParameters) {
-					plSQLCall.append(delim).append(paramName).append(CALL_PLSQL_ASG).append(paramName);
+					call.append(delim).append(paramName).append(CALL_ASG).append(paramName);
 				} else {
-					plSQLCall.append(delim).append(paramName).append(CALL_PLSQL_ASG2);
+					call.append(delim).append(paramName).append(CALL_ASG2);
 				}
 				delim = CALL_DELIM_2;
 			}
@@ -69,10 +69,10 @@ class StatementBuilder {
 		if (delim.equals(CALL_DELIM_2)) {
 			// When no parameters are used, PL/SQL does not even expect empty brackets,
 			// but nothing behind the callables name
-			plSQLCall.append(CALL_DELIM_3);
+			call.append(CALL_DELIM_3);
 		}
-		plSQLCall.append(CALL_POSTFIX);
-		return plSQLCall.toString();
+		call.append(CALL_POSTFIX);
+		return call.toString();
 	}
 
     private static final String SELECT_PREFIX = "SELECT * FROM ";

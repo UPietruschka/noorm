@@ -47,7 +47,7 @@ public class PageableBeanList<T extends IBean> implements Serializable, List<T> 
 	 */
 	private List<Long> beanIds = new ArrayList<Long>();
 
-	private final String plsqlIdListCallable;
+	private final String procedureIdListCallable;
 	private final String refCursorName;
 	private final String idListName;
 	private final Class beanClass;
@@ -59,14 +59,14 @@ public class PageableBeanList<T extends IBean> implements Serializable, List<T> 
 	private BeanTransformer<T> beanTransformer;
 
 	public PageableBeanList(final Long[] pIDArray,
-							final String pPLSQLIdListCallable,
+							final String pProcedureIdListCallable,
 							final String pRefCursorName,
 							final String pIDListName,
 							final Class pBeanClass) {
 
 		beanIds = Arrays.asList(pIDArray);
 		prefetchArray = new Object[beanIds.size()];
-		plsqlIdListCallable = pPLSQLIdListCallable;
+		procedureIdListCallable = pProcedureIdListCallable;
 		refCursorName = pRefCursorName;
 		idListName = pIDListName;
 		beanClass = pBeanClass;
@@ -82,8 +82,8 @@ public class PageableBeanList<T extends IBean> implements Serializable, List<T> 
 			Long[] dataIdArray = idSubList.toArray(new Long[]{});
 			final Map<String, Object> filterParameters = new HashMap<String, Object>();
 			filterParameters.put(idListName, dataIdArray);
-			beanSubList = statementProcessor.getBeanListFromPLSQL
-					(plsqlIdListCallable, refCursorName, filterParameters, beanClass);
+			beanSubList = statementProcessor.getBeanListFromProcedure
+                    (procedureIdListCallable, refCursorName, filterParameters, beanClass);
 		}
 
 		// Unfortunately, the query based on the ID list does not preserve the order of the

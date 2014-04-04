@@ -534,8 +534,8 @@ public class DataSourceProvider {
 		logMessage.append(", port : ");
 		logMessage.append(getActiveConfiguration().getDebugJDWPPort());
 		log.debug(logMessage.toString());
-		final String plSQLCall = "{ call dbms_debug_jdwp.connect_tcp(host => :host, port => :port)";
-		final CallableStatement cstmt = pCon.prepareCall(plSQLCall);
+		final String procedureCall = "{ call dbms_debug_jdwp.connect_tcp(host => :host, port => :port)";
+		final CallableStatement cstmt = pCon.prepareCall(procedureCall);
 		cstmt.setString("host", getActiveConfiguration().getDebugJDWPHost());
 		cstmt.setString("port", getActiveConfiguration().getDebugJDWPPort());
 		cstmt.execute();
