@@ -1,8 +1,7 @@
 package org.noorm.jdbc;
 
-import oracle.jdbc.OracleCallableStatement;
-import oracle.sql.ARRAY;
-import oracle.sql.ArrayDescriptor;
+import org.noorm.jdbc.platform.IPlatform;
+import org.noorm.jdbc.platform.JDBCType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -33,20 +32,6 @@ public class JDBCProcedureProcessor<T> {
 	private static JDBCProcedureProcessor statementProcessor = new JDBCProcedureProcessor();
 
 	private final StatementBuilder statementBuilder = new StatementBuilder();
-
-	public static final String NOORM_ID_LIST_DB_TYPE_NAME = "NUM_ARRAY";
-
-	/*
-	 * Using named parameters for callable statements does not work consistently over the various supported
-	 * combinations of JDBC driver versions and database versions. In addition, a bug in Oracle 11.2.0.1.0
-	 * (9147506 Named parameter in callable statement not working from JDBC), prevents the usage of named
-	 * parameters for callable statements when using Oracle JDBC 11.2.0.2.0). Although the release notes for
-	 * Oracle database patch 11.2.0.2.0 state that bug 9147506 is fixed with this patch, there are still
-	 * problems with Oracle XE 11.2.0.2.0 beta, which should have the same code base.
-	 * The following parameters disabled the usage of named parameters for callable statements (instead,
-	 * indexed parameters are used. This does not apply to prepared statements).
-	 */
-	private static final boolean USE_NAMED_PARAMETERS = false;
 
 	private JDBCProcedureProcessor() {
 	}
@@ -105,7 +90,7 @@ public class JDBCProcedureProcessor<T> {
 		try {
 			con = DataSourceProvider.getConnection();
 			final String procedureCall = statementBuilder.buildProcedureCall
-                    (pCallable, pOutParamName, pInParameters, USE_NAMED_PARAMETERS);
+                    (pCallable, pOutParamName, pInParameters);
 			if (log.isDebugEnabled()) {
 				log.debug("Preparing and executing PL/SQL Call: ".concat(procedureCall)
                         .concat("; using connection : ".concat(con.toString())));
@@ -121,12 +106,7 @@ public class JDBCProcedureProcessor<T> {
 				if (pOutClass.isAssignableFrom(java.util.Date.class)) {
 					type = Types.TIMESTAMP;
 				}
-
-				if (USE_NAMED_PARAMETERS) {
-					cstmt.registerOutParameter(pOutParamName, type);
-				} else {
-					cstmt.registerOutParameter(parameterIndex++, type);
-				}
+                cstmt.registerOutParameter(parameterIndex++, type);
 			}
 
 			if (pInParameters != null) {
@@ -168,63 +148,33 @@ public class JDBCProcedureProcessor<T> {
 							  final CallableStatement cstmt) throws SQLException {
 
 		T outValue = null;
-		if (USE_NAMED_PARAMETERS) {
-			if (pOutClass.equals(Long.class)) {
-				outValue = (T) Long.valueOf(cstmt.getLong(pOutParamName));
-			}
-			if (pOutClass.equals(Integer.class)) {
-				outValue = (T) Integer.valueOf(cstmt.getInt(pOutParamName));
-			}
-			if (pOutClass.equals(Double.class)) {
-				outValue = (T) Double.valueOf(cstmt.getDouble(pOutParamName));
-			}
-			if (pOutClass.equals(Short.class)) {
-				outValue = (T) Short.valueOf(cstmt.getShort(pOutParamName));
-			}
-			if (pOutClass.equals(Float.class)) {
-				outValue = (T) Float.valueOf(cstmt.getFloat(pOutParamName));
-			}
-			if (pOutClass.equals(BigDecimal.class)) {
-				outValue = (T) cstmt.getBigDecimal(pOutParamName);
-			}
-			if (pOutClass.equals(String.class)) {
-				outValue = (T) cstmt.getString(pOutParamName);
-			}
-			if (pOutClass.equals(java.sql.Date.class)) {
-				outValue = (T) cstmt.getDate(pOutParamName);
-			}
-			if (pOutClass.equals(Timestamp.class)) {
-				outValue = (T) cstmt.getTimestamp(pOutParamName);
-			}
-		} else {
-			if (pOutClass.equals(Long.class)) {
-				outValue = (T) Long.valueOf(cstmt.getLong(1));
-			}
-			if (pOutClass.equals(Integer.class)) {
-				outValue = (T) Integer.valueOf(cstmt.getInt(1));
-			}
-			if (pOutClass.equals(Double.class)) {
-				outValue = (T) Double.valueOf(cstmt.getDouble(1));
-			}
-			if (pOutClass.equals(Short.class)) {
-				outValue = (T) Short.valueOf(cstmt.getShort(1));
-			}
-			if (pOutClass.equals(Float.class)) {
-				outValue = (T) Float.valueOf(cstmt.getFloat(1));
-			}
-			if (pOutClass.equals(BigDecimal.class)) {
-				outValue = (T) cstmt.getBigDecimal(1);
-			}
-			if (pOutClass.equals(String.class)) {
-				outValue = (T) cstmt.getString(1);
-			}
-			if (pOutClass.equals(java.sql.Date.class)) {
-				outValue = (T) cstmt.getDate(1);
-			}
-			if (pOutClass.equals(Timestamp.class)) {
-				outValue = (T) cstmt.getTimestamp(1);
-			}
-		}
+        if (pOutClass.equals(Long.class)) {
+            outValue = (T) Long.valueOf(cstmt.getLong(1));
+        }
+        if (pOutClass.equals(Integer.class)) {
+            outValue = (T) Integer.valueOf(cstmt.getInt(1));
+        }
+        if (pOutClass.equals(Double.class)) {
+            outValue = (T) Double.valueOf(cstmt.getDouble(1));
+        }
+        if (pOutClass.equals(Short.class)) {
+            outValue = (T) Short.valueOf(cstmt.getShort(1));
+        }
+        if (pOutClass.equals(Float.class)) {
+            outValue = (T) Float.valueOf(cstmt.getFloat(1));
+        }
+        if (pOutClass.equals(BigDecimal.class)) {
+            outValue = (T) cstmt.getBigDecimal(1);
+        }
+        if (pOutClass.equals(String.class)) {
+            outValue = (T) cstmt.getString(1);
+        }
+        if (pOutClass.equals(java.sql.Date.class)) {
+            outValue = (T) cstmt.getDate(1);
+        }
+        if (pOutClass.equals(Timestamp.class)) {
+            outValue = (T) cstmt.getTimestamp(1);
+        }
 
 		if (outValue == null) {
 			throw new DataAccessException(DataAccessException.Type.UNSUPPORTED_DATATYPE, pOutClass.getName());
@@ -308,7 +258,7 @@ public class JDBCProcedureProcessor<T> {
 		try {
 			con = DataSourceProvider.getConnection();
 			final String procedureCall = statementBuilder.buildProcedureCall
-                    (pCallable, pRefCursorName, pInParameters, USE_NAMED_PARAMETERS);
+                    (pCallable, pRefCursorName, pInParameters);
 			if (log.isDebugEnabled()) {
                 log.debug("Preparing and executing PL/SQL Call: ".concat(procedureCall)
                         .concat("; using connection : ".concat(con.toString())));
@@ -316,22 +266,14 @@ public class JDBCProcedureProcessor<T> {
 			cstmt = con.prepareCall(procedureCall);
 
 			int parameterIndex = 1;
-			if (USE_NAMED_PARAMETERS) {
-				cstmt.registerOutParameter(pRefCursorName, oracle.jdbc.OracleTypes.CURSOR);
-			} else {
-				cstmt.registerOutParameter(parameterIndex++, oracle.jdbc.OracleTypes.CURSOR);
-			}
+            cstmt.registerOutParameter(parameterIndex++, JDBCType.REF_CURSOR.getVendorTypeNumber());
 
 			bindParameters(con, pInParameters, cstmt, parameterIndex);
 
 			cstmt.execute();
 
 			ResultSet rs;
-			if (USE_NAMED_PARAMETERS) {
-				rs = (ResultSet) cstmt.getObject(pRefCursorName);
-			} else {
-				rs = (ResultSet) cstmt.getObject(1);
-			}
+            rs = (ResultSet) cstmt.getObject(1);
 			final BeanMapper<T> mapper = BeanMapper.getInstance();
 			beanList = mapper.toBeanList(rs, pBeanClass);
 			if (beanList.isEmpty()) {
@@ -368,22 +310,15 @@ public class JDBCProcedureProcessor<T> {
 
 		int parameterIndex = pParameterIndex;
 		Map<String, Object> orderedParameters = new TreeMap<String, Object>(pInParameters);
+        final IPlatform platform = DataSourceProvider.getPlatform();
 		for (final String paramName : orderedParameters.keySet()) {
 			Object value = orderedParameters.get(paramName);
 			if (value == null) {
 				continue;
 			}
 			if (value instanceof Long[]) {
-				final ArrayDescriptor descriptor =
-						ArrayDescriptor.createDescriptor(NOORM_ID_LIST_DB_TYPE_NAME, pCon);
-				final ARRAY arrayToPass = new ARRAY(descriptor, pCon, value);
-				if (USE_NAMED_PARAMETERS) {
-					// The following works for the Oracle JDBC 11.2.0.1.0 driver, but is actually not correct,
-					// since named parameter binding should use the setXXXAtName methods (which does NOT work).
-                    ((OracleCallableStatement) pCstmt).setARRAY(paramName, arrayToPass);
-				} else {
-                    ((OracleCallableStatement) pCstmt).setARRAY(parameterIndex++, arrayToPass);
-				}
+                platform.prepareNumericArray(pCon, pCstmt, value, pParameterIndex);
+                parameterIndex++;
 				continue;
 			}
 			if (value instanceof String) {
@@ -401,13 +336,7 @@ public class JDBCProcedureProcessor<T> {
 			if (value instanceof java.util.Date) {
 				value = new Timestamp(((java.util.Date) value).getTime());
 			}
-			if (USE_NAMED_PARAMETERS) {
-				// The following works for the Oracle JDBC 11.2.0.1.0 driver, but is actually not correct,
-				// since named parameter binding should use the setXXXAtName methods (which does NOT work).
-				pCstmt.setObject(paramName, value);
-			} else {
-				pCstmt.setObject(parameterIndex++, value);
-			}
+            pCstmt.setObject(parameterIndex++, value);
 		}
 	}
 

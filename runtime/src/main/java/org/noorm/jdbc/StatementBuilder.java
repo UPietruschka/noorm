@@ -27,18 +27,13 @@ class StatementBuilder {
 
 	public String buildProcedureCall(final String pCallable,
                                      final String pOutParamName,
-                                     final Map<String, Object> pInParameters,
-                                     final boolean useNamedParameters) {
+                                     final Map<String, Object> pInParameters) {
 
 		final StringBuilder call = new StringBuilder();
 		call.append(CALL_PREFIX).append(pCallable);
 		String delim = CALL_DELIM_1;
 		if (pOutParamName != null) {
-			if (useNamedParameters) {
-				call.append(delim).append(pOutParamName).append(CALL_ASG).append(pOutParamName);
-			} else {
-				call.append(delim).append(pOutParamName).append(CALL_ASG2);
-			}
+            call.append(delim).append(pOutParamName).append(CALL_ASG2);
 			delim = CALL_DELIM_2;
 		}
 		if (pInParameters != null) {
@@ -58,11 +53,7 @@ class StatementBuilder {
 						continue;
 					}
 				}
-				if (useNamedParameters) {
-					call.append(delim).append(paramName).append(CALL_ASG).append(paramName);
-				} else {
-					call.append(delim).append(paramName).append(CALL_ASG2);
-				}
+                call.append(delim).append(paramName).append(CALL_ASG2);
 				delim = CALL_DELIM_2;
 			}
 		}

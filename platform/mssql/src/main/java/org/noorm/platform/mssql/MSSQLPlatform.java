@@ -5,6 +5,8 @@ import org.noorm.jdbc.platform.IMetadata;
 import org.noorm.jdbc.platform.IPlatform;
 
 import javax.sql.DataSource;
+import java.sql.CallableStatement;
+import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 
@@ -125,6 +127,21 @@ public class MSSQLPlatform implements IPlatform {
         } else {
             pStmt.setObject(pParameterIndex, pValue, pSQLType);
         }
+    }
+
+    /**
+     * Binds a numeric array to a callable statement.
+     *
+     * @param pCon            the JDBC connection
+     * @param pCstmt          the JDBC callable statement
+     * @param pValue          the value to bind (numeric array)
+     * @param pParameterIndex the parameter index
+     * @throws java.sql.SQLException JDBC driver exception
+     */
+    @Override
+    public void prepareNumericArray(Connection pCon, CallableStatement pCstmt, Object pValue, int pParameterIndex) throws SQLException {
+
+        throw new UnsupportedOperationException();
     }
 
     /**

@@ -1,6 +1,8 @@
 package org.noorm.jdbc.platform;
 
 import javax.sql.DataSource;
+import java.sql.CallableStatement;
+import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 
@@ -70,6 +72,20 @@ public interface IPlatform {
                    final Object pValue,
                    final int pParameterIndex,
                    final int pSQLType) throws SQLException;
+
+    /**
+     * Binds a numeric array to a callable statement.
+     *
+     * @param pCon the JDBC connection
+     * @param pCstmt the JDBC callable statement
+     * @param pValue the value to bind (numeric array)
+     * @param pParameterIndex the parameter index
+     * @throws SQLException JDBC driver exception
+     */
+    void prepareNumericArray(final Connection pCon,
+                             final CallableStatement pCstmt,
+                             final Object pValue,
+                             final int pParameterIndex) throws SQLException;
 
     /**
      * Provides database metadata for code generation and validation of generated code.

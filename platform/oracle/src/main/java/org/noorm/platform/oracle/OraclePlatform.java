@@ -1,11 +1,16 @@
 package org.noorm.platform.oracle;
 
+import oracle.jdbc.OracleCallableStatement;
 import oracle.jdbc.OracleConnection;
 import oracle.jdbc.pool.OracleDataSource;
+import oracle.sql.ARRAY;
+import oracle.sql.ArrayDescriptor;
 import org.noorm.jdbc.platform.IMetadata;
 import org.noorm.jdbc.platform.IPlatform;
 
 import javax.sql.DataSource;
+import java.sql.CallableStatement;
+import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.util.Properties;
@@ -18,6 +23,7 @@ import java.util.Properties;
 public class OraclePlatform implements IPlatform {
 
     public static final String ORACLE_PLATFORM = "Oracle";
+    public static final String NOORM_ID_LIST_DB_TYPE_NAME = "NUM_ARRAY";
 
     private final OracleMetadata oracleMetadata = OracleMetadata.getInstance();
 
@@ -141,6 +147,27 @@ public class OraclePlatform implements IPlatform {
                           final int pSQLType) throws SQLException {
 
         pStmt.setObject(pParameterIndex, pValue);
+    }
+
+    /**
+     * Binds a numeric array to a callable statement.
+     *
+     * @param pCon the JDBC connection
+     * @param pCstmt the JDBC callable statement
+     * @param pValue the value to bind (numeric array)
+     * @param pParameterIndex the parameter index
+     * @throws SQLException JDBC driver exception
+     */
+    @Override
+    public void prepareNumericArray(final Connection pCon,
+                                    final CallableStatement pCstmt,
+                                    final Object pValue,
+                                    final int pParameterIndex) throws SQLException {
+
+        final ArrayDescriptor descriptor =
+                ArrayDescriptor.createDescriptor(NOORM_ID_LIST_DB_TYPE_NAME, pCon);
+        final ARRAY arrayToPass = new ARRAY(descriptor, pCon, pValue);
+        ((OracleCallableStatement) pCstmt).setARRAY(pParameterIndex, arrayToPass);
     }
 
     /**

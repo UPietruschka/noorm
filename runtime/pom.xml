@@ -13,12 +13,6 @@
     <artifactId>noorm-runtime</artifactId>
     <name>NoORM Runtime Library</name>
 
-    <properties>
-        <oracle.groupId>com.oracle</oracle.groupId>
-        <oracle.version>11.2.0.2.0</oracle.version>
-        <oracle.driver.artifactId>ojdbc6</oracle.driver.artifactId>
-    </properties>
-
     <build>
         <resources>
             <resource>
@@ -28,12 +22,4 @@
         </resources>
     </build>
 
-    <dependencies>
-        <dependency>
-            <groupId>${oracle.groupId}</groupId>
-            <artifactId>${oracle.driver.artifactId}</artifactId>
-            <version>${oracle.version}</version>
-            <scope>provided</scope>
-        </dependency>
-    </dependencies>
 </project>

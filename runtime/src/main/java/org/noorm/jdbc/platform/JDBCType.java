@@ -170,7 +170,7 @@ public enum JDBCType {
     //REF_CURSOR(Types.REF_CURSOR),
 
     // Since we need the REF_CURSOR, we introduce it with a proprietary ID
-    REF_CURSOR(8888);
+    REF_CURSOR(-10);
 
     /**
      * Identifies the generic SQL type {@code TIME_WITH_TIMEZONE}.

@@ -37,6 +37,7 @@ public class ServiceGenerator {
 	private static final String DEFAULT_PACKAGE_FILTER_REGEX = ".*";
 	private static final String IGNORE_PACKAGE_FILTER_REGEX = "(NOORM_METADATA|NOORM_DYNAMIC_SQL)";
 	private static final String DEFAULT_PAGEABLE_PROC_NAME_REGEX = "(find_pageable.*)";
+    private static final String NOORM_ID_LIST_DB_TYPE_NAME = "NUM_ARRAY";
 
 	private IParameters parameters;
     private GeneratorConfiguration configuration;
@@ -118,7 +119,7 @@ public class ServiceGenerator {
 						final JDBCType jdbcType = parameter.getJDBCType();
 						final String databaseTypeName = parameter.getTypeName();
 						if (databaseTypeName != null &&
-								databaseTypeName.equals(JDBCProcedureProcessor.NOORM_ID_LIST_DB_TYPE_NAME)) {
+								databaseTypeName.equals(NOORM_ID_LIST_DB_TYPE_NAME)) {
 							parameterDescriptor.setJavaType(NOORM_ID_LIST_JAVA_TYPE_NAME);
 						} else {
 							final String javaType = GeneratorUtil.convertDatabaseType2JavaType(jdbcType,
