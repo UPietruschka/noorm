@@ -122,6 +122,11 @@
                 <version>${project.parent.version}</version>
                 <dependencies>
                     <dependency>
+                        <groupId>org.noorm</groupId>
+                        <artifactId>noorm-oracle-platform</artifactId>
+                        <version>${project.parent.version}</version>
+                    </dependency>
+                    <dependency>
                         <groupId>${oracle.groupId}</groupId>
                         <artifactId>${oracle.driver.artifactId}</artifactId>
                         <version>${oracle.version}</version>

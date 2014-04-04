@@ -1,21 +1,36 @@
-package org.noorm.platform.mssql;
+package org.noorm.platform.oracle;
 
-import com.microsoft.sqlserver.jdbc.SQLServerDataSource;
+import oracle.jdbc.OracleConnection;
+import oracle.jdbc.pool.OracleDataSource;
 import org.noorm.platform.IMetadata;
 import org.noorm.platform.IPlatform;
 
 import javax.sql.DataSource;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
+import java.util.Properties;
 
 /**
  * @author Ulf Pietruschka / ulf.pietruschka@ext.secunet.com
  *         Date: 11.02.14
  *         Time: 13:52
  */
-public class MSSQLPlatform implements IPlatform {
+public class OraclePlatform implements IPlatform {
 
-    private final MSSQLMetadata msSQLMetadata = MSSQLMetadata.getInstance();
+    public static final String ORACLE_PLATFORM = "Oracle";
+
+    private final OracleMetadata oracleMetadata = OracleMetadata.getInstance();
+
+    /**
+     * Returns the name of platform service provider
+     *
+     * @return the platform name
+     */
+    @Override
+    public String getName() {
+
+        return ORACLE_PLATFORM;
+    }
 
     /**
      * Creates a platform specific data source.
@@ -28,11 +43,30 @@ public class MSSQLPlatform implements IPlatform {
     @Override
     public DataSource getDataSource(String pURL, String pUsername, String pPassword) throws SQLException {
 
-        final SQLServerDataSource dataSource = new SQLServerDataSource();
-        dataSource.setUser(pUsername);
-        dataSource.setPassword(pPassword);
-        dataSource.setURL(pURL);
-        return dataSource;
+		final OracleDataSource oracleDataSource = new OracleDataSource();
+		oracleDataSource.setURL(pURL);
+		oracleDataSource.setUser(pUsername);
+		oracleDataSource.setPassword(pPassword);
+
+        // We enable the Oracle connection cache integrated with the Oracle JDBC driver.
+        // Even for single-threaded stand-alone applications using a connection pool/cache makes sense.
+        // Like any other ORM tool, NoORM does not manage data sources, but simply uses the JDBC API.
+        // When transactions are not handled explicitly by the calling application, the implicit
+        // auto-commit mode will cause connections to be closed with every single database call. Though
+        // DataSourceProvider could retain connections for some time, its primary function is not the
+        // maintenance of a connection cache or pool, so this job is delegated to the used data source,
+        // which should provide some caching functionality for any usage scenario.
+        // Unfortunately, Oracle stopped development of the build-in connection cache, so, starting with
+        // Oracle 11.2, the build-in cache is deprecated. We still use it here, since explicit data source
+        // initialization as performed here is not to be used in production systems anyway.
+        oracleDataSource.setConnectionCachingEnabled(true);
+        Properties cacheProps = new Properties();
+        cacheProps.setProperty("MinLimit", "1");
+        cacheProps.setProperty("MaxLimit", "8");
+        cacheProps.setProperty("InitialLimit", "1");
+        oracleDataSource.setConnectionCacheProperties(cacheProps);
+
+        return oracleDataSource;
     }
 
     /**
@@ -46,12 +80,15 @@ public class MSSQLPlatform implements IPlatform {
 
         final StringBuilder validationInfo = new StringBuilder();
         validationInfo.append("Validating data source. ");
-        if (pDataSource instanceof SQLServerDataSource) {
+        if (pDataSource instanceof OracleDataSource) {
+            final Properties connectionProperties = new Properties();
+            connectionProperties.setProperty(OracleConnection.CONNECTION_PROPERTY_FIXED_STRING, "true");
+            ((OracleDataSource) pDataSource).setConnectionProperties(connectionProperties);
             validationInfo.append("Connection parameters: ");
             validationInfo.append(";URL: ");
-            validationInfo.append(((SQLServerDataSource) pDataSource).getURL());
+            validationInfo.append(((OracleDataSource) pDataSource).getURL());
             validationInfo.append(";Username: ");
-            validationInfo.append(((SQLServerDataSource) pDataSource).getUser());
+            validationInfo.append(((OracleDataSource) pDataSource).getUser());
         } else {
             validationInfo.append("Unable to retrieve connection parameters from data source. [");
             validationInfo.append(pDataSource.getClass().getName());
@@ -69,7 +106,7 @@ public class MSSQLPlatform implements IPlatform {
     @Override
     public String getSequenceQuery(final String pSequenceName) {
 
-        final String sequenceQuery = "SELECT NEXT VALUE FOR  ".concat(pSequenceName);
+        final String sequenceQuery = "SELECT ".concat(pSequenceName).concat(".NEXTVAL FROM DUAL");
         return sequenceQuery;
     }
 
@@ -84,12 +121,8 @@ public class MSSQLPlatform implements IPlatform {
     @Override
     public int executeBatchWithReliableCount(final PreparedStatement pPreparedStatement) throws SQLException {
 
-        final int[] batchCounts = pPreparedStatement.executeBatch();
-        int updateCount = 0;
-        for (int i = 0; i < batchCounts.length; i++) {
-            updateCount += batchCounts[i];
-        }
-        return updateCount;
+        pPreparedStatement.executeBatch();
+        return pPreparedStatement.getUpdateCount();
     }
 
     /**
@@ -107,11 +140,7 @@ public class MSSQLPlatform implements IPlatform {
                           final int pParameterIndex,
                           final int pSQLType) throws SQLException {
 
-        if (pValue == null) {
-            pStmt.setNull(pParameterIndex, pSQLType);
-        } else {
-            pStmt.setObject(pParameterIndex, pValue, pSQLType);
-        }
+        pStmt.setObject(pParameterIndex, pValue);
     }
 
     /**
@@ -122,6 +151,6 @@ public class MSSQLPlatform implements IPlatform {
     @Override
     public IMetadata getMetadata() {
 
-        return msSQLMetadata;
+        return oracleMetadata;
     }
 }

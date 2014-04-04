@@ -26,6 +26,7 @@
     <modules>
         <module>runtime</module>
         <module>generator</module>
+        <module>platform</module>
     </modules>
 
     <properties>

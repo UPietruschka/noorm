@@ -1,8 +1,11 @@
 package org.noorm.platform;
 
 import org.noorm.jdbc.DataAccessException;
-import org.noorm.platform.mssql.MSSQLPlatform;
-import org.noorm.platform.oracle.OraclePlatform;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import java.util.Iterator;
+import java.util.ServiceLoader;
 
 /**
  * @author Ulf Pietruschka / ulf.pietruschka@ext.secunet.com
@@ -18,33 +21,37 @@ import org.noorm.platform.oracle.OraclePlatform;
  */
 public class PlatformFactory {
 
-    public static final String ORACLE_PLATFORM = "Oracle";
-    public static final String SQL_SERVER_PLATFORM = "SQLServer";
+    private static final Logger log = LoggerFactory.getLogger(PlatformFactory.class);
 
     public static IPlatform createPlatform(final Class pDataSourceClass, final String pPlatform) {
 
-        if (pDataSourceClass.getName().contains(ORACLE_PLATFORM)) {
-            return new OraclePlatform();
-        }
-        if (pDataSourceClass.getName().contains(SQL_SERVER_PLATFORM)) {
-            return new MSSQLPlatform();
-        }
-        if (pPlatform.equals(ORACLE_PLATFORM)) {
-            return new OraclePlatform();
-        }
-        if (pPlatform.equals(SQL_SERVER_PLATFORM)) {
-            return new MSSQLPlatform();
+        final Iterator<IPlatform> platforms = ServiceLoader.load(IPlatform.class).iterator();
+        while (platforms.hasNext()) {
+            final IPlatform platform = platforms.next();
+            final String platformName = platform.getName();
+            log.info("NoORM platform service provider found for : ".concat(platformName));
+
+            if (pDataSourceClass.getName().contains(platformName)) {
+                return platform;
+            }
+            if (pPlatform.equals(platformName)) {
+                return platform;
+            }
         }
         throw new DataAccessException(DataAccessException.Type.UNSUPPORTED_PLATFORM, pDataSourceClass.getName());
     }
 
     public static IPlatform createPlatform(final String pDatabaseProductName) {
 
-        if (pDatabaseProductName.equals(ORACLE_PLATFORM)) {
-            return new OraclePlatform();
-        }
-        if (pDatabaseProductName.equals(SQL_SERVER_PLATFORM)) {
-            return new MSSQLPlatform();
+        final Iterator<IPlatform> platforms = ServiceLoader.load(IPlatform.class).iterator();
+        while (platforms.hasNext()) {
+            final IPlatform platform = platforms.next();
+            final String platformName = platform.getName();
+            log.info("NoORM platform service provider found for : ".concat(platformName));
+
+            if (pDatabaseProductName.equals(platformName)) {
+                return platform;
+            }
         }
         throw new DataAccessException(DataAccessException.Type.UNSUPPORTED_PLATFORM, pDatabaseProductName);
     }

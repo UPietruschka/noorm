@@ -1,7 +1,8 @@
 package org.noorm.validation;
 
+import org.noorm.jdbc.DataSourceProvider;
 import org.noorm.jdbc.JDBCProcedureProcessor;
-import org.noorm.platform.oracle.OracleMetadata;
+import org.noorm.platform.IMetadata;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -59,7 +60,8 @@ public class NoORMValidator {
         final String noormJavaVersion = getNoORMJavaVersion();
         log.info("Validating NoORM runtime version [".concat(noormJavaVersion)
                 .concat("] against PL/SQL package NOORM_METADATA."));
-        final String metaDataServiceNoORMVersion = OracleMetadata.getInstance().getVersion();
+        final IMetadata metadata = DataSourceProvider.getPlatform().getMetadata();
+        final String metaDataServiceNoORMVersion = metadata.getVersion();
         if (!metaDataServiceNoORMVersion.equals(noormJavaVersion)) {
             final String errMsg = "NoORM Java runtime version ".concat(noormJavaVersion)
                     .concat(" does not match version ").concat(metaDataServiceNoORMVersion)

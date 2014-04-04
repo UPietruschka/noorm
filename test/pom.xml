@@ -83,6 +83,12 @@
         </dependency>
 
         <dependency>
+            <groupId>org.noorm</groupId>
+            <artifactId>noorm-oracle-platform</artifactId>
+            <version>${project.parent.version}</version>
+        </dependency>
+
+        <dependency>
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>
             <version>4.11</version>

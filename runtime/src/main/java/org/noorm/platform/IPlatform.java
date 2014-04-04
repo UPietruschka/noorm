@@ -12,8 +12,15 @@ import java.sql.SQLException;
 public interface IPlatform {
 
     /**
-     * Creates a platform specific data source.
+     * Returns the name of platform service provider
+     *
+     * @return the platform name
+     */
+    String getName();
 
+    /**
+     * Creates a platform specific data source.
+     *
      * @param pURL the connection URL
      * @param pUsername the username
      * @param pPassword the password
