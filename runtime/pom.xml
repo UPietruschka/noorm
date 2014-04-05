@@ -13,13 +13,4 @@
     <artifactId>noorm-runtime</artifactId>
     <name>NoORM Runtime Library</name>
 
-    <build>
-        <resources>
-            <resource>
-                <directory>src/main/resources</directory>
-                <filtering>true</filtering>
-            </resource>
-        </resources>
-    </build>
-
 </project>

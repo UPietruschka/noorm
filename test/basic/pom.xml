@@ -14,6 +14,7 @@
     <name>NoORM Oracle Test Suite - Basic</name>
 
     <build>
+
         <plugins>
 
             <plugin>
@@ -31,7 +32,7 @@
                             <artifactItems>
                                 <artifactItem>
                                     <groupId>org.noorm</groupId>
-                                    <artifactId>noorm-runtime</artifactId>
+                                    <artifactId>noorm-oracle-platform</artifactId>
                                     <version>${project.parent.version}</version>
                                     <type>jar</type>
                                     <overWrite>true</overWrite>

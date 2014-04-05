@@ -18,6 +18,15 @@
         <oracle.driver.artifactId>ojdbc6</oracle.driver.artifactId>
     </properties>
 
+    <build>
+        <resources>
+            <resource>
+                <directory>src/main/resources</directory>
+                <filtering>true</filtering>
+            </resource>
+        </resources>
+    </build>
+
     <dependencies>
         <dependency>
             <groupId>${oracle.groupId}</groupId>
