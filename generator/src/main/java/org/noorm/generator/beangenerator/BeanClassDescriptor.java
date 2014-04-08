@@ -21,7 +21,7 @@ public class BeanClassDescriptor {
     private String[] primaryKeyColumnNames;
     private String[] primaryKeyJavaNames;
 	private String sequenceName;
-    private Long sequenceIncrement;
+    private Integer sequenceIncrement;
     private boolean useInlineSequenceValueGeneration = false;
     private String versionColumnName;
     private String versionColumnJavaName = "";
@@ -108,11 +108,11 @@ public class BeanClassDescriptor {
 		sequenceName = pSequenceName;
 	}
 
-    public Long getSequenceIncrement() {
+    public Integer getSequenceIncrement() {
         return sequenceIncrement;
     }
 
-    public void setSequenceIncrement(final Long pSequenceIncrement) {
+    public void setSequenceIncrement(final Integer pSequenceIncrement) {
         sequenceIncrement = pSequenceIncrement;
     }
 

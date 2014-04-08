@@ -32,7 +32,8 @@ public class EnumValidator {
         final IMetadata metadata = DataSourceProvider.getPlatform().getMetadata();
 
 		log.debug("Retrieving table metadata from database.");
-		tableColumnMap = metadata.findTableMetadata();
+        // TODO: provide search pattern
+		tableColumnMap = metadata.findTableMetadata(null);
 	}
 
 	public <T extends Enum<T> & IEnum> void validateEnum(final Class<T> pEnumClass) {

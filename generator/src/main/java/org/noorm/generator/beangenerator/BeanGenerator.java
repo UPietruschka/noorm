@@ -71,13 +71,14 @@ public class BeanGenerator {
         final IMetadata metadata = DataSourceProvider.getPlatform().getMetadata();
 
 		log.info("Retrieving table metadata from database.");
-		final Map<String, List<TableMetadata>> tableColumnMap = metadata.findTableMetadata();
+        String beanTableFilterRegex = null;
+        if (configuration.getBeanTableFilter() != null) {
+            beanTableFilterRegex = configuration.getBeanTableFilter().getRegex();
+        }
+		final Map<String, List<TableMetadata>> tableColumnMap = metadata.findTableMetadata(beanTableFilterRegex);
 		log.info("Retrieving record metadata from database.");
 		final Map<String, List<TableMetadata>> recordColumnMap = metadata.findRecordMetadata();
 		tableColumnMap.putAll(recordColumnMap);
-
-		log.info("Retrieving primary key metadata from database.");
-		final List<PrimaryKeyColumn> pkColumnNameList = metadata.findPkColumns();
 
 		log.info("Retrieving sequence metadata from database.");
 		final List<Sequence> sequenceList = metadata.findSequences();
@@ -94,15 +95,6 @@ public class BeanGenerator {
 		}
 
 		for (final String tableName0 : tableColumnMap.keySet()) {
-            final Regex beanTableFilter = configuration.getBeanTableFilter();
-			if (beanTableFilter != null && beanTableFilter.getRegex() != null
-					&& !tableName0.matches(beanTableFilter.getRegex())) {
-				log.info("Exclude table ".concat(tableName0)
-						.concat(", table name does not match regex '")
-						.concat(beanTableFilter.getRegex())
-						.concat("'"));
-				continue;
-			}
 			if (tableName0.matches(IGNORE_BEAN_FILTER_REGEX)) {
 				// Ignore the NoORM tables
 				continue;
@@ -128,7 +120,11 @@ public class BeanGenerator {
             if (!tableName0.equals(tableName0.toUpperCase())) {
                 beanClassDescriptor.setTableNameCaseSensitive(true);
             }
-			final String[] primaryKeyColumnNames = getPrimaryKeyColumnNames(tableName0, pkColumnNameList);
+
+            log.info("Retrieving primary key metadata from database.");
+            final List<PrimaryKeyColumn> pkColumnNameList = metadata.findPkColumns(tableName0);
+
+            final String[] primaryKeyColumnNames = getPrimaryKeyColumnNames(tableName0, pkColumnNameList);
 			beanClassDescriptor.setPrimaryKeyColumnNames(primaryKeyColumnNames);
             final String[] primaryKeyJavaNames = new String[primaryKeyColumnNames.length];
             for (int i = 0; i < primaryKeyColumnNames.length; i++) {
@@ -149,7 +145,7 @@ public class BeanGenerator {
                 beanClassDescriptor.setSequenceIncrement(sequence.getIncrementBy());
             } else {
                 beanClassDescriptor.setSequenceName("");
-                beanClassDescriptor.setSequenceIncrement(0L);
+                beanClassDescriptor.setSequenceIncrement(0);
             }
             final Regex inlineSequenceTableFilter = configuration.getInlineSequenceTableFilter();
             if (inlineSequenceTableFilter != null && inlineSequenceTableFilter.getRegex() != null
@@ -260,11 +256,9 @@ public class BeanGenerator {
 
 		final List<String> pkColumnNames = new ArrayList<String>();
 		for (final PrimaryKeyColumn primaryKeyBean : pPrimaryKeyColumnList) {
-			if (pTableName.equals(primaryKeyBean.getTableName())) {
-				log.info("Primary key column ".concat(primaryKeyBean.getColumnName())
-						.concat(" found for table ").concat(pTableName));
-				pkColumnNames.add(primaryKeyBean.getColumnName());
-			}
+            log.info("Primary key column ".concat(primaryKeyBean.getColumnName())
+                    .concat(" found for table ").concat(pTableName));
+            pkColumnNames.add(primaryKeyBean.getColumnName());
 		}
 		if (pkColumnNames.isEmpty()) {
 			if (configuration.getViewName2PrimaryKeyMappings() != null) {

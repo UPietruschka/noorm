@@ -20,9 +20,10 @@ public interface IMetadata {
     /**
      * Returns the list of table/column metadata accessible for the authenticated database user.
      *
+     * @param pTableSearchPattern a regular expression narrowing the set of table subject to metadata retrieval
      * @return the requested
      */
-    Map<String, List<TableMetadata>> findTableMetadata();
+    Map<String, List<TableMetadata>> findTableMetadata(final String pTableSearchPattern);
 
     /**
      * Returns the list of packages of stored procedures subject to Java code generation.
@@ -50,9 +51,10 @@ public interface IMetadata {
     /**
      * Returns all primary key columns.
      *
-     * @return the list of primary key columns
+     * @param pTableName the table name
+     * @return the list of primary key columns for the given table
      */
-    List<PrimaryKeyColumn> findPkColumns();
+    List<PrimaryKeyColumn> findPkColumns(final String pTableName);
 
     /**
      * Returns the parameters for a given stored procedure.

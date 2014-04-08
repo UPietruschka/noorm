@@ -65,23 +65,36 @@ public class QueryGenerator {
 
         final IMetadata metadata = DataSourceProvider.getPlatform().getMetadata();
         log.info("Retrieving table metadata from database.");
-        final Map<String, List<TableMetadata>> tableColumnMap = metadata.findTableMetadata();
+        String beanTableFilterRegex = null;
+        if (configuration.getBeanTableFilter() != null) {
+            beanTableFilterRegex = configuration.getBeanTableFilter().getRegex();
+        }
+        final Map<String, List<TableMetadata>> tableColumnMap = metadata.findTableMetadata(beanTableFilterRegex);
 
         final Map<String, QueryClassDescriptor> queryClasses = new HashMap<String, QueryClassDescriptor>();
         for (final QueryDeclaration queryDeclaration : configuration.getQueryDeclarations()) {
             generateMethodName(queryDeclaration);
             final QueryDescriptor queryDescriptor = new QueryDescriptor();
             String t0 = queryDeclaration.getTableName();
-            final List<TableMetadata> tableMetadataList = tableColumnMap.get(t0);
+            List<TableMetadata> baseTableMetadataList = tableColumnMap.get(t0);
+            List<TableMetadata> tableMetadataList = tableColumnMap.get(t0);
             if (queryDeclaration.getBaseTable() != null && !queryDeclaration.getBaseTable().isEmpty()) {
                 t0 = queryDeclaration.getBaseTable();
                 if (tableColumnMap.get(t0) == null) {
-                    throw new GeneratorException("Illegal query declaration: no metadata found for table ".concat(t0));
+                    throw new GeneratorException("Invalid query declaration: no metadata found for table ".concat(t0));
                 }
-            }
-            if (tableMetadataList == null) {
-                throw new GeneratorException("Illegal query declaration: no metadata found for table "
-                        .concat(queryDeclaration.getTableName()));
+                baseTableMetadataList = tableColumnMap.get(t0);
+                // With a base table definition, we do not necessarily have the required metadata for the query
+                // view in the set of filtered table metadata. Thus, we issue the metadata query again for the
+                // view metadata.
+                final String viewName = queryDeclaration.getTableName();
+                final Map<String, List<TableMetadata>> viewColumnMap = metadata.findTableMetadata(viewName);
+                tableMetadataList = viewColumnMap.get(viewName);
+            } else {
+                if (baseTableMetadataList == null) {
+                    throw new GeneratorException("Invalid query declaration: no metadata found for table "
+                            .concat(queryDeclaration.getTableName()));
+                }
             }
             queryDescriptor.setQueryDeclaration(queryDeclaration);
             String beanName = GeneratorUtil.convertTableName2JavaName(t0, configuration.getTableNameMappings());
@@ -110,7 +123,7 @@ public class QueryGenerator {
                     }
                 }
                 if (javaType == null) {
-                    throw new GeneratorException("Illegal query declaration: no metadata found for table ".concat(t0)
+                    throw new GeneratorException("Invalid query declaration: no metadata found for table ".concat(t0)
                             .concat(" and column ").concat(columnName));
                 }
                 parameterDescriptor.setJavaType(javaType);

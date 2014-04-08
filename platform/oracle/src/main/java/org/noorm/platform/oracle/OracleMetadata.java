@@ -31,6 +31,11 @@ public class OracleMetadata implements IMetadata {
 		return oracleMetadata;
 	}
 
+    /**
+     * Returns the version of the proprietary metadata retrieval implementation.
+     *
+     * @return the version
+     */
 	@Override
     public String getVersion() {
 
@@ -41,17 +46,27 @@ public class OracleMetadata implements IMetadata {
 
 	}
 
+    /**
+     * Returns the list of table/column metadata accessible for the authenticated database user.
+     *
+     * @param pTableSearchPattern a regular expression narrowing the set of table subject to metadata retrieval
+     * @return the requested
+     */
 	@Override
-    public Map<String, List<TableMetadata>> findTableMetadata() {
+    public Map<String, List<TableMetadata>> findTableMetadata(final String pTableSearchPattern) {
 
 		final List<OracleTableMetadata> oracleTableMetadataList = findTableMetadata0();
 		final Map<String, List<TableMetadata>> tableColumnMap = new HashMap<String, List<TableMetadata>>();
 		String tableName = "";
 		List<TableMetadata> tableMetadataList0 = null;
 		for (OracleTableMetadata oracleTableMetadata : oracleTableMetadataList) {
-			// Filter out duplicates
+            // Filter out duplicates
 			if (!tableName.equals(oracleTableMetadata.getTableName())) {
 				tableName = oracleTableMetadata.getTableName();
+                if (pTableSearchPattern != null && !tableName.matches(pTableSearchPattern)) {
+                    tableName = "";
+                    continue;
+                }
 				log.debug("Collecting table metadata for table ".concat(tableName));
 				tableMetadataList0 = new ArrayList<TableMetadata>();
 				tableColumnMap.put(tableName, tableMetadataList0);
@@ -81,6 +96,12 @@ public class OracleMetadata implements IMetadata {
                 ("noorm_metadata.find_table_metadata", "p_table_metadata", filterParameters, OracleTableMetadata.class);
 	}
 
+    /**
+     * Returns the list of packages of stored procedures subject to Java code generation.
+     *
+     * @param pSearchRegex a regular expression to filter the list of packages
+     * @return the list of packages
+     */
 	@Override
     public List<String> findPackageNames(final String pSearchRegex) {
 
@@ -96,6 +117,12 @@ public class OracleMetadata implements IMetadata {
         return nameList;
 	}
 
+    /**
+     * Returns the list of procedures contained in the given package.
+     *
+     * @param pPackageName the package name
+     * @return the list of procedures
+     */
 	@Override
     public List<String> findProcedureNames(final String pPackageName) {
 
@@ -111,6 +138,11 @@ public class OracleMetadata implements IMetadata {
         return nameList;
 	}
 
+    /**
+     * Returns all accessible sequences.
+     *
+     * @return the list of sequence names
+     */
 	@Override
     public List<Sequence> findSequences() {
 
@@ -128,23 +160,37 @@ public class OracleMetadata implements IMetadata {
         return sequenceList;
 	}
 
+    /**
+     * Returns all primary key columns.
+     *
+     * @param pTableName the table name
+     * @return the list of primary key columns for the given table
+     */
 	@Override
-    public List<PrimaryKeyColumn> findPkColumns() {
+    public List<PrimaryKeyColumn> findPkColumns(final String pTableName) {
 
 		final JDBCProcedureProcessor<OraclePrimaryKeyColumn> statementProcessor = JDBCProcedureProcessor.getInstance();
 		final Map<String, Object> filterParameters = new HashMap<String, Object>();
+        filterParameters.put("p_table_name", pTableName);
 		final List<OraclePrimaryKeyColumn> pkColumnBeans = statementProcessor.getBeanListFromProcedure
                 ("noorm_metadata.find_pk_columns", "p_pk_columns", filterParameters, OraclePrimaryKeyColumn.class);
-        final List<PrimaryKeyColumn> pkColumns = new ArrayList<PrimaryKeyColumn>();
+        final List<PrimaryKeyColumn> primaryKeyColumnList = new ArrayList<PrimaryKeyColumn>();
         for (final OraclePrimaryKeyColumn pkColumnBean : pkColumnBeans) {
             final PrimaryKeyColumn pkColumn = new PrimaryKeyColumn();
             pkColumn.setTableName(pkColumnBean.getTableName());
             pkColumn.setColumnName(pkColumnBean.getColumnName());
-            pkColumns.add(pkColumn);
+            primaryKeyColumnList.add(pkColumn);
         }
-        return pkColumns;
+        return primaryKeyColumnList;
 	}
 
+    /**
+     * Returns the parameters for a given stored procedure.
+     *
+     * @param pPackageName the package name
+     * @param pProcedureName the procedure name
+     * @return the list of parameters for the given procedure
+     */
 	@Override
     public List<Parameter> findProcedureParameters(final String pPackageName, final String pProcedureName) {
 
@@ -166,6 +212,12 @@ public class OracleMetadata implements IMetadata {
         return parameters;
 	}
 
+    /**
+     * Returns the hash value for the source code of a given stored procedure package.
+     *
+     * @param pPackageName the package name
+     * @return the has value
+     */
 	@Override
     public Integer getPackageHashValue(final String pPackageName) {
 
@@ -176,6 +228,14 @@ public class OracleMetadata implements IMetadata {
                 ("noorm_metadata.get_package_hash_value", "p_code_hash_value", filterParameters, Integer.class);
 	}
 
+    /**
+     * Returns the type for a given parameter of a stored procedure.
+     *
+     * @param pPackageName the package name
+     * @param pProcedureName the procedure name
+     * @param pParameterName the parameter name
+     * @return the type
+     */
 	@Override
     public String getParameterRowtype(final String pPackageName,
                                       final String pProcedureName,
@@ -190,6 +250,11 @@ public class OracleMetadata implements IMetadata {
                 ("noorm_metadata.get_parameter_rowtype", "p_rowtype_name", filterParameters, String.class);
 	}
 
+    /**
+     * Returns metadata for a database type definition.
+     *
+     * @return the list of record metadata
+     */
 	@Override
     public Map<String, List<TableMetadata>> findRecordMetadata() {
 

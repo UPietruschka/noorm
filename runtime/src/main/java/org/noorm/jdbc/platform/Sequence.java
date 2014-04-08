@@ -8,7 +8,7 @@ package org.noorm.jdbc.platform;
 public class Sequence {
 
 	private String name;
-    private Long incrementBy;
+    private Integer incrementBy;
 
     public String getName() {
 		return name;
@@ -18,11 +18,11 @@ public class Sequence {
 		name = pName;
 	}
 
-    public Long getIncrementBy() {
+    public Integer getIncrementBy() {
         return incrementBy;
     }
 
-    public void setIncrementBy(final Long pIncrementBy) {
+    public void setIncrementBy(final Integer pIncrementBy) {
         incrementBy = pIncrementBy;
     }
 }

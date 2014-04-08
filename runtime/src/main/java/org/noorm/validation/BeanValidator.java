@@ -25,19 +25,17 @@ public class BeanValidator {
 
 	private static final Logger log = LoggerFactory.getLogger(BeanValidator.class);
 
+    protected IMetadata metadata;
 	protected Map<String, List<TableMetadata>> tableColumnMap;
-	protected List<PrimaryKeyColumn> allPKColumnNameList;
 	protected List<Sequence> sequenceDBNameList;
 
 	public void loadMetadata() {
 
-        final IMetadata metadata = DataSourceProvider.getPlatform().getMetadata();
+        metadata = DataSourceProvider.getPlatform().getMetadata();
 
 		log.debug("Retrieving table metadata from database.");
-		tableColumnMap = metadata.findTableMetadata();
-
-		log.debug("Retrieving primary key metadata from database.");
-		allPKColumnNameList = metadata.findPkColumns();
+        // TODO: provide search pattern
+		tableColumnMap = metadata.findTableMetadata(null);
 
 		log.debug("Retrieving sequence metadata from database.");
 		sequenceDBNameList = metadata.findSequences();
@@ -125,9 +123,12 @@ public class BeanValidator {
 			validationError(message.toString());
 		}
 
+        log.debug("Retrieving primary key metadata from database.");
+        final List<PrimaryKeyColumn> pkColumnNameList = metadata.findPkColumns(tableName);
+
 		final List<String> beanPKColumnList = Arrays.asList(pBean.getPrimaryKeyColumnNames());
 		final ArrayList<String> databasePKColumnList = new ArrayList<String>();
-		for (final PrimaryKeyColumn primaryKeyColumn : allPKColumnNameList) {
+		for (final PrimaryKeyColumn primaryKeyColumn : pkColumnNameList) {
 			if (tableName.equals(primaryKeyColumn.getTableName())) {
 				databasePKColumnList.add(primaryKeyColumn.getColumnName());
 				if (!beanPKColumnList.contains(primaryKeyColumn.getColumnName())) {

@@ -19,7 +19,7 @@ public class MSSQLPlatform implements IPlatform {
 
     private static final String SQL_SERVER_PLATFORM = "SQLServer";
 
-    private final MSSQLMetadata msSQLMetadata = MSSQLMetadata.getInstance();
+    private final MSSQLMetadata msSQLMetadata = new MSSQLMetadata();
 
     /**
      * Returns the name of platform service provider

@@ -56,22 +56,20 @@ public class EnumGenerator {
 
         log.info("Retrieving table metadata from database.");
         final IMetadata metadata = DataSourceProvider.getPlatform().getMetadata();
-		final Map<String, List<TableMetadata>> tableColumnMap = metadata.findTableMetadata();
+        String enumTableFilterRegex = null;
+        if (configuration.getEnumTableFilter() != null) {
+            enumTableFilterRegex = configuration.getEnumTableFilter().getRegex();
+        } else {
+            log.info("Parameter [enumTableFilter] not set. NoORM Enum generator will quit.");
+            return;
+        }
+        final Map<String, List<TableMetadata>> tableColumnMap = metadata.findTableMetadata(enumTableFilterRegex);
 
 		log.info("Generating NoORM Enum classes.");
 		final File enumPackageDir =	GeneratorUtil.createPackageDir
                 (parameters.getDestinationDirectory(), configuration.getEnumJavaPackage().getName());
 
 		for (final String tableName0 : tableColumnMap.keySet()) {
-            final Regex enumTableFilter = configuration.getEnumTableFilter();
-			if (enumTableFilter != null && enumTableFilter.getRegex() != null
-					&& !tableName0.matches(enumTableFilter.getRegex())) {
-				log.info("Exclude table ".concat(tableName0)
-						.concat(", table name does not match regex '")
-						.concat(configuration.getEnumTableFilter().getRegex())
-						.concat("'"));
-				continue;
-			}
 			final String javaEnumName =
 					GeneratorUtil.convertTableName2JavaName(tableName0, configuration.getTableNameMappings());
 			final List<TableMetadata> tableMetadataList1 = tableColumnMap.get(tableName0);
@@ -89,8 +87,8 @@ public class EnumGenerator {
 						("Parameter [enumTable2DisplayColumnMapping] must be set to enable enum generation.");
 			}
 			if (displayColumnName.isEmpty()) {
-				throw new GeneratorException
-						("Could not resolve the enum display column name using [enumTable2DisplayColumnMapping].");
+				throw new GeneratorException("Could not resolve the enum display column name using" +
+                        " [enumTable2DisplayColumnMapping]; ".concat(tableName0));
 			}
 			enumClassDescriptor.setDisplayColumnName(displayColumnName);
 			for (TableMetadata tableMetadata : tableMetadataList1) {

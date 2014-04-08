@@ -13,7 +13,7 @@ public class OracleSequence {
 	private String name;
 
     @JDBCColumn(name="INCREMENT_BY", updatable=false)
-    private Long incrementBy;
+    private Integer incrementBy;
 
     public String getName() {
 		return name;
@@ -23,11 +23,11 @@ public class OracleSequence {
 		name = pName;
 	}
 
-    public Long getIncrementBy() {
+    public Integer getIncrementBy() {
         return incrementBy;
     }
 
-    public void setIncrementBy(final Long pIncrementBy) {
+    public void setIncrementBy(final Integer pIncrementBy) {
         incrementBy = pIncrementBy;
     }
 }

@@ -1,7 +1,10 @@
 package org.noorm.platform.mssql;
 
+import org.noorm.jdbc.JDBCMetadata;
 import org.noorm.jdbc.JDBCQueryProcessor;
 import org.noorm.jdbc.platform.*;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -13,17 +16,11 @@ import java.util.Map;
  *         Date: 21.02.14
  *         Time: 13:44
  */
-public class MSSQLMetadata implements IMetadata {
+public class MSSQLMetadata extends JDBCMetadata {
+
+    private static final Logger log = LoggerFactory.getLogger(MSSQLMetadata.class);
 
     private JDBCQueryProcessor queryProcessor = JDBCQueryProcessor.getInstance();
-
-    private static MSSQLMetadata ourInstance = new MSSQLMetadata();
-
-    public static MSSQLMetadata getInstance() {
-        return ourInstance;
-    }
-
-    private MSSQLMetadata() { }
 
 
     /**
@@ -34,123 +31,6 @@ public class MSSQLMetadata implements IMetadata {
     @Override
     public String getVersion() {
         return "1.1.0-SNAPSHOT";
-    }
-
-    /**
-     * Returns the list of table/column metadata accessible for the authenticated database user.
-     *
-     * @return the requested
-     */
-    @Override
-    public Map<String, List<TableMetadata>> findTableMetadata() {
-
-        throw new UnsupportedOperationException();
-//        final Map<String, List<OracleTableMetadata>> tableMetaData = new HashMap<String, List<OracleTableMetadata>>();
-//        boolean success = true;
-//        Connection con = null;
-//        try {
-//            con = DataSourceProvider.getConnection();
-//            final DatabaseMetaData databaseMetaData = con.getMetaData();
-//            final ResultSet columns = databaseMetaData.getColumns(null, "identa", null, null);
-//            while (columns.next()) {
-//                final String tableName = columns.getString("TABLE_NAME");
-//                final String columnName = columns.getString("COLUMN_NAME");
-//                final int dataType = columns.getInt("DATA_TYPE");
-//                final String typeName = columns.getString("TYPE_NAME");
-//                final int columnSize = columns.getInt("COLUMN_SIZE");
-//                final int decimalDigits = columns.getInt("DECIMAL_DIGITS");
-//                final int nullable = columns.getInt("NULLABLE");
-//                final int charOctetLength = columns.getInt("CHAR_OCTET_LENGTH");
-//                final String isNullable = columns.getString("IS_NULLABLE");
-//                System.out.println(tableName + ":" + columnName + ":" + dataType + ":" + typeName + ":"
-//                        + columnSize + ":" + decimalDigits + ":" + nullable + ":" + charOctetLength + ":"
-//                        + isNullable);
-//            }
-//            return tableMetaData;
-//        } catch (Exception e) {
-//            success = false;
-//            throw new DataAccessException(DataAccessException.Type.COULD_NOT_ACCESS_JDBC_METADATA, e);
-//        } finally {
-//            try {
-//                if (con != null && !con.isClosed()) {
-//                    DataSourceProvider.returnConnection(success);
-//                }
-//            } catch (SQLException ignored) {
-//            } // Nothing to do
-//        }
-//
-//
-//
-//
-////        final String tableQuery = "SELECT object_id, name FROM sys.tables";
-////        final List<Map<String, Object>> results = queryProcessor.executeGenericSelect(tableQuery);
-////        for (final Map<String, Object> table : results) {
-//            final String tableName = (String) table.get("name");
-//            final Long objectId = (Long) table.get("object_id");
-//            final String objectIdS = String.valueOf(objectId);
-//            final String columnQuery = "SELECT name, column_id, system_type_id, max_length, precision, scale, is_nullable "
-//                                     + "FROM sys.columns WHERE object_id = " + objectIdS;
-//            final List<Map<String, Object>> results0 = queryProcessor.executeGenericSelect(columnQuery);
-//            final List<OracleTableMetadata> metadataBeanList = new ArrayList<OracleTableMetadata>();
-//            for (final Map<String, Object> column : results0) {
-//                final OracleTableMetadata metadataBean = new OracleTableMetadata();
-//                metadataBean.setTableName(tableName);
-//                metadataBean.setColumnName((String) column.get("name"));
-//                metadataBean.setColumnId((Long) column.get("column_id"));
-//                metadataBean.setCharLength((Long) column.get("max_length"));
-//                final Long sysTypeId = (Long) column.get("system_type_id");
-//                String dataType = "VARCHAR2";
-//                if (sysTypeId == 40) {
-//                    dataType = "DATE";
-//                }
-//                if (sysTypeId == 41) {
-//                    dataType = "TIMESTAMP";
-//                }
-//                if (sysTypeId == 42) {
-//                    dataType = "TIMESTAMP";
-//                }
-//                if (sysTypeId == 48) {
-//                    dataType = "NUMBER";
-//                }
-//                if (sysTypeId == 52) {
-//                    dataType = "NUMBER";
-//                }
-//                if (sysTypeId == 56) {
-//                    dataType = "NUMBER";
-//                }
-//                if (sysTypeId == 59) {
-//                    dataType = "NUMBER";
-//                }
-//                if (sysTypeId == 62) {
-//                    dataType = "NUMBER";
-//                }
-//                if (sysTypeId == 106) {
-//                    dataType = "NUMBER";
-//                }
-//                if (sysTypeId == 108) {
-//                    dataType = "NUMBER";
-//                }
-//                if (sysTypeId == 175) {
-//                    dataType = "CHAR";
-//                }
-//                if (sysTypeId == 189) {
-//                    dataType = "TIMESTAMP";
-//                }
-//                metadataBean.setDataType(dataType);
-//                metadataBean.setDataScale((Long) column.get("scale"));
-//                metadataBean.setDataPrecision((Long) column.get("precision"));
-//                String nullable = "YES";
-//                if (((Long) column.get("scale")) == 0) {
-//                    nullable = "NO";
-//                }
-//                metadataBean.setNullable(nullable);
-//                metadataBean.setInsertable("YES");
-//                metadataBean.setUpdatable("YES");
-//                metadataBeanList.add(metadataBean);
-//            }
-//            tableMetaData.put(tableName, metadataBeanList);
-//        }
-//        return tableMetaData;
     }
 
     /**
@@ -187,28 +67,19 @@ public class MSSQLMetadata implements IMetadata {
     @Override
     public List<Sequence> findSequences() {
 
-        final String sequenceQuery = "SELECT name, CONVERT(int, increment) FROM sys.sequences";
+        log.info("Retrieving sequence metadata from JDBC database metadata.");
+        final String sequenceQuery = "SELECT UPPER(name) name, CONVERT(int, increment) increment FROM sys.sequences";
         final List<Map<String, Object>> results = queryProcessor.executeGenericSelect(sequenceQuery);
         final List<Sequence> sequences = new ArrayList<Sequence>();
         for (final Map<String, Object> result : results) {
             final Sequence sequence = new Sequence();
             sequence.setName((String) result.get("name"));
-            sequence.setIncrementBy((Long) result.get("increment"));
+            sequence.setIncrementBy((Integer) result.get("increment"));
             sequences.add(sequence);
+            log.debug("Found sequence metadata for sequence name/increment by : "
+                    + sequence.getName() + "/" + sequence.getIncrementBy());
         }
         return sequences;
-    }
-
-    /**
-     * Returns all primary key columns.
-     *
-     * @return the list of primary key columns
-     */
-    @Override
-    public List<PrimaryKeyColumn> findPkColumns() {
-
-        final List<PrimaryKeyColumn> pkColumns = new ArrayList<PrimaryKeyColumn>();
-        return pkColumns;
     }
 
     /**

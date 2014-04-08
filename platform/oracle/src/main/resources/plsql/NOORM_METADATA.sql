@@ -56,7 +56,7 @@ PACKAGE noorm_metadata AS
 
   PROCEDURE find_sequence_names(p_sequence_names OUT sequence_refcur);
 
-  PROCEDURE find_pk_columns(p_pk_columns OUT pk_refcur);
+  PROCEDURE find_pk_columns(p_table_name IN VARCHAR2, p_pk_columns OUT pk_refcur);
 
   PROCEDURE find_procedure_parameters(p_package_name IN VARCHAR2,
                                       p_procedure_name IN VARCHAR2,

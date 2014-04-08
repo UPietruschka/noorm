@@ -76,7 +76,7 @@ public final class DataAccessException extends RuntimeException {
         ISOLATED_TABLE_LOCK(3200L, "ISOLATED_TABLE_LOCK", "Acquiring table locks requires explicit (user managed) transaction handling."),
         COULD_NOT_CREATE_LOB(3250L, "COULD_NOT_CREATE_LOB", "Could not create LOB type (Clob, Blob, NClob or SQLXML)."),
         ISOLATED_LOB_CREATION(3300L, "ISOLATED_LOB_CREATION", "Creating Clob, Blob, NClob and SQLXML requires explicit (user managed) transaction handling."),
-        UNSUPPORTED_PLATFORM(3400L, "UNSUPPORTED_PLATFORM", "The database platform chosen is not yet supported by NoORM.");
+        UNSUPPORTED_PLATFORM(3400L, "UNSUPPORTED_PLATFORM", "The database platform chosen is not yet supported by NoORM. You may have to add a NoORM platform service provider to your classpath.");
 
         private final Long id;
 		private final String code;

@@ -222,6 +222,8 @@ public class GeneratorUtil {
 
     private static String convertDatabaseType2JavaType(final JDBCType pJDBCType,
                                                        final int pDecimalDigits) {
+
+        // TODO: Handle non-Ora types more thoroughly
         String javaType = "String";
         if (pJDBCType.equals(JDBCType.BINARY)) {
             javaType = "byte[]";
@@ -253,6 +255,9 @@ public class GeneratorUtil {
         }
         if (pJDBCType.equals(JDBCType.DOUBLE)) {
             javaType = "Double";
+        }
+        if (pJDBCType.equals(JDBCType.INTEGER)) {
+            javaType = "Integer";
         }
         if (pJDBCType.equals(JDBCType.DATE)) {
             javaType = "java.util.Date";

@@ -70,7 +70,7 @@ PACKAGE BODY noorm_metadata AS
     FROM   user_sequences;
   END find_sequence_names;
 
-  PROCEDURE find_pk_columns(p_pk_columns OUT pk_refcur) AS
+  PROCEDURE find_pk_columns(p_table_name IN VARCHAR2, p_pk_columns OUT pk_refcur) AS
   BEGIN
     OPEN p_pk_columns FOR
     SELECT cc.table_name,
@@ -79,6 +79,7 @@ PACKAGE BODY noorm_metadata AS
            user_cons_columns cc
     WHERE  uc.table_name      = cc.table_name
     AND    uc.constraint_name = cc.constraint_name
+    AND    uc.table_name      = p_table_name
     AND    uc.constraint_type = 'P'
     UNION
     SELECT us.synonym_name table_name,
@@ -91,6 +92,7 @@ PACKAGE BODY noorm_metadata AS
     AND    ac.owner           = cc.owner
     AND    ac.table_name      = us.table_name
     AND    ac.owner           = us.table_owner
+    AND    us.synonym_name    = p_table_name
     AND    ac.constraint_type = 'P';
   END find_pk_columns;
 
