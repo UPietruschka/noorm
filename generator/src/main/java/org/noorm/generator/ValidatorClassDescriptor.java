@@ -13,8 +13,9 @@ public class ValidatorClassDescriptor {
 	private String packageName;
 	private List<String> classNames = new ArrayList<String>();
     private String dataSourceName;
+    private String tableSearchPattern;
 
-	public String getPackageName() {
+    public String getPackageName() {
 		return packageName;
 	}
 
@@ -36,6 +37,14 @@ public class ValidatorClassDescriptor {
 
     public void setDataSourceName(final String pDataSourceName) {
         dataSourceName = pDataSourceName;
+    }
+
+    public String getTableSearchPattern() {
+        return tableSearchPattern;
+    }
+
+    public void setTableSearchPattern(final String pTableSearchPattern) {
+        tableSearchPattern = pTableSearchPattern;
     }
 
     public boolean hasDataSourceName() {

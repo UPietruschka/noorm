@@ -27,13 +27,12 @@ public class EnumValidator {
 
 	protected Map<String, List<TableMetadata>> tableColumnMap;
 
-	public void loadMetadata() {
+	public void loadMetadata(final String pTableSearchPattern) {
 
         final IMetadata metadata = DataSourceProvider.getPlatform().getMetadata();
 
 		log.debug("Retrieving table metadata from database.");
-        // TODO: provide search pattern
-		tableColumnMap = metadata.findTableMetadata(null);
+		tableColumnMap = metadata.findTableMetadata(pTableSearchPattern);
 	}
 
 	public <T extends Enum<T> & IEnum> void validateEnum(final Class<T> pEnumClass) {

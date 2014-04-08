@@ -56,9 +56,10 @@ public class EnumGenerator {
 
         log.info("Retrieving table metadata from database.");
         final IMetadata metadata = DataSourceProvider.getPlatform().getMetadata();
-        String enumTableFilterRegex = null;
+        String enumTableFilterRegex;
         if (configuration.getEnumTableFilter() != null) {
             enumTableFilterRegex = configuration.getEnumTableFilter().getRegex();
+            validatorClassDescriptor.setTableSearchPattern(enumTableFilterRegex);
         } else {
             log.info("Parameter [enumTableFilter] not set. NoORM Enum generator will quit.");
             return;

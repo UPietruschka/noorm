@@ -74,6 +74,9 @@ public class BeanGenerator {
         String beanTableFilterRegex = null;
         if (configuration.getBeanTableFilter() != null) {
             beanTableFilterRegex = configuration.getBeanTableFilter().getRegex();
+            validatorClassDescriptor.setTableSearchPattern(beanTableFilterRegex);
+        } else {
+            validatorClassDescriptor.setTableSearchPattern(".*");
         }
 		final Map<String, List<TableMetadata>> tableColumnMap = metadata.findTableMetadata(beanTableFilterRegex);
 		log.info("Retrieving record metadata from database.");

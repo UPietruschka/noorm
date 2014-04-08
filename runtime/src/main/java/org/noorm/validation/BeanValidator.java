@@ -5,6 +5,7 @@ import org.noorm.jdbc.IBean;
 import org.noorm.jdbc.JDBCColumn;
 import org.noorm.jdbc.BeanMetaDataUtil;
 import org.noorm.jdbc.platform.IMetadata;
+import org.noorm.jdbc.platform.JDBCType;
 import org.noorm.jdbc.platform.PrimaryKeyColumn;
 import org.noorm.jdbc.platform.Sequence;
 import org.noorm.jdbc.platform.TableMetadata;
@@ -29,13 +30,12 @@ public class BeanValidator {
 	protected Map<String, List<TableMetadata>> tableColumnMap;
 	protected List<Sequence> sequenceDBNameList;
 
-	public void loadMetadata() {
+	public void loadMetadata(final String pTableSearchPattern) {
 
         metadata = DataSourceProvider.getPlatform().getMetadata();
 
 		log.debug("Retrieving table metadata from database.");
-        // TODO: provide search pattern
-		tableColumnMap = metadata.findTableMetadata(null);
+		tableColumnMap = metadata.findTableMetadata(pTableSearchPattern);
 
 		log.debug("Retrieving sequence metadata from database.");
 		sequenceDBNameList = metadata.findSequences();
@@ -68,12 +68,17 @@ public class BeanValidator {
 				final JDBCColumn jdbcColumn = beanMetaDataEntry.getValue();
 				if (jdbcColumn.name().equals(columnName)) {
 					// Validating annotated data-type against database metadata.
-// TODO: re-enable validation
-//					if (!jdbcColumn.dataType().equals(tableMetadata.getDataType())) {
-//						validationError(exceptionPrefix.concat("Data-type mismatch: [")
-//								.concat(tableMetadata.getDataType()).concat(" / ")
-//								.concat(jdbcColumn.dataType().concat("].")));
-//					}
+					if (jdbcColumn.dataType() != tableMetadata.getJDBCType().getVendorTypeNumber()) {
+                        String jdbcColumnTypeName = "Unknown (" + jdbcColumn.dataType() + (")");
+                        try {
+                            jdbcColumnTypeName = JDBCType.valueOf(jdbcColumn.dataType()).getName();
+                        } catch (IllegalArgumentException e) {
+                            // Ignore. The type is not known, default is already set.
+                        }
+						validationError(exceptionPrefix.concat("Data-type mismatch: [")
+								.concat(tableMetadata.getJDBCType().getName()).concat(" / ")
+								.concat(jdbcColumnTypeName.concat("].")));
+					}
 					// Validating annotated nullable-attribute against database metadata.
 					boolean isNullable = true;
 					if (!tableMetadata.getNullable()) {
