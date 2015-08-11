@@ -324,8 +324,6 @@ public class JDBCProcedureProcessor<T> {
 			if (value instanceof String) {
 				if ((value).equals("")) {
 					continue;
-				} else {
-					value = ((String) value).trim();
 				}
 			}
 			if (value instanceof byte[]) {

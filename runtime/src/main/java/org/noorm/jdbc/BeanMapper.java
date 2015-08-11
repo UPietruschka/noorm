@@ -153,7 +153,6 @@ public class BeanMapper<T> {
 			throws IllegalAccessException, SQLException {
 
 		String fieldName;
-        int dataType;
 		for (final Field field : pFields) {
 			// Ignore serialVersionUID
 			if (BeanMetaDataUtil.SERIAL_VERSION_UID.equals(field.getName())) {
@@ -164,7 +163,6 @@ public class BeanMapper<T> {
             final JDBCColumn colAnn = BeanMetaDataUtil.getJDBCColumnAnnotation(field);
             if (colAnn != null) {
                 fieldName = colAnn.name();
-                dataType = colAnn.dataType();
             } else {
                 // Ignore fields without JDBCColumn annotation (interpreted transient)
                 continue;
@@ -191,7 +189,7 @@ public class BeanMapper<T> {
 			if (fieldType == String.class) {
                 final String value = pResultSet.getString(fieldName);
                 if (value != null) {
-                    field.set(pBean, value.trim());
+                    field.set(pBean, value);
                 }
                 continue;
 			}
