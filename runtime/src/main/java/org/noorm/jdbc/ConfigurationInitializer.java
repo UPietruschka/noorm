@@ -89,7 +89,7 @@ public class ConfigurationInitializer {
             }
         } else {
             final String batchUpdateSizeS =
-                    (new Integer(dataSourceConfiguration.getDatabaseBatchUpdateSize()).toString());
+                    (Integer.toString(dataSourceConfiguration.getDatabaseBatchUpdateSize()));
             log.info("Setting (default) ".concat(key).concat(" = ").concat(batchUpdateSizeS));
         }
 
