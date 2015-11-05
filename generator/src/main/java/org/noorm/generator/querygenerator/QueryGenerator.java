@@ -106,10 +106,13 @@ public class QueryGenerator {
                 }
             }
             queryDescriptor.setBeanName(beanName);
+            int paramIndex = 1;
             for (final QueryColumn queryColumn : queryDeclaration.getQueryColumn()) {
                 final ParameterDescriptor parameterDescriptor = new ParameterDescriptor();
                 final String columnName = queryColumn.getName();
-                parameterDescriptor.setJavaName(PARAMETER_PREFIX + Utils.convertDBName2JavaName(columnName, true));
+                final String index = String.format("%02d", paramIndex++);
+                parameterDescriptor.setJavaName
+                        (PARAMETER_PREFIX + index + Utils.convertDBName2JavaName(columnName, true));
                 parameterDescriptor.setDbParamName(columnName);
                 String javaType = null;
                 for (final TableMetadata tableMetadata : tableMetadataList) {

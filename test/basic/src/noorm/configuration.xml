@@ -43,6 +43,9 @@
         <queryDeclaration tableName="EMPLOYEES" generatedMethodName="findEmployeesWithoutCommission">
             <queryColumn name="COMMISSION_PCT" operator="IS_NULL"/>
         </queryDeclaration>
+        <queryDeclaration tableName="EMPLOYEES">
+            <queryColumn name="HIRE_DATE" operator="GREATER_THAN_OR_EQUAL_TO"/>
+        </queryDeclaration>
         <queryDeclaration tableName="DEPARTMENTS" singleRowQuery="true">
             <queryColumn name="DEPARTMENT_ID" operator="EQUAL_TO"/>
         </queryDeclaration>
@@ -61,6 +64,17 @@
             <queryColumn name="DEPARTMENT_NAME" operator="LIKE"/>
         </queryDeclaration>
         <queryDeclaration tableName="case_sensitive_table"/>
+        <queryDeclaration tableName="V_EMPLOYEE_SEARCH" baseTable="EMPLOYEES" generatedMethodName="findEmployeesDynamic" generatedClassName="EmployeeFinder">
+            <queryColumn name="LAST_NAME"/>
+            <queryColumn name="HIRE_DATE" operator="GREATER_THAN_OR_EQUAL_TO"/>
+            <queryColumn name="HIRE_DATE" operator="LESS_THAN_OR_EQUAL_TO"/>
+            <queryColumn name="SALARY" operator="GREATER_THAN_OR_EQUAL_TO"/>
+            <queryColumn name="SALARY" operator="LESS_THAN_OR_EQUAL_TO"/>
+            <queryColumn name="JOB_TITLE"/>
+        </queryDeclaration>
+        <queryDeclaration tableName="COMPLEX_DATA_TYPES" singleRowQuery="true">
+            <queryColumn name="RAW_TYPE_COLUMN"/>
+        </queryDeclaration>
     </queryDeclarations>
     <typeMappings>
         <typeMapping tableFilterRegex="COMPLEX_DATA_TYPES" columnFilterRegex="CONVERTED_NUMBER" databaseType="NUMERIC" javaType="String"/>

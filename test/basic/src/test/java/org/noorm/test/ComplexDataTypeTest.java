@@ -6,6 +6,7 @@ import org.noorm.jdbc.JDBCDMLProcessor;
 import org.noorm.jdbc.LOBHelper;
 import org.noorm.test.hr.beans.ComplexDataTypes;
 import org.noorm.test.hr.services.ComplexDataService;
+import org.noorm.test.hr.services.DeclaredQueries;
 
 import java.sql.Blob;
 import java.sql.Clob;
@@ -32,6 +33,7 @@ public class ComplexDataTypeTest {
     private static final int TWENTY_MB = 20971520;
 
     private ComplexDataService complexDataService = ComplexDataService.getInstance();
+    private DeclaredQueries declaredQueries = DeclaredQueries.getInstance();
 
     @Test
     public void testRawCRUD() {
@@ -45,6 +47,8 @@ public class ComplexDataTypeTest {
             final ComplexDataTypes inserted0 = complexDataService.findUniqueCdtById(inserted.getId());
             assertEquals(inserted, inserted0);
             assertArrayEquals(SOME_BYTE_ARRAY, inserted0.getRawTypeColumn());
+            final ComplexDataTypes inserted1 = declaredQueries.findComplexDataTypesByRawTypeColumn(SOME_BYTE_ARRAY);
+            assertEquals(inserted, inserted1);
             inserted.setRawTypeColumn(SOME_NEW_BYTE_ARRAY);
             dmlProcessor.update(inserted0);
             dmlProcessor.delete(inserted0);

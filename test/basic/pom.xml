@@ -108,6 +108,7 @@
                                 <srcFile>src/main/resources/sql/EMPLOYEE_SERVICE.sql</srcFile>
                                 <srcFile>src/main/resources/sql/JOB_SERVICE.sql</srcFile>
                                 <srcFile>src/main/resources/sql/V_EMPLOYEES.sql</srcFile>
+                                <srcFile>src/main/resources/sql/V_EMPLOYEE_SEARCH.sql</srcFile>
                                 <srcFile>src/main/resources/sql/V_DEPARTMENTS.sql</srcFile>
                                 <srcFile>src/main/resources/sql/DEPARTMENT_SERVICE.sql</srcFile>
                                 <srcFile>src/main/resources/sql/COMPLEX_DATA_SERVICE.sql</srcFile>

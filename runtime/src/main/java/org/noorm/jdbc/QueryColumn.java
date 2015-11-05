@@ -39,6 +39,9 @@ public class QueryColumn implements Comparable {
 
     @Override
     public int compareTo(final Object pQueryColumn) {
-        return columnName.compareTo(((QueryColumn) pQueryColumn).getColumnName());
+        final String thisComparatorValue = columnName + operator.getOperatorName().name();
+        final QueryColumn other = (QueryColumn) pQueryColumn;
+        final String otherComparatorValue = other.getColumnName() + other.getOperator().getOperatorName().name();
+        return thisComparatorValue.compareTo(otherComparatorValue);
     }
 }

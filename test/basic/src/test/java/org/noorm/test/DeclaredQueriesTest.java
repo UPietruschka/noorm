@@ -10,6 +10,9 @@ import org.noorm.test.hr.services.BeanDML;
 import org.noorm.test.hr.services.DeclaredQueries;
 import org.noorm.test.hr.services.EmployeeFinder;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.List;
 
 import static org.junit.Assert.*;
@@ -79,6 +82,15 @@ public class DeclaredQueriesTest {
     }
 
     @Test
+    public void testFindEmployees3() {
+
+        Date hireDateFrom = getDate(2005, 01, 01);
+        final DeclaredQueries declaredQueries = DeclaredQueries.getInstance();
+        final List<Employees> employees = declaredQueries.findEmployeesByHireDate(hireDateFrom);
+        assertEquals(83, employees.size());
+    }
+
+    @Test
     public void testTrimCHARColumn() {
 
         final String countryId = "X";
@@ -97,5 +109,19 @@ public class DeclaredQueriesTest {
             DataSourceProvider.rollback();
             fail(e.getMessage());
         }
+    }
+
+    private Date getDate(final int pYear, final int pMonth, final int pDay) {
+
+        final String dateString = pYear + "/" + pMonth + "/" + pDay;
+        java.util.Date date = null;
+
+        try {
+            SimpleDateFormat formatter = new SimpleDateFormat("yyyy/MM/dd");
+            date = formatter.parse(dateString);
+        } catch (ParseException e) {
+            fail();
+        }
+        return date;
     }
 }

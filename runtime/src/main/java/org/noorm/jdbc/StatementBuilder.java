@@ -21,7 +21,6 @@ class StatementBuilder {
 	private static final String CALL_DELIM_1 = "(";
 	private static final String CALL_DELIM_2 = ",";
 	private static final String CALL_DELIM_3 = ")";
-	private static final String CALL_ASG = " => :";
 	private static final String CALL_ASG2 = " => ?";
 	private static final String CALL_POSTFIX = " }";
 
@@ -84,17 +83,19 @@ class StatementBuilder {
             String delim = WHERE;
             final Map<QueryColumn, Object> orderedParameters = new TreeMap<QueryColumn, Object>(pInParameters);
             for (final QueryColumn queryColumn : orderedParameters.keySet()) {
-                pSQLStatement.append(delim);
-                pSQLStatement.append(queryColumn.getColumnName());
-                pSQLStatement.append(queryColumn.getOperator().getOperatorSyntax());
-                if (!queryColumn.getOperator().isUnary()) {
-                    if (pUseNamedParameters) {
-                        pSQLStatement.append(ASG).append(queryColumn.getColumnName());
-                    } else {
-                        pSQLStatement.append(ASG2);
+                if (orderedParameters.get(queryColumn) != null || queryColumn.getOperator().isUnary()) {
+                    pSQLStatement.append(delim);
+                    pSQLStatement.append(queryColumn.getColumnName());
+                    pSQLStatement.append(queryColumn.getOperator().getOperatorSyntax());
+                    if (!queryColumn.getOperator().isUnary()) {
+                        if (pUseNamedParameters) {
+                            pSQLStatement.append(ASG).append(queryColumn.getColumnName());
+                        } else {
+                            pSQLStatement.append(ASG2);
+                        }
                     }
+                    delim = AND;
                 }
-                delim = AND;
             }
         }
         if (pAcquireLock) {

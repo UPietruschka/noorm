@@ -3,11 +3,7 @@ package org.noorm.jdbc;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.ResultSetMetaData;
-import java.sql.SQLException;
+import java.sql.*;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -90,7 +86,7 @@ public class JDBCQueryProcessor<T> {
             final Map<QueryColumn, Object> orderedParameters = new TreeMap<QueryColumn, Object>(pInParameters);
             for (final QueryColumn queryColumn : orderedParameters.keySet()) {
                 if (!queryColumn.getOperator().isUnary()) {
-                    final Object value = orderedParameters.get(queryColumn);
+                    Object value = orderedParameters.get(queryColumn);
                     // Fixed CHAR semantics now handled through global connection property
                     // if (value instanceof String) {
                         // SQL CHAR comparison semantics by default uses padding, which causes some
@@ -99,7 +95,12 @@ public class JDBCQueryProcessor<T> {
                         // disabled this behaviour and turns off padding.
                         // pstmt.setFixedCHAR(parameterIndex++, (String) value);
                     // } else {
+                    if (value instanceof java.util.Date) {
+                        value = new Timestamp(((java.util.Date) value).getTime());
+                    }
+                    if (value != null) {
                         pstmt.setObject(parameterIndex++, value);
+                    }
                     // }
                 }
             }
