@@ -21,7 +21,7 @@ gpg --yes -ab noorm-generator-%1.pom
 
 cd %HOMEPATH%\.m2\repository\org\noorm\noorm-platform\%1
 gpg --yes -ab noorm-platform-%1.pom
-"%JAVA_HOME%\bin\jar" -cvf noorm-platform-bundle.jar *.jar *.asc *.pom
+"%JAVA_HOME%\bin\jar" -cvf noorm-platform-bundle.jar *.asc *.pom
 
 cd %HOMEPATH%\.m2\repository\org\noorm\noorm-oracle-platform\%1
 gpg --yes -ab noorm-oracle-platform-%1-javadoc.jar
