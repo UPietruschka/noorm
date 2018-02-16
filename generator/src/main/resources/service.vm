@@ -87,9 +87,9 @@ public class $class.JavaName implements IService {
 #set ($returnType = "$proc.getOutParamJavaType()")
 #end
 #if($class.isInterface())
-	#if($proc.hasOutParam())$returnType#else void#end $proc.getJavaName()(#foreach ($param in $proc.Parameters)final $param.JavaType ${param.JavaName}#if($velocityCount<$proc.Parameters.size()),${nl}${subindent}#end#end);
+	#if($proc.hasOutParam())$returnType#else void#end $proc.getJavaName()(#foreach ($param in $proc.Parameters)final $param.JavaType ${param.JavaName}#if($foreach.count<$proc.Parameters.size()),${nl}${subindent}#end#end);
 #else
-	public#if($proc.hasOutParam()) $returnType#else void#end $proc.getJavaName()(#foreach ($param in $proc.Parameters)final $param.JavaType ${param.JavaName}#if($velocityCount<$proc.Parameters.size()),${nl}${subindent}#end#end) {
+	public#if($proc.hasOutParam()) $returnType#else void#end $proc.getJavaName()(#foreach ($param in $proc.Parameters)final $param.JavaType ${param.JavaName}#if($foreach.count<$proc.Parameters.size()),${nl}${subindent}#end#end) {
 
 #if ($class.hasDataSourceName())
 		DataSourceProvider.setActiveDataSource(DATA_SOURCE_NAME);

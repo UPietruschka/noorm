@@ -17,8 +17,8 @@ public class $class.Name<T> implements IBean<T>, Serializable#if($class.getCusto
 	private static final long serialVersionUID = $class.getSerialVersionUID()L;
 	private static final String TABLE_NAME = "$class.TableName";
 	private static final boolean IS_TABLE_NAME_CASE_SENSITIVE = $class.isTableNameCaseSensitive();
-	private static final String[] PK_COLUMN_NAMES = { #foreach ($param in $class.PrimaryKeyColumnNames)"$param"#if($velocityCount<$class.PrimaryKeyColumnNames.size()), #end#end };
-	private static final String[] PK_JAVA_NAMES = { #foreach ($param in $class.PrimaryKeyJavaNames)"$param"#if($velocityCount<$class.PrimaryKeyJavaNames.size()), #end#end };
+	private static final String[] PK_COLUMN_NAMES = { #foreach ($param in $class.PrimaryKeyColumnNames)"$param"#if($foreach.count<$class.PrimaryKeyColumnNames.size()), #end#end };
+	private static final String[] PK_JAVA_NAMES = { #foreach ($param in $class.PrimaryKeyJavaNames)"$param"#if($foreach.count<$class.PrimaryKeyJavaNames.size()), #end#end };
 	private static final String SEQUENCE_NAME = "$class.SequenceName";
 	private static final Long SEQUENCE_INCREMENT = $class.getSequenceIncrement()L;
 	private static final boolean USE_INLINE_SEQUENCE_VALUE_GENERATION = $class.useInlineSequenceValueGeneration();
@@ -128,15 +128,15 @@ public class $class.Name<T> implements IBean<T>, Serializable#if($class.getCusto
 	public boolean equals(final Object pObject) {
 		if (this == pObject) return true;
 		if (pObject == null || !(pObject instanceof $class.Name)) return false;
-		if (#foreach ($param in $class.PrimaryKeyJavaNames)${param} == null#if($velocityCount<$class.PrimaryKeyJavaNames.size()) || #end#end) return false;
+		if (#foreach ($param in $class.PrimaryKeyJavaNames)${param} == null#if($foreach.count<$class.PrimaryKeyJavaNames.size()) || #end#end) return false;
 		final $class.Name other = ($class.Name) pObject;
-		return #foreach ($param in $class.PrimaryKeyJavaNames)${param}.equals(other.${param})#if($velocityCount<$class.PrimaryKeyJavaNames.size()) && #end#end;
+		return #foreach ($param in $class.PrimaryKeyJavaNames)${param}.equals(other.${param})#if($foreach.count<$class.PrimaryKeyJavaNames.size()) && #end#end;
 	}
 
 	@Override
 	public int hashCode() {
-		if (#foreach ($param in $class.PrimaryKeyJavaNames)${param} == null#if($velocityCount<$class.PrimaryKeyJavaNames.size()) || #end#end) return super.hashCode();
-		return #foreach ($param in $class.PrimaryKeyJavaNames)${param}.hashCode()#if($velocityCount<$class.PrimaryKeyJavaNames.size()) + #end#end;
+		if (#foreach ($param in $class.PrimaryKeyJavaNames)${param} == null#if($foreach.count<$class.PrimaryKeyJavaNames.size()) || #end#end) return super.hashCode();
+		return #foreach ($param in $class.PrimaryKeyJavaNames)${param}.hashCode()#if($foreach.count<$class.PrimaryKeyJavaNames.size()) + #end#end;
 	}
 #end
 #end

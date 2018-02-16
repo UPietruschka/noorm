@@ -11,7 +11,7 @@ import org.noorm.jdbc.JDBCColumn;
 public enum $class.Name implements IEnum {
 
 #foreach ($rec in $class.Records)
-	$rec.getDisplayColumnValue()(#foreach ($att in $class.Attributes)$rec.getFormattedValue($att)#if($velocityCount<$class.Attributes.size()), #end#end)#if($velocityCount<$class.Records.size()),#else;#end${force_newline}
+	$rec.getDisplayColumnValue()(#foreach ($att in $class.Attributes)$rec.getFormattedValue($att)#if($foreach.count<$class.Attributes.size()), #end#end)#if($foreach.count<$class.Records.size()),#else;#end${force_newline}
 #end
 
 	private static final String TABLE_NAME = "$class.TableName";
@@ -21,7 +21,7 @@ public enum $class.Name implements IEnum {
 	private final $att.Type $att.Name;
 #end
 
-	$class.getName()(#foreach ($att in $class.Attributes)final $att.Type p$att.getMethodNamePostfix()#if($velocityCount<$class.Attributes.size()), #end#end) {
+	$class.getName()(#foreach ($att in $class.Attributes)final $att.Type p$att.getMethodNamePostfix()#if($foreach.count<$class.Attributes.size()), #end#end) {
 #foreach ($att in $class.Attributes)
 		$att.Name = p$att.getMethodNamePostfix();
 #end
