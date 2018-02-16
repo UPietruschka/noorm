@@ -5,6 +5,7 @@ import oracle.jdbc.OracleConnection;
 import oracle.jdbc.pool.OracleDataSource;
 import oracle.sql.ARRAY;
 import oracle.sql.ArrayDescriptor;
+import oracle.ucp.jdbc.PoolDataSource;
 import org.noorm.jdbc.platform.IMetadata;
 import org.noorm.jdbc.platform.IPlatform;
 
@@ -91,14 +92,30 @@ public class OraclePlatform implements IPlatform {
             connectionProperties.setProperty(OracleConnection.CONNECTION_PROPERTY_FIXED_STRING, "true");
             ((OracleDataSource) pDataSource).setConnectionProperties(connectionProperties);
             validationInfo.append("Connection parameters: ");
+            validationInfo.append(";Data Source Implementation: ");
+            validationInfo.append(pDataSource.getClass().getName());
             validationInfo.append(";URL: ");
             validationInfo.append(((OracleDataSource) pDataSource).getURL());
             validationInfo.append(";Username: ");
             validationInfo.append(((OracleDataSource) pDataSource).getUser());
         } else {
-            validationInfo.append("Unable to retrieve connection parameters from data source. [");
-            validationInfo.append(pDataSource.getClass().getName());
-            validationInfo.append("]");
+            // Check, whether we use an Oracle UCP data source
+            if (pDataSource instanceof PoolDataSource) {
+                final Properties connectionProperties = new Properties();
+                connectionProperties.setProperty(OracleConnection.CONNECTION_PROPERTY_FIXED_STRING, "true");
+                ((PoolDataSource) pDataSource).setConnectionProperties(connectionProperties);
+                validationInfo.append("Connection parameters: ");
+                validationInfo.append(";Data Source Implementation: ");
+                validationInfo.append(pDataSource.getClass().getName());
+                validationInfo.append(";URL: ");
+                validationInfo.append(((PoolDataSource) pDataSource).getURL());
+                validationInfo.append(";Username: ");
+                validationInfo.append(((PoolDataSource) pDataSource).getUser());
+            } else {
+                validationInfo.append("Unable to retrieve connection parameters from data source. [");
+                validationInfo.append(pDataSource.getClass().getName());
+                validationInfo.append("]");
+            }
         }
         return validationInfo.toString();
     }

@@ -189,7 +189,7 @@ public class BeanMapper<T> {
 			if (fieldType == String.class) {
                 final String value = pResultSet.getString(fieldName);
                 if (value != null) {
-                    field.set(pBean, value);
+                    field.set(pBean, value.trim());
                 }
                 continue;
 			}

@@ -20,8 +20,8 @@
 
     <properties>
         <oracle.groupId>com.oracle</oracle.groupId>
-        <oracle.version>11.2.0.2.0</oracle.version>
-        <oracle.driver.artifactId>ojdbc6</oracle.driver.artifactId>
+        <oracle.version>12.2.0.1.0</oracle.version>
+        <oracle.driver.artifactId>ojdbc8</oracle.driver.artifactId>
         <oracle.xdb.artifactId>xdb</oracle.xdb.artifactId>
         <oracle.xmlparser.artifactId>xmlparserv2</oracle.xmlparser.artifactId>
         <jdbc.driver.name>oracle.jdbc.OracleDriver</jdbc.driver.name>

@@ -14,8 +14,8 @@
 
     <properties>
         <oracle.groupId>com.oracle</oracle.groupId>
-        <oracle.version>11.2.0.2.0</oracle.version>
-        <oracle.driver.artifactId>ojdbc6</oracle.driver.artifactId>
+        <oracle.version>12.2.0.1.0</oracle.version>
+        <oracle.driver.artifactId>ojdbc8</oracle.driver.artifactId>
     </properties>
 
     <build>
@@ -34,6 +34,25 @@
             <version>${oracle.version}</version>
             <scope>provided</scope>
         </dependency>
+        <dependency>
+            <groupId>com.oracle</groupId>
+            <artifactId>ucp</artifactId>
+            <version>12.2.0.1.0</version>
+            <scope>provided</scope>
+        </dependency>
     </dependencies>
+
+    <repositories>
+        <repository>
+            <id>maven.oracle.com</id>
+            <name>oracle-maven-repo</name>
+            <url>https://maven.oracle.com</url>
+            <layout>default</layout>
+            <releases>
+                <enabled>true</enabled>
+                <updatePolicy>always</updatePolicy>
+            </releases>
+        </repository>
+    </repositories>
 
 </project>
