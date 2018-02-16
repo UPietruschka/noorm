@@ -75,6 +75,24 @@
                         </xs:documentation>
                     </xs:annotation>
                 </xs:element>
+                <xs:element name="table2InterfaceMappings" type="mappingList" minOccurs="0">
+                    <xs:annotation>
+                        <xs:documentation>
+                            Some database tables may have a couple of fields, which are identically in name
+                            and purpose (i.e.: "ID", "UPDATED_BY", "UPDATED_AT", etc.).
+                            For those tables, it can be helpful to apply some functionality for these columns
+                            by the means of a custom interface.
+                            Using this parameter, it is possible to specify the name of the interface, which
+                            is (automatically) implemented by the generated bean. Keep in mind that the
+                            required method names for the specified interface (with respect to possible renaming)
+                            must exist in the generated class.
+                            Note that the interface name must be fully qualified, when it does not reside in
+                            the same package, which has been configured with parameter "beanJavaPackage".
+                            Like in all other mappings, regular expressions may be used to specify the
+                            mapping.
+                        </xs:documentation>
+                    </xs:annotation>
+                </xs:element>
                 <xs:element name="inlineSequenceTableFilter" type="regex" minOccurs="0">
                     <xs:annotation>
                         <xs:documentation>

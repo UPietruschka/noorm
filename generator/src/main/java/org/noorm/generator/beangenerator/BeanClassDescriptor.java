@@ -30,6 +30,7 @@ public class BeanClassDescriptor {
 	private final List<BeanAttributeDescriptor> attributes = new ArrayList<BeanAttributeDescriptor>();
     private boolean generatePKBasedEqualsAndHashCode;
     private boolean enableOptLockFullRowCompare = false;
+    private String customInterfaceName;
 
     public long getSerialVersionUID() {
 
@@ -196,4 +197,12 @@ public class BeanClassDescriptor {
     public void setEnableOptLockFullRowCompare(final boolean pEnableOptLockFullRowCompare) {
         enableOptLockFullRowCompare = pEnableOptLockFullRowCompare;
     }
+
+	public String getCustomInterfaceName() {
+		return customInterfaceName;
+	}
+
+	public void setCustomInterfaceName(final String pCustomInterfaceName) {
+		customInterfaceName = pCustomInterfaceName;
+	}
 }

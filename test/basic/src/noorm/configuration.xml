@@ -14,6 +14,9 @@
         <mapping key="(case_sensitive_table)" value="case_sensitive_table_seq"/>
         <mapping key="(V_DEPARTMENTS)" value="DEPARTMENTS_SEQ"/>
     </table2SequenceMappings>
+    <table2InterfaceMappings>
+        <mapping key="(EMPLOYEES)" value="org.noorm.test.TestInterface"/>
+    </table2InterfaceMappings>
     <inlineSequenceTableFilter regex="(OPT_.*)"/>
     <columnNameMappings>
         <mapping key="([oO]pt)(.*)" value="$2"/>

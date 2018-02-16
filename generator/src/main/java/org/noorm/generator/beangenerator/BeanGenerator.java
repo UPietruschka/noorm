@@ -136,6 +136,13 @@ public class BeanGenerator {
             }
             beanClassDescriptor.setPrimaryKeyJavaNames(primaryKeyJavaNames);
             beanClassDescriptor.setGeneratePKBasedEqualsAndHashCode(configuration.isGeneratePKBasedEqualsAndHashCode());
+
+			final String interfaceName =
+					GeneratorUtil.getMappedString(tableName0, configuration.getTable2InterfaceMappings());
+			if (interfaceName != null && !interfaceName.isEmpty()) {
+				beanClassDescriptor.setCustomInterfaceName(interfaceName);
+			}
+
 			final Sequence sequence = getSequence(tableName0, sequenceList);
             if (sequence != null) {
                 final String sequenceName = sequence.getName();
