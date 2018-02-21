@@ -5,7 +5,7 @@
     <parent>
         <artifactId>noorm-platform</artifactId>
         <groupId>org.noorm</groupId>
-        <version>1.2.0</version>
+        <version>1.2.1-SNAPSHOT</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
@@ -32,12 +32,6 @@
             <groupId>${oracle.groupId}</groupId>
             <artifactId>${oracle.driver.artifactId}</artifactId>
             <version>${oracle.version}</version>
-            <scope>provided</scope>
-        </dependency>
-        <dependency>
-            <groupId>com.oracle</groupId>
-            <artifactId>ucp</artifactId>
-            <version>12.2.0.1.0</version>
             <scope>provided</scope>
         </dependency>
     </dependencies>

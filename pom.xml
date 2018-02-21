@@ -6,7 +6,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>org.noorm</groupId>
     <artifactId>noorm</artifactId>
-    <version>1.2.0</version>
+    <version>1.2.1-SNAPSHOT</version>
     <name>NoORM</name>
     <packaging>pom</packaging>
     <description>NoORM, database-centric code generation</description>
@@ -106,19 +106,6 @@
                         <id>javadocs</id>
                         <configuration>
                             <excludePackageNames>org.noorm.generator.schema</excludePackageNames>
-                        </configuration>
-                        <goals>
-                            <goal>jar</goal>
-                        </goals>
-                    </execution>
-                    <execution>
-                        <id>generated-classes-javadocs</id>
-                        <configuration>
-                            <groups>
-                                <group>
-                                    <packages>org.noorm.generator.schema</packages>
-                                </group>
-                            </groups>
                         </configuration>
                         <goals>
                             <goal>jar</goal>

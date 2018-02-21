@@ -267,30 +267,12 @@ public class JDBCDMLProcessor<T> {
                             Object newVersion = buildVersionColumnValue(bean, pBatchType, value);
                             platform.setObject(pstmt, newVersion, parameterIndex, jdbcColumn.dataType());
                         } else {
-                            // Fixed CHAR semantics now handled through global connection property
-                            // if (isPKColumn && value instanceof String) {
-                                // SQL CHAR comparison semantics by default uses padding, which causes some
-                                // confusion, since it does not even matter, whether the data has initially been
-                                // provided with or without padding. Using the following proprietary method
-                                // disabled this behaviour and turns off padding.
-                                // pstmt.setFixedCHAR(parameterIndex, (String) value);
-                            // } else {
                             platform.setObject(pstmt, value, parameterIndex, jdbcColumn.dataType());
-                            // }
                         }
                     }
                     if (pBatchType.equals(BatchType.DELETE)) {
                         if (isPKColumn) {
-                            // Fixed CHAR semantics now handled through global connection property
-                            // if (value instanceof String) {
-                                // SQL CHAR comparison semantics by default uses padding, which causes some
-                                // confusion, since it does not even matter, whether the data has initially been
-                                // provided with or without padding. Using the following proprietary method
-                                // disabled this behaviour and turns off padding.
-                                // pstmt.setFixedCHAR(parameterIndex, (String) value);
-                            // } else {
                             platform.setObject(pstmt, value, parameterIndex, jdbcColumn.dataType());
-                            // }
                         }
                     }
                 }
@@ -327,16 +309,7 @@ public class JDBCDMLProcessor<T> {
                             if (!isPKColumn && value != null) {
                                 final String namedParameter = fieldName.concat(StatementBuilder.OLD_VERSION_APPENDIX);
                                 final int parameterIndex = fieldName2ParameterIndex.get(namedParameter);
-                                // Fixed CHAR semantics now handled through global connection property
-                                // if (value instanceof String) {
-                                    // SQL CHAR comparison semantics by default uses padding, which causes some
-                                    // confusion, since it does not even matter, whether the data has initially been
-                                    // provided with or without padding. Using the following proprietary method
-                                    // disabled this behaviour and turns off padding.
-                                    // pstmt.setFixedCHAR(parameterIndex, (String) value);
-                                // } else {
                                 platform.setObject(pstmt, value, parameterIndex, jdbcColumn.dataType());
-                                // }
                             }
                         }
                         if (pBatchType.equals(BatchType.UPDATE)) {

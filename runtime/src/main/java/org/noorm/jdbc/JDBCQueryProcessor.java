@@ -1,5 +1,6 @@
 package org.noorm.jdbc;
 
+import org.noorm.jdbc.platform.IPlatform;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -84,24 +85,16 @@ public class JDBCQueryProcessor<T> {
 
             int parameterIndex = 1;
             final Map<QueryColumn, Object> orderedParameters = new TreeMap<QueryColumn, Object>(pInParameters);
+            final IPlatform platform = DataSourceProvider.getPlatform();
             for (final QueryColumn queryColumn : orderedParameters.keySet()) {
                 if (!queryColumn.getOperator().isUnary()) {
                     Object value = orderedParameters.get(queryColumn);
-                    // Fixed CHAR semantics now handled through global connection property
-                    // if (value instanceof String) {
-                        // SQL CHAR comparison semantics by default uses padding, which causes some
-                        // confusion, since it does not even matter, whether the data has initially been
-                        // provided with or without padding. Using the following proprietary method
-                        // disabled this behaviour and turns off padding.
-                        // pstmt.setFixedCHAR(parameterIndex++, (String) value);
-                    // } else {
                     if (value instanceof java.util.Date) {
                         value = new Timestamp(((java.util.Date) value).getTime());
                     }
                     if (value != null) {
-                        pstmt.setObject(parameterIndex++, value);
+                        platform.setObject(pstmt, value, parameterIndex++, -1);
                     }
-                    // }
                 }
             }
             ResultSet rs = pstmt.executeQuery();

@@ -1,5 +1,6 @@
 REM Create Maven artifact bundles for NoORM
 REM Pass the version of the release subject to Maven/Sonatype deployment as command line parameter
+REM Upload the generated bundles at https://oss.sonatype.org (Staging Upload)
 
 cd %HOMEPATH%\.m2\repository\org\noorm\noorm\%1
 gpg --yes -ab noorm-%1.pom

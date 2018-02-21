@@ -125,7 +125,11 @@ public class MSSQLPlatform implements IPlatform {
         if (pValue == null) {
             pStmt.setNull(pParameterIndex, pSQLType);
         } else {
-            pStmt.setObject(pParameterIndex, pValue, pSQLType);
+            if (pSQLType == -1) {
+                pStmt.setObject(pParameterIndex, pValue);
+            } else {
+                pStmt.setObject(pParameterIndex, pValue, pSQLType);
+            }
         }
     }
 

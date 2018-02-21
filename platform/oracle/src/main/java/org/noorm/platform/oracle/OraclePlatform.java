@@ -2,10 +2,10 @@ package org.noorm.platform.oracle;
 
 import oracle.jdbc.OracleCallableStatement;
 import oracle.jdbc.OracleConnection;
+import oracle.jdbc.OraclePreparedStatement;
 import oracle.jdbc.pool.OracleDataSource;
 import oracle.sql.ARRAY;
 import oracle.sql.ArrayDescriptor;
-import oracle.ucp.jdbc.PoolDataSource;
 import org.noorm.jdbc.platform.IMetadata;
 import org.noorm.jdbc.platform.IPlatform;
 
@@ -83,7 +83,7 @@ public class OraclePlatform implements IPlatform {
      * @return a textual summary of the data source validation
      */
     @Override
-    public String validateDataSource(DataSource pDataSource) throws SQLException {
+    public String validateDataSource(final DataSource pDataSource) throws SQLException {
 
         final StringBuilder validationInfo = new StringBuilder();
         validationInfo.append("Validating data source. ");
@@ -99,23 +99,9 @@ public class OraclePlatform implements IPlatform {
             validationInfo.append(";Username: ");
             validationInfo.append(((OracleDataSource) pDataSource).getUser());
         } else {
-            // Check, whether we use an Oracle UCP data source
-            if (pDataSource instanceof PoolDataSource) {
-                final Properties connectionProperties = new Properties();
-                connectionProperties.setProperty(OracleConnection.CONNECTION_PROPERTY_FIXED_STRING, "true");
-                ((PoolDataSource) pDataSource).setConnectionProperties(connectionProperties);
-                validationInfo.append("Connection parameters: ");
-                validationInfo.append(";Data Source Implementation: ");
-                validationInfo.append(pDataSource.getClass().getName());
-                validationInfo.append(";URL: ");
-                validationInfo.append(((PoolDataSource) pDataSource).getURL());
-                validationInfo.append(";Username: ");
-                validationInfo.append(((PoolDataSource) pDataSource).getUser());
-            } else {
-                validationInfo.append("Unable to retrieve connection parameters from data source. [");
-                validationInfo.append(pDataSource.getClass().getName());
-                validationInfo.append("]");
-            }
+            validationInfo.append("Unable to retrieve connection parameters from data source. [");
+            validationInfo.append(pDataSource.getConnection().getClass().getName());
+            validationInfo.append("]");
         }
         return validationInfo.toString();
     }
@@ -163,7 +149,15 @@ public class OraclePlatform implements IPlatform {
                           final int pParameterIndex,
                           final int pSQLType) throws SQLException {
 
-        pStmt.setObject(pParameterIndex, pValue);
+        if (pValue instanceof String) {
+            // SQL CHAR comparison semantics by default uses padding, which causes some
+            // confusion, since it does not even matter, whether the data has initially been
+            // provided with or without padding. Using the following proprietary method
+            // disabled this behaviour and turns off padding.
+            ((OraclePreparedStatement) pStmt).setFixedCHAR(pParameterIndex, (String) pValue);
+        } else {
+            pStmt.setObject(pParameterIndex, pValue);
+        }
     }
 
     /**
