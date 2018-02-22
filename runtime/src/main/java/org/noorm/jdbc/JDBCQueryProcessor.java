@@ -51,6 +51,28 @@ public class JDBCQueryProcessor<T> {
                                       final Map<QueryColumn, Object> pInParameters,
                                       final Class<T> pBeanClass,
                                       final boolean pAcquireLock) {
+
+        return getBeanListFromSQL(pTableName, pInParameters, pBeanClass, pAcquireLock, null);
+    }
+
+    /**
+     * Executes a generic SQL statement for the given table (or view) name with the given query parameters.
+     * This functionality is designated to support the query declaration available in the Maven generator plugin.
+     * Any complex SQL like joins is expected to be encapsulated within a database view definition and is not
+     * supported here.
+     *
+     * @param pTableName the table or view name used for the SQL query
+     * @param pInParameters the parameters for the where-clause of the SQL query
+     * @param pBeanClass the return type
+     * @param pAcquireLock flag to indicate, whether a write lock should be acquired for the retrieved records
+     * @param pFilterExtension additional parameters for paging and sorting
+     * @return a list containing the results of type pBeanClass
+     */
+    public List<T> getBeanListFromSQL(final String pTableName,
+                                      final Map<QueryColumn, Object> pInParameters,
+                                      final Class<T> pBeanClass,
+                                      final boolean pAcquireLock,
+                                      final FilterExtension pFilterExtension) {
         try {
             if (pTableName == null || pTableName.isEmpty()) {
                 throw new IllegalArgumentException("Parameter [pTableName] must not be null.");

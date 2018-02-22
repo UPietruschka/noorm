@@ -405,6 +405,16 @@
                     </xs:documentation>
                 </xs:annotation>
             </xs:attribute>
+            <xs:attribute name="useFilterExtension" type="xs:boolean">
+                <xs:annotation>
+                    <xs:documentation>
+                        Indicates, whether the generated API for this query should include a FilterExtension.
+                        The FilterExtension provides support for paging and sorting for the given query.
+                        Note that this functionality is not available (and does not make sense either) for
+                        single row queries.
+                    </xs:documentation>
+                </xs:annotation>
+            </xs:attribute>
         </xs:complexType>
     </xs:element>
 

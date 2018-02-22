@@ -46,7 +46,7 @@
         <queryDeclaration tableName="EMPLOYEES" generatedMethodName="findEmployeesWithoutCommission">
             <queryColumn name="COMMISSION_PCT" operator="IS_NULL"/>
         </queryDeclaration>
-        <queryDeclaration tableName="EMPLOYEES">
+        <queryDeclaration tableName="EMPLOYEES" useFilterExtension="true">
             <queryColumn name="HIRE_DATE" operator="GREATER_THAN_OR_EQUAL_TO"/>
         </queryDeclaration>
         <queryDeclaration tableName="DEPARTMENTS" singleRowQuery="true">

@@ -2,6 +2,7 @@ package org.noorm.test;
 
 import org.junit.Test;
 import org.noorm.jdbc.DataSourceProvider;
+import org.noorm.jdbc.FilterExtension;
 import org.noorm.jdbc.TableLock;
 import org.noorm.test.hr.beans.Countries;
 import org.noorm.test.hr.beans.Departments;
@@ -84,9 +85,13 @@ public class DeclaredQueriesTest {
     @Test
     public void testFindEmployees3() {
 
-        Date hireDateFrom = getDate(2005, 01, 01);
+        final FilterExtension filterExtension = new FilterExtension();
+        filterExtension.setIndex(0);
+        filterExtension.setCount(FilterExtension.UNLIMITED_COUNT);
+        filterExtension.addSortCriteria("HIRE_DATE");
+        final Date hireDateFrom = getDate(2005, 01, 01);
         final DeclaredQueries declaredQueries = DeclaredQueries.getInstance();
-        final List<Employees> employees = declaredQueries.findEmployeesByHireDate(hireDateFrom);
+        final List<Employees> employees = declaredQueries.findEmployeesByHireDate(hireDateFrom, filterExtension);
         assertEquals(83, employees.size());
     }
 

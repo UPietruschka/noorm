@@ -38,6 +38,10 @@ public class QueryDescriptor {
         return queryDeclaration.isSingleRowQuery();
     }
 
+    public boolean useFilterExtension() {
+        return queryDeclaration.isUseFilterExtension();
+    }
+
     public boolean isAcquireLock() {
         return queryDeclaration.isAcquireLock();
     }
