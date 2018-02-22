@@ -13,7 +13,7 @@ import java.util.TreeMap;
  *         Date: 02.06.11
  *         Time: 16:31
  */
-class StatementBuilder {
+public class StatementBuilder {
 
 	public static final String OLD_VERSION_APPENDIX = "_OLD";
 

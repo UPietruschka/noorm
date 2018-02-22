@@ -13,7 +13,11 @@ import java.util.TreeSet;
  */
 public class FilterExtension {
 
-    public static final int UNLIMITED_COUNT = -1;
+    /**
+     * Paging is expected to get used for providing data for UI presentation, thus, any page size
+     * (e.g. "count") larger than 1024 does not seem to be a reasonable choice.
+     */
+    public static final int UNLIMITED_COUNT = 1024;
 
     private int index = 0;
     private int count = UNLIMITED_COUNT;

@@ -88,7 +88,7 @@ public class JDBCQueryProcessor<T> {
         }
 
         if (log.isDebugEnabled()) {
-            debugSQLCall(pTableName, pInParameters, pBeanClass);
+            debugSQLCall(pTableName, pInParameters, pBeanClass, pFilterExtension);
         }
 
         boolean success = true;
@@ -97,8 +97,9 @@ public class JDBCQueryProcessor<T> {
         PreparedStatement pstmt = null;
         try {
             con = DataSourceProvider.getConnection();
-            final String sqlStmt = statementBuilder.buildSQLStatement
-                    (pTableName, pInParameters, USE_NAMED_PARAMETERS, pAcquireLock);
+            final IPlatform platform = DataSourceProvider.getPlatform();
+            final String sqlStmt = platform.buildSQLStatement
+                    (pTableName, pInParameters, USE_NAMED_PARAMETERS, pAcquireLock, pFilterExtension);
             if (log.isDebugEnabled()) {
                 log.debug("Preparing and executing SQL statement: ".concat(sqlStmt)
                         .concat("; using connection : ".concat(con.toString())));
@@ -107,7 +108,6 @@ public class JDBCQueryProcessor<T> {
 
             int parameterIndex = 1;
             final Map<QueryColumn, Object> orderedParameters = new TreeMap<QueryColumn, Object>(pInParameters);
-            final IPlatform platform = DataSourceProvider.getPlatform();
             for (final QueryColumn queryColumn : orderedParameters.keySet()) {
                 if (!queryColumn.getOperator().isUnary()) {
                     Object value = orderedParameters.get(queryColumn);
@@ -208,10 +208,21 @@ public class JDBCQueryProcessor<T> {
 
     private void debugSQLCall(final String pTableName,
                               final Map<QueryColumn, Object> pInParameters,
-                              final Class<T> pBeanClass) {
+                              final Class<T> pBeanClass,
+                              final FilterExtension pFilterExtension) {
 
         final StringBuilder formattedParameters = new StringBuilder();
         formattedParameters.append("Executing SQL statement on table ").append(pTableName);
+        if (pFilterExtension != null) {
+            formattedParameters.append("\nFilter extension: Index: ");
+            formattedParameters.append(pFilterExtension.getIndex());
+            formattedParameters.append(", Count: ");
+            formattedParameters.append(pFilterExtension.getCount());
+            for (final FilterExtension.SortCriteria sortCriteria : pFilterExtension.getSortCriteria()) {
+                formattedParameters.append("\n  ").append(sortCriteria.getColumnName());
+                formattedParameters.append(" / ").append(sortCriteria.getDirection());
+            }
+        }
         if (pInParameters != null) {
             String prefix = "\nInput parameters: ";
             for (final QueryColumn queryColumn : pInParameters.keySet()) {

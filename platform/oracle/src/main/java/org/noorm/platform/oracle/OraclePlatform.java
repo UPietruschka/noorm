@@ -6,6 +6,9 @@ import oracle.jdbc.OraclePreparedStatement;
 import oracle.jdbc.pool.OracleDataSource;
 import oracle.sql.ARRAY;
 import oracle.sql.ArrayDescriptor;
+import org.noorm.jdbc.FilterExtension;
+import org.noorm.jdbc.QueryColumn;
+import org.noorm.jdbc.StatementBuilder;
 import org.noorm.jdbc.platform.IMetadata;
 import org.noorm.jdbc.platform.IPlatform;
 
@@ -14,7 +17,9 @@ import java.sql.CallableStatement;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
+import java.util.Map;
 import java.util.Properties;
+import java.util.TreeSet;
 
 /**
  * @author Ulf Pietruschka / ulf.pietruschka@ext.secunet.com
@@ -27,6 +32,7 @@ public class OraclePlatform implements IPlatform {
     public static final String NOORM_ID_LIST_DB_TYPE_NAME = "NUM_ARRAY";
 
     private final OracleMetadata oracleMetadata = OracleMetadata.getInstance();
+    private final StatementBuilder statementBuilder = new StatementBuilder();
 
     /**
      * Returns the name of platform service provider
@@ -179,6 +185,59 @@ public class OraclePlatform implements IPlatform {
                 ArrayDescriptor.createDescriptor(NOORM_ID_LIST_DB_TYPE_NAME, pCon);
         final ARRAY arrayToPass = new ARRAY(descriptor, pCon, pValue);
         ((OracleCallableStatement) pCstmt).setARRAY(pParameterIndex, arrayToPass);
+    }
+
+    private static final String BASE_QUERY_PLACEHOLDER = "##BASE_QUERY##";
+    private static final String COUNT_PLACEHOLDER = "##COUNT##";
+    private static final String STARTROW_PLACEHOLDER = "##STARTROW##";
+    private static final String ENDROW_PLACEHOLDER = "##ENDROW##";
+    private static final String ORDERBY_PLACEHOLDER = "##ORDERBY##";
+    private static final String ORACLE_PAGING_WRAPPER =
+            "SELECT /*+ first_rows(" + COUNT_PLACEHOLDER + ") */ * FROM (SELECT WRAPPED.*, ROWNUM r1 FROM "
+          + "(" + BASE_QUERY_PLACEHOLDER + ORDERBY_PLACEHOLDER + ") WRAPPED WHERE rownum < " + ENDROW_PLACEHOLDER
+          + ") WHERE r1 >= " + STARTROW_PLACEHOLDER;
+
+    private static final String ORDER_BY_CLAUSE = " ORDER BY ";
+
+    /**
+     * Constructs a SQL query based on the provided information.
+     *
+     * @param pTableName          the table name
+     * @param pInParameters       the query parameters
+     * @param pUseNamedParameters whether to use named parameters or not
+     * @param pAcquireLock        lock the retrieved data for further processing
+     * @param pFilterExtension    paging and sorting information
+     * @return the constructed SQL query
+     */
+    @Override
+    public String buildSQLStatement(final String pTableName,
+                                    final Map<QueryColumn, Object> pInParameters,
+                                    final boolean pUseNamedParameters,
+                                    final boolean pAcquireLock,
+                                    final FilterExtension pFilterExtension) {
+
+        final String baseQuery =
+                statementBuilder.buildSQLStatement(pTableName, pInParameters, pUseNamedParameters, pAcquireLock);
+        if (pFilterExtension == null) {
+            return baseQuery;
+        }
+        String statement = ORACLE_PAGING_WRAPPER;
+        statement = statement.replace(BASE_QUERY_PLACEHOLDER, baseQuery);
+        statement = statement.replace(COUNT_PLACEHOLDER, Integer.toString(pFilterExtension.getCount()));
+        statement = statement.replace(STARTROW_PLACEHOLDER, Integer.toString(pFilterExtension.getIndex()));
+        final int endRow = pFilterExtension.getIndex() + pFilterExtension.getCount();
+        statement = statement.replace(ENDROW_PLACEHOLDER, Integer.toString(endRow));
+        final TreeSet<FilterExtension.SortCriteria> sortCriterias = pFilterExtension.getSortCriteria();
+        if (sortCriterias.size() > 0) {
+            String orderByClause = "";
+            String delimiter = ORDER_BY_CLAUSE;
+            for (final FilterExtension.SortCriteria sortCriteria : sortCriterias) {
+                orderByClause += delimiter + sortCriteria.getColumnName() + " " + sortCriteria.getDirection();
+                delimiter = ", ";
+            }
+            statement = statement.replace(ORDERBY_PLACEHOLDER, orderByClause);
+        }
+        return statement;
     }
 
     /**

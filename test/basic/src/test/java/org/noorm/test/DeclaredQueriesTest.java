@@ -86,13 +86,14 @@ public class DeclaredQueriesTest {
     public void testFindEmployees3() {
 
         final FilterExtension filterExtension = new FilterExtension();
-        filterExtension.setIndex(0);
-        filterExtension.setCount(FilterExtension.UNLIMITED_COUNT);
+        filterExtension.setIndex(10);
+        filterExtension.setCount(30);
+        filterExtension.addSortCriteria("SALARY", FilterExtension.Direction.DESC);
         filterExtension.addSortCriteria("HIRE_DATE");
         final Date hireDateFrom = getDate(2005, 01, 01);
         final DeclaredQueries declaredQueries = DeclaredQueries.getInstance();
         final List<Employees> employees = declaredQueries.findEmployeesByHireDate(hireDateFrom, filterExtension);
-        assertEquals(83, employees.size());
+        assertEquals(30, employees.size());
     }
 
     @Test

@@ -1,6 +1,9 @@
 package org.noorm.platform.mssql;
 
 import com.microsoft.sqlserver.jdbc.SQLServerDataSource;
+import org.noorm.jdbc.FilterExtension;
+import org.noorm.jdbc.QueryColumn;
+import org.noorm.jdbc.StatementBuilder;
 import org.noorm.jdbc.platform.IMetadata;
 import org.noorm.jdbc.platform.IPlatform;
 
@@ -9,6 +12,7 @@ import java.sql.CallableStatement;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
+import java.util.Map;
 
 /**
  * @author Ulf Pietruschka / ulf.pietruschka@ext.secunet.com
@@ -20,6 +24,7 @@ public class MSSQLPlatform implements IPlatform {
     private static final String SQL_SERVER_PLATFORM = "SQLServer";
 
     private final MSSQLMetadata msSQLMetadata = new MSSQLMetadata();
+    private final StatementBuilder statementBuilder = new StatementBuilder();
 
     /**
      * Returns the name of platform service provider
@@ -146,6 +151,33 @@ public class MSSQLPlatform implements IPlatform {
     public void prepareNumericArray(Connection pCon, CallableStatement pCstmt, Object pValue, int pParameterIndex) throws SQLException {
 
         throw new UnsupportedOperationException();
+    }
+
+    /**
+     * Constructs a SQL query based on the provided information.
+     *
+     * NOTE: FilterExtension functionality NOT YET IMPLEMENTED!
+     *
+     * @param pTableName          the table name
+     * @param pInParameters       the query parameters
+     * @param pUseNamedParameters whether to use named parameters or not
+     * @param pAcquireLock        lock the retrieved data for further processing
+     * @param pFilterExtension    paging and sorting information
+     * @return the constructed SQL query
+     */
+    @Override
+    public String buildSQLStatement(final String pTableName,
+                                    final Map<QueryColumn, Object> pInParameters,
+                                    final boolean pUseNamedParameters,
+                                    final boolean pAcquireLock,
+                                    final FilterExtension pFilterExtension) {
+
+        final String baseQuery =
+                statementBuilder.buildSQLStatement(pTableName, pInParameters, pUseNamedParameters, pAcquireLock);
+        if (pFilterExtension == null) {
+            return baseQuery;
+        }
+        return baseQuery;
     }
 
     /**

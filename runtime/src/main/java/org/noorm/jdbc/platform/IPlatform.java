@@ -1,10 +1,14 @@
 package org.noorm.jdbc.platform;
 
+import org.noorm.jdbc.FilterExtension;
+import org.noorm.jdbc.QueryColumn;
+
 import javax.sql.DataSource;
 import java.sql.CallableStatement;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
+import java.util.Map;
 
 /**
  * @author Ulf Pietruschka / ulf.pietruschka@ext.secunet.com
@@ -86,6 +90,22 @@ public interface IPlatform {
                              final CallableStatement pCstmt,
                              final Object pValue,
                              final int pParameterIndex) throws SQLException;
+
+    /**
+     * Constructs a SQL query based on the provided information.
+     *
+     * @param pTableName the table name
+     * @param pInParameters the query parameters
+     * @param pUseNamedParameters whether to use named parameters or not
+     * @param pAcquireLock lock the retrieved data for further processing
+     * @param pFilterExtension paging and sorting information
+     * @return the constructed SQL query
+     */
+    String buildSQLStatement(final String pTableName,
+                             final Map<QueryColumn, Object> pInParameters,
+                             final boolean pUseNamedParameters,
+                             final boolean pAcquireLock,
+                             final FilterExtension pFilterExtension);
 
     /**
      * Provides database metadata for code generation and validation of generated code.
