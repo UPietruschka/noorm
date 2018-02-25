@@ -187,11 +187,11 @@ public class OraclePlatform implements IPlatform {
         ((OracleCallableStatement) pCstmt).setARRAY(pParameterIndex, arrayToPass);
     }
 
-    private static final String BASE_QUERY_PLACEHOLDER = "##BASE_QUERY##";
-    private static final String COUNT_PLACEHOLDER = "##COUNT##";
-    private static final String STARTROW_PLACEHOLDER = "##STARTROW##";
-    private static final String ENDROW_PLACEHOLDER = "##ENDROW##";
-    private static final String ORDERBY_PLACEHOLDER = "##ORDERBY##";
+    private static final String BASE_QUERY_PLACEHOLDER = "__BASE_QUERY__";
+    private static final String COUNT_PLACEHOLDER = "__COUNT__";
+    private static final String STARTROW_PLACEHOLDER = "__STARTROW__";
+    private static final String ENDROW_PLACEHOLDER = "__ENDROW__";
+    private static final String ORDERBY_PLACEHOLDER = "__ORDERBY__";
     private static final String ORACLE_PAGING_WRAPPER =
             "SELECT /*+ first_rows(" + COUNT_PLACEHOLDER + ") */ * FROM (SELECT WRAPPED.*, ROWNUM r1 FROM "
           + "(" + BASE_QUERY_PLACEHOLDER + ORDERBY_PLACEHOLDER + ") WRAPPED WHERE rownum < " + ENDROW_PLACEHOLDER
@@ -224,8 +224,10 @@ public class OraclePlatform implements IPlatform {
         String statement = ORACLE_PAGING_WRAPPER;
         statement = statement.replace(BASE_QUERY_PLACEHOLDER, baseQuery);
         statement = statement.replace(COUNT_PLACEHOLDER, Integer.toString(pFilterExtension.getCount()));
-        statement = statement.replace(STARTROW_PLACEHOLDER, Integer.toString(pFilterExtension.getIndex()));
-        final int endRow = pFilterExtension.getIndex() + pFilterExtension.getCount();
+        // Oracle rownum starts from "1", we want index to start from "0", so we add "1" to the index.
+        final int index0 = pFilterExtension.getIndex() + 1;
+        statement = statement.replace(STARTROW_PLACEHOLDER, Integer.toString(index0));
+        final int endRow = index0 + pFilterExtension.getCount();
         statement = statement.replace(ENDROW_PLACEHOLDER, Integer.toString(endRow));
         final TreeSet<FilterExtension.SortCriteria> sortCriterias = pFilterExtension.getSortCriteria();
         if (sortCriterias.size() > 0) {
@@ -236,6 +238,8 @@ public class OraclePlatform implements IPlatform {
                 delimiter = ", ";
             }
             statement = statement.replace(ORDERBY_PLACEHOLDER, orderByClause);
+        } else {
+            statement = statement.replace(ORDERBY_PLACEHOLDER, "");
         }
         return statement;
     }

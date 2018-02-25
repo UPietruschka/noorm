@@ -65,7 +65,7 @@ public class ${class.JavaName} {
 #end
 #end
 		final JDBCQueryProcessor<$query.getBeanName()> queryProcessor = JDBCQueryProcessor.getInstance();
-		final List<$query.getBeanName()> results = queryProcessor.getBeanListFromSQL("$query.getTableName()", parameters, ${query.getBeanName()}.class, $query.isAcquireLock()#if($query.useFilterExtension())#if($query.Parameters.size()>0), #{end}pFilterExtension#end);
+		final List<$query.getBeanName()> results = queryProcessor.getBeanListFromSQL("$query.getTableName()", parameters, ${query.getBeanName()}.class, $query.isAcquireLock()#if($query.useFilterExtension()), pFilterExtension#end);
 #if($query.isSingleRowQuery())
 		if (results.isEmpty()) {
 			return null;
