@@ -47,29 +47,40 @@ public class FilterExtension {
         sortCriteria = pSortCriteria;
     }
 
-    public void addSortCriteria(final String pColumnName) {
-        sortCriteria.add(new SortCriteria(pColumnName));
+    public void addSortCriteria(final String pAttributeName) {
+        sortCriteria.add(new SortCriteria(pAttributeName));
     }
 
-    public void addSortCriteria(final String pColumnName, final Direction pDirection) {
-        sortCriteria.add(new SortCriteria(pColumnName, pDirection));
+    public void addSortCriteria(final String pAttributeName, final Direction pDirection) {
+        sortCriteria.add(new SortCriteria(pAttributeName, pDirection));
     }
 
     /**
      * Inner class for the specification of sort criteria (column and direction)
+     * Note the distinction between attribute name and column name. The latter denotes the database
+     * column name, while the first denotes the Java name.
      */
     public static class SortCriteria implements Comparable<SortCriteria> {
 
+        private String attributeName;
         private String columnName;
         private Direction direction = Direction.ASC;
 
-        public SortCriteria(final String pColumnName) {
-            columnName = pColumnName;
+        public SortCriteria(final String pAttributeName) {
+            attributeName = pAttributeName;
         }
 
-        public SortCriteria(final String pColumnName, final Direction pDirecetion) {
-            columnName = pColumnName;
+        public SortCriteria(final String pAttributeName, final Direction pDirecetion) {
+            attributeName = pAttributeName;
             direction = pDirecetion;
+        }
+
+        public String getAttributeName() {
+            return attributeName;
+        }
+
+        public void setAttributeName(final String pAttributeName) {
+            attributeName = pAttributeName;
         }
 
         public String getColumnName() {
@@ -102,7 +113,7 @@ public class FilterExtension {
          */
         @Override
         public int compareTo(SortCriteria other) {
-            return this.getColumnName().compareTo(other.getColumnName());
+            return this.getAttributeName().compareTo(other.getAttributeName());
         }
     }
 

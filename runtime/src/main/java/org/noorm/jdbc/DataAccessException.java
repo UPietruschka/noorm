@@ -45,7 +45,7 @@ public final class DataAccessException extends RuntimeException {
 		return type;
 	}
 
-	public static enum Type {
+	public enum Type {
 
 		COULD_NOT_ESTABLISH_CONNECTION(1000L, "COULD_NOT_ESTABLISH_CONNECTION", "Could not establish database connection."),
         NESTED_TRANSACTION_ROLLBACK(1020L, "NESTED_TRANSACTION_ROLLBACK", "Nested transaction rolled back."),
@@ -76,7 +76,8 @@ public final class DataAccessException extends RuntimeException {
         ISOLATED_TABLE_LOCK(3200L, "ISOLATED_TABLE_LOCK", "Acquiring table locks requires explicit (user managed) transaction handling."),
         COULD_NOT_CREATE_LOB(3250L, "COULD_NOT_CREATE_LOB", "Could not create LOB type (Clob, Blob, NClob or SQLXML)."),
         ISOLATED_LOB_CREATION(3300L, "ISOLATED_LOB_CREATION", "Creating Clob, Blob, NClob and SQLXML requires explicit (user managed) transaction handling."),
-        UNSUPPORTED_PLATFORM(3400L, "UNSUPPORTED_PLATFORM", "The database platform chosen is not yet supported by NoORM. You may have to add a NoORM platform service provider to your classpath.");
+        UNSUPPORTED_PLATFORM(3400L, "UNSUPPORTED_PLATFORM", "The database platform chosen is not yet supported by NoORM. You may have to add a NoORM platform service provider to your classpath."),
+		ILLEGAL_SORT_CRITERIA(3500L, "ILLEGAL_SORT_CRITERIA", "Illegal sort criteria provided.");
 
         private final Long id;
 		private final String code;

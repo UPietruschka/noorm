@@ -436,6 +436,10 @@
                 construction of WHERE conditions. Note that the operators "IS_NULL" and "IS_NOT_NULL" are
                 unary, i.e., they do not need the provision of a parameter to compare against (will be
                 automatically reflected by the code generator).
+                Operator "IN" corresponds to the SQL operator "IN", meaning that not only one single value
+                is used for the WHERE condition, but a list. The generated Java code will expect a
+                java.util.List with elements of the column type (resp. mapped Java type) in the finder
+                interface.
             </xs:documentation>
         </xs:annotation>
         <xs:restriction base="xs:string">
@@ -448,6 +452,7 @@
             <xs:enumeration value="LIKE"/>
             <xs:enumeration value="IS_NULL"/>
             <xs:enumeration value="IS_NOT_NULL"/>
+            <xs:enumeration value="IN"/>
         </xs:restriction>
     </xs:simpleType>
 

@@ -6,6 +6,7 @@ import oracle.jdbc.OraclePreparedStatement;
 import oracle.jdbc.pool.OracleDataSource;
 import oracle.sql.ARRAY;
 import oracle.sql.ArrayDescriptor;
+import org.noorm.jdbc.DataAccessException;
 import org.noorm.jdbc.FilterExtension;
 import org.noorm.jdbc.QueryColumn;
 import org.noorm.jdbc.StatementBuilder;
@@ -234,7 +235,11 @@ public class OraclePlatform implements IPlatform {
             String orderByClause = "";
             String delimiter = ORDER_BY_CLAUSE;
             for (final FilterExtension.SortCriteria sortCriteria : sortCriterias) {
-                orderByClause += delimiter + sortCriteria.getColumnName() + " " + sortCriteria.getDirection();
+                final String columnName = sortCriteria.getColumnName();
+                if (columnName == null) {
+                    throw new DataAccessException(DataAccessException.Type.ILLEGAL_SORT_CRITERIA);
+                }
+                orderByClause += delimiter + columnName + " " + sortCriteria.getDirection();
                 delimiter = ", ";
             }
             statement = statement.replace(ORDERBY_PLACEHOLDER, orderByClause);

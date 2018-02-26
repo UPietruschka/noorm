@@ -26,8 +26,6 @@ public class JDBCQueryProcessor<T> {
 
 	private static JDBCQueryProcessor queryProcessor = new JDBCQueryProcessor();
 
-	private final StatementBuilder statementBuilder = new StatementBuilder();
-
 	private JDBCQueryProcessor() { }
 
 	public static <T> JDBCQueryProcessor<T> getInstance() {
@@ -98,6 +96,17 @@ public class JDBCQueryProcessor<T> {
         try {
             con = DataSourceProvider.getConnection();
             final IPlatform platform = DataSourceProvider.getPlatform();
+            if (pFilterExtension != null) {
+                final Map<String, String> javaNames2ColumnNames = BeanMetaDataUtil.getJavaNames2ColumnNames(pBeanClass);
+                for (final FilterExtension.SortCriteria sortCriteria : pFilterExtension.getSortCriteria()) {
+                    final String attributeName = sortCriteria.getAttributeName();
+                    final String columnName = javaNames2ColumnNames.get(attributeName);
+                    if (columnName == null || attributeName == null) {
+                        throw new DataAccessException(DataAccessException.Type.ILLEGAL_SORT_CRITERIA);
+                    }
+                    sortCriteria.setColumnName(columnName);
+                }
+            }
             final String sqlStmt = platform.buildSQLStatement
                     (pTableName, pInParameters, USE_NAMED_PARAMETERS, pAcquireLock, pFilterExtension);
             if (log.isDebugEnabled()) {

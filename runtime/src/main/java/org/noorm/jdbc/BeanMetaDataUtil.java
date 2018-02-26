@@ -30,6 +30,21 @@ public class BeanMetaDataUtil {
     private static Map<Field, JDBCColumn> jdbcColumnAnnotationCache = new HashMap<Field, JDBCColumn>();
     private static Map<Class, Field[]> declaredFieldInclParentCache = new HashMap<Class, Field[]>();
 
+    public static Map<String, String> getJavaNames2ColumnNames(final Class pClass) {
+
+    	final HashMap<String, String> javaNames2ColumnNames = new HashMap<>();
+		final Field[] fields = getDeclaredFieldsInclParent(pClass);
+		for (final Field field : fields) {
+			final JDBCColumn jdbcColumn = getJDBCColumnAnnotation(field);
+			if (jdbcColumn != null) {
+				final String javaName = field.getName();
+				final String columnName = jdbcColumn.name();
+				javaNames2ColumnNames.put(javaName, columnName);
+			}
+		}
+		return javaNames2ColumnNames;
+	}
+
 	/**
 	 * Using Class.getDeclaredFields does not return fields declared in a potentially existing super-class.
 	 * This method extends the retrieval of declared fields to the super-class, if any. Note that there is

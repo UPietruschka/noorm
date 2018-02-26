@@ -88,8 +88,8 @@ public class DeclaredQueriesTest {
         final FilterExtension filterExtension = new FilterExtension();
         filterExtension.setIndex(10);
         filterExtension.setCount(30);
-        filterExtension.addSortCriteria("SALARY", FilterExtension.Direction.DESC);
-        filterExtension.addSortCriteria("HIRE_DATE");
+        filterExtension.addSortCriteria("salary", FilterExtension.Direction.DESC);
+        filterExtension.addSortCriteria("hireDate");
         final Date hireDateFrom = getDate(2005, 01, 01);
         final DeclaredQueries declaredQueries = DeclaredQueries.getInstance();
         final List<Employees> employees = declaredQueries.findEmployeesByHireDate(hireDateFrom, filterExtension);
