@@ -36,7 +36,7 @@ public class StatementBuilder {
 			delim = CALL_DELIM_2;
 		}
 		if (pInParameters != null) {
-			final Map<String, Object> orderedParameters = new TreeMap<String, Object>(pInParameters);
+			final Map<String, Object> orderedParameters = new TreeMap<>(pInParameters);
 			for (final String paramName : orderedParameters.keySet()) {
 				final Object value = orderedParameters.get(paramName);
 				if (value == null) {
@@ -67,6 +67,9 @@ public class StatementBuilder {
 
     private static final String SELECT_PREFIX = "SELECT * FROM ";
     private static final String SELECT_LOCK = " FOR UPDATE";
+    private static final String SELECT_IN_CLAUSE_START = "(";
+    private static final String SELECT_IN_CLAUSE_END = ")";
+    private static final String SELECT_IN_CLAUSE_DELIM = ",";
 
     public String buildSQLStatement(final String pTableName,
                                     final Map<QueryColumn, Object> pInParameters,
@@ -81,17 +84,32 @@ public class StatementBuilder {
         }
         if (pInParameters.size() > 0) {
             String delim = WHERE;
-            final Map<QueryColumn, Object> orderedParameters = new TreeMap<QueryColumn, Object>(pInParameters);
+            final Map<QueryColumn, Object> orderedParameters = new TreeMap<>(pInParameters);
             for (final QueryColumn queryColumn : orderedParameters.keySet()) {
                 if (orderedParameters.get(queryColumn) != null || queryColumn.getOperator().isUnary()) {
                     pSQLStatement.append(delim);
                     pSQLStatement.append(queryColumn.getColumnName());
                     pSQLStatement.append(queryColumn.getOperator().getOperatorSyntax());
                     if (!queryColumn.getOperator().isUnary()) {
-                        if (pUseNamedParameters) {
-                            pSQLStatement.append(ASG).append(queryColumn.getColumnName());
+                        if (orderedParameters.get(queryColumn) instanceof List) {
+                            final List<Object> inClauseValues = ((List<Object>) orderedParameters.get(queryColumn));
+                            String inClauseDelim = SELECT_IN_CLAUSE_START;
+                            for (int i = 0; i < inClauseValues.size(); i++) {
+                                pSQLStatement.append(inClauseDelim);
+                                if (pUseNamedParameters) {
+                                    pSQLStatement.append(ASG).append(queryColumn.getColumnName());
+                                } else {
+                                    pSQLStatement.append(ASG2);
+                                }
+                                inClauseDelim = SELECT_IN_CLAUSE_DELIM;
+                            }
+                            pSQLStatement.append(SELECT_IN_CLAUSE_END);
                         } else {
-                            pSQLStatement.append(ASG2);
+                            if (pUseNamedParameters) {
+                                pSQLStatement.append(ASG).append(queryColumn.getColumnName());
+                            } else {
+                                pSQLStatement.append(ASG2);
+                            }
                         }
                     }
                     delim = AND;
@@ -262,7 +280,7 @@ public class StatementBuilder {
         final BeanMapper<IBean> mapper = BeanMapper.getInstance();
         final Map<String, Object> fieldMap = mapper.toMap(pBean);
         final Field[] fields = BeanMetaDataUtil.getDeclaredFieldsInclParent(pBean.getClass());
-        final List<String> caseSensitiveFields = new ArrayList<String>();
+        final List<String> caseSensitiveFields = new ArrayList<>();
         for (final Field field : fields) {
             final JDBCColumn colAnn = BeanMetaDataUtil.getJDBCColumnAnnotation(field);
             if (colAnn != null && colAnn.caseSensitiveName()) {

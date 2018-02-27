@@ -15,6 +15,7 @@ public class ParameterDescriptor {
     // The operator and the unaryOperator-indicator are only used for declared queries
     private OperatorName operator;
     private boolean unaryOperator = false;
+    private boolean isList = false;
 
 	public void setJavaName(final String pJavaName) {
 		javaName = pJavaName;
@@ -59,4 +60,12 @@ public class ParameterDescriptor {
     public void setUnaryOperator(final boolean pUnary) {
         unaryOperator = pUnary;
     }
+
+	public boolean isList() {
+		return isList;
+	}
+
+	public void setIsList(final boolean pIsList) {
+		isList = pIsList;
+	}
 }

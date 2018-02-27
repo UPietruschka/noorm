@@ -1,6 +1,7 @@
 package org.noorm.jdbc;
 
 import javax.xml.bind.annotation.adapters.HexBinaryAdapter;
+import java.util.List;
 
 /**
  * Utility methods to support JDBCProcedureProcessor and the class generators.
@@ -111,10 +112,20 @@ public class Utils {
                 }
                 parameterToString = formattedIDList.toString();
             } else {
-                if (pParameter != null) {
-                    parameterToString = pParameter.toString();
+                if (pParameter instanceof List) {
+                    final StringBuilder formattedList = new StringBuilder();
+                    String delimiter = "";
+                    for (final Object o : (List) pParameter) {
+                        formattedList.append(delimiter).append(o);
+                        delimiter = ", ";
+                    }
+                    parameterToString = formattedList.toString();
                 } else {
-                    parameterToString = "NULL";
+                    if (pParameter != null) {
+                        parameterToString = pParameter.toString();
+                    } else {
+                        parameterToString = "NULL";
+                    }
                 }
             }
         }

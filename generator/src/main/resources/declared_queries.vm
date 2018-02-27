@@ -49,9 +49,9 @@ public class ${class.JavaName} {
 #foreach($query in $class.queries)
 
 #if($class.isInterface())
-	#if(!$query.isSingleRowQuery())List<#end$query.getBeanName()#if(!$query.isSingleRowQuery())>#end $query.getMethodName()(#foreach($param in $query.Parameters)#if(!$param.isUnaryOperator())final $param.JavaType ${param.JavaName}#if($foreach.count<$query.Parameters.size()),${nl}${subindent}#end#end#end#if($query.useFilterExtension())#if($query.Parameters.size()>0), #{end}final FilterExtension pFilterExtension#end);
+	#if(!$query.isSingleRowQuery())List<#end$query.getBeanName()#if(!$query.isSingleRowQuery())>#end $query.getMethodName()(#foreach($param in $query.Parameters)#if(!$param.isUnaryOperator())final #if($param.isList())List<#end$param.JavaType#if($param.isList())>#end ${param.JavaName}#if($foreach.count<$query.Parameters.size()),${nl}${subindent}#end#end#end#if($query.useFilterExtension())#if($query.Parameters.size()>0), #{end}final FilterExtension pFilterExtension#end);
 #else
-	public #if(!$query.isSingleRowQuery())List<#end$query.getBeanName()#if(!$query.isSingleRowQuery())>#end $query.getMethodName()(#foreach($param in $query.Parameters)#if(!$param.isUnaryOperator())final $param.JavaType ${param.JavaName}#if($foreach.count<$query.Parameters.size()),${nl}${subindent}#end#end#end#if($query.useFilterExtension())#if($query.Parameters.size()>0), #{end}final FilterExtension pFilterExtension#end) {
+	public #if(!$query.isSingleRowQuery())List<#end$query.getBeanName()#if(!$query.isSingleRowQuery())>#end $query.getMethodName()(#foreach($param in $query.Parameters)#if(!$param.isUnaryOperator())final #if($param.isList())List<#end$param.JavaType#if($param.isList())>#end ${param.JavaName}#if($foreach.count<$query.Parameters.size()),${nl}${subindent}#end#end#end#if($query.useFilterExtension())#if($query.Parameters.size()>0), #{end}final FilterExtension pFilterExtension#end) {
 
 #if($class.hasDataSourceName())
 		DataSourceProvider.setActiveDataSource(DATA_SOURCE_NAME);

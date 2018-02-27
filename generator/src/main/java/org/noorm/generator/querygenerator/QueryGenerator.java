@@ -137,6 +137,9 @@ public class QueryGenerator {
                 if (queryColumn.getOperator().equals(OperatorName.IS_NOT_NULL)) {
                     parameterDescriptor.setUnaryOperator(true);
                 }
+                if (queryColumn.getOperator().equals(OperatorName.IN)) {
+                    parameterDescriptor.setIsList(true);
+                }
                 queryDescriptor.addParameter(parameterDescriptor);
             }
             String javaName = queryDeclaration.getGeneratedClassName();

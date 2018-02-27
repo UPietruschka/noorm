@@ -57,7 +57,7 @@
             <queryColumn name="MAX_SALARY" operator="LESS_THAN_OR_EQUAL_TO"/>
         </queryDeclaration>
         <queryDeclaration tableName="COUNTRIES" acquireLock="true">
-            <queryColumn name="COUNTRY_ID" operator="EQUAL_TO"/>
+            <queryColumn name="COUNTRY_ID" operator="IN"/>
         </queryDeclaration>
         <queryDeclaration tableName="V_EMPLOYEES" baseTable="EMPLOYEES" generatedMethodName="findEmployeesByDepartmentCity" generatedClassName="EmployeeFinder">
             <queryColumn name="DEPARTMENT_NAME"/>

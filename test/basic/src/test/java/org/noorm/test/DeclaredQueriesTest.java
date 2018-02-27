@@ -13,6 +13,7 @@ import org.noorm.test.hr.services.EmployeeFinder;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -107,7 +108,11 @@ public class DeclaredQueriesTest {
             DataSourceProvider.begin();
             TableLock.acquire(country, TableLock.LockMode.ROW_EXCLUSIVE);
             beanDML.insertCountries(country);
-            final List<Countries>countries = declaredQueries.findCountriesByCountryId(countryId);
+            final List<String> countryIds = new ArrayList<>();
+            countryIds.add(countryId);
+            countryIds.add("QQ"); // Non existent value
+            countryIds.add("XX"); // Non existent value
+            final List<Countries>countries = declaredQueries.findCountriesByCountryId(countryIds);
             assertEquals(1, countries.size());
             beanDML.deleteCountries(country);
             DataSourceProvider.commit();

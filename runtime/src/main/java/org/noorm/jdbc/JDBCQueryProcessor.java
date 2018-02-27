@@ -116,15 +116,22 @@ public class JDBCQueryProcessor<T> {
             pstmt = con.prepareStatement(sqlStmt);
 
             int parameterIndex = 1;
-            final Map<QueryColumn, Object> orderedParameters = new TreeMap<QueryColumn, Object>(pInParameters);
+            final Map<QueryColumn, Object> orderedParameters = new TreeMap<>(pInParameters);
             for (final QueryColumn queryColumn : orderedParameters.keySet()) {
                 if (!queryColumn.getOperator().isUnary()) {
                     Object value = orderedParameters.get(queryColumn);
                     if (value instanceof java.util.Date) {
                         value = new Timestamp(((java.util.Date) value).getTime());
                     }
-                    if (value != null) {
-                        platform.setObject(pstmt, value, parameterIndex++, -1);
+                    if (value instanceof List) {
+                        final List<Object> inClauseValues = ((List<Object>) orderedParameters.get(queryColumn));
+                        for (final Object inClauseValue : inClauseValues) {
+                            platform.setObject(pstmt, inClauseValue, parameterIndex++, -1);
+                        }
+                    } else {
+                        if (value != null) {
+                            platform.setObject(pstmt, value, parameterIndex++, -1);
+                        }
                     }
                 }
             }
@@ -133,7 +140,7 @@ public class JDBCQueryProcessor<T> {
             final BeanMapper<T> mapper = BeanMapper.getInstance();
             beanList = mapper.toBeanList(rs, pBeanClass);
             if (beanList.isEmpty()) {
-                beanList = new ArrayList<T>();
+                beanList = new ArrayList<>();
             }
             rs.close();
 
@@ -178,7 +185,7 @@ public class JDBCQueryProcessor<T> {
 		}
 
 		boolean success = true;
-		final List<Map<String, Object>> recordList = new ArrayList<Map<String, Object>>();
+		final List<Map<String, Object>> recordList = new ArrayList<>();
 		Connection con = null;
 		PreparedStatement pstmt = null;
 
@@ -189,7 +196,7 @@ public class JDBCQueryProcessor<T> {
 			final ResultSetMetaData metaData = resultSet.getMetaData();
 			final int columnCount = metaData.getColumnCount();
 			while (resultSet.next()) {
-				final Map<String, Object> record = new HashMap<String, Object>();
+				final Map<String, Object> record = new HashMap<>();
 				for (int i = 1; i <= columnCount; i++) {
 					final String columnName = metaData.getColumnName(i);
 					final Object value = resultSet.getObject(columnName);

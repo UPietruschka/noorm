@@ -59,6 +59,7 @@ public class Operator {
             operatorSyntax = " IS NOT NULL ";
             unary = true;
         }
+        if (operatorName.equals(Name.IN)) { operatorSyntax = " IN "; }
     }
 
     public String getOperatorSyntax() {
@@ -83,7 +84,8 @@ public class Operator {
         LESS_THAN_OR_EQUAL_TO("LESS_THAN_OR_EQUAL_TO"),
         LIKE("LIKE"),
         IS_NULL("IS_NULL"),
-        IS_NOT_NULL("IS_NOT_NULL");
+        IS_NOT_NULL("IS_NOT_NULL"),
+        IN("IN");
 
         private Name(final String pOperatorName) {
             operatorName = pOperatorName;
