@@ -18,9 +18,9 @@ import java.sql.CallableStatement;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
+import java.util.List;
 import java.util.Map;
 import java.util.Properties;
-import java.util.TreeSet;
 
 /**
  * @author Ulf Pietruschka / ulf.pietruschka@ext.secunet.com
@@ -230,7 +230,7 @@ public class OraclePlatform implements IPlatform {
         statement = statement.replace(STARTROW_PLACEHOLDER, Integer.toString(index0));
         final int endRow = index0 + pFilterExtension.getCount();
         statement = statement.replace(ENDROW_PLACEHOLDER, Integer.toString(endRow));
-        final TreeSet<FilterExtension.SortCriteria> sortCriterias = pFilterExtension.getSortCriteria();
+        final List<FilterExtension.SortCriteria> sortCriterias = pFilterExtension.getSortCriteria();
         if (sortCriterias.size() > 0) {
             String orderByClause = "";
             String delimiter = ORDER_BY_CLAUSE;

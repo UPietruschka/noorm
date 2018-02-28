@@ -1,6 +1,7 @@
 package org.noorm.jdbc;
 
-import java.util.TreeSet;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * For declared queries, paging and sorting may be required.
@@ -21,7 +22,7 @@ public class FilterExtension {
 
     private int index = 0;
     private int count = UNLIMITED_COUNT;
-    private TreeSet<SortCriteria> sortCriteria = new TreeSet<>();
+    private List<SortCriteria> sortCriteria = new ArrayList<>();
 
     public int getIndex() {
         return index;
@@ -39,11 +40,11 @@ public class FilterExtension {
         count = pCount;
     }
 
-    public TreeSet<SortCriteria> getSortCriteria() {
+    public List<SortCriteria> getSortCriteria() {
         return sortCriteria;
     }
 
-    public void setSortCriteria(final TreeSet<SortCriteria> pSortCriteria) {
+    public void setSortCriteria(final List<SortCriteria> pSortCriteria) {
         sortCriteria = pSortCriteria;
     }
 
