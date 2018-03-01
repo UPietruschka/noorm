@@ -86,13 +86,23 @@ public class StatementBuilder {
             String delim = WHERE;
             final Map<QueryColumn, Object> orderedParameters = new TreeMap<>(pInParameters);
             for (final QueryColumn queryColumn : orderedParameters.keySet()) {
-                if (orderedParameters.get(queryColumn) != null || queryColumn.getOperator().isUnary()) {
+                final Object value = orderedParameters.get(queryColumn);
+                boolean addWHERECondition = false;
+                if (value != null || queryColumn.getOperator().isUnary()) {
+                    addWHERECondition = true;
+                    if (value instanceof List) {
+                        if (((List) value).size() == 0) {
+                            addWHERECondition = false;
+                        }
+                    }
+                }
+                if (addWHERECondition) {
                     pSQLStatement.append(delim);
                     pSQLStatement.append(queryColumn.getColumnName());
                     pSQLStatement.append(queryColumn.getOperator().getOperatorSyntax());
                     if (!queryColumn.getOperator().isUnary()) {
-                        if (orderedParameters.get(queryColumn) instanceof List) {
-                            final List<Object> inClauseValues = ((List<Object>) orderedParameters.get(queryColumn));
+                        if (value instanceof List) {
+                            final List<Object> inClauseValues = ((List<Object>) value);
                             String inClauseDelim = SELECT_IN_CLAUSE_START;
                             for (int i = 0; i < inClauseValues.size(); i++) {
                                 pSQLStatement.append(inClauseDelim);
