@@ -6,10 +6,7 @@ import oracle.jdbc.OraclePreparedStatement;
 import oracle.jdbc.pool.OracleDataSource;
 import oracle.sql.ARRAY;
 import oracle.sql.ArrayDescriptor;
-import org.noorm.jdbc.DataAccessException;
-import org.noorm.jdbc.FilterExtension;
-import org.noorm.jdbc.QueryColumn;
-import org.noorm.jdbc.StatementBuilder;
+import org.noorm.jdbc.*;
 import org.noorm.jdbc.platform.IMetadata;
 import org.noorm.jdbc.platform.IPlatform;
 
@@ -194,9 +191,10 @@ public class OraclePlatform implements IPlatform {
     private static final String ENDROW_PLACEHOLDER = "__ENDROW__";
     private static final String ORDERBY_PLACEHOLDER = "__ORDERBY__";
     private static final String ORACLE_PAGING_WRAPPER =
-            "SELECT /*+ first_rows(" + COUNT_PLACEHOLDER + ") */ * FROM (SELECT WRAPPED.*, ROWNUM r1 FROM "
-          + "(" + BASE_QUERY_PLACEHOLDER + ORDERBY_PLACEHOLDER + ") WRAPPED WHERE rownum < " + ENDROW_PLACEHOLDER
-          + ") WHERE r1 >= " + STARTROW_PLACEHOLDER;
+            "SELECT /*+ first_rows(" + COUNT_PLACEHOLDER + ") */ * FROM "
+          + "(SELECT WRAPPED.*, ROWNUM pos, COUNT(*) OVER() " + IBean.PAGING_TOTAL + " FROM "
+          + "(" + BASE_QUERY_PLACEHOLDER + ORDERBY_PLACEHOLDER + ") WRAPPED) "
+          + "WHERE pos BETWEEN " + STARTROW_PLACEHOLDER + " AND " + ENDROW_PLACEHOLDER;
 
     private static final String ORDER_BY_CLAUSE = " ORDER BY ";
 
@@ -224,11 +222,11 @@ public class OraclePlatform implements IPlatform {
         }
         String statement = ORACLE_PAGING_WRAPPER;
         statement = statement.replace(BASE_QUERY_PLACEHOLDER, baseQuery);
-        statement = statement.replace(COUNT_PLACEHOLDER, Integer.toString(pFilterExtension.getCount()));
-        // Oracle rownum starts from "1", we want index to start from "0", so we add "1" to the index.
-        final int index0 = pFilterExtension.getIndex() + 1;
-        statement = statement.replace(STARTROW_PLACEHOLDER, Integer.toString(index0));
-        final int endRow = index0 + pFilterExtension.getCount();
+        statement = statement.replace(COUNT_PLACEHOLDER, Integer.toString(pFilterExtension.getLimit()));
+        // Oracle rownum starts from "1", we want offset to start from "0", so we add "1" to the offset.
+        final int offset0 = pFilterExtension.getOffset() + 1;
+        statement = statement.replace(STARTROW_PLACEHOLDER, Integer.toString(offset0));
+        final int endRow = offset0 + pFilterExtension.getLimit() - 1;
         statement = statement.replace(ENDROW_PLACEHOLDER, Integer.toString(endRow));
         final List<FilterExtension.SortCriteria> sortCriterias = pFilterExtension.getSortCriteria();
         if (sortCriterias.size() > 0) {

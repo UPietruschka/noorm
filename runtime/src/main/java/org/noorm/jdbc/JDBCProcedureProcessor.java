@@ -275,7 +275,7 @@ public class JDBCProcedureProcessor<T> {
 			ResultSet rs;
             rs = (ResultSet) cstmt.getObject(1);
 			final BeanMapper<T> mapper = BeanMapper.getInstance();
-			beanList = mapper.toBeanList(rs, pBeanClass);
+			beanList = mapper.toBeanList(rs, pBeanClass, false);
 			if (beanList.isEmpty()) {
 				beanList = new ArrayList<T>();
 			}

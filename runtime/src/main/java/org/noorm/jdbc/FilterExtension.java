@@ -16,28 +16,29 @@ public class FilterExtension {
 
     /**
      * Paging is expected to get used for providing data for UI presentation, thus, any page size
-     * (e.g. "count") larger than 1024 does not seem to be a reasonable choice.
+     * (e.g. "limit") larger than 1024 does not seem to be a reasonable choice.
      */
-    public static final int UNLIMITED_COUNT = 1024;
+    public static final int UNLIMITED = 1024;
 
-    private int index = 0;
-    private int count = UNLIMITED_COUNT;
+    private int offset = 0;
+    private int limit = UNLIMITED;
     private List<SortCriteria> sortCriteria = new ArrayList<>();
+    private boolean pagingTotalSupported = true;
 
-    public int getIndex() {
-        return index;
+    public int getOffset() {
+        return offset;
     }
 
-    public void setIndex(final int pIndex) {
-        index = pIndex;
+    public void setOffset(final int pOffset) {
+        offset = pOffset;
     }
 
-    public int getCount() {
-        return count;
+    public int getLimit() {
+        return limit;
     }
 
-    public void setCount(final int pCount) {
-        count = pCount;
+    public void setLimit(final int pLimit) {
+        limit = pLimit;
     }
 
     public List<SortCriteria> getSortCriteria() {
@@ -54,6 +55,14 @@ public class FilterExtension {
 
     public void addSortCriteria(final String pAttributeName, final Direction pDirection) {
         sortCriteria.add(new SortCriteria(pAttributeName, pDirection));
+    }
+
+    public boolean isPagingTotalSupported() {
+        return pagingTotalSupported;
+    }
+
+    public void setIsPagingTotalSupported(final boolean isPagingTotalSupported) {
+        pagingTotalSupported = isPagingTotalSupported;
     }
 
     /**

@@ -51,6 +51,7 @@ public class BeanValidator {
 			validationError("Cannot find table ".concat(tableName).concat(" in connected DB schema."));
 		}
 		final Map<String, JDBCColumn> beanMetadata = BeanMetaDataUtil.getColumnMetaData(pBean.getClass());
+        beanMetadata.remove(IBean.PAGING_TOTAL);
 		for (final TableMetadata tableMetadata : tableMetadataList) {
 			final String columnName = tableMetadata.getColumnName();
 			final StringBuilder msgBuilder = new StringBuilder();

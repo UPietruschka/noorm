@@ -36,35 +36,6 @@ public class BeanMapper<T> {
 	}
 
 	/**
-	 * Maps the record, the given ResultSet currently points to, to a Bean.
-	 *
-	 * @param pResultSet the ResultSet subject to conversion to a Bean
-	 * @param pBeanClass the type of the Bean
-	 * @return the Bean filled with the data from the ResultSet
-	 * @throws SQLException JDBC driver exception
-	 */
-	public T toBean(final ResultSet pResultSet, final Class<T> pBeanClass) throws SQLException {
-
-		T bean = null;
-        if (log.isTraceEnabled()) {
-            log.trace("Converting database results to single Bean class ".concat(pBeanClass.getName()));
-        }
-		final Field[] fields = BeanMetaDataUtil.getDeclaredFieldsInclParent(pBeanClass);
-		if (pResultSet.next() && fields != null && fields.length > 0) {
-			try {
-				bean = pBeanClass.newInstance();
-				populateFields(pResultSet, bean, fields);
-			} catch (InstantiationException ex) {
-				throw new DataAccessException(ex);
-			} catch (IllegalAccessException ex) {
-				throw new DataAccessException(ex);
-			}
-		}
-
-		return bean;
-	}
-
-	/**
 	 * Maps the given ResultSet to a list of Beans.
 	 *
 	 * @param pResultSet the ResultSet subject to conversion to a Bean list
@@ -72,7 +43,9 @@ public class BeanMapper<T> {
 	 * @return the Bean list filled with the data from the ResultSet
 	 * @throws SQLException JDBC driver exception
 	 */
-	public List<T> toBeanList(final ResultSet pResultSet, final Class<T> pBeanClass) throws SQLException {
+	public List<T> toBeanList(final ResultSet pResultSet,
+							  final Class<T> pBeanClass,
+							  final boolean pFetchPagingTotal) throws SQLException {
 
         if (log.isTraceEnabled()) {
             log.trace("Converting database results to list of Bean class ".concat(pBeanClass.getName()));
@@ -90,7 +63,7 @@ public class BeanMapper<T> {
 					bean = (T) new Long(pResultSet.getLong(1));
 				} else {
 					bean = pBeanClass.newInstance();
-					populateFields(pResultSet, bean, fields);
+					populateFields(pResultSet, bean, fields, pFetchPagingTotal);
 				}
 			} catch (InstantiationException ex) {
 				throw new DataAccessException(ex);
@@ -149,8 +122,10 @@ public class BeanMapper<T> {
 		return fieldMap;
 	}
 
-	private void populateFields(final ResultSet pResultSet, final T pBean, final Field[] pFields)
-			throws IllegalAccessException, SQLException {
+	private void populateFields(final ResultSet pResultSet,
+								final T pBean,
+								final Field[] pFields,
+								final boolean pFetchPagingTotal) throws IllegalAccessException, SQLException {
 
 		String fieldName;
 		for (final Field field : pFields) {
@@ -167,6 +142,10 @@ public class BeanMapper<T> {
                 // Ignore fields without JDBCColumn annotation (interpreted transient)
                 continue;
             }
+			if (!pFetchPagingTotal && fieldName.equals(IBean.PAGING_TOTAL)) {
+            	// Column PAGING_TOTAL is only available for paging queries.
+				continue;
+			}
 
 			if (log.isTraceEnabled()) {
 				StringBuilder logMessage = new StringBuilder();

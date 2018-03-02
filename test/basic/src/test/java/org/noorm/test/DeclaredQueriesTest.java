@@ -87,8 +87,8 @@ public class DeclaredQueriesTest {
     public void testFindEmployees3() {
 
         final FilterExtension filterExtension = new FilterExtension();
-        filterExtension.setIndex(10);
-        filterExtension.setCount(30);
+        filterExtension.setOffset(10);
+        filterExtension.setLimit(30);
         filterExtension.addSortCriteria("salary", FilterExtension.Direction.DESC);
         filterExtension.addSortCriteria("hireDate");
         final Date hireDateFrom = getDate(2005, 01, 01);

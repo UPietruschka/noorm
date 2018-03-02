@@ -138,7 +138,11 @@ public class JDBCQueryProcessor<T> {
             ResultSet rs = pstmt.executeQuery();
 
             final BeanMapper<T> mapper = BeanMapper.getInstance();
-            beanList = mapper.toBeanList(rs, pBeanClass);
+            boolean fetchPagingTotal = false;
+            if (pFilterExtension != null) {
+                fetchPagingTotal = pFilterExtension.isPagingTotalSupported();
+            }
+            beanList = mapper.toBeanList(rs, pBeanClass, fetchPagingTotal);
             if (beanList.isEmpty()) {
                 beanList = new ArrayList<>();
             }
@@ -230,10 +234,10 @@ public class JDBCQueryProcessor<T> {
         final StringBuilder formattedParameters = new StringBuilder();
         formattedParameters.append("Executing SQL statement on table ").append(pTableName);
         if (pFilterExtension != null) {
-            formattedParameters.append("\nFilter extension: Index: ");
-            formattedParameters.append(pFilterExtension.getIndex());
-            formattedParameters.append(", Count: ");
-            formattedParameters.append(pFilterExtension.getCount());
+            formattedParameters.append("\nFilter extension: Offset: ");
+            formattedParameters.append(pFilterExtension.getOffset());
+            formattedParameters.append(", Limit: ");
+            formattedParameters.append(pFilterExtension.getLimit());
             for (final FilterExtension.SortCriteria sortCriteria : pFilterExtension.getSortCriteria()) {
                 formattedParameters.append("\n  ").append(sortCriteria.getColumnName());
                 formattedParameters.append(" / ").append(sortCriteria.getDirection());

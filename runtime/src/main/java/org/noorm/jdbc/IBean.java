@@ -12,6 +12,21 @@ import java.util.HashMap;
 public interface IBean<T> {
 
 	/**
+	 * Declared queries with FilterExtension and paging can provide a total count for the
+	 * underlying query. This total is provided in the virtual column PAGING_TOTAL.
+	 */
+	public static final String PAGING_TOTAL = "PAGING_TOTAL";
+
+	/**
+	 * When paging is used (FilterExtension), one may want to know the total number of rows
+	 * retrieved. All NoORM generated beans contain an additional column, which is populate with
+	 * the total number of rows.
+	 *
+	 * @return the total number of rows for a paged query
+	 */
+	Integer getPagingTotal();
+
+	/**
 	 * Generic object to enrich the Bean with additional information.
 	 * @return the generic object.
 	 */
