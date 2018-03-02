@@ -14,6 +14,7 @@ public class BeanAttributeDescriptor {
 	private String columnName;
 	private String type;
 	private String dataType;
+	private boolean insertable = true;
 	private boolean updatable = true;
 	private boolean nullable = true;
     private boolean caseSensitiveName = false;
@@ -57,6 +58,14 @@ public class BeanAttributeDescriptor {
 
 	public void setDataType(final String pDataType) {
 		dataType = pDataType;
+	}
+
+	public boolean isInsertable() {
+		return insertable;
+	}
+
+	public void setInsertable(final boolean pInsertable) {
+		insertable = pInsertable;
 	}
 
 	public boolean isUpdatable() {

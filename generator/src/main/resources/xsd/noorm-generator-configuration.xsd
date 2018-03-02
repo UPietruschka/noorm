@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema"
-           xmlns="http://www.noorm.org/generator-configuration/1.2.0"
-           targetNamespace="http://www.noorm.org/generator-configuration/1.2.0"
+           xmlns="http://www.noorm.org/generator-configuration/1.2.2"
+           targetNamespace="http://www.noorm.org/generator-configuration/1.2.2"
            elementFormDefault="qualified"
            attributeFormDefault="unqualified">
 
@@ -265,6 +265,21 @@
                         </xs:documentation>
                     </xs:annotation>
                 </xs:element>
+                <xs:element name="noUpdateColumnMappings" type="noUpdateColumnMappings" minOccurs="0">
+                    <xs:annotation>
+                        <xs:documentation>
+                            Some table columns are designed to never change their value again after insertion.
+                            For instance, columns denoting the creation time or the user, who created the
+                            record are candidates for columns, which never change.
+                            In principle, one may pass the initially inserted value again with subsequent
+                            updates, but this can be cumbersome.
+                            Thus, using this configuration parameter, columns can be specified, which will be
+                            omitted by the automatic generation and execution of update statements.
+                            To specify a column, define a mapping from a table name to a column name.
+                            Like in other mappings, regular expressions can be used to simplify the mapping.
+                        </xs:documentation>
+                    </xs:annotation>
+                </xs:element>
                 <xs:element name="typeMappings" type="typeMappings" minOccurs="0">
                     <xs:annotation>
                         <xs:documentation>
@@ -455,6 +470,44 @@
             <xs:enumeration value="IN"/>
         </xs:restriction>
     </xs:simpleType>
+
+    <xs:complexType name="noUpdateColumnMappings">
+        <xs:annotation>
+            <xs:documentation>
+                A list of custom no update column mappings (see type "noUpdateColumnMapping").
+            </xs:documentation>
+        </xs:annotation>
+        <xs:sequence>
+            <xs:element ref="noUpdateColumnMapping" maxOccurs="unbounded"/>
+        </xs:sequence>
+    </xs:complexType>
+
+    <xs:element name="noUpdateColumnMapping">
+        <xs:annotation>
+            <xs:documentation>
+                A single no update column mapping with its application scope.
+            </xs:documentation>
+        </xs:annotation>
+        <xs:complexType>
+            <xs:attribute name="tableFilterRegex" type="xs:string">
+                <xs:annotation>
+                    <xs:documentation>
+                        To apply the specified column mapping to all tables (and columns), a wildcard
+                        expression can be used (".*").
+                    </xs:documentation>
+                </xs:annotation>
+            </xs:attribute>
+            <xs:attribute name="columnFilterRegex" type="xs:string">
+                <xs:annotation>
+                    <xs:documentation>
+                        The scope of the specified column mapping can be specified on a per column basis
+                        using regular expressions to identify the column(s) for the application of the
+                        custom column mapping.
+                    </xs:documentation>
+                </xs:annotation>
+            </xs:attribute>
+        </xs:complexType>
+    </xs:element>
 
     <xs:complexType name="typeMappings">
         <xs:annotation>

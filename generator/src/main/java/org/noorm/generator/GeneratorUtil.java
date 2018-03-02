@@ -3,10 +3,7 @@ package org.noorm.generator;
 import org.apache.velocity.Template;
 import org.apache.velocity.VelocityContext;
 import org.apache.velocity.app.Velocity;
-import org.noorm.generator.schema.NameMappingList;
-import org.noorm.generator.schema.TypeMapping;
-import org.noorm.generator.schema.GeneratorConfiguration;
-import org.noorm.generator.schema.Mapping;
+import org.noorm.generator.schema.*;
 import org.noorm.jdbc.Utils;
 import org.noorm.jdbc.platform.JDBCType;
 
@@ -158,6 +155,30 @@ public class GeneratorUtil {
     }
 
     /**
+     * Checks, whether the given column for the given table is configured to never get updated.
+     *
+     * @param pTableName the table name
+     * @param pColumnName the column name
+     * @param pNoUpdateColumnMappings the configured mapping for no update columns
+     * @return the Java type name
+     */
+    public static boolean checkForNoUpdateColumns(final String pTableName,
+                                                  final String pColumnName,
+                                                  final List<NoUpdateColumnMapping> pNoUpdateColumnMappings) {
+
+        if (pNoUpdateColumnMappings != null) {
+            for (final NoUpdateColumnMapping noUpdateColumnMapping : pNoUpdateColumnMappings) {
+                final String columnFilterRegex = noUpdateColumnMapping.getColumnFilterRegex();
+                final String tableFilterRegex = noUpdateColumnMapping.getTableFilterRegex();
+                if (checkTableColumnFilterRegexPair(pTableName, pColumnName, tableFilterRegex, columnFilterRegex)) {
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+
+    /**
      * Maps the given database type to the corresponding Java type, which represents the database type in
      * the generated Java Bean class (e.g. "VARCHAR2" / "String").
      *
@@ -168,7 +189,6 @@ public class GeneratorUtil {
      * @param pTypeMappings the custom type mapping
      * @return the Java type name
      */
-
     public static String convertDatabaseType2JavaType(final JDBCType pJDBCType,
                                                       final int pDecimalDigits,
                                                       final String pTableName,
@@ -180,37 +200,9 @@ public class GeneratorUtil {
                 final JDBCType mapType = JDBCType.valueOf(typeMapping.getDatabaseType().value());
                 if (pJDBCType.equals(mapType) &&
                         typeMapping.getParameterFilterRegex() == null) {
-                    if (typeMapping.getColumnFilterRegex() == null && typeMapping.getTableFilterRegex() == null) {
-                        // Though it is possible to specify attributes 'minOccurs' and 'maxOccurs' to a choice
-                        // element in XML schema to indicate that "al least" one element should be defined, the
-                        // generated code for this construction is rather awkward, so we do the check for this here
-                        // (a 'choice' is no longer used, but simple elements with 'minOccurs="0"')
-                        throw new GeneratorException("At least one of the elements 'columnFilterRegex'"
-                                .concat(" or 'tableFilterRegex' must be specified for each custom type mapping"));
-                    }
-                    boolean tableNameMatches = false;
-                    boolean columnNameMatches = false;
-                    if (typeMapping.getColumnFilterRegex() != null) {
-                        final Pattern finder1 = Pattern.compile(typeMapping.getColumnFilterRegex().toUpperCase());
-                        final Matcher matcher1 = finder1.matcher(pColumnName.toUpperCase());
-                        if (matcher1.matches()) {
-                            columnNameMatches = true;
-                        }
-                    } else {
-                        // No specified column-name restriction includes all columns.
-                        columnNameMatches = true;
-                    }
-                    if (typeMapping.getTableFilterRegex() != null) {
-                        final Pattern finder2 = Pattern.compile(typeMapping.getTableFilterRegex().toUpperCase());
-                        final Matcher matcher2 = finder2.matcher(pTableName.toUpperCase());
-                        if (matcher2.matches()) {
-                            tableNameMatches = true;
-                        }
-                    } else {
-                        // No specified table-name restriction includes all tables.
-                        tableNameMatches = true;
-                    }
-                    if (tableNameMatches && columnNameMatches) {
+                    final String columnFilterRegex = typeMapping.getColumnFilterRegex();
+                    final String tableFilterRegex = typeMapping.getTableFilterRegex();
+                    if (checkTableColumnFilterRegexPair(pTableName, pColumnName, tableFilterRegex, columnFilterRegex)) {
                         return typeMapping.getJavaType().value();
                     }
                 }
@@ -218,6 +210,47 @@ public class GeneratorUtil {
         }
 
         return convertDatabaseType2JavaType(pJDBCType, pDecimalDigits);
+    }
+
+    private static boolean checkTableColumnFilterRegexPair(final String pTableName,
+                                                           final String pColumnName,
+                                                           final String pTableFilterRegex,
+                                                           final String pColumnFilterRegex) {
+
+        if (pColumnFilterRegex == null && pTableFilterRegex == null) {
+            // Though it is possible to specify attributes 'minOccurs' and 'maxOccurs' to a choice
+            // element in XML schema to indicate that "at least" one element should be defined, the
+            // generated code for this construction is rather awkward, so we do the check for this here
+            // (a 'choice' is no longer used, but simple elements with 'minOccurs="0"')
+            throw new GeneratorException("At least one of the elements 'columnFilterRegex'"
+                    .concat(" or 'tableFilterRegex' must be specified for each mapping"));
+        }
+        boolean tableNameMatches = false;
+        boolean columnNameMatches = false;
+        if (pColumnFilterRegex != null) {
+            final Pattern finder1 = Pattern.compile(pColumnFilterRegex.toUpperCase());
+            final Matcher matcher1 = finder1.matcher(pColumnName.toUpperCase());
+            if (matcher1.matches()) {
+                columnNameMatches = true;
+            }
+        } else {
+            // No specified column-name restriction includes all columns.
+            columnNameMatches = true;
+        }
+        if (pTableFilterRegex != null) {
+            final Pattern finder2 = Pattern.compile(pTableFilterRegex.toUpperCase());
+            final Matcher matcher2 = finder2.matcher(pTableName.toUpperCase());
+            if (matcher2.matches()) {
+                tableNameMatches = true;
+            }
+        } else {
+            // No specified table-name restriction includes all tables.
+            tableNameMatches = true;
+        }
+        if (tableNameMatches && columnNameMatches) {
+            return true;
+        }
+        return false;
     }
 
     private static String convertDatabaseType2JavaType(final JDBCType pJDBCType,

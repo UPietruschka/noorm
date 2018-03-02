@@ -155,7 +155,7 @@ public class StatementBuilder {
 		String delim = INSERT_DELIM_1;
         for (final Field field : fields) {
             final JDBCColumn colAnn = BeanMetaDataUtil.getJDBCColumnAnnotation(field);
-            if (colAnn != null && colAnn.updatable()) {
+            if (colAnn != null && colAnn.insertable()) {
                 if (colAnn.caseSensitiveName()) {
                     insert.append(delim).append("\"".concat(colAnn.name()).concat("\""));
                 } else {
@@ -170,7 +170,7 @@ public class StatementBuilder {
         Integer parameterIndex = 1;
         for (final Field field : fields) {
             final JDBCColumn colAnn = BeanMetaDataUtil.getJDBCColumnAnnotation(field);
-            if (colAnn != null && colAnn.updatable()) {
+            if (colAnn != null && colAnn.insertable()) {
                 insert.append(delim);
                 boolean isPKColumn = false;
                 for (final String pkColumnName : primaryKeyColumnNames) {

@@ -15,6 +15,7 @@ public @interface JDBCColumn {
 
 	String name() default "";
 	int dataType() default 0;
+	boolean insertable() default true;
 	boolean updatable() default true;
 	boolean nullable() default true;
     boolean caseSensitiveName() default false;

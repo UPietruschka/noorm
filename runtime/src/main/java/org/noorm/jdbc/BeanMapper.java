@@ -103,7 +103,8 @@ public class BeanMapper<T> {
 			field.setAccessible(true);
             final JDBCColumn colAnn = BeanMetaDataUtil.getJDBCColumnAnnotation(field);
             if (colAnn != null) {
-                if (!colAnn.updatable()) {
+            	// All non-insertable columns are also non-updatable, so no more distinction required
+                if (!colAnn.insertable()) {
                     continue;
                 }
                 fieldName = colAnn.name();

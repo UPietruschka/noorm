@@ -29,10 +29,10 @@ public class $class.Name<T> implements IBean<T>, Serializable#if($class.getCusto
 #else
 	private static final JDBCType VERSION_COLUMN_TYPE = JDBCType.$class.VersionColumnType;
 #end
-	@JDBCColumn(name=PAGING_TOTAL, dataType=Types.NUMERIC, updatable = false)
+	@JDBCColumn(name=PAGING_TOTAL, dataType=Types.NUMERIC, insertable=false, updatable=false)
 	protected Integer pagingTotal;
 #foreach ($att in $class.Attributes)
-	@JDBCColumn(name="$att.ColumnName", dataType=$att.DataType#if(!$att.Updatable), updatable=false#end#if(!$att.Nullable), nullable=false#end#if($att.CaseSensitiveName), caseSensitiveName=true#end#if($att.MaxLength>0), maxLength=$att.MaxLength#end)
+	@JDBCColumn(name="$att.ColumnName", dataType=$att.DataType#if(!$att.Insertable), insertable=false#end#if(!$att.Updatable), updatable=false#end#if(!$att.Nullable), nullable=false#end#if($att.CaseSensitiveName), caseSensitiveName=true#end#if($att.MaxLength>0), maxLength=$att.MaxLength#end)
 	protected $att.Type $att.Name;
 #end
 	private transient T auxiliaryData;

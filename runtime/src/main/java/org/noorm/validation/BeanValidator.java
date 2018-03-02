@@ -93,9 +93,12 @@ public class BeanValidator {
 					if (!tableMetadata.getUpdatable()) {
 						isUpdatable = false;
 					}
-					if (jdbcColumn.updatable() != isUpdatable) {
-						validationError(exceptionPrefix.concat("Updatable indicator mismatch"));
+					if (jdbcColumn.insertable() != isUpdatable) {
+						validationError(exceptionPrefix.concat("Insertable indicator mismatch"));
 					}
+                    if (jdbcColumn.updatable() != isUpdatable) {
+                        validationError(exceptionPrefix.concat("Updatable indicator mismatch"));
+                    }
 					// Validating annotated max-length against database metadata.
 					if (jdbcColumn.maxLength() > 0 && (jdbcColumn.maxLength() != tableMetadata.getColumnSize())) {
 						validationError(exceptionPrefix.concat("Data length mismatch"));

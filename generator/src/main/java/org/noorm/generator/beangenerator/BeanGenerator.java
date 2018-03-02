@@ -182,13 +182,20 @@ public class BeanGenerator {
                         (columnName, true, configuration.getColumnNameMappings());
                 beanAttributeDescriptor.setMethodNamePostfix(methodNamePostfix);
 
+                final boolean noUpdateConfigured = GeneratorUtil.checkForNoUpdateColumns
+						(tableMetadata.getTableName(), columnName, configuration.getNoUpdateColumnMappings());
+				if (noUpdateConfigured || !tableMetadata.getUpdatable()) {
+					beanAttributeDescriptor.setUpdatable(false);
+				}
+				if (!tableMetadata.getUpdatable()) {
+					beanAttributeDescriptor.setInsertable(false);
+				}
+
                 final JDBCType jdbcType = tableMetadata.getJDBCType();
 				final String javaType = GeneratorUtil.convertDatabaseType2JavaType(jdbcType,
                         tableMetadata.getDecimalDigits(), tableMetadata.getTableName(),
                         columnName, configuration.getTypeMappings());
-				if (!tableMetadata.getUpdatable()) {
-					beanAttributeDescriptor.setUpdatable(false);
-				}
+
 				beanAttributeDescriptor.setType(javaType);
 
                 String jdbcTypeDeclaration = "Types.".concat(jdbcType.getName());
