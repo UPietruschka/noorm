@@ -20,7 +20,7 @@ import java.util.Map;
 import java.util.Properties;
 
 /**
- * @author Ulf Pietruschka / ulf.pietruschka@ext.secunet.com
+ * @author Ulf Pietruschka / ulf.pietruschka@etenso.com
  *         Date: 11.02.14
  *         Time: 13:52
  */

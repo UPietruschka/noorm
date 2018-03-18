@@ -11,7 +11,7 @@ import java.sql.SQLException;
 import java.util.Map;
 
 /**
- * @author Ulf Pietruschka / ulf.pietruschka@ext.secunet.com
+ * @author Ulf Pietruschka / ulf.pietruschka@etenso.com
  *         Date: 11.02.14
  *         Time: 13:48
  */

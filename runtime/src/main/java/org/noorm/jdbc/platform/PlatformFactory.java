@@ -8,7 +8,7 @@ import java.util.Iterator;
 import java.util.ServiceLoader;
 
 /**
- * @author Ulf Pietruschka / ulf.pietruschka@ext.secunet.com
+ * @author Ulf Pietruschka / ulf.pietruschka@etenso.com
  *         Date: 11.02.14
  *         Time: 14:06
  *

@@ -14,9 +14,9 @@
 
     <dependencies>
         <dependency>
-            <groupId>com.microsoft</groupId>
-            <artifactId>sqljdbc4</artifactId>
-            <version>2012</version>
+            <groupId>com.microsoft.sqlserver</groupId>
+            <artifactId>mssql-jdbc</artifactId>
+            <version>6.4.0.jre7</version>
             <scope>provided</scope>
         </dependency>
     </dependencies>

@@ -19,7 +19,7 @@ import java.util.Map;
 /**
  * Provisioning of standard JDBC metadata.
  *
- * @author Ulf Pietruschka / ulf.pietruschka@ext.secunet.com
+ * @author Ulf Pietruschka / ulf.pietruschka@etenso.com
  *         Date: 07.04.14
  *         Time: 10:21
  */

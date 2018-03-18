@@ -1,4 +1,4 @@
-package org.noorm.platform.mssql;
+package org.noorm.platform.postgresql;
 
 import org.noorm.jdbc.JDBCMetadata;
 import org.noorm.jdbc.JDBCQueryProcessor;
@@ -13,12 +13,12 @@ import java.util.Map;
 
 /**
  * @author Ulf Pietruschka / ulf.pietruschka@etenso.com
- *         Date: 21.02.14
+ *         Date: 21.02.17
  *         Time: 13:44
  */
-public class MSSQLMetadata extends JDBCMetadata {
+public class PostgresqlMetadata extends JDBCMetadata {
 
-    private static final Logger log = LoggerFactory.getLogger(MSSQLMetadata.class);
+    private static final Logger log = LoggerFactory.getLogger(PostgresqlMetadata.class);
 
     private JDBCQueryProcessor queryProcessor = JDBCQueryProcessor.getInstance();
 

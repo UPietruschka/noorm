@@ -1,11 +1,11 @@
-package org.noorm.platform.mssql;
+package org.noorm.platform.postgresql;
 
-import com.microsoft.sqlserver.jdbc.SQLServerDataSource;
 import org.noorm.jdbc.FilterExtension;
 import org.noorm.jdbc.QueryColumn;
 import org.noorm.jdbc.StatementBuilder;
 import org.noorm.jdbc.platform.IMetadata;
 import org.noorm.jdbc.platform.IPlatform;
+import org.postgresql.ds.PGSimpleDataSource;
 
 import javax.sql.DataSource;
 import java.sql.CallableStatement;
@@ -16,14 +16,14 @@ import java.util.Map;
 
 /**
  * @author Ulf Pietruschka / ulf.pietruschka@etenso.com
- *         Date: 11.02.14
+ *         Date: 11.02.17
  *         Time: 13:52
  */
-public class MSSQLPlatform implements IPlatform {
+public class PostgresqlPlatform implements IPlatform {
 
-    private static final String SQL_SERVER_PLATFORM = "SQLServer";
+    private static final String POSTGRESQL_PLATFORM = "Postgresql";
 
-    private final MSSQLMetadata msSQLMetadata = new MSSQLMetadata();
+    private final PostgresqlMetadata postgresqlMetadata = new PostgresqlMetadata();
     private final StatementBuilder statementBuilder = new StatementBuilder();
 
     /**
@@ -34,7 +34,7 @@ public class MSSQLPlatform implements IPlatform {
     @Override
     public String getName() {
 
-        return SQL_SERVER_PLATFORM;
+        return POSTGRESQL_PLATFORM;
     }
 
     /**
@@ -48,10 +48,10 @@ public class MSSQLPlatform implements IPlatform {
     @Override
     public DataSource getDataSource(String pURL, String pUsername, String pPassword) throws SQLException {
 
-        final SQLServerDataSource dataSource = new SQLServerDataSource();
+        final PGSimpleDataSource dataSource = new PGSimpleDataSource();
+        dataSource.setURL(pURL);
         dataSource.setUser(pUsername);
         dataSource.setPassword(pPassword);
-        dataSource.setURL(pURL);
         return dataSource;
     }
 
@@ -66,12 +66,12 @@ public class MSSQLPlatform implements IPlatform {
 
         final StringBuilder validationInfo = new StringBuilder();
         validationInfo.append("Validating data source. ");
-        if (pDataSource instanceof SQLServerDataSource) {
+        if (pDataSource instanceof PGSimpleDataSource) {
             validationInfo.append("Connection parameters: ");
             validationInfo.append(";URL: ");
-            validationInfo.append(((SQLServerDataSource) pDataSource).getURL());
+            validationInfo.append(((PGSimpleDataSource) pDataSource).getURL());
             validationInfo.append(";Username: ");
-            validationInfo.append(((SQLServerDataSource) pDataSource).getUser());
+            validationInfo.append(((PGSimpleDataSource) pDataSource).getUser());
         } else {
             validationInfo.append("Unable to retrieve connection parameters from data source. [");
             validationInfo.append(pDataSource.getClass().getName());
@@ -188,6 +188,6 @@ public class MSSQLPlatform implements IPlatform {
     @Override
     public IMetadata getMetadata() {
 
-        return msSQLMetadata;
+        return postgresqlMetadata;
     }
 }

@@ -2,29 +2,22 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0"
          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
-
     <parent>
-        <artifactId>noorm</artifactId>
+        <artifactId>noorm-platform</artifactId>
         <groupId>org.noorm</groupId>
         <version>1.2.3-SNAPSHOT</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
-    <packaging>pom</packaging>
-    <name>NoORM Platform Service Provider</name>
-    <artifactId>noorm-platform</artifactId>
-
-    <modules>
-        <module>oracle</module>
-        <module>mssql</module>
-        <module>postgresql</module>
-    </modules>
+    <name>NoORM Platform Service Provider - Postgresql</name>
+    <artifactId>noorm-postgresql-platform</artifactId>
 
     <dependencies>
         <dependency>
-            <groupId>org.noorm</groupId>
-            <artifactId>noorm-runtime</artifactId>
-            <version>${project.parent.version}</version>
+            <groupId>org.postgresql</groupId>
+            <artifactId>postgresql</artifactId>
+            <version>42.2.2.jre7</version>
+            <scope>provided</scope>
         </dependency>
     </dependencies>
 

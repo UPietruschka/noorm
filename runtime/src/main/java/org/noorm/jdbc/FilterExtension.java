@@ -8,7 +8,7 @@ import java.util.List;
  * This class is user to specify and transport paging and filtering information to
  * the runtime engine.
  *
- * @author Ulf Pietruschka / ulf.pietruschka@ext.secunet.com
+ * @author Ulf Pietruschka / ulf.pietruschka@etenso.com
  *         Date: 11.09.17
  *         Time: 14:38
  */

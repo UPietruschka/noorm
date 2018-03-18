@@ -3,7 +3,7 @@ package org.noorm.jdbc.platform;
 import java.sql.Types;
 
 /**
- * @author Ulf Pietruschka / ulf.pietruschka@ext.secunet.com
+ * @author Ulf Pietruschka / ulf.pietruschka@etenso.com
  *         Date: 25.03.2014
  *         Time: 16:46
  */
