@@ -1,5 +1,6 @@
 package org.noorm.platform.postgresql;
 
+import org.noorm.jdbc.DataAccessException;
 import org.noorm.jdbc.FilterExtension;
 import org.noorm.jdbc.QueryColumn;
 import org.noorm.jdbc.StatementBuilder;
@@ -12,6 +13,7 @@ import java.sql.CallableStatement;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -153,6 +155,10 @@ public class PostgresqlPlatform implements IPlatform {
         throw new UnsupportedOperationException();
     }
 
+    private static final String ORDER_BY_CLAUSE = " ORDER BY ";
+    private static final String OFFSET_CLAUSE = " OFFSET ";
+    private static final String LIMIT_CLAUSE = " LIMIT ";
+
     /**
      * Constructs a SQL query based on the provided information.
      *
@@ -177,7 +183,24 @@ public class PostgresqlPlatform implements IPlatform {
         if (pFilterExtension == null) {
             return baseQuery;
         }
-        return baseQuery;
+        String filteredQuery = baseQuery;
+        final List<FilterExtension.SortCriteria> sortCriterias = pFilterExtension.getSortCriteria();
+        if (sortCriterias.size() > 0) {
+            String orderByClause = "";
+            String delimiter = ORDER_BY_CLAUSE;
+            for (final FilterExtension.SortCriteria sortCriteria : sortCriterias) {
+                final String columnName = sortCriteria.getColumnName();
+                if (columnName == null) {
+                    throw new DataAccessException(DataAccessException.Type.ILLEGAL_SORT_CRITERIA);
+                }
+                orderByClause += delimiter + columnName + " " + sortCriteria.getDirection();
+                delimiter = ", ";
+            }
+            filteredQuery += orderByClause;
+        }
+        filteredQuery += OFFSET_CLAUSE + pFilterExtension.getOffset();
+        filteredQuery += LIMIT_CLAUSE + pFilterExtension.getLimit();
+        return filteredQuery;
     }
 
     /**
