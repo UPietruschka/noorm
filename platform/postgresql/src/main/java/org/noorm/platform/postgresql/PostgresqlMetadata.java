@@ -1,5 +1,6 @@
 package org.noorm.platform.postgresql;
 
+import org.noorm.jdbc.DataAccessException;
 import org.noorm.jdbc.JDBCMetadata;
 import org.noorm.jdbc.JDBCQueryProcessor;
 import org.noorm.jdbc.platform.*;
@@ -68,13 +69,20 @@ public class PostgresqlMetadata extends JDBCMetadata {
     public List<Sequence> findSequences() {
 
         log.info("Retrieving sequence metadata from JDBC database metadata.");
-        final String sequenceQuery = "SELECT UPPER(name) name, CONVERT(int, increment) increment FROM sys.sequences";
-        final List<Map<String, Object>> results = queryProcessor.executeGenericSelect(sequenceQuery);
+        final String sequenceNameQuery = "SELECT C.RELNAME sequence_name FROM PG_CLASS C WHERE C.RELKIND = 'S'";
+        final String sequenceIncrementQuery = "SELECT INCREMENT_BY FROM ";
+        final List<Map<String, Object>> nameResults = queryProcessor.executeGenericSelect(sequenceNameQuery);
         final List<Sequence> sequences = new ArrayList<>();
-        for (final Map<String, Object> result : results) {
+        for (final Map<String, Object> nameResult : nameResults) {
             final Sequence sequence = new Sequence();
-            sequence.setName((String) result.get("name"));
-            sequence.setIncrementBy((Integer) result.get("increment"));
+            sequence.setName((String) nameResult.get("sequence_name"));
+            final String incQuery = sequenceIncrementQuery.concat(sequence.getName());
+            final List<Map<String, Object>> incResults = queryProcessor.executeGenericSelect(incQuery);
+            if (incResults.size() != 1) {
+                throw new DataAccessException(DataAccessException.Type.COULD_NOT_ACCESS_JDBC_METADATA);
+            }
+            final Map<String, Object> incResult= incResults.get(0);
+            sequence.setIncrementBy((Integer) incResult.get("increment_by"));
             sequences.add(sequence);
             log.debug("Found sequence metadata for sequence name/increment by : "
                     + sequence.getName() + "/" + sequence.getIncrementBy());

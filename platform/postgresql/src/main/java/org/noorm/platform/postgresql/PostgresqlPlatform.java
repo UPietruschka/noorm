@@ -89,7 +89,7 @@ public class PostgresqlPlatform implements IPlatform {
     @Override
     public String getSequenceQuery(final String pSequenceName) {
 
-        final String sequenceQuery = "SELECT NEXT VALUE FOR  ".concat(pSequenceName);
+        final String sequenceQuery = "SELECT NEXTVAL ('".concat(pSequenceName).concat("')");
         return sequenceQuery;
     }
 
