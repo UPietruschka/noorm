@@ -1,9 +1,6 @@
 package org.noorm.platform.postgresql;
 
-import org.noorm.jdbc.DataAccessException;
-import org.noorm.jdbc.FilterExtension;
-import org.noorm.jdbc.QueryColumn;
-import org.noorm.jdbc.StatementBuilder;
+import org.noorm.jdbc.*;
 import org.noorm.jdbc.platform.IMetadata;
 import org.noorm.jdbc.platform.IPlatform;
 import org.postgresql.ds.PGSimpleDataSource;
@@ -156,6 +153,7 @@ public class PostgresqlPlatform implements IPlatform {
     }
 
     private static final String ORDER_BY_CLAUSE = " ORDER BY ";
+    private static final String COUNT_OVER_COLUMN_SELECT = "SELECT COUNT(*) OVER()" + IBean.PAGING_TOTAL + ", ";
     private static final String OFFSET_CLAUSE = " OFFSET ";
     private static final String LIMIT_CLAUSE = " LIMIT ";
 
@@ -184,6 +182,7 @@ public class PostgresqlPlatform implements IPlatform {
             return baseQuery;
         }
         String filteredQuery = baseQuery;
+        filteredQuery = filteredQuery.replaceFirst("SELECT ", COUNT_OVER_COLUMN_SELECT);
         final List<FilterExtension.SortCriteria> sortCriterias = pFilterExtension.getSortCriteria();
         if (sortCriterias.size() > 0) {
             String orderByClause = "";
