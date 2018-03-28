@@ -143,6 +143,12 @@ public class BeanGenerator {
 				beanClassDescriptor.setCustomInterfaceName(interfaceName);
 			}
 
+			final String superClassName =
+					GeneratorUtil.getMappedString(tableName0, configuration.getTable2SuperClassMappings());
+			if (superClassName != null && !superClassName.isEmpty()) {
+				beanClassDescriptor.setSuperClassName(superClassName);
+			}
+
 			final Sequence sequence = getSequence(tableName0, sequenceList);
             if (sequence != null) {
                 final String sequenceName = sequence.getName();

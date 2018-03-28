@@ -31,6 +31,7 @@ public class BeanClassDescriptor {
     private boolean generatePKBasedEqualsAndHashCode;
     private boolean enableOptLockFullRowCompare = false;
     private String customInterfaceName;
+	private String superClassName;
 
     public long getSerialVersionUID() {
 
@@ -204,5 +205,13 @@ public class BeanClassDescriptor {
 
 	public void setCustomInterfaceName(final String pCustomInterfaceName) {
 		customInterfaceName = pCustomInterfaceName;
+	}
+
+	public String getSuperClassName() {
+		return superClassName;
+	}
+
+	public void setSuperClassName(final String pSuperClassName) {
+		superClassName = pSuperClassName;
 	}
 }

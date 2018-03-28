@@ -98,6 +98,16 @@ public class DataSourceProvider {
         return activeConnectionData;
     }
 
+	/**
+	 * Removes the active connection data hold in a ThreadLocal variable of the DataSourceProvider.
+	 * THIS METHOD SHOULD ONLY BE CALLED for thread clean up, i.e., from ServletRequestListener.requestDestroyed
+	 * implementations!
+	 */
+	public static void clearActiveConnectionData() {
+
+    	activeConThreadDta.remove();
+	}
+
     /**
      * Activates the data source with the given name.
      * The name of the data source is either the name provided for the data source in the NoORM configuration
