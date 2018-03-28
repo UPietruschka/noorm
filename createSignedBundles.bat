@@ -37,3 +37,10 @@ gpg --yes -ab noorm-mssql-platform-%1-sources.jar
 gpg --yes -ab noorm-mssql-platform-%1.jar
 gpg --yes -ab noorm-mssql-platform-%1.pom
 "%JAVA_HOME%\bin\jar" -cvf noorm-mssql-platform-bundle.jar *.jar *.asc *.pom
+
+cd %HOMEPATH%\.m2\repository\org\noorm\noorm-postgresql-platform\%1
+gpg --yes -ab noorm-postgresql-platform-%1-javadoc.jar
+gpg --yes -ab noorm-postgresql-platform-%1-sources.jar
+gpg --yes -ab noorm-postgresql-platform-%1.jar
+gpg --yes -ab noorm-postgresql-platform-%1.pom
+"%JAVA_HOME%\bin\jar" -cvf noorm-postgresql-platform-bundle.jar *.jar *.asc *.pom
