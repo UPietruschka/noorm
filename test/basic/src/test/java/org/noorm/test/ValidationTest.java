@@ -16,7 +16,6 @@ public class ValidationTest {
 	@Test
 	public void testNoORMValidation() {
 		NoORMValidator.validateNoORMMetadataVersion();
-        NoORMValidator.validateNoORMDynamicSQLVersion();
 	}
 
 	@Test

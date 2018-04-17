@@ -7,7 +7,6 @@ import org.noorm.generator.IParameters;
 import org.noorm.generator.schema.GeneratorConfiguration;
 import org.noorm.generator.schema.Regex;
 import org.noorm.jdbc.DataSourceProvider;
-import org.noorm.jdbc.JDBCProcedureProcessor;
 import org.noorm.jdbc.Utils;
 import org.noorm.jdbc.platform.IMetadata;
 import org.noorm.jdbc.platform.JDBCType;
@@ -35,8 +34,7 @@ public class ServiceGenerator {
 	private static final String SERVICE_VALIDATOR_VM_TEMPLATE_FILE = "/service_validator.vm";
 	private static final String SERVICE_VALIDATOR_CLASS_NAME = "GenericServiceValidator";
 	private static final String DEFAULT_PACKAGE_FILTER_REGEX = ".*";
-	private static final String IGNORE_PACKAGE_FILTER_REGEX = "(NOORM_METADATA|NOORM_DYNAMIC_SQL)";
-	private static final String DEFAULT_PAGEABLE_PROC_NAME_REGEX = "(find_pageable.*)";
+	private static final String IGNORE_PACKAGE_FILTER_REGEX = "(NOORM_METADATA)";
     private static final String NOORM_ID_LIST_DB_TYPE_NAME = "NUM_ARRAY";
 
 	private IParameters parameters;
@@ -127,16 +125,6 @@ public class ServiceGenerator {
 							parameterDescriptor.setJavaType(javaType);
 						}
 						procedureDescriptor.addParameter(parameterDescriptor);
-                        final Regex pageableProcedureName = configuration.getPageableProcedureName();
-						if (pageableProcedureName != null && pageableProcedureName.getRegex() != null) {
-							if (procedureName.toLowerCase().matches(pageableProcedureName.getRegex())) {
-								procedureDescriptor.setPageableFinder(true);
-							}
-						} else {
-							if (procedureName.toLowerCase().matches(DEFAULT_PAGEABLE_PROC_NAME_REGEX)) {
-								procedureDescriptor.setPageableFinder(true);
-							}
-						}
 					} else { // OUT parameter
 						procedureDescriptor.setHasOutParam(true);
 						procedureDescriptor.setOutDbParamName(parameter.getName().toLowerCase());

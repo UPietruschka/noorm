@@ -94,10 +94,6 @@ public class $class.JavaName implements IService {
 #if ($class.hasDataSourceName())
 		DataSourceProvider.setActiveDataSource(DATA_SOURCE_NAME);
 #end
-#if($proc.isPageableFinder())
-		return new PageableBeanList<${proc.getOutParamJavaType()}>
-				($proc.Parameters[0].JavaName, "${class.DatabasePackageName}.$proc.DbProcedureName", "$proc.OutDbParamName", "$proc.Parameters[0].DbParamName", ${proc.getOutParamJavaType()}.class);
-#else
 #if($proc.hasOutParam())
 		final JDBCProcedureProcessor<$proc.getOutParamJavaType()> procedureProcessor = JDBCProcedureProcessor.getInstance();
 #end
@@ -120,7 +116,6 @@ public class $class.JavaName implements IService {
 #else
 		typelessProcedureProcessor.callProcedure
 				("${class.DatabasePackageName}.$proc.DbProcedureName", filterParameters);
-#end
 #end
 	}
 #end

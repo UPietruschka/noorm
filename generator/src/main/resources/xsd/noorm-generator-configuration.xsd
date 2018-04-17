@@ -194,8 +194,7 @@
                             The database metadata does not provide unambiguous information for the primary
                             key of a view (for tables, this information is available). When the intended use of a
                             view includes DML operations (which requires the view to contain one and only one
-                            key-preserved table) or data access with the PageableBeanList, NoORM needs a key to
-                            uniquely distinguish the records of this view.
+                            key-preserved table), NoORM needs a key to uniquely distinguish the records of this view.
                             Use this parameter to specify the column name of the key used for a given view.
                             Typically, this key is the primary key of the single key-preserved table contained in
                             the view definition.
@@ -210,14 +209,6 @@
                             the signature of the generated Java code, instead of a List a single Bean is returned).
                             Use this parameter to specify a regular expression matching all procedure names
                             subject to single row retrieval.
-                        </xs:documentation>
-                    </xs:annotation>
-                </xs:element>
-                <xs:element name="pageableProcedureName" type="regex" minOccurs="0">
-                    <xs:annotation>
-                        <xs:documentation>
-                            Large query results can be mapped into a PageableBeanList to provide efficient
-                            access to the data by loading the full record only for the requested page.
                         </xs:documentation>
                     </xs:annotation>
                 </xs:element>

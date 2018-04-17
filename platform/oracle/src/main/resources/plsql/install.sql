@@ -2,15 +2,8 @@
 
 spool install_noorm.log
 
--- Types
+-- Metadata Package
 
-@@NUM_ARRAY
-
--- Generic Packages
-
-@@DYNSQL_QUERY_TEMPLATE
-@@NOORM_DYNAMIC_SQL
-@@NOORM_DYNAMIC_SQL_body
 @@NOORM_METADATA
 @@NOORM_METADATA_body
 

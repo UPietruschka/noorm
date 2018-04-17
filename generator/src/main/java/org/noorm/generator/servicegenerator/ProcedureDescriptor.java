@@ -21,7 +21,6 @@ public class ProcedureDescriptor {
 	private boolean isOutParamRefCursor = false;
 	private boolean isOutParamScalar = false;
 	private boolean isSingleRowFinder = false;
-	private boolean pageableFinder = false;
 
 	public void setJavaName(final String pJavaName) {
 		javaName = pJavaName;
@@ -93,13 +92,5 @@ public class ProcedureDescriptor {
 
 	public void setSingleRowFinder(final boolean pSingleRowFinder) {
 		isSingleRowFinder = pSingleRowFinder;
-	}
-
-	public boolean isPageableFinder() {
-		return pageableFinder;
-	}
-
-	public void setPageableFinder(final boolean pPageableFinder) {
-		pageableFinder = pPageableFinder;
 	}
 }

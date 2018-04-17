@@ -3,7 +3,7 @@ package org.noorm.test;
 import org.junit.Test;
 import org.noorm.jdbc.DataSourceProvider;
 import org.noorm.test.hr.beans.Employees;
-import org.noorm.test.hr.services.EmployeeSearch;
+import org.noorm.test.hr.services.EmployeeFinder;
 import org.noorm.test.hr.services.JobService;
 
 import java.util.List;
@@ -22,7 +22,7 @@ public class JobServiceTest {
 	@Test
 	public void testGetEmployeeCount() {
 		
-		JobService jobService = JobService.getInstance();
+		final JobService jobService = JobService.getInstance();
 		final Long employeeCount = jobService.getEmployeeCount();
 		assertEquals(EMPLOYEE_COUNT, employeeCount);
 	}
@@ -32,17 +32,20 @@ public class JobServiceTest {
 
 		DataSourceProvider.begin();
         try {
-            JobService jobService = JobService.getInstance();
+            final JobService jobService = JobService.getInstance();
             // Increase the salary for the given department by 8%
             jobService.increaseSalary(90, 0.08d);
-            EmployeeSearch employeeSearch = EmployeeSearch.getInstance();
+
+            final EmployeeFinder employeeFinder = EmployeeFinder.getInstance();
             // Search for an exact match of the first employee with increased salary
-            List<Employees> employeesList0 =
-                    employeeSearch.findEmployeesByFilter(null, null, null, null, 25920L, 25920L);
+            final List<Employees> employeesList0 = employeeFinder.findEmployeesDynamic
+                    (null, null, null,
+                            25920D, 25920D, null);
             assertEquals(1, employeesList0.size());
             // Search for an exact match of the second and third employee with increased salary
-            List<Employees> employeesList1 =
-                    employeeSearch.findEmployeesByFilter(null, null, null, null, 18360L, 18360L);
+            final List<Employees> employeesList1 = employeeFinder.findEmployeesDynamic
+                    (null, null, null,
+                            18360D, 18360D, null);
             assertEquals(2, employeesList1.size());
         } finally {
             DataSourceProvider.rollback();
