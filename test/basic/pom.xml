@@ -80,6 +80,7 @@
                             <onError>continue</onError>
                             <srcFiles>
                                 <srcFile>src/main/resources/sql/OPT_LOCK_TABLES.sql</srcFile>
+                                <srcFile>src/main/resources/sql/NON_SEQ_INSERT_TABLES.sql</srcFile>
                                 <srcFile>src/main/resources/sql/CASE_SENSITIVE_TABLE.sql</srcFile>
                                 <srcFile>src/main/resources/sql/COMPLEX_DATA_TYPES_TABLE.sql</srcFile>
                                 <srcFile>src/main/resources/sql/JOBS_SYNONYM.sql</srcFile>

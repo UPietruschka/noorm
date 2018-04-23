@@ -19,7 +19,7 @@
     </table2InterfaceMappings>
     <inlineSequenceTableFilter regex="(OPT_.*)"/>
     <columnNameMappings>
-        <mapping key="([oO]pt)(.*)" value="$2"/>
+        <mapping key="([oO]pt|[Nn]swp|[Nn]snp)(.*)" value="$2"/>
     </columnNameMappings>
     <enumTable2DisplayColumnMappings>
         <mapping key="REGIONS" value="REGION_NAME"/>
