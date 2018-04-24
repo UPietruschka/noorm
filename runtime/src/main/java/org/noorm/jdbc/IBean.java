@@ -1,7 +1,6 @@
 package org.noorm.jdbc;
 
-import org.noorm.jdbc.platform.JDBCType;
-
+import java.sql.JDBCType;
 import java.util.HashMap;
 
 /**

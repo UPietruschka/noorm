@@ -1,7 +1,6 @@
 package org.noorm.jdbc;
 
 import org.noorm.jdbc.platform.IPlatform;
-import org.noorm.jdbc.platform.JDBCType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -257,6 +256,7 @@ public class JDBCProcedureProcessor<T> {
 		CallableStatement cstmt = null;
 		try {
 			con = DataSourceProvider.getConnection();
+			final IPlatform platform = DataSourceProvider.getPlatform();
 			final String procedureCall = statementBuilder.buildProcedureCall
                     (pCallable, pRefCursorName, pInParameters);
 			if (log.isDebugEnabled()) {
@@ -266,7 +266,7 @@ public class JDBCProcedureProcessor<T> {
 			cstmt = con.prepareCall(procedureCall);
 
 			int parameterIndex = 1;
-            cstmt.registerOutParameter(parameterIndex++, JDBCType.REF_CURSOR.getVendorTypeNumber());
+            cstmt.registerOutParameter(parameterIndex++, platform.getRefCursorJDBCType());
 
 			bindParameters(con, pInParameters, cstmt, parameterIndex);
 

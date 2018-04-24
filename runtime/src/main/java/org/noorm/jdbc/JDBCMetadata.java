@@ -1,7 +1,6 @@
 package org.noorm.jdbc;
 
 import org.noorm.jdbc.platform.IMetadata;
-import org.noorm.jdbc.platform.JDBCType;
 import org.noorm.jdbc.platform.PrimaryKeyColumn;
 import org.noorm.jdbc.platform.TableMetadata;
 import org.slf4j.Logger;
@@ -9,6 +8,7 @@ import org.slf4j.LoggerFactory;
 
 import java.sql.Connection;
 import java.sql.DatabaseMetaData;
+import java.sql.JDBCType;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
@@ -35,7 +35,7 @@ public abstract class JDBCMetadata implements IMetadata {
      */
     public Map<String, List<TableMetadata>> findTableMetadata(final String pTableSearchPattern) {
 
-        final Map<String, List<TableMetadata>> tableMetaDataMap = new HashMap<String, List<TableMetadata>>();
+        final Map<String, List<TableMetadata>> tableMetaDataMap = new HashMap<>();
         boolean success = true;
         Connection con = null;
         try {
@@ -62,7 +62,7 @@ public abstract class JDBCMetadata implements IMetadata {
                         + "\n" + " Nullable       : " + isNullable);
                 List<TableMetadata> tableMetadataList = tableMetaDataMap.get(tableName);
                 if (tableMetadataList == null) {
-                    tableMetadataList = new ArrayList<TableMetadata>();
+                    tableMetadataList = new ArrayList<>();
                 }
                 final TableMetadata tableMetadata = new TableMetadata();
                 tableMetadata.setTableName(tableName);
@@ -109,7 +109,7 @@ public abstract class JDBCMetadata implements IMetadata {
             con = DataSourceProvider.getConnection();
             final DatabaseMetaData databaseMetaData = con.getMetaData();
             final ResultSet primaryKeys = databaseMetaData.getPrimaryKeys(null, null, pTableName);
-            final List<PrimaryKeyColumn> primaryKeyColumnList = new ArrayList<PrimaryKeyColumn>();
+            final List<PrimaryKeyColumn> primaryKeyColumnList = new ArrayList<>();
             log.info("Retrieving primary key metadata from JDBC database metadata.");
             while (primaryKeys.next()) {
                 final String tableName = primaryKeys.getString("TABLE_NAME");

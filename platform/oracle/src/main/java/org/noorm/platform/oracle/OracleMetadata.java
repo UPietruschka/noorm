@@ -3,11 +3,15 @@ package org.noorm.platform.oracle;
 import org.noorm.jdbc.JDBCMetadata;
 import org.noorm.jdbc.JDBCProcedureProcessor;
 import org.noorm.jdbc.JDBCQueryProcessor;
-import org.noorm.jdbc.platform.*;
+import org.noorm.jdbc.platform.Parameter;
+import org.noorm.jdbc.platform.PrimaryKeyColumn;
+import org.noorm.jdbc.platform.Sequence;
+import org.noorm.jdbc.platform.TableMetadata;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.math.BigDecimal;
+import java.sql.JDBCType;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;

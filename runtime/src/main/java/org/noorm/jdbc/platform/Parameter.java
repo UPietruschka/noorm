@@ -1,5 +1,7 @@
 package org.noorm.jdbc.platform;
 
+import java.sql.JDBCType;
+
 /**
  * @author Ulf Pietruschka / ulf.pietruschka@etenso.com
  *         Date: 27.03.14

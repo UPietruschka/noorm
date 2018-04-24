@@ -29,6 +29,8 @@ public class OraclePlatform implements IPlatform {
     public static final String ORACLE_PLATFORM = "Oracle";
     public static final String NOORM_ID_LIST_DB_TYPE_NAME = "NUM_ARRAY";
 
+    private static final int ORACLE_REF_CURSOR_JDBC_TYPE = -10;
+
     private final OracleMetadata oracleMetadata = OracleMetadata.getInstance();
     private final StatementBuilder statementBuilder = new StatementBuilder();
 
@@ -183,6 +185,18 @@ public class OraclePlatform implements IPlatform {
                 ArrayDescriptor.createDescriptor(NOORM_ID_LIST_DB_TYPE_NAME, pCon);
         final ARRAY arrayToPass = new ARRAY(descriptor, pCon, pValue);
         ((OracleCallableStatement) pCstmt).setARRAY(pParameterIndex, arrayToPass);
+    }
+
+    /**
+     * The REF_CURSOR JDBC type is used to directly utilize a SQL cursor established from within
+     * a stored procedure for a JDBC ResultSet. However, though we have JDBCType.REF_CURSOR, this
+     * does not necessarily match the vendor type, so we can provide the vendor type here.
+     *
+     * @return the REF_CURSOR JDBC type
+     */
+    @Override
+    public int getRefCursorJDBCType() {
+        return ORACLE_REF_CURSOR_JDBC_TYPE;
     }
 
     private static final String BASE_QUERY_PLACEHOLDER = "__BASE_QUERY__";

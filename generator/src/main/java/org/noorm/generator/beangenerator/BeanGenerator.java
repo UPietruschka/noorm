@@ -7,11 +7,15 @@ import org.noorm.generator.IParameters;
 import org.noorm.generator.schema.GeneratorConfiguration;
 import org.noorm.generator.schema.Regex;
 import org.noorm.jdbc.DataSourceProvider;
-import org.noorm.jdbc.platform.*;
+import org.noorm.jdbc.platform.IMetadata;
+import org.noorm.jdbc.platform.PrimaryKeyColumn;
+import org.noorm.jdbc.platform.Sequence;
+import org.noorm.jdbc.platform.TableMetadata;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.File;
+import java.sql.JDBCType;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;

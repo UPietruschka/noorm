@@ -5,13 +5,13 @@ import org.noorm.jdbc.IBean;
 import org.noorm.jdbc.JDBCColumn;
 import org.noorm.jdbc.BeanMetaDataUtil;
 import org.noorm.jdbc.platform.IMetadata;
-import org.noorm.jdbc.platform.JDBCType;
 import org.noorm.jdbc.platform.PrimaryKeyColumn;
 import org.noorm.jdbc.platform.Sequence;
 import org.noorm.jdbc.platform.TableMetadata;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.sql.JDBCType;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;

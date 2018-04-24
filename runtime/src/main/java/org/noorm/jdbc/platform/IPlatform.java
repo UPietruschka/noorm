@@ -92,6 +92,15 @@ public interface IPlatform {
                              final int pParameterIndex) throws SQLException;
 
     /**
+     * The REF_CURSOR JDBC type is used to directly utilize a SQL cursor established from within
+     * a stored procedure for a JDBC ResultSet. However, though we have JDBCType.REF_CURSOR, this
+     * does not necessarily match the vendor type, so we can provide the vendor type here.
+     *
+     * @return the REF_CURSOR JDBC type
+     */
+    int getRefCursorJDBCType();
+
+    /**
      * Constructs a SQL query based on the provided information.
      *
      * @param pTableName the table name

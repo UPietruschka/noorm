@@ -8,10 +8,7 @@ import org.noorm.jdbc.platform.IMetadata;
 import org.noorm.jdbc.platform.IPlatform;
 
 import javax.sql.DataSource;
-import java.sql.CallableStatement;
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.SQLException;
+import java.sql.*;
 import java.util.Map;
 
 /**
@@ -151,6 +148,18 @@ public class MSSQLPlatform implements IPlatform {
     public void prepareNumericArray(Connection pCon, CallableStatement pCstmt, Object pValue, int pParameterIndex) throws SQLException {
 
         throw new UnsupportedOperationException();
+    }
+
+    /**
+     * The REF_CURSOR JDBC type is used to directly utilize a SQL cursor established from within
+     * a stored procedure for a JDBC ResultSet. However, though we have JDBCType.REF_CURSOR, this
+     * does not necessarily match the vendor type, so we can provide the vendor type here.
+     *
+     * @return the REF_CURSOR JDBC type
+     */
+    @Override
+    public int getRefCursorJDBCType() {
+        return JDBCType.REF_CURSOR.getVendorTypeNumber();
     }
 
     /**

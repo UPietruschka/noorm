@@ -5,12 +5,12 @@ import org.apache.velocity.VelocityContext;
 import org.apache.velocity.app.Velocity;
 import org.noorm.generator.schema.*;
 import org.noorm.jdbc.Utils;
-import org.noorm.jdbc.platform.JDBCType;
 
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.sql.JDBCType;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;

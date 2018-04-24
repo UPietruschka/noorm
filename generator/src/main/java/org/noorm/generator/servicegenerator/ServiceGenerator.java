@@ -9,12 +9,12 @@ import org.noorm.generator.schema.Regex;
 import org.noorm.jdbc.DataSourceProvider;
 import org.noorm.jdbc.Utils;
 import org.noorm.jdbc.platform.IMetadata;
-import org.noorm.jdbc.platform.JDBCType;
 import org.noorm.jdbc.platform.Parameter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.File;
+import java.sql.JDBCType;
 import java.util.List;
 
 /**

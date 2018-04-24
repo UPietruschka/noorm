@@ -1,5 +1,7 @@
 package org.noorm.jdbc.platform;
 
+import java.sql.JDBCType;
+
 /**
  * Table metadata container
  * @author Ulf Pietruschka / ulf.pietruschka@etenso.com
