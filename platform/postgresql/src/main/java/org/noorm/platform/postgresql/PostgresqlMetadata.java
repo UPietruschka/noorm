@@ -68,7 +68,6 @@ public class PostgresqlMetadata extends JDBCMetadata {
     @Override
     public List<Sequence> findSequences() {
 
-        log.info("Retrieving sequence metadata from JDBC database metadata.");
         final String sequenceNameQuery = "SELECT C.RELNAME sequence_name FROM PG_CLASS C WHERE C.RELKIND = 'S'";
         final String sequenceIncrementQuery = "SELECT INCREMENT_BY FROM ";
         final List<Map<String, Object>> nameResults = queryProcessor.executeGenericSelect(sequenceNameQuery);

@@ -25,12 +25,6 @@ PACKAGE noorm_metadata AS
     name VARCHAR2(128)
     );
   TYPE name_refcur IS REF CURSOR RETURN name_record;
-  TYPE sequence_record IS RECORD
-    (
-    sequence_name VARCHAR2(30),
-    increment_by NUMBER
-    );
-  TYPE sequence_refcur IS REF CURSOR RETURN sequence_record;
   TYPE parameter_record IS RECORD
     (
     name VARCHAR2(30),
@@ -39,12 +33,6 @@ PACKAGE noorm_metadata AS
     direction VARCHAR2(18)
     );
   TYPE parameter_refcur IS REF CURSOR RETURN parameter_record;
-  TYPE pk_record IS RECORD
-    (
-    table_name  VARCHAR2(30),
-    column_name VARCHAR2(30)
-    );
-  TYPE pk_refcur IS REF CURSOR RETURN pk_record;
 
   PROCEDURE get_version(p_version OUT VARCHAR2);
 
@@ -53,10 +41,6 @@ PACKAGE noorm_metadata AS
   PROCEDURE find_package_names(p_search_regex IN VARCHAR2, p_package_names OUT name_refcur);
 
   PROCEDURE find_procedure_names(p_package_name IN VARCHAR2, p_procedure_names OUT name_refcur);
-
-  PROCEDURE find_sequence_names(p_sequence_names OUT sequence_refcur);
-
-  PROCEDURE find_pk_columns(p_table_name IN VARCHAR2, p_pk_columns OUT pk_refcur);
 
   PROCEDURE find_procedure_parameters(p_package_name IN VARCHAR2,
                                       p_procedure_name IN VARCHAR2,

@@ -63,39 +63,6 @@ PACKAGE BODY noorm_metadata AS
     AND    procedure_name IS NOT NULL;
   END find_procedure_names;
 
-  PROCEDURE find_sequence_names(p_sequence_names OUT sequence_refcur) AS
-  BEGIN
-    OPEN p_sequence_names FOR
-    SELECT sequence_name, increment_by
-    FROM   user_sequences;
-  END find_sequence_names;
-
-  PROCEDURE find_pk_columns(p_table_name IN VARCHAR2, p_pk_columns OUT pk_refcur) AS
-  BEGIN
-    OPEN p_pk_columns FOR
-    SELECT cc.table_name,
-           cc.column_name
-    FROM   user_constraints uc,
-           user_cons_columns cc
-    WHERE  uc.table_name      = cc.table_name
-    AND    uc.constraint_name = cc.constraint_name
-    AND    uc.table_name      = p_table_name
-    AND    uc.constraint_type = 'P'
-    UNION
-    SELECT us.synonym_name table_name,
-           cc.column_name
-    FROM   all_constraints ac,
-           all_cons_columns cc,
-           user_synonyms us
-    WHERE  ac.table_name      = cc.table_name
-    AND    ac.constraint_name = cc.constraint_name
-    AND    ac.owner           = cc.owner
-    AND    ac.table_name      = us.table_name
-    AND    ac.owner           = us.table_owner
-    AND    us.synonym_name    = p_table_name
-    AND    ac.constraint_type = 'P';
-  END find_pk_columns;
-
   /*
     Unfortunately, PL/SQL record definitions are only subject to the PL/SQL compiler interpretation
     and not available in the Oracle data dictionary. For reverse engineering PL/SQL procedure calls
