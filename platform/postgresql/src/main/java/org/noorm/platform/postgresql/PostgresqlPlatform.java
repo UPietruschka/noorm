@@ -135,21 +135,6 @@ public class PostgresqlPlatform implements IPlatform {
     }
 
     /**
-     * Binds a numeric array to a callable statement.
-     *
-     * @param pCon            the JDBC connection
-     * @param pCstmt          the JDBC callable statement
-     * @param pValue          the value to bind (numeric array)
-     * @param pParameterIndex the parameter index
-     * @throws java.sql.SQLException JDBC driver exception
-     */
-    @Override
-    public void prepareNumericArray(Connection pCon, CallableStatement pCstmt, Object pValue, int pParameterIndex) throws SQLException {
-
-        throw new UnsupportedOperationException();
-    }
-
-    /**
      * The REF_CURSOR JDBC type is used to directly utilize a SQL cursor established from within
      * a stored procedure for a JDBC ResultSet. However, though we have JDBCType.REF_CURSOR, this
      * does not necessarily match the vendor type, so we can provide the vendor type here.

@@ -28,14 +28,12 @@ public class ServiceGenerator {
 
 	private static final Logger log = LoggerFactory.getLogger(ServiceGenerator.class);
 	private static final String INPUT_PARAMETER = "IN";
-	private static final String NOORM_ID_LIST_JAVA_TYPE_NAME = "Long[]";
 	private static final String NOORM_METADATA_ID_RECORD = "NOORM_METADATA_ID_RECORD";
 	private static final String SERVICE_VM_TEMPLATE_FILE = "/service.vm";
 	private static final String SERVICE_VALIDATOR_VM_TEMPLATE_FILE = "/service_validator.vm";
 	private static final String SERVICE_VALIDATOR_CLASS_NAME = "GenericServiceValidator";
 	private static final String DEFAULT_PACKAGE_FILTER_REGEX = ".*";
 	private static final String IGNORE_PACKAGE_FILTER_REGEX = "(NOORM_METADATA)";
-    private static final String NOORM_ID_LIST_DB_TYPE_NAME = "NUM_ARRAY";
 
 	private IParameters parameters;
     private GeneratorConfiguration configuration;
@@ -115,15 +113,9 @@ public class ServiceGenerator {
 						final String javaParameterName = Utils.convertDBName2JavaName(parameter.getName(), false);
 						parameterDescriptor.setJavaName(javaParameterName);
 						final JDBCType jdbcType = parameter.getJDBCType();
-						final String databaseTypeName = parameter.getTypeName();
-						if (databaseTypeName != null &&
-								databaseTypeName.equals(NOORM_ID_LIST_DB_TYPE_NAME)) {
-							parameterDescriptor.setJavaType(NOORM_ID_LIST_JAVA_TYPE_NAME);
-						} else {
-							final String javaType = GeneratorUtil.convertDatabaseType2JavaType(jdbcType,
-                                    parameterDescriptor.getDbParamName(), configuration.getTypeMappings());
-							parameterDescriptor.setJavaType(javaType);
-						}
+						final String javaType = GeneratorUtil.convertDatabaseType2JavaType(jdbcType,
+								parameterDescriptor.getDbParamName(), configuration.getTypeMappings());
+						parameterDescriptor.setJavaType(javaType);
 						procedureDescriptor.addParameter(parameterDescriptor);
 					} else { // OUT parameter
 						procedureDescriptor.setHasOutParam(true);

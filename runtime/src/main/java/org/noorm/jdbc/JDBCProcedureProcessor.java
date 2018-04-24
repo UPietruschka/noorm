@@ -109,14 +109,14 @@ public class JDBCProcedureProcessor<T> {
 			}
 
 			if (pInParameters != null) {
-				bindParameters(con, pInParameters, cstmt, parameterIndex);
+				bindParameters(pInParameters, cstmt, parameterIndex);
 			}
 
 			cstmt.execute();
 
 			T outValue = null;
 			if (pOutParamName != null) {
-				outValue = getOutParameter(pOutParamName, pOutClass, cstmt);
+				outValue = getOutParameter(pOutClass, cstmt);
 			}
 
 			if (log.isDebugEnabled()) {
@@ -142,8 +142,7 @@ public class JDBCProcedureProcessor<T> {
 
 	}
 
-	private T getOutParameter(final String pOutParamName,
-							  final Class<T> pOutClass,
+	private T getOutParameter(final Class<T> pOutClass,
 							  final CallableStatement cstmt) throws SQLException {
 
 		T outValue = null;
@@ -268,7 +267,7 @@ public class JDBCProcedureProcessor<T> {
 			int parameterIndex = 1;
             cstmt.registerOutParameter(parameterIndex++, platform.getRefCursorJDBCType());
 
-			bindParameters(con, pInParameters, cstmt, parameterIndex);
+			bindParameters(pInParameters, cstmt, parameterIndex);
 
 			cstmt.execute();
 
@@ -303,22 +302,15 @@ public class JDBCProcedureProcessor<T> {
 		}
 	}
 
-	private void bindParameters(final Connection pCon,
-								final Map<String, Object> pInParameters,
+	private void bindParameters(final Map<String, Object> pInParameters,
 								final CallableStatement pCstmt,
 								final int pParameterIndex) throws SQLException {
 
 		int parameterIndex = pParameterIndex;
-		Map<String, Object> orderedParameters = new TreeMap<String, Object>(pInParameters);
-        final IPlatform platform = DataSourceProvider.getPlatform();
+		Map<String, Object> orderedParameters = new TreeMap<>(pInParameters);
 		for (final String paramName : orderedParameters.keySet()) {
 			Object value = orderedParameters.get(paramName);
 			if (value == null) {
-				continue;
-			}
-			if (value instanceof Long[]) {
-                platform.prepareNumericArray(pCon, pCstmt, value, pParameterIndex);
-                parameterIndex++;
 				continue;
 			}
 			if (value instanceof String) {
