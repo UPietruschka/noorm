@@ -8,8 +8,8 @@ import org.noorm.test.hr.beans.NoSeqNoPk;
 import org.noorm.test.hr.beans.NoSeqWithPk;
 import org.noorm.test.hr.services.BeanDML;
 
-import static junit.framework.Assert.fail;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
 
 /**
  * @author Ulf Pietruschka / ulf.pietruschka@etenso.com

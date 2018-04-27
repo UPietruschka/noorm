@@ -8,7 +8,6 @@ import org.noorm.test.hr.beans.OptLockLong;
 import org.noorm.test.hr.services.BeanDML;
 
 import static org.junit.Assert.*;
-import static junit.framework.Assert.fail;
 
 /**
  * @author Ulf Pietruschka / ulf.pietruschka@etenso.com

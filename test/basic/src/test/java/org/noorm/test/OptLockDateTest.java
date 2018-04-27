@@ -10,7 +10,6 @@ import org.noorm.test.hr.services.BeanDML;
 import java.sql.Timestamp;
 
 import static org.junit.Assert.*;
-import static junit.framework.Assert.fail;
 
 /**
  * @author Ulf Pietruschka / ulf.pietruschka@etenso.com
