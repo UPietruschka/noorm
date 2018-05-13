@@ -71,49 +71,6 @@ public class OracleMetadata extends JDBCMetadata {
         return convertOracleType2JDBCType(pDataTypeName, pDecimalDigits);
     }
 
-    /**
-     * Returns the list of table/column metadata accessible for the authenticated database user.
-     *
-     * @param pSchemaPattern a regular expression narrowing the set of schemas subject to metadata retrieval
-     * @param pTableNamePattern a regular expression narrowing the set of tables subject to metadata retrieval
-     * @return the requested
-     */
-	//@Override
-    public Map<String, List<TableMetadata>> findTableMetadataz(final String pSchemaPattern,
-                                                               final String pTableNamePattern) {
-
-		final List<OracleTableMetadata> oracleTableMetadataList = findTableMetadata0();
-		final Map<String, List<TableMetadata>> tableColumnMap = new HashMap<>();
-		String tableName = "";
-		List<TableMetadata> tableMetadataList0 = null;
-		for (OracleTableMetadata oracleTableMetadata : oracleTableMetadataList) {
-            // Filter out duplicates
-			if (!tableName.equals(oracleTableMetadata.getTableName())) {
-				tableName = oracleTableMetadata.getTableName();
-                if (pTableNamePattern != null && !tableName.matches(pTableNamePattern)) {
-                    tableName = "";
-                    continue;
-                }
-				log.debug("Collecting table metadata for table ".concat(tableName));
-				tableMetadataList0 = new ArrayList<>();
-				tableColumnMap.put(tableName, tableMetadataList0);
-			}
-            int decimalDigits = 0;
-            if (oracleTableMetadata.getDataScale() != null) {
-                decimalDigits = oracleTableMetadata.getDataScale().intValue();
-            }
-            final TableMetadata tableMetadata = new TableMetadata();
-            tableMetadata.setTableName(oracleTableMetadata.getTableName());
-            tableMetadata.setColumnName(oracleTableMetadata.getColumnName());
-            tableMetadata.setJDBCType(convertOracleType2JDBCType(oracleTableMetadata.getDataType(), decimalDigits));
-            tableMetadata.setColumnSize(oracleTableMetadata.getCharLength().intValue());
-            tableMetadata.setDecimalDigits(decimalDigits);
-            tableMetadata.setNullable(oracleTableMetadata.getNullable().equals(NULLABLE));
-			tableMetadataList0.add(tableMetadata);
-		}
-		return tableColumnMap;
-	}
-
 	private List<OracleTableMetadata> findTableMetadata0() {
 
 		final JDBCProcedureProcessor<OracleTableMetadata> statementProcessor = JDBCProcedureProcessor.getInstance();
