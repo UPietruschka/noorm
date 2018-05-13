@@ -69,7 +69,9 @@ public class QueryGenerator {
         if (configuration.getBeanTableFilter() != null) {
             beanTableFilterRegex = configuration.getBeanTableFilter().getRegex();
         }
-        final Map<String, List<TableMetadata>> tableColumnMap = metadata.findTableMetadata(beanTableFilterRegex);
+        final String schemaFilterRegex = configuration.getSchemaFilter().getRegex();
+        final Map<String, List<TableMetadata>> tableColumnMap =
+                metadata.findTableMetadata(schemaFilterRegex, beanTableFilterRegex);
 
         final Map<String, QueryClassDescriptor> queryClasses = new HashMap<String, QueryClassDescriptor>();
         for (final QueryDeclaration queryDeclaration : configuration.getQueryDeclarations()) {
@@ -88,7 +90,8 @@ public class QueryGenerator {
                 // view in the set of filtered table metadata. Thus, we issue the metadata query again for the
                 // view metadata.
                 final String viewName = queryDeclaration.getTableName();
-                final Map<String, List<TableMetadata>> viewColumnMap = metadata.findTableMetadata(viewName);
+                final Map<String, List<TableMetadata>> viewColumnMap =
+                        metadata.findTableMetadata(schemaFilterRegex, viewName);
                 tableMetadataList = viewColumnMap.get(viewName);
             } else {
                 if (baseTableMetadataList == null) {

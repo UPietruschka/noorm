@@ -22,7 +22,7 @@ public class GenericBeanValidator {
 #if ($class.hasDataSourceName())
 		DataSourceProvider.setActiveDataSource(DATA_SOURCE_NAME);
 #end
-		beanValidator.loadMetadata("$class.getTableSearchPattern()");
+		beanValidator.loadMetadata("$class.getSchemaPattern()", "$class.getTableNamePattern()");
 #foreach ($className in $class.ClassNames)
 		beanValidator.validateBean(new ${className}());
 #end

@@ -30,12 +30,12 @@ public class BeanValidator {
 	protected Map<String, List<TableMetadata>> tableColumnMap;
 	protected List<Sequence> sequenceDBNameList;
 
-	public void loadMetadata(final String pTableSearchPattern) {
+	public void loadMetadata(final String pSchemaPattern, final String pTableNamePattern) {
 
         metadata = DataSourceProvider.getPlatform().getMetadata();
 
 		log.debug("Retrieving table metadata from database.");
-		tableColumnMap = metadata.findTableMetadata(pTableSearchPattern);
+		tableColumnMap = metadata.findTableMetadata(pSchemaPattern, pTableNamePattern);
 
 		log.debug("Retrieving sequence metadata from database.");
 		sequenceDBNameList = metadata.findSequences();

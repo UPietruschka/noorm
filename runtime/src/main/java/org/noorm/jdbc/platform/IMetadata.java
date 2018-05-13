@@ -1,5 +1,6 @@
 package org.noorm.jdbc.platform;
 
+import java.sql.JDBCType;
 import java.util.List;
 import java.util.Map;
 
@@ -20,10 +21,21 @@ public interface IMetadata {
     /**
      * Returns the list of table/column metadata accessible for the authenticated database user.
      *
-     * @param pTableSearchPattern a regular expression narrowing the set of table subject to metadata retrieval
+     * @param pSchemaPattern a regular expression narrowing the set of schemas subject to metadata retrieval
+     * @param pTableNamePattern a regular expression narrowing the set of tables subject to metadata retrieval
      * @return the requested
      */
-    Map<String, List<TableMetadata>> findTableMetadata(final String pTableSearchPattern);
+    Map<String, List<TableMetadata>> findTableMetadata(final String pSchemaPattern, final String pTableNamePattern);
+
+    /**
+     * Resolves the JDBC datatype on basis of the platform specific type information found in JDBC metadata
+     *
+     * @param pDataType      the numeric data type code
+     * @param pDataTypeName  the data type name
+     * @param pDecimalDigits the number of decimal digits for non-integer like numeric types
+     * @return the mapped JDBC standard type
+     */
+    JDBCType findJDBCType(final int pDataType, final String pDataTypeName, final int pDecimalDigits);
 
     /**
      * Returns the list of packages of stored procedures subject to Java code generation.

@@ -28,12 +28,30 @@ public abstract class JDBCMetadata implements IMetadata {
     private static final Logger log = LoggerFactory.getLogger(JDBCQueryProcessor.class);
 
     /**
+     * Resolves the JDBC datatype on basis of the platform specific type information found in JDBC metadata
+     *
+     * @param pDataType      the numeric data type code
+     * @param pDataTypeName  the data type name
+     * @param pDecimalDigits the number of decimal digits for non-integer like numeric types
+     * @return the mapped JDBC standard type
+     */
+    @Override
+    public JDBCType findJDBCType(int pDataType, String pDataTypeName, int pDecimalDigits) {
+
+        final JDBCType jdbcType = JDBCType.valueOf(pDataType);
+        return jdbcType;
+    }
+
+    /**
      * Returns the list of table/column metadata accessible for the authenticated database user.
      *
-     * @param pTableSearchPattern a regular expression narrowing the set of table subject to metadata retrieval
+     * @param pSchemaPattern a regular expression narrowing the set of schemas subject to metadata retrieval
+     * @param pTableNamePattern a regular expression narrowing the set of tables subject to metadata retrieval
      * @return the requested
      */
-    public Map<String, List<TableMetadata>> findTableMetadata(final String pTableSearchPattern) {
+    @Override
+    public Map<String, List<TableMetadata>> findTableMetadata(final String pSchemaPattern,
+                                                              final String pTableNamePattern) {
 
         final Map<String, List<TableMetadata>> tableMetaDataMap = new HashMap<>();
         boolean success = true;
@@ -42,18 +60,20 @@ public abstract class JDBCMetadata implements IMetadata {
             con = DataSourceProvider.getConnection();
             final DatabaseMetaData databaseMetaData = con.getMetaData();
             log.info("Retrieving JDBC metadata.");
-            final ResultSet columns = databaseMetaData.getColumns(null, null, null, null);
+            final ResultSet columns = databaseMetaData.getColumns
+                    (null, pSchemaPattern, null, null);
             while (columns.next()) {
                 final String tableName = columns.getString("TABLE_NAME");
-                if (pTableSearchPattern != null && !tableName.matches(pTableSearchPattern)) {
+                if (pTableNamePattern != null && !tableName.matches(pTableNamePattern)) {
                     continue;
                 }
                 final String columnName = columns.getString("COLUMN_NAME");
                 final int dataType = columns.getInt("DATA_TYPE");
+                final String typeName = columns.getString("TYPE_NAME");
                 final int columnSize = columns.getInt("COLUMN_SIZE");
                 final int decimalDigits = columns.getInt("DECIMAL_DIGITS");
                 final int nullable = columns.getInt("NULLABLE");
-                final JDBCType jdbcType = JDBCType.valueOf(dataType);
+                final JDBCType jdbcType = findJDBCType(dataType, typeName, decimalDigits);
                 final boolean isNullable = nullable == DatabaseMetaData.columnNullable;
                 log.debug("Retrieving JDBC database metadata for table/column : " + tableName + "/" + columnName
                         + "\n" + " JDBC type      : " + jdbcType.getName()

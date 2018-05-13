@@ -78,11 +78,14 @@ public class BeanGenerator {
         String beanTableFilterRegex = null;
         if (configuration.getBeanTableFilter() != null) {
             beanTableFilterRegex = configuration.getBeanTableFilter().getRegex();
-            validatorClassDescriptor.setTableSearchPattern(beanTableFilterRegex);
+            validatorClassDescriptor.setTableNamePattern(beanTableFilterRegex);
         } else {
-            validatorClassDescriptor.setTableSearchPattern(".*");
+            validatorClassDescriptor.setTableNamePattern(".*");
         }
-		final Map<String, List<TableMetadata>> tableColumnMap = metadata.findTableMetadata(beanTableFilterRegex);
+        final String schemaFilterRegex = configuration.getSchemaFilter().getRegex();
+		validatorClassDescriptor.setSchemaPattern(schemaFilterRegex);
+		final Map<String, List<TableMetadata>> tableColumnMap =
+				metadata.findTableMetadata(schemaFilterRegex, beanTableFilterRegex);
 		log.info("Retrieving record metadata from database.");
 		final Map<String, List<TableMetadata>> recordColumnMap = metadata.findRecordMetadata();
 		tableColumnMap.putAll(recordColumnMap);

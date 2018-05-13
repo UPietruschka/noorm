@@ -22,7 +22,7 @@ public class GenericEnumValidator {
 #if ($class.hasDataSourceName())
 		DataSourceProvider.setActiveDataSource(DATA_SOURCE_NAME);
 #end
-		enumValidator.loadMetadata("$class.getTableSearchPattern()");
+		enumValidator.loadMetadata("$class.getSchemaPattern()", "$class.getTableNamePattern()");
 #foreach ($className in $class.ClassNames)
 		enumValidator.validateEnum(${className}.class);
 #end

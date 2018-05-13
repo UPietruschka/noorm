@@ -13,7 +13,8 @@ public class ValidatorClassDescriptor {
 	private String packageName;
 	private List<String> classNames = new ArrayList<String>();
     private String dataSourceName;
-    private String tableSearchPattern;
+    private String schemaPattern;
+    private String tableNamePattern;
 
     public String getPackageName() {
 		return packageName;
@@ -39,12 +40,20 @@ public class ValidatorClassDescriptor {
         dataSourceName = pDataSourceName;
     }
 
-    public String getTableSearchPattern() {
-        return tableSearchPattern;
+    public String getSchemaPattern() {
+        return schemaPattern;
     }
 
-    public void setTableSearchPattern(final String pTableSearchPattern) {
-        tableSearchPattern = pTableSearchPattern;
+    public void setSchemaPattern(final String pSchemaPattern) {
+        schemaPattern = pSchemaPattern;
+    }
+
+    public String getTableNamePattern() {
+        return tableNamePattern;
+    }
+
+    public void setTableNamePattern(final String pTableNamePattern) {
+        tableNamePattern = pTableNamePattern;
     }
 
     public boolean hasDataSourceName() {

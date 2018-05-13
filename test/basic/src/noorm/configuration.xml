@@ -6,6 +6,7 @@
     <beanJavaPackage name="org.noorm.test.hr.beans"/>
     <enumJavaPackage name="org.noorm.test.hr.enums"/>
     <serviceJavaPackage name="org.noorm.test.hr.services"/>
+    <schemaFilter regex="HR"/>
     <enumTableFilter regex="REGIONS|OPT_VARIANTS"/>
     <packageFilter regex="(.*SERVICE|.*SEARCH)"/>
     <table2SequenceMappings>

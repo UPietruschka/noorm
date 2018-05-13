@@ -59,12 +59,15 @@ public class EnumGenerator {
         String enumTableFilterRegex;
         if (configuration.getEnumTableFilter() != null) {
             enumTableFilterRegex = configuration.getEnumTableFilter().getRegex();
-            validatorClassDescriptor.setTableSearchPattern(enumTableFilterRegex);
+            validatorClassDescriptor.setTableNamePattern(enumTableFilterRegex);
         } else {
             log.info("Parameter [enumTableFilter] not set. NoORM Enum generator will quit.");
             return;
         }
-        final Map<String, List<TableMetadata>> tableColumnMap = metadata.findTableMetadata(enumTableFilterRegex);
+		final String schemaFilterRegex = configuration.getSchemaFilter().getRegex();
+		validatorClassDescriptor.setSchemaPattern(schemaFilterRegex);
+        final Map<String, List<TableMetadata>> tableColumnMap =
+				metadata.findTableMetadata(schemaFilterRegex, enumTableFilterRegex);
 
 		log.info("Generating NoORM Enum classes.");
 		final File enumPackageDir =	GeneratorUtil.createPackageDir

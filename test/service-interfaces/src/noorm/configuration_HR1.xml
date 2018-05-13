@@ -7,6 +7,7 @@
     <enumJavaPackage name="org.noorm.test.hr1.enums"/>
     <serviceJavaPackage name="org.noorm.test.hr1.services.impl"/>
     <serviceInterfaceJavaPackage name="org.noorm.test.hr1.services"/>
+    <schemaFilter regex="HR"/>
     <beanTableFilter regex="(C.*|E.*|G.*|H.*|J.*|L.*|V.*|.*RECORD)"/>
     <enumTableFilter regex="REGIONS"/>
     <table2SequenceMappings>

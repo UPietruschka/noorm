@@ -41,6 +41,13 @@
                         </xs:documentation>
                     </xs:annotation>
                 </xs:element>
+                <xs:element name="schemaFilter" type="regex">
+                    <xs:annotation>
+                        <xs:documentation>
+                            Regular expression to filter database object for particular schemas.
+                        </xs:documentation>
+                    </xs:annotation>
+                </xs:element>
                 <xs:element name="beanTableFilter" type="regex" minOccurs="0">
                     <xs:annotation>
                         <xs:documentation>

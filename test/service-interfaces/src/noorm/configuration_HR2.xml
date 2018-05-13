@@ -6,6 +6,7 @@
 <beanJavaPackage name="org.noorm.test.hr2.beans"/>
     <serviceJavaPackage name="org.noorm.test.hr2.services.impl"/>
     <serviceInterfaceJavaPackage name="org.noorm.test.hr2.services"/>
+    <schemaFilter regex="HR"/>
     <beanTableFilter regex="DEPARTMENTS|EMPLOYEES"/>
     <packageFilter regex="--NO_MATCH_DESIRED--"/>
     <table2SequenceMappings>

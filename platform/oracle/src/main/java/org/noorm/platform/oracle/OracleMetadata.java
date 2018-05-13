@@ -55,13 +55,65 @@ public class OracleMetadata extends JDBCMetadata {
 	}
 
     /**
+     * Resolves the JDBC datatype on basis of the platform specific type information found in JDBC metadata
+     *
+     * @param pDataType      the numeric data type code
+     * @param pDataTypeName  the data type name
+     * @param pDecimalDigits the number of decimal digits for non-integer like numeric types
+     * @return the mapped JDBC standard type
+     */
+    @Override
+    public JDBCType findJDBCType(int pDataType, String pDataTypeName, int pDecimalDigits) {
+
+        JDBCType jdbcType = null;
+        if (pDataTypeName.endsWith("RAW")) {
+            jdbcType = JDBCType.BINARY;
+        }
+        if (pDataTypeName.contains("XMLTYPE")) {
+            jdbcType = JDBCType.SQLXML;
+        }
+        if (pDataTypeName.equals("NUMBER")) {
+            if (pDecimalDigits > 0) {
+                jdbcType = JDBCType.DOUBLE;
+            } else {
+                jdbcType = JDBCType.NUMERIC;
+            }
+        }
+        if (pDataTypeName.equals("BINARY_FLOAT")) {
+            jdbcType = JDBCType.FLOAT;
+        }
+        if (pDataTypeName.equals("BINARY_DOUBLE")) {
+            jdbcType = JDBCType.DOUBLE;
+        }
+        if (pDataTypeName.equals("FLOAT")) {
+            jdbcType = JDBCType.DOUBLE;
+        }
+        if (pDataTypeName.startsWith("TIMESTAMP")) {
+            jdbcType = JDBCType.TIMESTAMP;
+        }
+        if (pDataTypeName.equals("REF CURSOR")) {
+            jdbcType = JDBCType.REF_CURSOR;
+        }
+        if (jdbcType == null) {
+            try {
+                jdbcType = JDBCType.valueOf(pDataType);
+            } catch (IllegalArgumentException e) {
+                jdbcType = JDBCType.VARCHAR;
+            }
+        }
+        return jdbcType;
+    }
+
+    /**
      * Returns the list of table/column metadata accessible for the authenticated database user.
      *
-     * @param pTableSearchPattern a regular expression narrowing the set of table subject to metadata retrieval
+     * @param pSchemaPattern a regular expression narrowing the set of schemas subject to metadata retrieval
+     * @param pTableNamePattern a regular expression narrowing the set of tables subject to metadata retrieval
      * @return the requested
      */
-	@Override
-    public Map<String, List<TableMetadata>> findTableMetadata(final String pTableSearchPattern) {
+	//@Override
+    public Map<String, List<TableMetadata>> findTableMetadataz(final String pSchemaPattern,
+                                                               final String pTableNamePattern) {
 
 		final List<OracleTableMetadata> oracleTableMetadataList = findTableMetadata0();
 		final Map<String, List<TableMetadata>> tableColumnMap = new HashMap<>();
@@ -71,7 +123,7 @@ public class OracleMetadata extends JDBCMetadata {
             // Filter out duplicates
 			if (!tableName.equals(oracleTableMetadata.getTableName())) {
 				tableName = oracleTableMetadata.getTableName();
-                if (pTableSearchPattern != null && !tableName.matches(pTableSearchPattern)) {
+                if (pTableNamePattern != null && !tableName.matches(pTableNamePattern)) {
                     tableName = "";
                     continue;
                 }

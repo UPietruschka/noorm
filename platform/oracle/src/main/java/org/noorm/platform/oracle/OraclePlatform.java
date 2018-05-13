@@ -90,6 +90,7 @@ public class OraclePlatform implements IPlatform {
         if (pDataSource instanceof OracleDataSource) {
             final Properties connectionProperties = new Properties();
             connectionProperties.setProperty(OracleConnection.CONNECTION_PROPERTY_FIXED_STRING, "true");
+            connectionProperties.setProperty(OracleConnection.CONNECTION_PROPERTY_INCLUDE_SYNONYMS, "true");
             ((OracleDataSource) pDataSource).setConnectionProperties(connectionProperties);
             validationInfo.append("Connection parameters: ");
             validationInfo.append(";Data Source Implementation: ");
