@@ -26,7 +26,6 @@ public class OracleMetadata extends JDBCMetadata {
 
 	private static final Logger log = LoggerFactory.getLogger(OracleMetadata.class);
 
-    public static final String UPDATABLE = "YES";
     public static final String NULLABLE = "Y";
 	private static OracleMetadata oracleMetadata = new OracleMetadata();
     private JDBCQueryProcessor queryProcessor = JDBCQueryProcessor.getInstance();
@@ -54,6 +53,10 @@ public class OracleMetadata extends JDBCMetadata {
 
 	}
 
+    private static final String UPDATABLE_COLUMN_QUERY =
+            "SELECT column_name, updatable FROM all_updatable_columns " +
+                    "WHERE  owner = p_owner AND table_name = p_table_name";
+
     /**
      * Resolves the JDBC datatype on basis of the platform specific type information found in JDBC metadata
      *
@@ -65,43 +68,7 @@ public class OracleMetadata extends JDBCMetadata {
     @Override
     public JDBCType findJDBCType(int pDataType, String pDataTypeName, int pDecimalDigits) {
 
-        JDBCType jdbcType = null;
-        if (pDataTypeName.endsWith("RAW")) {
-            jdbcType = JDBCType.BINARY;
-        }
-        if (pDataTypeName.contains("XMLTYPE")) {
-            jdbcType = JDBCType.SQLXML;
-        }
-        if (pDataTypeName.equals("NUMBER")) {
-            if (pDecimalDigits > 0) {
-                jdbcType = JDBCType.DOUBLE;
-            } else {
-                jdbcType = JDBCType.NUMERIC;
-            }
-        }
-        if (pDataTypeName.equals("BINARY_FLOAT")) {
-            jdbcType = JDBCType.FLOAT;
-        }
-        if (pDataTypeName.equals("BINARY_DOUBLE")) {
-            jdbcType = JDBCType.DOUBLE;
-        }
-        if (pDataTypeName.equals("FLOAT")) {
-            jdbcType = JDBCType.DOUBLE;
-        }
-        if (pDataTypeName.startsWith("TIMESTAMP")) {
-            jdbcType = JDBCType.TIMESTAMP;
-        }
-        if (pDataTypeName.equals("REF CURSOR")) {
-            jdbcType = JDBCType.REF_CURSOR;
-        }
-        if (jdbcType == null) {
-            try {
-                jdbcType = JDBCType.valueOf(pDataType);
-            } catch (IllegalArgumentException e) {
-                jdbcType = JDBCType.VARCHAR;
-            }
-        }
-        return jdbcType;
+        return convertOracleType2JDBCType(pDataTypeName, pDecimalDigits);
     }
 
     /**
@@ -142,7 +109,6 @@ public class OracleMetadata extends JDBCMetadata {
             tableMetadata.setColumnSize(oracleTableMetadata.getCharLength().intValue());
             tableMetadata.setDecimalDigits(decimalDigits);
             tableMetadata.setNullable(oracleTableMetadata.getNullable().equals(NULLABLE));
-            tableMetadata.setUpdatable(oracleTableMetadata.getUpdatable().equals(UPDATABLE));
 			tableMetadataList0.add(tableMetadata);
 		}
 		return tableColumnMap;
@@ -356,7 +322,6 @@ public class OracleMetadata extends JDBCMetadata {
             recordMetadata.setColumnSize(recordMetadataBean.getCharLength().intValue());
             recordMetadata.setDecimalDigits(decimalDigits);
             recordMetadata.setNullable(recordMetadataBean.getNullable().equals(NULLABLE));
-            recordMetadata.setUpdatable(recordMetadataBean.getUpdatable().equals(UPDATABLE));
 			recordMetadataList0.add(recordMetadata);
 		}
 		return recordColumnMap;

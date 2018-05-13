@@ -13,7 +13,6 @@
         <mapping key="(EMPLOYEES|DEPARTMENTS|LOCATIONS|COMPLEX.*)" value="$1_SEQ"/>
         <mapping key="(OPT_LOCK_.*)" value="OPT_LOCK_SEQ"/>
         <mapping key="(case_sensitive_table)" value="case_sensitive_table_seq"/>
-        <mapping key="(V_DEPARTMENTS)" value="DEPARTMENTS_SEQ"/>
     </table2SequenceMappings>
     <table2InterfaceMappings>
         <mapping key="(EMPLOYEES)" value="org.noorm.test.TestInterface"/>
@@ -32,9 +31,6 @@
         <mapping key="case_.*" value="version"/>
     </optLockVersionColumnMappings>
     <optLockFullRowCompareTableFilter regex="V_DEPARTMENTS|JOBS|JOB_HISTORY"/>
-    <viewName2PrimaryKeyMappings>
-        <mapping key="V_DEPARTMENTS" value="DEPARTMENT_ID"/>
-    </viewName2PrimaryKeyMappings>
     <singleRowFinderProcedureFilter regex="(.*_unique.*)"/>
     <queryDeclarations>
         <queryDeclaration tableName="EMPLOYEES">

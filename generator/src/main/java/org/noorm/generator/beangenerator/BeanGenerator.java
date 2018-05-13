@@ -197,11 +197,8 @@ public class BeanGenerator {
 
                 final boolean noUpdateConfigured = GeneratorUtil.checkForNoUpdateColumns
 						(tableMetadata.getTableName(), columnName, configuration.getNoUpdateColumnMappings());
-				if (noUpdateConfigured || !tableMetadata.getUpdatable()) {
+				if (noUpdateConfigured) {
 					beanAttributeDescriptor.setUpdatable(false);
-				}
-				if (!tableMetadata.getUpdatable()) {
-					beanAttributeDescriptor.setInsertable(false);
 				}
 
                 final JDBCType jdbcType = tableMetadata.getJDBCType();
@@ -291,13 +288,6 @@ public class BeanGenerator {
             pkColumnNames.add(primaryKeyBean.getColumnName());
 		}
 		if (pkColumnNames.isEmpty()) {
-			if (configuration.getViewName2PrimaryKeyMappings() != null) {
-				final String viewPKName =
-                        GeneratorUtil.getMappedString(pTableName, configuration.getViewName2PrimaryKeyMappings());
-				if (!viewPKName.isEmpty()) {
-					pkColumnNames.add(viewPKName);
-				}
-			}
 			if (pkColumnNames.isEmpty()) {
 				log.info("No primary key found."
 						.concat("Automatic support for DML will not be available for table ")

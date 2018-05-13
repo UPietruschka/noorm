@@ -16,7 +16,6 @@ public class TableMetadata {
 	private int decimalDigits;
 	private int columnSize;
 	private boolean nullable;
-	private boolean updatable;
 
 	public String getTableName() {
 		return tableName;
@@ -64,13 +63,5 @@ public class TableMetadata {
 
 	public void setNullable(final boolean pNullable) {
 		nullable = pNullable;
-	}
-
-	public boolean getUpdatable() {
-		return updatable;
-	}
-
-	public void setUpdatable(final boolean pUpdatable) {
-		updatable = pUpdatable;
 	}
 }

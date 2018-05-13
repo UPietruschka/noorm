@@ -2,6 +2,7 @@ package org.noorm.test;
 
 import org.junit.Test;
 import org.noorm.jdbc.DataSourceProvider;
+import org.noorm.test.hr.beans.Departments;
 import org.noorm.test.hr.beans.VDepartments;
 import org.noorm.test.hr.services.BeanDML;
 import org.noorm.test.hr.services.DepartmentService;
@@ -49,21 +50,21 @@ public class DepartmentServiceTest {
         DataSourceProvider.begin();
         try {
             final DepartmentService departmentService = DepartmentService.getInstance();
-            final VDepartments newDepartments = new VDepartments();
+            final Departments newDepartments = new Departments();
             newDepartments.setDepartmentName(NEW_DEPARTMENT_NAME);
             newDepartments.setLocationId(NEW_DEPARTMENT_LOCATION_ID);
             newDepartments.setManagerId(NEW_DEPARTMENT_MANAGER_ID);
-            final VDepartments newDepartments1 = beanDML.insertVDepartments(newDepartments);
+            final Departments newDepartments1 = beanDML.insertDepartments(newDepartments);
             assertNotNull(newDepartments1);
-            final List<VDepartments> vDepartmentsList =
+            final List<VDepartments> departmentsList =
                     departmentService.findDepartmentsById(newDepartments1.getDepartmentId());
-            assertEquals(1L, vDepartmentsList.size());
+            assertEquals(1L, departmentsList.size());
             newDepartments1.setLocationId(NEW_DEPARTMENT_LOCATION_ID1);
-            beanDML.updateVDepartments(newDepartments1);
-            beanDML.deleteVDepartments(newDepartments1);
-            final List<VDepartments> vDepartmentsList1 =
+            beanDML.updateDepartments(newDepartments1);
+            beanDML.deleteDepartments(newDepartments1);
+            final List<VDepartments> departmentsList1 =
                     departmentService.findDepartmentsById(newDepartments1.getDepartmentId());
-            assertEquals(0L, vDepartmentsList1.size());
+            assertEquals(0L, departmentsList1.size());
             DataSourceProvider.commit();
         } catch (Throwable e) {
             DataSourceProvider.rollback();

@@ -195,19 +195,6 @@
                         </xs:documentation>
                     </xs:annotation>
                 </xs:element>
-                <xs:element name="viewName2PrimaryKeyMappings" type="mappingList" minOccurs="0">
-                    <xs:annotation>
-                        <xs:documentation>
-                            The database metadata does not provide unambiguous information for the primary
-                            key of a view (for tables, this information is available). When the intended use of a
-                            view includes DML operations (which requires the view to contain one and only one
-                            key-preserved table), NoORM needs a key to uniquely distinguish the records of this view.
-                            Use this parameter to specify the column name of the key used for a given view.
-                            Typically, this key is the primary key of the single key-preserved table contained in
-                            the view definition.
-                        </xs:documentation>
-                    </xs:annotation>
-                </xs:element>
                 <xs:element name="singleRowFinderProcedureFilter" type="regex" minOccurs="0">
                     <xs:annotation>
                         <xs:documentation>

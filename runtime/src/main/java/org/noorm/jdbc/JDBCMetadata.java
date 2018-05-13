@@ -90,7 +90,6 @@ public abstract class JDBCMetadata implements IMetadata {
                 tableMetadata.setColumnSize(columnSize);
                 tableMetadata.setDecimalDigits(decimalDigits);
                 tableMetadata.setNullable(isNullable);
-                tableMetadata.setUpdatable(true);
                 tableMetadata.setJDBCType(jdbcType);
                 tableMetadataList.add(tableMetadata);
                 tableMetaDataMap.put(tableName, tableMetadataList);
