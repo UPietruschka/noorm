@@ -35,7 +35,6 @@ public class BeanGenerator {
 	private static final String BEAN_VALIDATOR_VM_TEMPLATE_FILE = "/bean_validator.vm";
 	private static final String BEAN_VALIDATOR_CLASS_NAME = "GenericBeanValidator";
 	private static final String BEAN_DML_VM_TEMPLATE_FILE = "/bean_dml.vm";
-	private static final String IGNORE_BEAN_FILTER_REGEX = "(DYNSQL_QUERY_TEMPLATE)";
 
 	private IParameters parameters;
     private GeneratorConfiguration configuration;
@@ -105,10 +104,6 @@ public class BeanGenerator {
 		}
 
 		for (final String tableName0 : tableColumnMap.keySet()) {
-			if (tableName0.matches(IGNORE_BEAN_FILTER_REGEX)) {
-				// Ignore the NoORM tables
-				continue;
-			}
 			final String javaBeanName =
                     GeneratorUtil.convertTableName2JavaName(tableName0, configuration.getTableNameMappings());
 			final List<TableMetadata> tableMetadataList1 = tableColumnMap.get(tableName0);
@@ -281,7 +276,7 @@ public class BeanGenerator {
 	private String[] getPrimaryKeyColumnNames(final String pTableName,
 										      final List<PrimaryKeyColumn> pPrimaryKeyColumnList) {
 
-		final List<String> pkColumnNames = new ArrayList<String>();
+		final List<String> pkColumnNames = new ArrayList<>();
 		for (final PrimaryKeyColumn primaryKeyBean : pPrimaryKeyColumnList) {
             log.info("Primary key column ".concat(primaryKeyBean.getColumnName())
                     .concat(" found for table ").concat(pTableName));

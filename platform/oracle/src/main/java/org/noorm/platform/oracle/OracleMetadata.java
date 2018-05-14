@@ -53,10 +53,6 @@ public class OracleMetadata extends JDBCMetadata {
 
 	}
 
-    private static final String UPDATABLE_COLUMN_QUERY =
-            "SELECT column_name, updatable FROM all_updatable_columns " +
-                    "WHERE  owner = p_owner AND table_name = p_table_name";
-
     /**
      * Resolves the JDBC datatype on basis of the platform specific type information found in JDBC metadata
      *

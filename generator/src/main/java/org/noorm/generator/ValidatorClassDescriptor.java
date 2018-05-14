@@ -11,7 +11,7 @@ import java.util.List;
 public class ValidatorClassDescriptor {
 
 	private String packageName;
-	private List<String> classNames = new ArrayList<String>();
+	private List<String> classNames = new ArrayList<>();
     private String dataSourceName;
     private String schemaPattern;
     private String tableNamePattern;
