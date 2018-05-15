@@ -7,6 +7,7 @@ import org.noorm.test.hr.beans.JobHistory;
 import org.noorm.test.hr.services.BeanDML;
 import org.noorm.test.hr.services.EmployeeService;
 
+import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
@@ -36,7 +37,7 @@ public class MultiThreadTest {
         searchC.add(Calendar.MONTH, 2 + pAddMonth);
         endC.add(Calendar.MONTH, 3 + pAddMonth);
         final Date start = startC.getTime();
-        final Date search = searchC.getTime();
+        final Timestamp search = new Timestamp(searchC.getTimeInMillis());
         final Date end = endC.getTime();
         final List<JobHistory> jobHistoryList = new ArrayList<JobHistory>();
         final List<Employees> employeeList = employeeService.findAllEmployees();

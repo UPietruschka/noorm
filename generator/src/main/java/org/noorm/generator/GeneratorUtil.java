@@ -289,14 +289,29 @@ public class GeneratorUtil {
         if (pJDBCType.equals(JDBCType.DOUBLE)) {
             javaType = "Double";
         }
+        if (pJDBCType.equals(JDBCType.DECIMAL)) {
+            javaType = "Double";
+        }
         if (pJDBCType.equals(JDBCType.INTEGER)) {
             javaType = "Integer";
+        }
+        if (pJDBCType.equals(JDBCType.SMALLINT)) {
+            javaType = "Integer";
+        }
+        if (pJDBCType.equals(JDBCType.TINYINT)) {
+            javaType = "Integer";
+        }
+        if (pJDBCType.equals(JDBCType.BIGINT)) {
+            javaType = "Long";
         }
         if (pJDBCType.equals(JDBCType.DATE)) {
             javaType = "java.util.Date";
         }
         if (pJDBCType.equals(JDBCType.TIMESTAMP)) {
-            javaType = "java.util.Date";
+            javaType = "java.sql.Timestamp";
+        }
+        if (pJDBCType.equals(JDBCType.TIMESTAMP_WITH_TIMEZONE)) {
+            javaType = "java.sql.Timestamp";
         }
         return javaType;
     }

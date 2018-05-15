@@ -81,7 +81,7 @@ public class PostgresqlMetadata extends JDBCMetadata {
                 throw new DataAccessException(DataAccessException.Type.COULD_NOT_ACCESS_JDBC_METADATA);
             }
             final Map<String, Object> incResult= incResults.get(0);
-            sequence.setIncrementBy((Integer) incResult.get("increment_by"));
+            sequence.setIncrementBy(((Long) incResult.get("increment_by")).intValue());
             sequences.add(sequence);
             log.debug("Found sequence metadata for sequence name/increment by : "
                     + sequence.getName() + "/" + sequence.getIncrementBy());
