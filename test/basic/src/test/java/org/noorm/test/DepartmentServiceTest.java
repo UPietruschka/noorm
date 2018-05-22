@@ -4,8 +4,8 @@ import org.junit.Test;
 import org.noorm.jdbc.DataSourceProvider;
 import org.noorm.test.hr.beans.Departments;
 import org.noorm.test.hr.beans.VDepartments;
-import org.noorm.test.hr.services.BeanDML;
 import org.noorm.test.hr.services.DepartmentService;
+import org.noorm.test.hr.services.DepartmentsDML;
 
 import java.util.List;
 
@@ -28,7 +28,7 @@ public class DepartmentServiceTest {
     private static final Integer NEW_DEPARTMENT_LOCATION_ID1 = 3100;
     private static final Long NEW_DEPARTMENT_MANAGER_ID = 205L;
 
-	private BeanDML beanDML = BeanDML.getInstance();
+	private DepartmentsDML departmentsDML = DepartmentsDML.getInstance();
 
     @Test
     public void testFindVDepartmentById() {
@@ -54,14 +54,14 @@ public class DepartmentServiceTest {
             newDepartments.setDepartmentName(NEW_DEPARTMENT_NAME);
             newDepartments.setLocationId(NEW_DEPARTMENT_LOCATION_ID);
             newDepartments.setManagerId(NEW_DEPARTMENT_MANAGER_ID);
-            final Departments newDepartments1 = beanDML.insertDepartments(newDepartments);
+            final Departments newDepartments1 = departmentsDML.insertDepartments(newDepartments);
             assertNotNull(newDepartments1);
             final List<VDepartments> departmentsList =
                     departmentService.findDepartmentsById(newDepartments1.getDepartmentId());
             assertEquals(1L, departmentsList.size());
             newDepartments1.setLocationId(NEW_DEPARTMENT_LOCATION_ID1);
-            beanDML.updateDepartments(newDepartments1);
-            beanDML.deleteDepartments(newDepartments1);
+            departmentsDML.updateDepartments(newDepartments1);
+            departmentsDML.deleteDepartments(newDepartments1);
             final List<VDepartments> departmentsList1 =
                     departmentService.findDepartmentsById(newDepartments1.getDepartmentId());
             assertEquals(0L, departmentsList1.size());

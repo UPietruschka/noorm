@@ -4,8 +4,10 @@
        xsi:schemaLocation="http://www.springframework.org/schema/beans
                            http://www.springframework.org/schema/beans/spring-beans-3.0.xsd">
 
-    <bean id="beanDML_HR1" class="org.noorm.test.hr1.services.impl.BeanDML"/>
-    <bean id="beanDML_HR2" class="org.noorm.test.hr2.services.impl.BeanDML"/>
+    <bean id="employeesDML" class="org.noorm.test.hr1.services.impl.EmployeesDML"/>
+    <bean id="departmentsDML" class="org.noorm.test.hr2.services.impl.DepartmentsDML"/>
+    <bean id="jobsDML" class="org.noorm.test.hr1.services.impl.JobsDML"/>
+    <bean id="historyDML" class="org.noorm.test.hr1.services.impl.HistoryDML"/>
     <bean id="employeeService" class="org.noorm.test.hr1.services.impl.EmployeeService"/>
     <bean id="employeeDAO" class="org.noorm.test.hr2.services.impl.EmployeeDAO"/>
 

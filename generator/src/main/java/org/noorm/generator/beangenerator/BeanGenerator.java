@@ -59,18 +59,6 @@ public class BeanGenerator {
 		final ValidatorClassDescriptor validatorClassDescriptor = new ValidatorClassDescriptor();
 		validatorClassDescriptor.setPackageName(configuration.getBeanJavaPackage().getName());
 
-		final BeanDMLClassDescriptor beanDMLClassDescriptor = new BeanDMLClassDescriptor();
-		beanDMLClassDescriptor.setBeanPackageName(configuration.getBeanJavaPackage().getName());
-        if (GeneratorUtil.hasServiceInterfacePackageName(configuration)) {
-            beanDMLClassDescriptor.setInterfacePackageName(configuration.getServiceInterfaceJavaPackage().getName());
-        }
-		beanDMLClassDescriptor.setPackageName(configuration.getServiceJavaPackage().getName());
-
-        if (GeneratorUtil.hasDataSourceName(configuration)) {
-            validatorClassDescriptor.setDataSourceName(configuration.getDataSource().getName());
-            beanDMLClassDescriptor.setDataSourceName(configuration.getDataSource().getName());
-        }
-
         final IMetadata metadata = DataSourceProvider.getPlatform().getMetadata();
 
 		log.info("Retrieving table metadata from database.");
@@ -240,18 +228,37 @@ public class BeanGenerator {
             }
 			GeneratorUtil.generateFile(beanPackageDir, BEAN_VM_TEMPLATE_FILE,
 					beanClassDescriptor.getName(), beanClassDescriptor);
-			beanDMLClassDescriptor.addBean(beanClassDescriptor);
+
+			final BeanDMLClassDescriptor beanDMLClassDescriptor = new BeanDMLClassDescriptor();
+			beanDMLClassDescriptor.setBeanPackageName(configuration.getBeanJavaPackage().getName());
+			beanDMLClassDescriptor.setJavaName(beanClassDescriptor.getName() + "DML");
+            beanDMLClassDescriptor.addBean(beanClassDescriptor);
+			if (GeneratorUtil.hasServiceInterfacePackageName(configuration)) {
+				beanDMLClassDescriptor.setInterfacePackageName
+                        (configuration.getServiceInterfaceJavaPackage().getName());
+			}
+			beanDMLClassDescriptor.setPackageName(configuration.getServiceJavaPackage().getName());
+
+			if (GeneratorUtil.hasDataSourceName(configuration)) {
+				validatorClassDescriptor.setDataSourceName(configuration.getDataSource().getName());
+				beanDMLClassDescriptor.setDataSourceName(configuration.getDataSource().getName());
+			}
+
+			GeneratorUtil.generateFile(servicePackageDir, BEAN_DML_VM_TEMPLATE_FILE,
+					beanDMLClassDescriptor.getJavaName(), beanDMLClassDescriptor);
+			if (GeneratorUtil.hasServiceInterfacePackageName(configuration)) {
+				beanDMLClassDescriptor.setInterface(true);
+				GeneratorUtil.generateFile(serviceInterfacePackageDir, BEAN_DML_VM_TEMPLATE_FILE,
+						"I" + beanDMLClassDescriptor.getJavaName(), beanDMLClassDescriptor);
+			}
 		}
 		GeneratorUtil.generateFile(beanPackageDir, BEAN_VALIDATOR_VM_TEMPLATE_FILE,
 				BEAN_VALIDATOR_CLASS_NAME, validatorClassDescriptor);
-		GeneratorUtil.generateFile(servicePackageDir, BEAN_DML_VM_TEMPLATE_FILE,
-                beanDMLClassDescriptor.getJavaName(), beanDMLClassDescriptor);
-        if (GeneratorUtil.hasServiceInterfacePackageName(configuration)) {
-			beanDMLClassDescriptor.setInterface(true);
-			GeneratorUtil.generateFile(serviceInterfacePackageDir, BEAN_DML_VM_TEMPLATE_FILE,
-					beanDMLClassDescriptor.getJavaInterfaceName(), beanDMLClassDescriptor);
-		}
 	}
+
+	private void generateBeanDML() {
+
+    }
 
 	private Sequence getSequence(final String pTableName,
                                  final List<Sequence> pSequenceList) {

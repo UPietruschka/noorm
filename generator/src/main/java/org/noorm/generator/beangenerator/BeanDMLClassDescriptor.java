@@ -10,8 +10,7 @@ import java.util.List;
  */
 public class BeanDMLClassDescriptor {
 
-    private static final String BEAN_DML_CLASS_NAME = "BeanDML";
-
+	private String javaName;
 	private String packageName;
 	private String interfacePackageName;
 	private String beanPackageName;
@@ -63,14 +62,17 @@ public class BeanDMLClassDescriptor {
 		return interfacePackageName != null && !interfacePackageName.isEmpty();
 	}
 
-    public String getJavaName() {
-        return BEAN_DML_CLASS_NAME;
+	public void setJavaName(final String pJavaName) {
+        javaName = pJavaName;
     }
 
-	public String getJavaInterfaceName() {
-        final String BEAN_DML_INTERFACE_NAME = "IBeanDML";
-        return BEAN_DML_INTERFACE_NAME;
-	}
+    public String getJavaName() {
+        return javaName;
+    }
+
+    public String getFirstLowerName() {
+        return javaName.toLowerCase().substring(0, 1).concat(javaName.substring(1));
+    }
 
     public String getDataSourceName() {
         return dataSourceName;

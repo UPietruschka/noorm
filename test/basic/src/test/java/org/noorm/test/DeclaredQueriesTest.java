@@ -7,7 +7,7 @@ import org.noorm.jdbc.TableLock;
 import org.noorm.test.hr.beans.Countries;
 import org.noorm.test.hr.beans.Departments;
 import org.noorm.test.hr.beans.Employees;
-import org.noorm.test.hr.services.BeanDML;
+import org.noorm.test.hr.services.CountriesDML;
 import org.noorm.test.hr.services.DeclaredQueries;
 import org.noorm.test.hr.services.EmployeeFinder;
 
@@ -26,7 +26,7 @@ import static org.junit.Assert.*;
  */
 public class DeclaredQueriesTest {
 
-    private BeanDML beanDML = BeanDML.getInstance();
+    private CountriesDML countriesDML = CountriesDML.getInstance();
 
     @Test
     public void testFindDepartment() {
@@ -107,14 +107,14 @@ public class DeclaredQueriesTest {
         try {
             DataSourceProvider.begin();
             TableLock.acquire(country, TableLock.LockMode.ROW_EXCLUSIVE);
-            beanDML.insertCountries(country);
+            countriesDML.insertCountries(country);
             final List<String> countryIds = new ArrayList<>();
             countryIds.add(countryId);
             countryIds.add("QQ"); // Non existent value
             countryIds.add("XX"); // Non existent value
             final List<Countries>countries = declaredQueries.findCountriesByCountryId(countryIds);
             assertEquals(1, countries.size());
-            beanDML.deleteCountries(country);
+            countriesDML.deleteCountries(country);
             DataSourceProvider.commit();
         } catch (Throwable e) {
             DataSourceProvider.rollback();

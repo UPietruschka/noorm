@@ -4,8 +4,8 @@ import org.junit.Test;
 import org.noorm.jdbc.DataSourceProvider;
 import org.noorm.test.hr.beans.Employees;
 import org.noorm.test.hr.beans.JobHistory;
-import org.noorm.test.hr.services.BeanDML;
 import org.noorm.test.hr.services.EmployeeService;
+import org.noorm.test.hr.services.JobHistoryDML;
 
 import java.sql.Timestamp;
 import java.util.ArrayList;
@@ -24,7 +24,7 @@ public class MultiThreadTest {
 
     private static final int TEST_LOOP_COUNT = 30;
 
-    private BeanDML beanDML = BeanDML.getInstance();
+    private JobHistoryDML jobHistoryDML = JobHistoryDML.getInstance();
     private EmployeeService employeeService = EmployeeService.getInstance();
 
     // Test executed with testMultiThreadTCConnection
@@ -53,7 +53,7 @@ public class MultiThreadTest {
                 break;
             }
         }
-        beanDML.insertJobHistoryList(jobHistoryList);
+        jobHistoryDML.insertJobHistoryList(jobHistoryList);
 
         // Wait a short while to guarantee that for the multi-thread test different connections are used
         try {
@@ -65,7 +65,7 @@ public class MultiThreadTest {
         final List<JobHistory> jobHistoryList1 = employeeService.findJobHistoryByDate(search);
         assertEquals(jobHistoryList1.size(), TEST_LOOP_COUNT);
         for (final JobHistory jobHistory : jobHistoryList1) {
-            beanDML.deleteJobHistory(jobHistory);
+            jobHistoryDML.deleteJobHistory(jobHistory);
         }
     }
 

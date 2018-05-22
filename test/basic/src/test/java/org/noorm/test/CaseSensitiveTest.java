@@ -3,7 +3,7 @@ package org.noorm.test;
 import org.junit.Test;
 import org.noorm.jdbc.DataSourceProvider;
 import org.noorm.test.hr.beans.CaseSensitiveTable;
-import org.noorm.test.hr.services.BeanDML;
+import org.noorm.test.hr.services.CaseSensitiveTableDML;
 import org.noorm.test.hr.services.DeclaredQueries;
 
 import java.util.ArrayList;
@@ -19,7 +19,7 @@ import static org.junit.Assert.fail;
  */
 public class CaseSensitiveTest {
 
-    private BeanDML beanDML = BeanDML.getInstance();
+    private CaseSensitiveTableDML caseSensitiveTableDML = CaseSensitiveTableDML.getInstance();
 
     @Test
     public void testCaseSensitiveCRUD() {
@@ -36,13 +36,13 @@ public class CaseSensitiveTest {
             cs2.setC1(2L);
             cs2.setC2("B");
             csList.add(cs2);
-            beanDML.insertCaseSensitiveTableList(csList);
+            caseSensitiveTableDML.insertCaseSensitiveTableList(csList);
             final List<CaseSensitiveTable> csList1 = declaredQueries.findCaseSensitiveTable();
             assertEquals(2L, csList1.size());
             final CaseSensitiveTable newCS1 = csList1.get(0);
             newCS1.setC2("C");
-            beanDML.updateCaseSensitiveTable(newCS1);
-            beanDML.deleteCaseSensitiveTableList(csList1);
+            caseSensitiveTableDML.updateCaseSensitiveTable(newCS1);
+            caseSensitiveTableDML.deleteCaseSensitiveTableList(csList1);
             final List<CaseSensitiveTable> csList2 = declaredQueries.findCaseSensitiveTable();
             assertEquals(0L, csList2.size());
             DataSourceProvider.commit();

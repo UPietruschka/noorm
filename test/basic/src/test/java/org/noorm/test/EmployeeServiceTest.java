@@ -7,8 +7,10 @@ import org.noorm.test.hr.beans.Employees;
 import org.noorm.test.hr.beans.JobHistory;
 import org.noorm.test.hr.beans.Jobs;
 import org.noorm.test.hr.beans.SalaryGroupRecord;
-import org.noorm.test.hr.services.BeanDML;
 import org.noorm.test.hr.services.EmployeeService;
+import org.noorm.test.hr.services.EmployeesDML;
+import org.noorm.test.hr.services.JobHistoryDML;
+import org.noorm.test.hr.services.JobsDML;
 
 import java.util.List;
 
@@ -21,7 +23,9 @@ import static org.junit.Assert.*;
  */
 public class EmployeeServiceTest {
 
-	private BeanDML beanDML = BeanDML.getInstance();
+    private EmployeesDML employeesDML = EmployeesDML.getInstance();
+	private JobsDML jobsDML = JobsDML.getInstance();
+	private JobHistoryDML jobHistoryDML = JobHistoryDML.getInstance();
 
 	@Test
 	public void testFindEmployees() {
@@ -81,14 +85,14 @@ public class EmployeeServiceTest {
             employees.setCommissionPct(new java.math.BigDecimal(0.28D));
             employees.setManagerId(108L);
             employees.setDepartmentId(60);
-            final Employees newEmployees = beanDML.insertEmployees(employees);
+            final Employees newEmployees = employeesDML.insertEmployees(employees);
             final List<Employees> employeesList1 = employeeService.findEmployeesByLastname("Doe");
             assertEquals(employeesList1.size(), 1);
             assertEquals(employeesList1.get(0), newEmployees);
 
             // Modify the just inserted record
             newEmployees.setLastName("Public");
-            beanDML.updateEmployees(newEmployees);
+            employeesDML.updateEmployees(newEmployees);
             final List<Employees> employeesList2 = employeeService.findEmployeesByLastname("Doe");
             assertEquals(employeesList2.size(), 0);
             final List<Employees> employeesList3 = employeeService.findEmployeesByLastname("Public");
@@ -98,8 +102,8 @@ public class EmployeeServiceTest {
             // Delete the just inserted record. We have to delete the job history record inserted by the trigger, too
             final List<JobHistory> jobHistoryList =
                     employeeService.findJobHistoryByEmpId(newEmployees.getEmployeeId());
-            beanDML.deleteJobHistoryList(jobHistoryList);
-            beanDML.deleteEmployees(newEmployees);
+            jobHistoryDML.deleteJobHistoryList(jobHistoryList);
+            employeesDML.deleteEmployees(newEmployees);
             final List<Employees> employeesList4 = employeeService.findEmployeesByLastname("Public");
             assertEquals(employeesList4.size(), 0);
 
@@ -164,20 +168,20 @@ public class EmployeeServiceTest {
             jobs.setJobTitle("Controller");
             jobs.setMinSalary(8000L);
             jobs.setMaxSalary(12000L);
-            final Jobs newJobs =  beanDML.insertJobs(jobs);
+            final Jobs newJobs = jobsDML.insertJobs(jobs);
             final List<Jobs> jobsList = employeeService.findJobById("CT_MGR");
             assertEquals(jobsList.size(), 1);
             assertEquals(jobsList.get(0), newJobs);
 
             // Modify the just inserted record
             newJobs.setJobTitle("Controlling");
-            beanDML.updateJobs(newJobs);
+            jobsDML.updateJobs(newJobs);
             final List<Jobs> jobsList2 = employeeService.findJobById("CT_MGR");
             assertEquals(jobsList2.size(), 1);
             assertEquals(jobsList2.get(0).getJobTitle(), "Controlling");
 
             // Delete the just inserted record.
-            beanDML.deleteJobs(newJobs);
+            jobsDML.deleteJobs(newJobs);
             final List<Jobs> jobsList3 = employeeService.findJobById("CT_MGR");
             assertEquals(jobsList3.size(), 0);
 

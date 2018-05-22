@@ -3,8 +3,8 @@ package org.noorm.test;
 import org.junit.Test;
 import org.noorm.jdbc.DataSourceProvider;
 import org.noorm.test.hr.beans.JobsSynonym;
-import org.noorm.test.hr.services.BeanDML;
 import org.noorm.test.hr.services.DeclaredQueries;
+import org.noorm.test.hr.services.JobsSynonymDML;
 
 import java.util.List;
 
@@ -38,11 +38,11 @@ public class JobSynonymTest {
             job.setJobTitle("Test Title");
             job.setMinSalary(0L);
             job.setMaxSalary(1L);
-            BeanDML beanDML = BeanDML.getInstance();
-            final JobsSynonym job0 = beanDML.insertJobsSynonym(job);
+            JobsSynonymDML jobsSynonymDML = JobsSynonymDML.getInstance();
+            final JobsSynonym job0 = jobsSynonymDML.insertJobsSynonym(job);
             job0.setMaxSalary(2L);
-            beanDML.updateJobsSynonym(job0);
-            beanDML.deleteJobsSynonym(job0);
+            jobsSynonymDML.updateJobsSynonym(job0);
+            jobsSynonymDML.deleteJobsSynonym(job0);
             DataSourceProvider.commit();
         } catch (Throwable e) {
             DataSourceProvider.rollback();

@@ -4,6 +4,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.noorm.jdbc.DataSourceProvider;
 import org.noorm.test.hr1.services.IEmployeeService;
+import org.noorm.test.hr1.services.IJobsDML;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
@@ -25,7 +26,7 @@ public class NestedTransactionTest {
     private static final String HR1_DATA_SOURCE = "HR1";
 
     @Resource
-    private org.noorm.test.hr1.services.IBeanDML beanDML_HR1;
+    private IJobsDML jobsDML;
     @Resource
     private IEmployeeService employeeService;
 
@@ -77,6 +78,6 @@ public class NestedTransactionTest {
         assertEquals(1, jobsBeanList.size());
         JobsExt job = jobsBeanList.get(0);
         job.setMaxSalary(10000L);
-        beanDML_HR1.updateJobs(job);
+        jobsDML.updateJobs(job);
     }
 }

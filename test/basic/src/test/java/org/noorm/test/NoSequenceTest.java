@@ -6,7 +6,8 @@ import org.noorm.jdbc.DataAccessException;
 import org.noorm.jdbc.DataSourceProvider;
 import org.noorm.test.hr.beans.NoSeqNoPk;
 import org.noorm.test.hr.beans.NoSeqWithPk;
-import org.noorm.test.hr.services.BeanDML;
+import org.noorm.test.hr.services.NoSeqNoPkDML;
+import org.noorm.test.hr.services.NoSeqWithPkDML;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
@@ -21,7 +22,8 @@ public class NoSequenceTest {
     private static final String SOME_TEXT = "SOME_TEXT";
     private static final String SOME_NEW_TEXT = "SOME_NEW_TEXT";
 
-    private BeanDML beanDML = BeanDML.getInstance();
+    private NoSeqWithPkDML noSeqWithPkDML = NoSeqWithPkDML.getInstance();
+    private NoSeqNoPkDML noSeqNoPkDML = NoSeqNoPkDML.getInstance();
 
     @Test
     public void testNoSeqWithPkCRUD() {
@@ -31,11 +33,11 @@ public class NoSequenceTest {
             final NoSeqWithPk noSeqWithPk = new NoSeqWithPk();
             noSeqWithPk.setId(1L);
             noSeqWithPk.setText(SOME_TEXT);
-            final NoSeqWithPk insertedNoSeqWithPk =  beanDML.insertNoSeqWithPk(noSeqWithPk);
+            final NoSeqWithPk insertedNoSeqWithPk =  noSeqWithPkDML.insertNoSeqWithPk(noSeqWithPk);
             assertEquals(SOME_TEXT, insertedNoSeqWithPk.getText());
             insertedNoSeqWithPk.setText(SOME_NEW_TEXT);
-            beanDML.updateNoSeqWithPk(insertedNoSeqWithPk);
-            beanDML.deleteNoSeqWithPk(insertedNoSeqWithPk);
+            noSeqWithPkDML.updateNoSeqWithPk(insertedNoSeqWithPk);
+            noSeqWithPkDML.deleteNoSeqWithPk(insertedNoSeqWithPk);
             DataSourceProvider.commit();
         } catch (Throwable e) {
             DataSourceProvider.rollback();
@@ -51,10 +53,10 @@ public class NoSequenceTest {
             final NoSeqNoPk noSeqNoPk = new NoSeqNoPk();
             noSeqNoPk.setId(1L);
             noSeqNoPk.setText(SOME_TEXT);
-            final NoSeqNoPk insertedNoSeqNoPk =  beanDML.insertNoSeqNoPk(noSeqNoPk);
+            final NoSeqNoPk insertedNoSeqNoPk = noSeqNoPkDML.insertNoSeqNoPk(noSeqNoPk);
             assertEquals(SOME_TEXT, insertedNoSeqNoPk.getText());
             insertedNoSeqNoPk.setText(SOME_NEW_TEXT);
-            beanDML.updateNoSeqNoPk(insertedNoSeqNoPk);
+            noSeqNoPkDML.updateNoSeqNoPk(insertedNoSeqNoPk);
             DataSourceProvider.commit();
         } catch (DataAccessException e) {
             if (!e.getType().equals(DataAccessException.Type.GENERIC_UPDATE_NOT_SUPPORTED_WITHOUT_PK)) {

@@ -2,8 +2,8 @@ package org.noorm.test;
 
 import org.noorm.jdbc.DataSourceProvider;
 import org.noorm.test.hr.beans.Employees;
-import org.noorm.test.hr.services.BeanDML;
 import org.noorm.test.hr.services.EmployeeService;
+import org.noorm.test.hr.services.EmployeesDML;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -22,7 +22,7 @@ import java.util.List;
  */
 public class PerformanceTestRunner {
 
-    private static BeanDML beanDML = BeanDML.getInstance();
+    private static EmployeesDML employeesDML = EmployeesDML.getInstance();
     private static String[] JOB_IDS = new String[] {"AC_ACCOUNT", "AC_MGR", "AD_ASST", "AD_PRES", "AD_VP",
             "FI_ACCOUNT", "FI_MGR", "HR_REP", "IT_PROG", "MK_MAN", "MK_REP", "PR_REP", "PU_CLERK", "PU_MAN",
             "SA_MAN", "SA_REP", "SH_CLERK", "ST_CLERK", "ST_MAN" };
@@ -67,10 +67,10 @@ public class PerformanceTestRunner {
             employeeList.add(employees);
         }
         if (pUseBatchMode) {
-            beanDML.insertEmployeesList(employeeList);
+            employeesDML.insertEmployeesList(employeeList);
         } else {
             for (int i = 0; i < TEST_LOOP; i++) {
-                beanDML.insertEmployees(employeeList.get(i));
+                employeesDML.insertEmployees(employeeList.get(i));
             }
         }
     }
@@ -87,12 +87,12 @@ public class PerformanceTestRunner {
         for (final Employees employee : pEmployeesBeanList) {
             employee.setCommissionPct(new java.math.BigDecimal(0.22D));
         }
-        beanDML.updateEmployeesList(pEmployeesBeanList);
+        employeesDML.updateEmployeesList(pEmployeesBeanList);
     }
 
     private static void testEmployeeDelete(List<Employees> pEmployeesBeanList) {
 
-        beanDML.deleteEmployeesList(pEmployeesBeanList);
+        employeesDML.deleteEmployeesList(pEmployeesBeanList);
     }
 
     private static Employees assembleEmployee(final String pLastName,
