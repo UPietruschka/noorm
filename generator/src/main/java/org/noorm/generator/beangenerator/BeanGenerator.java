@@ -256,10 +256,6 @@ public class BeanGenerator {
 				BEAN_VALIDATOR_CLASS_NAME, validatorClassDescriptor);
 	}
 
-	private void generateBeanDML() {
-
-    }
-
 	private Sequence getSequence(final String pTableName,
                                  final List<Sequence> pSequenceList) {
 
