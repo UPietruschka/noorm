@@ -95,12 +95,17 @@ public abstract class JDBCMetadata implements IMetadata {
                 tableMetaDataMap.put(tableName, tableMetadataList);
             }
             if (tableMetaDataMap.isEmpty()) {
-                log.info("No JDBC table metadata found.");
+                log.error("No JDBC table metadata found for schema pattern '{}' and table name pattern '{}'",
+                        pSchemaPattern, pTableNamePattern);
+                throw new DataAccessException(DataAccessException.Type.REFERENCED_JDBC_METADATA_NOT_FOUND);
             } else {
                 log.info("JDBC table metadata found for " + tableMetaDataMap.size() + " tables.");
             }
             return tableMetaDataMap;
         } catch (Exception e) {
+            if (e instanceof DataAccessException) {
+                throw ((DataAccessException) e);
+            }
             log.error(DataAccessException.Type.COULD_NOT_ACCESS_JDBC_METADATA.getDescription(), e);
             success = false;
             throw new DataAccessException(DataAccessException.Type.COULD_NOT_ACCESS_JDBC_METADATA, e);
