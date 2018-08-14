@@ -35,7 +35,7 @@
             <plugin>
                 <groupId>org.jvnet.jaxb2.maven2</groupId>
                 <artifactId>maven-jaxb2-plugin</artifactId>
-                <version>0.13.3</version>
+                <version>0.14.0</version>
                 <executions>
                     <execution>
                         <phase>generate-sources</phase>
@@ -58,7 +58,7 @@
                                 <plugin>
                                     <groupId>com.github.jaxb-xew-plugin</groupId>
                                     <artifactId>jaxb-xew-plugin</artifactId>
-                                    <version>1.9</version>
+                                    <version>1.10</version>
                                 </plugin>
                             </plugins>
                         </configuration>
