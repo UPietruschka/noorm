@@ -366,6 +366,7 @@
         <xs:complexType>
             <xs:sequence>
                 <xs:element name="queryColumn" type="queryColumn" minOccurs="0" maxOccurs="unbounded"/>
+                <xs:element name="logical" type="logical" minOccurs="0" maxOccurs="unbounded"/>
             </xs:sequence>
             <xs:attribute name="tableName" use="required" type="xs:string">
                 <xs:annotation>
@@ -433,6 +434,19 @@
         </xs:complexType>
     </xs:element>
 
+    <xs:complexType name="logical">
+        <xs:annotation>
+            <xs:documentation>
+                A logical operator (AND, OR) overrides the default way (AND) to combine query conditions.
+            </xs:documentation>
+        </xs:annotation>
+        <xs:choice minOccurs="2" maxOccurs="unbounded">
+            <xs:element name="queryColumn" type="queryColumn"/>
+            <xs:element name="logical" type="logical"/>
+        </xs:choice>
+        <xs:attribute name="operator" use="required" type="logicalOperatorName"/>
+    </xs:complexType>
+
     <xs:complexType name="queryColumn">
         <xs:annotation>
             <xs:documentation>
@@ -468,6 +482,18 @@
             <xs:enumeration value="IS_NULL"/>
             <xs:enumeration value="IS_NOT_NULL"/>
             <xs:enumeration value="IN"/>
+        </xs:restriction>
+    </xs:simpleType>
+
+    <xs:simpleType name="logicalOperatorName">
+        <xs:annotation>
+            <xs:documentation>
+                Logical operators to combine query conditions.
+            </xs:documentation>
+        </xs:annotation>
+        <xs:restriction base="xs:string">
+            <xs:enumeration value="AND"/>
+            <xs:enumeration value="OR"/>
         </xs:restriction>
     </xs:simpleType>
 

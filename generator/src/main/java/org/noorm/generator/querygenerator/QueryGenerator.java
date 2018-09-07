@@ -4,10 +4,7 @@ import org.noorm.generator.GeneratorException;
 import org.noorm.generator.GeneratorUtil;
 import org.noorm.generator.ParameterDescriptor;
 import org.noorm.generator.IParameters;
-import org.noorm.generator.schema.GeneratorConfiguration;
-import org.noorm.generator.schema.OperatorName;
-import org.noorm.generator.schema.QueryColumn;
-import org.noorm.generator.schema.QueryDeclaration;
+import org.noorm.generator.schema.*;
 import org.noorm.jdbc.DataSourceProvider;
 import org.noorm.jdbc.Utils;
 import org.noorm.jdbc.platform.IMetadata;
@@ -110,6 +107,14 @@ public class QueryGenerator {
             }
             queryDescriptor.setBeanName(beanName);
             int paramIndex = 1;
+
+            for (final Logical logical : queryDeclaration.getLogical()) {
+                for (final Object queryColumnOrLogical : logical.getQueryColumnOrLogical()) {
+
+                }
+            }
+
+
             for (final QueryColumn queryColumn : queryDeclaration.getQueryColumn()) {
                 final ParameterDescriptor parameterDescriptor = new ParameterDescriptor();
                 final String columnName = queryColumn.getName();
