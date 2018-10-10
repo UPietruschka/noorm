@@ -174,6 +174,7 @@ public class OraclePlatform implements IPlatform {
     }
 
     private static final String BASE_QUERY_PLACEHOLDER = "__BASE_QUERY__";
+    private static final String TOTAL_LIMIT_PLACEHOLDER = "__TOTAL_LIMIT__";
     private static final String COUNT_PLACEHOLDER = "__COUNT__";
     private static final String STARTROW_PLACEHOLDER = "__STARTROW__";
     private static final String ENDROW_PLACEHOLDER = "__ENDROW__";
@@ -181,10 +182,11 @@ public class OraclePlatform implements IPlatform {
     private static final String ORACLE_PAGING_WRAPPER =
             "SELECT /*+ first_rows(" + COUNT_PLACEHOLDER + ") */ * FROM "
           + "(SELECT WRAPPED.*, ROWNUM pos, COUNT(*) OVER() " + IBean.PAGING_TOTAL + " FROM "
-          + "(" + BASE_QUERY_PLACEHOLDER + ORDERBY_PLACEHOLDER + ") WRAPPED) "
+          + "(" + BASE_QUERY_PLACEHOLDER + TOTAL_LIMIT_PLACEHOLDER + ORDERBY_PLACEHOLDER + ") WRAPPED) "
           + "WHERE pos BETWEEN " + STARTROW_PLACEHOLDER + " AND " + ENDROW_PLACEHOLDER;
 
     private static final String ORDER_BY_CLAUSE = " ORDER BY ";
+    private static final String TOTAL_LIMIT_CLAUSE = " AND ROWNUM <= ";
 
     /**
      * Constructs a SQL query based on the provided information.
@@ -210,6 +212,12 @@ public class OraclePlatform implements IPlatform {
         }
         String statement = ORACLE_PAGING_WRAPPER;
         statement = statement.replace(BASE_QUERY_PLACEHOLDER, baseQuery);
+        final Integer totalLimit = pFilterExtension.getTotalLimit();
+        if (totalLimit != null && totalLimit > 0) {
+            statement = statement.replace(TOTAL_LIMIT_PLACEHOLDER, TOTAL_LIMIT_CLAUSE + totalLimit + " ");
+        } else {
+            statement = statement.replace(TOTAL_LIMIT_PLACEHOLDER, "");
+        }
         statement = statement.replace(COUNT_PLACEHOLDER, Integer.toString(pFilterExtension.getLimit()));
         // Oracle rownum starts from "1", we want offset to start from "0", so we add "1" to the offset.
         final int offset0 = pFilterExtension.getOffset() + 1;

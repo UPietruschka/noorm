@@ -22,6 +22,7 @@ public class FilterExtension {
 
     private int offset = 0;
     private int limit = UNLIMITED;
+    private Integer totalLimit;
     private List<SortCriteria> sortCriteria = new ArrayList<>();
     private boolean pagingTotalSupported = true;
 
@@ -39,6 +40,14 @@ public class FilterExtension {
 
     public void setLimit(final int pLimit) {
         limit = pLimit;
+    }
+
+    public Integer getTotalLimit() {
+        return totalLimit;
+    }
+
+    public void setTotalLimit(final Integer pTotalLimit) {
+        totalLimit = pTotalLimit;
     }
 
     public List<SortCriteria> getSortCriteria() {
