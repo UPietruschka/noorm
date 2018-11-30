@@ -442,6 +442,7 @@
         </xs:annotation>
         <xs:attribute name="name" use="required" type="xs:string"/>
         <xs:attribute name="operator" type="operatorName"/>
+        <xs:attribute name="customExpression" type="xs:string"/>
     </xs:complexType>
 
     <xs:simpleType name="operatorName">
@@ -455,6 +456,10 @@
                 is used for the WHERE condition, but a list. The generated Java code will expect a
                 java.util.List with elements of the column type (resp. mapped Java type) in the finder
                 interface.
+                When choosing the CUSTOM operator, the additional attribute 'customExpression' must be
+                provided. While the name of the query column still points to a valid database column, the
+                custom expression may use the query column for any meaningful purpose, which eventually
+                evaluates to a boolean (in SQL).
             </xs:documentation>
         </xs:annotation>
         <xs:restriction base="xs:string">
@@ -468,6 +473,7 @@
             <xs:enumeration value="IS_NULL"/>
             <xs:enumeration value="IS_NOT_NULL"/>
             <xs:enumeration value="IN"/>
+            <xs:enumeration value="CUSTOM"/>
         </xs:restriction>
     </xs:simpleType>
 

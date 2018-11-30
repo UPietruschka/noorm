@@ -117,6 +117,7 @@ public class QueryGenerator {
                 parameterDescriptor.setJavaName
                         (PARAMETER_PREFIX + index + Utils.convertDBName2JavaName(columnName, true));
                 parameterDescriptor.setDbParamName(columnName);
+                parameterDescriptor.setCustomExpression(queryColumn.getCustomExpression());
                 String javaType = null;
                 for (final TableMetadata tableMetadata : tableMetadataList) {
                     if (tableMetadata.getColumnName().equals(columnName)) {
@@ -129,8 +130,8 @@ public class QueryGenerator {
                     }
                 }
                 if (javaType == null) {
-                    throw new GeneratorException("Invalid query declaration: no metadata found for table ".concat(t0)
-                            .concat(" and column ").concat(columnName));
+                    throw new GeneratorException("Invalid query declaration: no metadata found for table "
+                            .concat(t0).concat(" and column ").concat(columnName));
                 }
                 parameterDescriptor.setJavaType(javaType);
                 parameterDescriptor.setOperator(queryColumn.getOperator());

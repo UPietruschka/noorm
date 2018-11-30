@@ -16,6 +16,7 @@ public class ParameterDescriptor {
     private OperatorName operator;
     private boolean unaryOperator = false;
     private boolean isList = false;
+    private String customExpression;
 
 	public void setJavaName(final String pJavaName) {
 		javaName = pJavaName;
@@ -67,5 +68,17 @@ public class ParameterDescriptor {
 
 	public void setIsList(final boolean pIsList) {
 		isList = pIsList;
+	}
+
+	public String getCustomExpression() {
+		return customExpression;
+	}
+
+	public void setCustomExpression(final String pCustomExpression) {
+		customExpression = pCustomExpression;
+	}
+
+	public boolean hasCustomExpression() {
+		return customExpression != null;
 	}
 }

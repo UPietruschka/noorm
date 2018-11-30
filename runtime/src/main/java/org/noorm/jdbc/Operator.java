@@ -85,9 +85,10 @@ public class Operator {
         LIKE("LIKE"),
         IS_NULL("IS_NULL"),
         IS_NOT_NULL("IS_NOT_NULL"),
-        IN("IN");
+        IN("IN"),
+        CUSTOM("CUSTOM");
 
-        private Name(final String pOperatorName) {
+        Name(final String pOperatorName) {
             operatorName = pOperatorName;
         }
 

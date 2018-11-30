@@ -98,27 +98,31 @@ public class StatementBuilder {
                 }
                 if (addWHERECondition) {
                     pSQLStatement.append(delim);
-                    pSQLStatement.append(queryColumn.getColumnName());
-                    pSQLStatement.append(queryColumn.getOperator().getOperatorSyntax());
-                    if (!queryColumn.getOperator().isUnary()) {
-                        if (value instanceof List) {
-                            final List<Object> inClauseValues = ((List<Object>) value);
-                            String inClauseDelim = SELECT_IN_CLAUSE_START;
-                            for (int i = 0; i < inClauseValues.size(); i++) {
-                                pSQLStatement.append(inClauseDelim);
+                    if (queryColumn.getOperator().getOperatorName() == Operator.Name.CUSTOM) {
+                        pSQLStatement.append(queryColumn.getCustomExpression());
+                    } else {
+                        pSQLStatement.append(queryColumn.getColumnName());
+                        pSQLStatement.append(queryColumn.getOperator().getOperatorSyntax());
+                        if (!queryColumn.getOperator().isUnary()) {
+                            if (value instanceof List) {
+                                final List<Object> inClauseValues = ((List<Object>) value);
+                                String inClauseDelim = SELECT_IN_CLAUSE_START;
+                                for (int i = 0; i < inClauseValues.size(); i++) {
+                                    pSQLStatement.append(inClauseDelim);
+                                    if (pUseNamedParameters) {
+                                        pSQLStatement.append(ASG).append(queryColumn.getColumnName());
+                                    } else {
+                                        pSQLStatement.append(ASG2);
+                                    }
+                                    inClauseDelim = SELECT_IN_CLAUSE_DELIM;
+                                }
+                                pSQLStatement.append(SELECT_IN_CLAUSE_END);
+                            } else {
                                 if (pUseNamedParameters) {
                                     pSQLStatement.append(ASG).append(queryColumn.getColumnName());
                                 } else {
                                     pSQLStatement.append(ASG2);
                                 }
-                                inClauseDelim = SELECT_IN_CLAUSE_DELIM;
-                            }
-                            pSQLStatement.append(SELECT_IN_CLAUSE_END);
-                        } else {
-                            if (pUseNamedParameters) {
-                                pSQLStatement.append(ASG).append(queryColumn.getColumnName());
-                            } else {
-                                pSQLStatement.append(ASG2);
                             }
                         }
                     }

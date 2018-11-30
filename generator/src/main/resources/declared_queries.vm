@@ -59,9 +59,9 @@ public class ${class.JavaName} {
 		final Map<QueryColumn, Object> parameters = new HashMap<QueryColumn, Object>();
 #foreach ($param in $query.Parameters)
 #if($param.isUnaryOperator())
-		parameters.put(new QueryColumn("$param.getDbParamName().toLowerCase()", new Operator(Operator.Name.$param.getOperator())), null);
+		parameters.put(new QueryColumn("$param.getDbParamName().toLowerCase()", new Operator(Operator.Name.$param.getOperator()),#if($param.hasCustomExpression()) "$param.getCustomExpression()"#else null#end), null);
 #else
-		parameters.put(new QueryColumn("$param.getDbParamName().toLowerCase()", new Operator(Operator.Name.$param.getOperator())), $param.JavaName);
+		parameters.put(new QueryColumn("$param.getDbParamName().toLowerCase()", new Operator(Operator.Name.$param.getOperator()),#if($param.hasCustomExpression()) "$param.getCustomExpression()"#else null#end), $param.JavaName);
 #end
 #end
 		final JDBCQueryProcessor<$query.getBeanName()> queryProcessor = JDBCQueryProcessor.getInstance();

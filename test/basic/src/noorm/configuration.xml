@@ -34,7 +34,7 @@
     <singleRowFinderProcedureFilter regex="(.*_unique.*)"/>
     <queryDeclarations>
         <queryDeclaration tableName="EMPLOYEES">
-            <queryColumn name="COMMISSION_PCT" operator="EQUAL_TO"/>
+            <queryColumn name="COMMISSION_PCT" operator="CUSTOM" customExpression="COMMISSION_PCT = ?"/>
         </queryDeclaration>
         <queryDeclaration tableName="EMPLOYEES" generatedMethodName="findEmployeesWithCommission">
             <queryColumn name="COMMISSION_PCT" operator="IS_NOT_NULL"/>
