@@ -117,7 +117,16 @@ public class QueryGenerator {
                 parameterDescriptor.setJavaName
                         (PARAMETER_PREFIX + index + Utils.convertDBName2JavaName(columnName, true));
                 parameterDescriptor.setDbParamName(columnName);
-                parameterDescriptor.setCustomExpression(queryColumn.getCustomExpression());
+                final String customExpression = queryColumn.getCustomExpression();
+                parameterDescriptor.setCustomExpression(customExpression);
+                if (customExpression == null && queryColumn.getOperator() == OperatorName.CUSTOM) {
+                    throw new GeneratorException("Invalid query declaration: custom expression missing for table "
+                            .concat(t0).concat(" and column ").concat(columnName));
+                }
+                if (customExpression != null && queryColumn.getOperator() != OperatorName.CUSTOM) {
+                    throw new GeneratorException("Invalid query declaration: custom expression not allowed for table "
+                            .concat(t0).concat(" and column ").concat(columnName));
+                }
                 String javaType = null;
                 for (final TableMetadata tableMetadata : tableMetadataList) {
                     if (tableMetadata.getColumnName().equals(columnName)) {
