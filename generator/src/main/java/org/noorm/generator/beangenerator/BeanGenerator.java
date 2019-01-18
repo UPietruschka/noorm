@@ -133,10 +133,18 @@ public class BeanGenerator {
 				beanClassDescriptor.setCustomInterfaceName(interfaceName);
 			}
 
-			final String superClassName =
+			final String superClassTableName =
 					GeneratorUtil.getMappedString(tableName0, configuration.getTable2SuperClassMappings());
-			if (superClassName != null && !superClassName.isEmpty()) {
-				beanClassDescriptor.setSuperClassName(superClassName);
+			List<TableMetadata> superClassTableMetadataList = null;
+			if (superClassTableName != null && !superClassTableName.isEmpty()) {
+				superClassTableMetadataList = tableColumnMap.get(superClassTableName);
+				if (superClassTableMetadataList == null) {
+					throw new GeneratorException(("No metadata found for super class table ["
+							.concat(superClassTableName).concat("]")));
+				}
+				final String javaSuperClassName = GeneratorUtil.convertTableName2JavaName
+						(superClassTableName, configuration.getTableNameMappings());
+				beanClassDescriptor.setSuperClassName(javaSuperClassName);
 			}
 
 			final Sequence sequence = getSequence(tableName0, sequenceList);
@@ -182,6 +190,22 @@ public class BeanGenerator {
 						(tableMetadata.getTableName(), columnName, configuration.getNoUpdateColumnMappings());
 				if (noUpdateConfigured) {
 					beanAttributeDescriptor.setUpdatable(false);
+				}
+
+				// We resemble updatable views here. To accomplish this, we have to mark columns, which are present
+				// in the derived class only (the view) as non-insertable and non-updatable
+				if (superClassTableName != null && !superClassTableName.isEmpty()) {
+					boolean isNotInSuperClass = true;
+					for (final TableMetadata superClassTableMetadata : superClassTableMetadataList) {
+						final String superClassColumName = superClassTableMetadata.getColumnName();
+						if (columnName.equals(superClassColumName)) {
+							isNotInSuperClass = false;
+						}
+					}
+					if (isNotInSuperClass) {
+						beanAttributeDescriptor.setInsertable(false);
+						beanAttributeDescriptor.setUpdatable(false);
+					}
 				}
 
                 final JDBCType jdbcType = tableMetadata.getJDBCType();

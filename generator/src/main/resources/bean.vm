@@ -14,20 +14,22 @@ import org.noorm.jdbc.JDBCColumn;
  */
 public class $class.Name<T>#if($class.getSuperClassName()) extends $class.SuperClassName<T>#end implements IBean<T>, Serializable#if($class.getCustomInterfaceName()), $class.CustomInterfaceName#end {
 
+#if(!$class.getSuperClassName())
 	private static final long serialVersionUID = $class.getSerialVersionUID()L;
-	private static final String TABLE_NAME = "$class.TableName";
-	private static final boolean IS_TABLE_NAME_CASE_SENSITIVE = $class.isTableNameCaseSensitive();
-	private static final String[] PK_COLUMN_NAMES = { #foreach ($param in $class.PrimaryKeyColumnNames)"$param"#if($foreach.count<$class.PrimaryKeyColumnNames.size()), #end#end };
-	private static final String[] PK_JAVA_NAMES = { #foreach ($param in $class.PrimaryKeyJavaNames)"$param"#if($foreach.count<$class.PrimaryKeyJavaNames.size()), #end#end };
-	private static final String SEQUENCE_NAME = "$class.SequenceName";
-	private static final Long SEQUENCE_INCREMENT = $class.getSequenceIncrement()L;
-	private static final boolean USE_INLINE_SEQUENCE_VALUE_GENERATION = $class.useInlineSequenceValueGeneration();
-	private static final String VERSION_COLUMN_NAME = "$class.VersionColumnName";
-	private static final String VERSION_COLUMN_JAVA_NAME = "$class.VersionColumnJavaName";
+	protected static final String TABLE_NAME = "$class.TableName";
+	protected static final boolean IS_TABLE_NAME_CASE_SENSITIVE = $class.isTableNameCaseSensitive();
+	protected static final String[] PK_COLUMN_NAMES = { #foreach ($param in $class.PrimaryKeyColumnNames)"$param"#if($foreach.count<$class.PrimaryKeyColumnNames.size()), #end#end };
+	protected static final String[] PK_JAVA_NAMES = { #foreach ($param in $class.PrimaryKeyJavaNames)"$param"#if($foreach.count<$class.PrimaryKeyJavaNames.size()), #end#end };
+	protected static final String SEQUENCE_NAME = "$class.SequenceName";
+	protected static final Long SEQUENCE_INCREMENT = $class.getSequenceIncrement()L;
+	protected static final boolean USE_INLINE_SEQUENCE_VALUE_GENERATION = $class.useInlineSequenceValueGeneration();
+	protected static final String VERSION_COLUMN_NAME = "$class.VersionColumnName";
+	protected static final String VERSION_COLUMN_JAVA_NAME = "$class.VersionColumnJavaName";
 #if (!$class.getVersionColumnType())
-	private static final JDBCType VERSION_COLUMN_TYPE = null;
+	protected static final JDBCType VERSION_COLUMN_TYPE = null;
 #else
-	private static final JDBCType VERSION_COLUMN_TYPE = JDBCType.$class.VersionColumnType;
+	protected static final JDBCType VERSION_COLUMN_TYPE = JDBCType.$class.VersionColumnType;
+#end
 #end
 	@JDBCColumn(name=PAGING_TOTAL, dataType=Types.NUMERIC, insertable=false, updatable=false)
 	protected Integer pagingTotal;
@@ -64,6 +66,7 @@ public class $class.Name<T>#if($class.getSuperClassName()) extends $class.SuperC
 #end
 	}
 
+#if(!$class.getSuperClassName())
     @Override
 	public String getTableName() {
 		return TABLE_NAME;
@@ -113,6 +116,7 @@ public class $class.Name<T>#if($class.getSuperClassName()) extends $class.SuperC
 	public JDBCType getVersionColumnType() {
 		return VERSION_COLUMN_TYPE;
 	}
+#end
 #foreach ($att in $class.Attributes)
 
 	public $att.Type get$att.getMethodNamePostfix()() {
