@@ -34,7 +34,6 @@ public class BeanGenerator {
 	private static final String BEAN_VM_TEMPLATE_FILE = "/bean.vm";
 	private static final String BEAN_VALIDATOR_VM_TEMPLATE_FILE = "/bean_validator.vm";
 	private static final String BEAN_VALIDATOR_CLASS_NAME = "GenericBeanValidator";
-	private static final String BEAN_DML_VM_TEMPLATE_FILE = "/bean_dml.vm";
 
 	private IParameters parameters;
     private GeneratorConfiguration configuration;
@@ -49,9 +48,6 @@ public class BeanGenerator {
         if (!GeneratorUtil.hasBeanPackageName(configuration)) {
 			throw new IllegalArgumentException("Parameter [beanPackageName] is null.");
 		}
-        if (!GeneratorUtil.hasServicePackageName(configuration)) {
-            throw new IllegalArgumentException("Parameter [servicePackageName] is null.");
-        }
 		if (parameters.getDestinationDirectory() == null || !parameters.getDestinationDirectory().exists()) {
 			throw new IllegalArgumentException("Parameter [destinationDirectory] is null or mis-configured.");
 		}
@@ -83,13 +79,6 @@ public class BeanGenerator {
 		log.info("Generating NoORM Bean classes.");
 		final File beanPackageDir = GeneratorUtil.createPackageDir
 				(parameters.getDestinationDirectory(), configuration.getBeanJavaPackage().getName());
-		final File servicePackageDir = GeneratorUtil.createPackageDir
-				(parameters.getDestinationDirectory(), configuration.getServiceJavaPackage().getName());
-		File serviceInterfacePackageDir = null;
-        if (GeneratorUtil.hasServiceInterfacePackageName(configuration)) {
-			serviceInterfacePackageDir = GeneratorUtil.createPackageDir
-					(parameters.getDestinationDirectory(), configuration.getServiceInterfaceJavaPackage().getName());
-		}
 
 		for (final String tableName0 : tableColumnMap.keySet()) {
 			final String javaBeanName =
@@ -97,13 +86,6 @@ public class BeanGenerator {
 			final List<TableMetadata> tableMetadataList1 = tableColumnMap.get(tableName0);
 			final BeanClassDescriptor beanClassDescriptor = new BeanClassDescriptor();
 			beanClassDescriptor.setName(javaBeanName);
-			if (configuration.getExtendedBeanMappings() != null) {
-				final String extJavaBeanName =
-                        GeneratorUtil.getMappedString(javaBeanName, configuration.getExtendedBeanMappings());
-				if (!extJavaBeanName.isEmpty()) {
-					beanClassDescriptor.setExtendedName(extJavaBeanName);
-				}
-			}
 			// Do not add PL/SQL record beans to the validator (record beans are declared in the PL/SQL code
 			// and get automatically validated by the service validator)
 			if (!recordColumnMap.containsKey(tableName0)) {
@@ -134,7 +116,7 @@ public class BeanGenerator {
 			}
 
 			final String superClassTableName =
-					GeneratorUtil.getMappedString(tableName0, configuration.getTable2SuperClassMappings());
+					GeneratorUtil.getMappedString(tableName0, configuration.getTable2SuperClassTableMappings());
 			List<TableMetadata> superClassTableMetadataList = null;
 			if (superClassTableName != null && !superClassTableName.isEmpty()) {
 				superClassTableMetadataList = tableColumnMap.get(superClassTableName);
@@ -253,27 +235,8 @@ public class BeanGenerator {
 			GeneratorUtil.generateFile(beanPackageDir, BEAN_VM_TEMPLATE_FILE,
 					beanClassDescriptor.getName(), beanClassDescriptor);
 
-			final BeanDMLClassDescriptor beanDMLClassDescriptor = new BeanDMLClassDescriptor();
-			beanDMLClassDescriptor.setBeanPackageName(configuration.getBeanJavaPackage().getName());
-			beanDMLClassDescriptor.setJavaName(beanClassDescriptor.getName() + "DML");
-            beanDMLClassDescriptor.addBean(beanClassDescriptor);
-			if (GeneratorUtil.hasServiceInterfacePackageName(configuration)) {
-				beanDMLClassDescriptor.setInterfacePackageName
-                        (configuration.getServiceInterfaceJavaPackage().getName());
-			}
-			beanDMLClassDescriptor.setPackageName(configuration.getServiceJavaPackage().getName());
-
 			if (GeneratorUtil.hasDataSourceName(configuration)) {
 				validatorClassDescriptor.setDataSourceName(configuration.getDataSource().getName());
-				beanDMLClassDescriptor.setDataSourceName(configuration.getDataSource().getName());
-			}
-
-			GeneratorUtil.generateFile(servicePackageDir, BEAN_DML_VM_TEMPLATE_FILE,
-					beanDMLClassDescriptor.getJavaName(), beanDMLClassDescriptor);
-			if (GeneratorUtil.hasServiceInterfacePackageName(configuration)) {
-				beanDMLClassDescriptor.setInterface(true);
-				GeneratorUtil.generateFile(serviceInterfacePackageDir, BEAN_DML_VM_TEMPLATE_FILE,
-						"I" + beanDMLClassDescriptor.getJavaName(), beanDMLClassDescriptor);
 			}
 		}
 		GeneratorUtil.generateFile(beanPackageDir, BEAN_VALIDATOR_VM_TEMPLATE_FILE,

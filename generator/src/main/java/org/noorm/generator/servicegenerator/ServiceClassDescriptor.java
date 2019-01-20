@@ -18,7 +18,7 @@ public class ServiceClassDescriptor {
 	private String packageName;
 	private String interfacePackageName;
 	private String beanPackageName;
-	private final List<ProcedureDescriptor> procedures = new ArrayList<ProcedureDescriptor>();
+	private final List<ProcedureDescriptor> procedures = new ArrayList<>();
 	private boolean isInterface = false;
     private String dataSourceName;
 

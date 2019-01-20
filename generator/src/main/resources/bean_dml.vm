@@ -49,66 +49,85 @@ public class $class.getJavaName() {
 		return $class.getFirstLowerName();
 	}
 #end
-#foreach ($bean in $class.Beans)
-#if($bean.isUpdatable())
 
 #if($class.isInterface())
-	$bean.getDMLName() insert$bean.getName()(final $bean.getDMLName() p$bean.getName());
+	$class.getDMLName() insert$class.getName()(final $class.getDMLName() p$class.getName());
 
-	void insert$bean.getName()List(final List<$bean.getDMLName()> p$bean.getName()List);
+	void insert$class.getName()List(final List<$class.getDMLName()> p$class.getName()List);
 
-	$bean.getDMLName() update$bean.getName()(final $bean.getDMLName() p$bean.getName());
+	$class.getDMLName() update$class.getName()(final $class.getDMLName() p$class.getName());
 
-	void update$bean.getName()List(final List<$bean.getDMLName()> p$bean.getName()List);
+	void update$class.getName()List(final List<$class.getDMLName()> p$class.getName()List);
 
-	void delete$bean.getName()(final $bean.getDMLName() p$bean.getName());
+	void delete$class.getName()(final $class.getDMLName() p$class.getName());
 
-	void delete$bean.getName()List(final List<$bean.getDMLName()> p$bean.getName()List);
+	void delete$class.getName()List(final List<$class.getDMLName()> p$class.getName()List);
 #else
-	public $bean.getDMLName() insert$bean.getName()(final $bean.getDMLName() p$bean.getName()) {
+	public $class.getDMLName() insert$class.getName()(final $class.getDMLName() p$class.getName()) {
 #if ($class.hasDataSourceName())
 		DataSourceProvider.setActiveDataSource(DATA_SOURCE_NAME);
 #end
-		final JDBCDMLProcessor<$bean.getDMLName()> dmlProcessor = JDBCDMLProcessor.getInstance();
-		return dmlProcessor.insert(p$bean.getName());
+		final JDBCDMLProcessor<$class.getDMLName()> dmlProcessor = JDBCDMLProcessor.getInstance();
+		return dmlProcessor.insert(p$class.getName());
 	}
 
-	public void insert$bean.getName()List(final List<$bean.getDMLName()> p$bean.getName()List) {
+	public void insert$class.getName()List(final List<$class.getDMLName()> p$class.getName()List) {
 #if ($class.hasDataSourceName())
 		DataSourceProvider.setActiveDataSource(DATA_SOURCE_NAME);
 #end
-		typelessDMLProcessor.insert(p$bean.getName()List);
+		typelessDMLProcessor.insert(p$class.getName()List);
 	}
 
-	public $bean.getDMLName() update$bean.getName()(final $bean.getDMLName() p$bean.getName()) {
+	public $class.getDMLName() update$class.getName()(final $class.getDMLName() p$class.getName()) {
 #if ($class.hasDataSourceName())
 		DataSourceProvider.setActiveDataSource(DATA_SOURCE_NAME);
 #end
-		final JDBCDMLProcessor<$bean.getDMLName()> dmlProcessor = JDBCDMLProcessor.getInstance();
-		return dmlProcessor.update(p$bean.getName());
+		final JDBCDMLProcessor<$class.getDMLName()> dmlProcessor = JDBCDMLProcessor.getInstance();
+		return dmlProcessor.update(p$class.getName());
 	}
 
-	public void update$bean.getName()List(final List<$bean.getDMLName()> p$bean.getName()List) {
+	public void update$class.getName()List(final List<$class.getDMLName()> p$class.getName()List) {
 #if ($class.hasDataSourceName())
 		DataSourceProvider.setActiveDataSource(DATA_SOURCE_NAME);
 #end
-		typelessDMLProcessor.update(p$bean.getName()List);
+		typelessDMLProcessor.update(p$class.getName()List);
 	}
 
-	public void delete$bean.getName()(final $bean.getDMLName() p$bean.getName()) {
+	public void delete$class.getName()(final $class.getDMLName() p$class.getName()) {
 #if ($class.hasDataSourceName())
 		DataSourceProvider.setActiveDataSource(DATA_SOURCE_NAME);
 #end
-		typelessDMLProcessor.delete(p$bean.getName());
+		typelessDMLProcessor.delete(p$class.getName());
 	}
 
-	public void delete$bean.getName()List(final List<$bean.getDMLName()> p$bean.getName()List) {
+	public void delete$class.getName()List(final List<$class.getDMLName()> p$class.getName()List) {
 #if ($class.hasDataSourceName())
 		DataSourceProvider.setActiveDataSource(DATA_SOURCE_NAME);
 #end
-		typelessDMLProcessor.delete(p$bean.getName()List);
+		typelessDMLProcessor.delete(p$class.getName()List);
 	}
 #end
+#foreach($delete in $class.deletes)
+
+#if($class.isInterface())
+	void $delete.getMethodName()(#foreach($param in $delete.Parameters)#if(!$param.isUnaryOperator())final #if($param.isList())List<#end$param.JavaType#if($param.isList())>#end ${param.JavaName}#if($foreach.count<$query.Parameters.size()),${nl}${subindent}#end#end#end);
+#else
+	public void $delete.getMethodName()(#foreach($param in $delete.Parameters)#if(!$param.isUnaryOperator())final #if($param.isList())List<#end$param.JavaType#if($param.isList())>#end ${param.JavaName}#if($foreach.count<$query.Parameters.size()),${nl}${subindent}#end#end#end) {
+
+#if($class.hasDataSourceName())
+		DataSourceProvider.setActiveDataSource(DATA_SOURCE_NAME);
+#end
+		final Map<QueryColumn, Object> parameters = new HashMap<QueryColumn, Object>();
+#foreach ($param in $delete.Parameters)
+#if($param.isUnaryOperator())
+		parameters.put(new QueryColumn("$param.getDbParamName().toLowerCase()", new Operator(Operator.Name.$param.getOperator()),#if($param.hasCustomExpression()) "$param.getCustomExpression()"#else null#end), null);
+#else
+		parameters.put(new QueryColumn("$param.getDbParamName().toLowerCase()", new Operator(Operator.Name.$param.getOperator()),#if($param.hasCustomExpression()) "$param.getCustomExpression()"#else null#end), $param.JavaName);
+#end
+#end
+		final JDBCDMLProcessor<$delete.getBeanName()> dmlProcessor = JDBCDMLProcessor.getInstance();
+		dmlProcessor.delete("$delete.getTableName()", parameters, ${delete.getBeanName()}.class);
+	}
 #end
 #end
 }

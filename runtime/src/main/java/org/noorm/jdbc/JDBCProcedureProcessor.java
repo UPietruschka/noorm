@@ -31,6 +31,7 @@ public class JDBCProcedureProcessor<T> {
 	private static JDBCProcedureProcessor statementProcessor = new JDBCProcedureProcessor();
 
 	private final StatementBuilder statementBuilder = new StatementBuilder();
+	private final LoggingHelper loggingHelper = new LoggingHelper();
 
 	private JDBCProcedureProcessor() {
 	}
@@ -80,7 +81,7 @@ public class JDBCProcedureProcessor<T> {
 		}
 
 		if (log.isDebugEnabled()) {
-			debugProcedureCall(pCallable, pInParameters, null);
+			loggingHelper.debugProcedureCall(pCallable, pInParameters, null);
 		}
 
 		boolean success = true;
@@ -120,7 +121,7 @@ public class JDBCProcedureProcessor<T> {
 			}
 
 			if (log.isDebugEnabled()) {
-				debugProcedureTermination(pCallable, -1);
+				loggingHelper.debugProcedureTermination(pCallable, -1);
 			}
 
 			return outValue;
@@ -246,7 +247,7 @@ public class JDBCProcedureProcessor<T> {
 		}
 
 		if (log.isDebugEnabled()) {
-			debugProcedureCall(pCallable, pInParameters, pBeanClass);
+			loggingHelper.debugProcedureCall(pCallable, pInParameters, pBeanClass);
 		}
 
 		boolean success = true;
@@ -281,7 +282,7 @@ public class JDBCProcedureProcessor<T> {
 			rs.close();
 
 			if (log.isDebugEnabled()) {
-				debugProcedureTermination(pCallable, beanList.size());
+				loggingHelper.debugProcedureTermination(pCallable, beanList.size());
 			}
 
 			return beanList;
@@ -328,37 +329,5 @@ public class JDBCProcedureProcessor<T> {
 			}
             pCstmt.setObject(parameterIndex++, value);
 		}
-	}
-
-	public void debugProcedureCall(final String pCallable,
-                                   final Map<String, Object> pInParameters,
-                                   final Class<T> pBeanClass) {
-
-		final StringBuilder formattedParameters = new StringBuilder();
-		formattedParameters.append("Calling PL/SQL procedure ").append(pCallable);
-		if (pInParameters != null) {
-			String prefix = "\nInput parameters: ";
-			for (final String paramName : pInParameters.keySet()) {
-                final Object parameter = pInParameters.get(paramName);
-                String parameterToString = Utils.getParameter2String(parameter);
-				formattedParameters.append(prefix).append(paramName).append(" : ").append(parameterToString);
-				prefix = "\n                  ";
-			}
-		}
-		if (pBeanClass != null) {
-			formattedParameters.append("\nBean Class:        ").append(pBeanClass.getName());
-		}
-		log.debug(formattedParameters.toString());
-	}
-
-    private void debugProcedureTermination(final String pCallable,
-                                           final int pRowsProcessed) {
-
-		StringBuilder logMessage = new StringBuilder();
-		logMessage.append("PL/SQL procedure ").append(pCallable).append(" successfully terminated. ");
-		if (pRowsProcessed >= 0) {
-			logMessage.append(Integer.toString(pRowsProcessed)).append(" rows processed.");
-		}
-		log.debug(logMessage.toString());
 	}
 }

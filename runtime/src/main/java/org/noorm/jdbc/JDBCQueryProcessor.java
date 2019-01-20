@@ -25,8 +25,9 @@ public class JDBCQueryProcessor<T> {
     private static final boolean USE_NAMED_PARAMETERS = false;
 
 	private static JDBCQueryProcessor queryProcessor = new JDBCQueryProcessor();
+    private final LoggingHelper loggingHelper = new LoggingHelper();
 
-	private JDBCQueryProcessor() { }
+    private JDBCQueryProcessor() { }
 
 	public static <T> JDBCQueryProcessor<T> getInstance() {
 
@@ -86,7 +87,7 @@ public class JDBCQueryProcessor<T> {
         }
 
         if (log.isDebugEnabled()) {
-            debugSQLCall(pTableName, pInParameters, pBeanClass, pFilterExtension);
+            loggingHelper.debugSQLCall(pTableName, pInParameters, pBeanClass, pFilterExtension);
         }
 
         boolean success = true;
@@ -225,40 +226,6 @@ public class JDBCQueryProcessor<T> {
 			} // Nothing to do
 		}
 	}
-
-    private void debugSQLCall(final String pTableName,
-                              final Map<QueryColumn, Object> pInParameters,
-                              final Class<T> pBeanClass,
-                              final FilterExtension pFilterExtension) {
-
-        final StringBuilder formattedParameters = new StringBuilder();
-        formattedParameters.append("Executing SQL statement on table ").append(pTableName);
-        if (pFilterExtension != null) {
-            formattedParameters.append("\nFilter extension: Offset: ");
-            formattedParameters.append(pFilterExtension.getOffset());
-            formattedParameters.append(", Limit: ");
-            formattedParameters.append(pFilterExtension.getLimit());
-            for (final FilterExtension.SortCriteria sortCriteria : pFilterExtension.getSortCriteria()) {
-                formattedParameters.append("\n  ").append(sortCriteria.getColumnName());
-                formattedParameters.append(" / ").append(sortCriteria.getDirection());
-            }
-        }
-        if (pInParameters != null) {
-            String prefix = "\nInput parameters: ";
-            for (final QueryColumn queryColumn : pInParameters.keySet()) {
-                final String paramName = queryColumn.getColumnName();
-                final Object parameter = pInParameters.get(queryColumn);
-                String parameterToString = Utils.getParameter2String(parameter);
-                formattedParameters.append(prefix).append(paramName)
-                        .append(queryColumn.getOperator().getOperatorSyntax()).append(parameterToString);
-                prefix = "\n                  ";
-            }
-        }
-        if (pBeanClass != null) {
-            formattedParameters.append("\nBean Class:        ").append(pBeanClass.getName());
-        }
-        log.debug(formattedParameters.toString());
-    }
 
     private void debugSQLTermination(final String pTableName,
                                      final int pRowsProcessed) {

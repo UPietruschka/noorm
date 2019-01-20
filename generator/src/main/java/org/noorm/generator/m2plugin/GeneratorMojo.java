@@ -10,6 +10,7 @@ import org.apache.maven.project.MavenProject;
 import org.apache.velocity.app.Velocity;
 import org.noorm.generator.GeneratorUtil;
 import org.noorm.generator.IParameters;
+import org.noorm.generator.beangenerator.BeanDMLGenerator;
 import org.noorm.generator.beangenerator.BeanGenerator;
 import org.noorm.generator.enumgenerator.EnumGenerator;
 import org.noorm.generator.querygenerator.QueryGenerator;
@@ -166,6 +167,10 @@ public class GeneratorMojo extends AbstractMojo implements IParameters {
 		// Generate Beans
 		final BeanGenerator beanGenerator = new BeanGenerator(this, configuration);
 		beanGenerator.execute();
+
+        // Generate Bean DML
+        final BeanDMLGenerator beanDMLGenerator = new BeanDMLGenerator(this, configuration);
+        beanDMLGenerator.execute();
 
 		// Generate Enums
 		if (GeneratorUtil.hasEnumPackageName(configuration)) {

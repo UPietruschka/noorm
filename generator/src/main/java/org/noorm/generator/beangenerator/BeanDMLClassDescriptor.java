@@ -10,13 +10,39 @@ import java.util.List;
  */
 public class BeanDMLClassDescriptor {
 
+	private String name;
 	private String javaName;
+	private String extendedName;
 	private String packageName;
 	private String interfacePackageName;
 	private String beanPackageName;
-	private final List<BeanClassDescriptor> beans = new ArrayList<BeanClassDescriptor>();
+	private final List<BeanClassDescriptor> beans = new ArrayList<>();
+	private final List<DeleteDescriptor> deletes = new ArrayList<>();
 	private boolean isInterface = false;
     private String dataSourceName;
+
+	public String getName() {
+		return name;
+	}
+
+	public void setName(final String pName) {
+		name = pName;
+	}
+
+	public String getExtendedName() {
+		return extendedName;
+	}
+
+	public void setExtendedName(final String pExtendedName) {
+		extendedName = pExtendedName;
+	}
+
+	public String getDMLName() {
+		if (extendedName != null && !extendedName.isEmpty()) {
+			return extendedName;
+		}
+		return name;
+	}
 
     public String getPackageName() {
 		return packageName;
@@ -48,6 +74,14 @@ public class BeanDMLClassDescriptor {
 
 	public List<BeanClassDescriptor> getBeans() {
 		return beans;
+	}
+
+	public void addDelete(final DeleteDescriptor pDelete) {
+		deletes.add(pDelete);
+	}
+
+	public List<DeleteDescriptor> getDeletes() {
+		return deletes;
 	}
 
 	public boolean isInterface() {

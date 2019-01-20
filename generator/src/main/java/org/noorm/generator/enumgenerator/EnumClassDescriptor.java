@@ -16,8 +16,8 @@ public class EnumClassDescriptor {
 	private String tableName;
 	private String displayColumnName;
 	private String packageName;
-	private final List<EnumAttributeDescriptor> attributes = new ArrayList<EnumAttributeDescriptor>();
-	private final List<EnumRecordDescriptor> records = new ArrayList<EnumRecordDescriptor>();
+	private final List<EnumAttributeDescriptor> attributes = new ArrayList<>();
+	private final List<EnumRecordDescriptor> records = new ArrayList<>();
 
 	public void setName(final String pName) {
 		name = pName;

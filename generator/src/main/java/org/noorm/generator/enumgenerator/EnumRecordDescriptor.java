@@ -14,7 +14,7 @@ import java.util.Map;
 public class EnumRecordDescriptor {
 
 	private String displayColumnValue;
-	private final Map<EnumAttributeDescriptor, Object> attributeValues = new HashMap<EnumAttributeDescriptor, Object>();
+	private final Map<EnumAttributeDescriptor, Object> attributeValues = new HashMap<>();
 
 	public String getDisplayColumnValue() {
 		return Utils.getNormalizedDisplayColumnValue(displayColumnValue);

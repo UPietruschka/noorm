@@ -16,7 +16,7 @@ public class QueryClassDescriptor {
     private String interfacePackageName;
     private String beanPackageName;
     private String javaName;
-    private final List<QueryDescriptor> queries = new ArrayList<QueryDescriptor>();
+    private final List<QueryDescriptor> queries = new ArrayList<>();
     private boolean isInterface = false;
     private String dataSourceName;
 

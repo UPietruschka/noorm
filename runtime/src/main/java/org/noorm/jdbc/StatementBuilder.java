@@ -82,58 +82,11 @@ public class StatementBuilder {
         } else {
             pSQLStatement.append(SELECT_PREFIX).append(pTableName);
         }
-        if (pInParameters.size() > 0) {
-            String delim = WHERE;
-            final Map<QueryColumn, Object> orderedParameters = new TreeMap<>(pInParameters);
-            for (final QueryColumn queryColumn : orderedParameters.keySet()) {
-                final Object value = orderedParameters.get(queryColumn);
-                boolean addWHERECondition = false;
-                if (value != null || queryColumn.getOperator().isUnary()) {
-                    addWHERECondition = true;
-                    if (value instanceof List) {
-                        if (((List) value).size() == 0) {
-                            addWHERECondition = false;
-                        }
-                    }
-                }
-                if (addWHERECondition) {
-                    pSQLStatement.append(delim);
-                    if (queryColumn.getOperator().getOperatorName() == Operator.Name.CUSTOM) {
-                        pSQLStatement.append(queryColumn.getCustomExpression());
-                    } else {
-                        pSQLStatement.append(queryColumn.getColumnName());
-                        pSQLStatement.append(queryColumn.getOperator().getOperatorSyntax());
-                        if (!queryColumn.getOperator().isUnary()) {
-                            if (value instanceof List) {
-                                final List<Object> inClauseValues = ((List<Object>) value);
-                                String inClauseDelim = SELECT_IN_CLAUSE_START;
-                                for (int i = 0; i < inClauseValues.size(); i++) {
-                                    pSQLStatement.append(inClauseDelim);
-                                    if (pUseNamedParameters) {
-                                        pSQLStatement.append(ASG).append(queryColumn.getColumnName());
-                                    } else {
-                                        pSQLStatement.append(ASG2);
-                                    }
-                                    inClauseDelim = SELECT_IN_CLAUSE_DELIM;
-                                }
-                                pSQLStatement.append(SELECT_IN_CLAUSE_END);
-                            } else {
-                                if (pUseNamedParameters) {
-                                    pSQLStatement.append(ASG).append(queryColumn.getColumnName());
-                                } else {
-                                    pSQLStatement.append(ASG2);
-                                }
-                            }
-                        }
-                    }
-                    delim = AND;
-                }
-            }
-        }
+        final StringBuilder sqlStatement = buildQueryWhereClause(pInParameters, pUseNamedParameters, pSQLStatement);
         if (pAcquireLock) {
-            pSQLStatement.append(SELECT_LOCK);
+            sqlStatement.append(SELECT_LOCK);
         }
-        return pSQLStatement.toString();
+        return sqlStatement.toString();
     }
 
 	private static final String INSERT_PREFIX = "INSERT INTO ";
@@ -274,6 +227,74 @@ public class StatementBuilder {
                 pField2ParameterIndex, parameterIndex, pUseNamedParameters);
 		return delete.toString();
 	}
+
+    public String buildDelete(final String pTableName,
+                              final Map<QueryColumn, Object> pInParameters,
+                              final boolean pUseNamedParameters) {
+
+        final StringBuilder pSQLStatement = new StringBuilder();
+        if (!pTableName.equals(pTableName.toUpperCase())) {
+            pSQLStatement.append(DELETE_PREFIX).append("\"".concat(pTableName).concat("\""));
+        } else {
+            pSQLStatement.append(DELETE_PREFIX).append(pTableName);
+        }
+        return buildQueryWhereClause(pInParameters, pUseNamedParameters, pSQLStatement).toString();
+    }
+
+    private StringBuilder buildQueryWhereClause(final Map<QueryColumn, Object> pInParameters,
+                                                final boolean pUseNamedParameters,
+                                                final StringBuilder pSQLStatement) {
+
+        if (pInParameters.size() > 0) {
+            String delim = WHERE;
+            final Map<QueryColumn, Object> orderedParameters = new TreeMap<>(pInParameters);
+            for (final QueryColumn queryColumn : orderedParameters.keySet()) {
+                final Object value = orderedParameters.get(queryColumn);
+                boolean addWHERECondition = false;
+                if (value != null || queryColumn.getOperator().isUnary()) {
+                    addWHERECondition = true;
+                    if (value instanceof List) {
+                        if (((List) value).size() == 0) {
+                            addWHERECondition = false;
+                        }
+                    }
+                }
+                if (addWHERECondition) {
+                    pSQLStatement.append(delim);
+                    if (queryColumn.getOperator().getOperatorName() == Operator.Name.CUSTOM) {
+                        pSQLStatement.append(queryColumn.getCustomExpression());
+                    } else {
+                        pSQLStatement.append(queryColumn.getColumnName());
+                        pSQLStatement.append(queryColumn.getOperator().getOperatorSyntax());
+                        if (!queryColumn.getOperator().isUnary()) {
+                            if (value instanceof List) {
+                                final List<Object> inClauseValues = ((List<Object>) value);
+                                String inClauseDelim = SELECT_IN_CLAUSE_START;
+                                for (int i = 0; i < inClauseValues.size(); i++) {
+                                    pSQLStatement.append(inClauseDelim);
+                                    if (pUseNamedParameters) {
+                                        pSQLStatement.append(ASG).append(queryColumn.getColumnName());
+                                    } else {
+                                        pSQLStatement.append(ASG2);
+                                    }
+                                    inClauseDelim = SELECT_IN_CLAUSE_DELIM;
+                                }
+                                pSQLStatement.append(SELECT_IN_CLAUSE_END);
+                            } else {
+                                if (pUseNamedParameters) {
+                                    pSQLStatement.append(ASG).append(queryColumn.getColumnName());
+                                } else {
+                                    pSQLStatement.append(ASG2);
+                                }
+                            }
+                        }
+                    }
+                    delim = AND;
+                }
+            }
+        }
+        return pSQLStatement;
+    }
 
     private static final String WHERE = " WHERE ";
     private static final String AND = " AND ";

@@ -15,7 +15,6 @@ public class BeanClassDescriptor {
 	private long serialVersionUID;
 	private String name;
 	private String shortName;
-	private String extendedName;
 	private String tableName;
     private boolean isTableNameCaseSensitive = false;
     private String[] primaryKeyColumnNames;
@@ -27,7 +26,7 @@ public class BeanClassDescriptor {
     private String versionColumnJavaName = "";
     private String versionColumnType;
 	private String packageName;
-	private final List<BeanAttributeDescriptor> attributes = new ArrayList<BeanAttributeDescriptor>();
+	private final List<BeanAttributeDescriptor> attributes = new ArrayList<>();
     private boolean generatePKBasedEqualsAndHashCode;
     private boolean enableOptLockFullRowCompare = false;
     private String customInterfaceName;
@@ -56,14 +55,6 @@ public class BeanClassDescriptor {
 
 	public String getShortName() {
 		return shortName;
-	}
-
-	public String getExtendedName() {
-		return extendedName;
-	}
-
-	public void setExtendedName(final String pExtendedName) {
-		extendedName = pExtendedName;
 	}
 
 	public String getTableName() {
@@ -164,13 +155,6 @@ public class BeanClassDescriptor {
 
 	public void setPackageName(final String pPackageName) {
 		packageName = pPackageName;
-	}
-
-	public String getDMLName() {
-		if (extendedName != null && !extendedName.isEmpty()) {
-			return extendedName;
-		}
-		return name;
 	}
 
 	public boolean isUpdatable() {

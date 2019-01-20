@@ -30,6 +30,7 @@ public class JDBCDMLProcessor<T> {
 
     private static JDBCDMLProcessor dmlProcessor = new JDBCDMLProcessor();
     private final StatementBuilder statementBuilder = new StatementBuilder();
+    private final LoggingHelper loggingHelper = new LoggingHelper();
 
     private JDBCDMLProcessor() {
     }
@@ -197,7 +198,7 @@ public class JDBCDMLProcessor<T> {
             }
             if (log.isDebugEnabled()) {
                 final String tableName = firstBean.getTableName();
-                debugDML(tableName, sequenceName, batch);
+                loggingHelper.debugDML(tableName, sequenceName, batch);
             }
             if (returnModifiedBean) {
                 if (primaryKeyColumnNames.length != 1) {
@@ -406,6 +407,92 @@ public class JDBCDMLProcessor<T> {
         }
     }
 
+    /**
+     * Executes a generic DELETE statement for the given table (or view) name with the given query parameters.
+     * This functionality is designated to support the query declaration available in the Maven generator plugin.
+     * Any complex SQL like joins is expected to be encapsulated within a database view definition and is not
+     * supported here.
+     *
+     * @param pTableName the table or view name used for the SQL query
+     * @param pInParameters the parameters for the where-clause of the SQL query
+     * @param pBeanClass the return type
+     */
+    public void delete(final String pTableName,
+                       final Map<QueryColumn, Object> pInParameters,
+                       final Class<T> pBeanClass) {
+
+        try {
+            if (pTableName == null || pTableName.isEmpty()) {
+                throw new IllegalArgumentException("Parameter [pTableName] must not be null.");
+            }
+            if (pBeanClass == null) {
+                throw new IllegalArgumentException("Parameter [pBeanClass] must not be null.");
+            }
+            if (pInParameters == null) {
+                throw new IllegalArgumentException("Parameter [pInParameters] must not be null.");
+            }
+        } catch (IllegalArgumentException e) {
+            throw new DataAccessException(DataAccessException.Type.PARAMETERS_MUST_NOT_BE_NULL, e);
+        }
+
+        if (log.isDebugEnabled()) {
+            loggingHelper.debugDelete(pTableName, pInParameters, pBeanClass);
+        }
+
+        boolean success = true;
+        Connection con = null;
+        PreparedStatement pstmt = null;
+        try {
+            con = DataSourceProvider.getConnection();
+            final IPlatform platform = DataSourceProvider.getPlatform();
+            final String sqlStmt = statementBuilder.buildDelete(pTableName, pInParameters, USE_NAMED_PARAMETERS);
+            if (log.isDebugEnabled()) {
+                log.debug("Preparing and executing SQL statement: ".concat(sqlStmt)
+                        .concat("; using connection : ".concat(con.toString())));
+            }
+            pstmt = con.prepareStatement(sqlStmt);
+
+            int parameterIndex = 1;
+            final Map<QueryColumn, Object> orderedParameters = new TreeMap<>(pInParameters);
+            for (final QueryColumn queryColumn : orderedParameters.keySet()) {
+                if (!queryColumn.getOperator().isUnary()) {
+                    Object value = orderedParameters.get(queryColumn);
+                    if (value instanceof java.util.Date) {
+                        value = new Timestamp(((java.util.Date) value).getTime());
+                    }
+                    if (value instanceof List) {
+                        final List<Object> inClauseValues = ((List<Object>) orderedParameters.get(queryColumn));
+                        for (final Object inClauseValue : inClauseValues) {
+                            platform.setObject(pstmt, inClauseValue, parameterIndex++, -1);
+                        }
+                    } else {
+                        if (value != null) {
+                            platform.setObject(pstmt, value, parameterIndex++, -1);
+                        }
+                    }
+                }
+            }
+            int updateCount = pstmt.executeUpdate();
+            if (log.isDebugEnabled()) {
+                log.debug("Bulk deletion operation deleted" + updateCount + " records");
+            }
+        } catch (Exception e) {
+            log.error(DataAccessException.Type.COULD_NOT_ACCESS_DATA.getDescription(), e);
+            success = false;
+            throw new DataAccessException(DataAccessException.Type.COULD_NOT_ACCESS_DATA, e);
+        } finally {
+            try {
+                if (pstmt != null) {
+                    pstmt.close();
+                }
+                if (con != null && !con.isClosed()) {
+                    DataSourceProvider.returnConnection(success);
+                }
+            } catch (SQLException ignored) {
+            } // Nothing to do
+        }
+    }
+
     private Object buildVersionColumnValue(final IBean pBean, final BatchType pBatchType, final Object pOldValue) {
 
         Object value;
@@ -445,28 +532,6 @@ public class JDBCDMLProcessor<T> {
         message.append(pPassedRows);
         message.append("]");
         throw new DataAccessException(DataAccessException.Type.COULD_NOT_ACCESS_DATA, message.toString());
-    }
-
-    private void debugDML(final String pTableName, final String pSequenceName, final String pStatement) {
-
-        final StringBuilder logMessage = new StringBuilder();
-        if (pStatement.toUpperCase().startsWith("INSERT")) {
-            logMessage.append("Inserting into ").append(pTableName);
-            logMessage.append(" with sequence ").append(pSequenceName);
-            logMessage.append(".\n");
-            logMessage.append("Using insert statement: ").append(pStatement);
-        } else {
-            if (pStatement.toUpperCase().startsWith("UPDATE")) {
-                logMessage.append("Updating ").append(pTableName);
-                logMessage.append(".\n");
-                logMessage.append("Using update statement: ").append(pStatement);
-            } else { // DELETE
-                logMessage.append("Deleting from ").append(pTableName);
-                logMessage.append(".\n");
-                logMessage.append("Using delete statement: ").append(pStatement);
-            }
-        }
-        log.debug(logMessage.toString());
     }
 
     private enum BatchType {

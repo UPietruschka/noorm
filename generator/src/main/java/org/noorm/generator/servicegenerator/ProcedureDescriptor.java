@@ -14,7 +14,7 @@ public class ProcedureDescriptor {
 
 	private String javaName;
 	private String dbProcedureName;
-	private final List<ParameterDescriptor> parameters = new ArrayList<ParameterDescriptor>();
+	private final List<ParameterDescriptor> parameters = new ArrayList<>();
 	private String outDbParamName;
 	private String outParamJavaType;
 	private boolean hasOutParam;
