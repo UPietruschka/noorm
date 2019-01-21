@@ -13,6 +13,9 @@
         <jxb:bindings node="//xs:complexType[@name='deleteDeclarationType']">
             <inheritance:implements>org.noorm.generator.IDeclaration</inheritance:implements>
         </jxb:bindings>
+        <jxb:bindings node="//xs:complexType[@name='updateDeclarationType']">
+            <inheritance:implements>org.noorm.generator.IDeclaration</inheritance:implements>
+        </jxb:bindings>
     </jxb:bindings>
 
 </jxb:bindings>

@@ -265,6 +265,14 @@
                         </xs:documentation>
                     </xs:annotation>
                 </xs:element>
+                <xs:element name="updateDeclarations" type="updateDeclarations" minOccurs="0">
+                    <xs:annotation>
+                        <xs:documentation>
+                            Update declarations work very much the same way, query declaration work, except that
+                            the declared query is used to find records for update.
+                        </xs:documentation>
+                    </xs:annotation>
+                </xs:element>
                 <xs:element name="deleteDeclarations" type="deleteDeclarations" minOccurs="0">
                     <xs:annotation>
                         <xs:documentation>
@@ -434,6 +442,48 @@
                     The FilterExtension provides support for paging and sorting for the given query.
                     Note that this functionality is not available (and does not make sense either) for
                     single row queries.
+                </xs:documentation>
+            </xs:annotation>
+        </xs:attribute>
+    </xs:complexType>
+
+    <xs:complexType name="updateDeclarations">
+        <xs:annotation>
+            <xs:documentation>
+                A list of automatically generated update declarations.
+            </xs:documentation>
+        </xs:annotation>
+        <xs:sequence>
+            <xs:element ref="updateDeclaration" maxOccurs="unbounded"/>
+        </xs:sequence>
+    </xs:complexType>
+
+    <xs:element name="updateDeclaration">
+        <xs:complexType>
+            <xs:complexContent>
+                <xs:extension base="updateDeclarationType"/>
+            </xs:complexContent>
+        </xs:complexType>
+    </xs:element>
+
+    <xs:complexType name="updateDeclarationType">
+        <xs:sequence>
+            <xs:element name="updateColumn" type="xs:string" maxOccurs="unbounded"/>
+            <xs:element name="queryColumn" type="queryColumn" minOccurs="0" maxOccurs="unbounded"/>
+        </xs:sequence>
+        <xs:attribute name="tableName" use="required" type="xs:string">
+            <xs:annotation>
+                <xs:documentation>
+                    The name of the database entity (table or view) to delete/query against.
+                </xs:documentation>
+            </xs:annotation>
+        </xs:attribute>
+        <xs:attribute name="generatedMethodName" type="xs:string">
+            <xs:annotation>
+                <xs:documentation>
+                    The (Java) method name for the generated code (if omitted, NoORM automatically
+                    generates a method name. This is typically suitable, if not too many query columns
+                    are defined. For many query columns, manual method name specification if preferable).
                 </xs:documentation>
             </xs:annotation>
         </xs:attribute>

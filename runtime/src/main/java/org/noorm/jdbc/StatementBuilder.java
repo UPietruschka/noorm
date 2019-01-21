@@ -241,6 +241,30 @@ public class StatementBuilder {
         return buildQueryWhereClause(pInParameters, pUseNamedParameters, pSQLStatement).toString();
     }
 
+    public String buildUpdate(final String pTableName,
+                              final Map<String, Object> pUpdateParameters,
+                              final Map<QueryColumn, Object> pInParameters,
+                              final boolean pUseNamedParameters) {
+
+        final StringBuilder pSQLStatement = new StringBuilder();
+        if (!pTableName.equals(pTableName.toUpperCase())) {
+            pSQLStatement.append(UPDATE_PREFIX).append("\"".concat(pTableName).concat("\""));
+        } else {
+            pSQLStatement.append(UPDATE_PREFIX).append(pTableName);
+        }
+        String delimiter = UPDATE_DELIM_1;
+        for (final String updateParameterName : pUpdateParameters.keySet()) {
+            pSQLStatement.append(delimiter);
+            if (pUseNamedParameters) {
+                pSQLStatement.append(updateParameterName).append(EQUALS).append(ASG).append(updateParameterName);
+            } else {
+                pSQLStatement.append(updateParameterName).append(EQUALS).append(ASG2);
+            }
+            delimiter = UPDATE_DELIM_2;
+        }
+        return buildQueryWhereClause(pInParameters, pUseNamedParameters, pSQLStatement).toString();
+    }
+
     private StringBuilder buildQueryWhereClause(final Map<QueryColumn, Object> pInParameters,
                                                 final boolean pUseNamedParameters,
                                                 final StringBuilder pSQLStatement) {
