@@ -34,7 +34,7 @@ public class OptLockDateTest {
             assertEquals(SOME_TEXT, insertedOptLockDate.getText());
             insertedOptLockDate.setText(SOME_NEW_TEXT);
             optLockDateDML.updateOptLockDate(insertedOptLockDate);
-            optLockDateDML.deleteOptLockDate(insertedOptLockDate);
+            optLockDateDML.deleteOptLockDateByText(SOME_NEW_TEXT);
             DataSourceProvider.commit();
         } catch (Throwable e) {
             DataSourceProvider.rollback();

@@ -75,6 +75,12 @@
             <queryColumn name="RAW_TYPE_COLUMN"/>
         </queryDeclaration>
     </queryDeclarations>
+    <deleteDeclarations>
+        <deleteDeclaration tableName="OPT_LOCK_DATE"
+                           generatedMethodName="deleteOptLockDateByText">
+            <queryColumn name="OPT_TEXT"/>
+        </deleteDeclaration>
+    </deleteDeclarations>
     <typeMappings>
         <typeMapping tableFilterRegex="COMPLEX_DATA_TYPES" columnFilterRegex="CONVERTED_NUMBER" databaseType="NUMERIC" javaType="String"/>
         <typeMapping columnFilterRegex="COMMISSION_PCT" databaseType="DOUBLE" javaType="java.math.BigDecimal"/>

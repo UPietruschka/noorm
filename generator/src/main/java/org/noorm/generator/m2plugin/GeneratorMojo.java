@@ -248,5 +248,12 @@ public class GeneratorMojo extends AbstractMojo implements IParameters {
                 }
             }
         }
+        for (final DeleteDeclaration deleteDeclaration : configuration.getDeleteDeclarations()) {
+            for (final QueryColumn queryColumn : deleteDeclaration.getQueryColumn()) {
+                if (queryColumn.getOperator() == null) {
+                    queryColumn.setOperator(OperatorName.EQUAL_TO);
+                }
+            }
+        }
     }
 }

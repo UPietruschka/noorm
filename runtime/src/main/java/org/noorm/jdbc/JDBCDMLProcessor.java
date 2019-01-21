@@ -416,10 +416,11 @@ public class JDBCDMLProcessor<T> {
      * @param pTableName the table or view name used for the SQL query
      * @param pInParameters the parameters for the where-clause of the SQL query
      * @param pBeanClass the return type
+     * @return the number of deleted records
      */
-    public void delete(final String pTableName,
-                       final Map<QueryColumn, Object> pInParameters,
-                       final Class<T> pBeanClass) {
+    public int delete(final String pTableName,
+                      final Map<QueryColumn, Object> pInParameters,
+                      final Class<T> pBeanClass) {
 
         try {
             if (pTableName == null || pTableName.isEmpty()) {
@@ -472,10 +473,11 @@ public class JDBCDMLProcessor<T> {
                     }
                 }
             }
-            int updateCount = pstmt.executeUpdate();
+            int deleteCount = pstmt.executeUpdate();
             if (log.isDebugEnabled()) {
-                log.debug("Bulk deletion operation deleted" + updateCount + " records");
+                log.debug("Bulk deletion operation deleted " + deleteCount + " records");
             }
+            return deleteCount;
         } catch (Exception e) {
             log.error(DataAccessException.Type.COULD_NOT_ACCESS_DATA.getDescription(), e);
             success = false;
