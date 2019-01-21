@@ -47,11 +47,16 @@
                             <verbose>true</verbose>
                             <schemaDirectory>./src/main/resources/xsd</schemaDirectory>
                             <removeOldOutput>false</removeOldOutput>
+                            <bindingDirectory>src/main/resources/xjb</bindingDirectory>
+                            <bindingIncludes>
+                                <include>bindings.xjb</include>
+                            </bindingIncludes>
                             <episode>false</episode>
                             <extension>true</extension>
                             <args>
                                 <arg>-no-header</arg>
                                 <arg>-Xxew</arg>
+                                <arg>-Xinheritance</arg>
                                 <arg>-Xxew:instantiate lazy</arg>
                             </args>
                             <plugins>
@@ -59,6 +64,16 @@
                                     <groupId>com.github.jaxb-xew-plugin</groupId>
                                     <artifactId>jaxb-xew-plugin</artifactId>
                                     <version>1.10</version>
+                                </plugin>
+                                <plugin>
+                                    <groupId>org.jvnet.jaxb2_commons</groupId>
+                                    <artifactId>jaxb2-basics</artifactId>
+                                    <version>0.11.1</version>
+                                </plugin>
+                                <plugin>
+                                    <groupId>org.jvnet.jaxb2_commons</groupId>
+                                    <artifactId>jaxb2-basics-tools</artifactId>
+                                    <version>0.11.1</version>
                                 </plugin>
                             </plugins>
                         </configuration>

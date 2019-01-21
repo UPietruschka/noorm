@@ -363,83 +363,81 @@
     </xs:complexType>
 
     <xs:element name="queryDeclaration">
-        <xs:annotation>
-            <xs:documentation>
-                Query declarations provide a convenient and simple way to specify SQL queries without the need
-                to explicitly write SQL code. However, query declarations are not designated to replace SQL code
-                of arbitrary complexity, but only to provide an efficient method to specify rather primitive SQL
-                queries using a single entity only and a list of WHERE conditions concatenated by "AND".
-            </xs:documentation>
-        </xs:annotation>
         <xs:complexType>
-            <xs:sequence>
-                <xs:element name="queryColumn" type="queryColumn" minOccurs="0" maxOccurs="unbounded"/>
-            </xs:sequence>
-            <xs:attribute name="tableName" use="required" type="xs:string">
-                <xs:annotation>
-                    <xs:documentation>
-                        The name of the database entity (table or view) to query against.
-                    </xs:documentation>
-                </xs:annotation>
-            </xs:attribute>
-            <xs:attribute name="baseTable" type="xs:string">
-                <xs:annotation>
-                    <xs:documentation>
-                        The name of the database entity (table or view), which is the base for the returning
-                        type. When parameter "tableName" is a view, the desired return type may be only one of
-                        the tables contained in the view.
-                    </xs:documentation>
-                </xs:annotation>
-            </xs:attribute>
-            <xs:attribute name="generatedMethodName" type="xs:string">
-                <xs:annotation>
-                    <xs:documentation>
-                        The (Java) method name for the generated code (if omitted, NoORM automatically
-                        generates a method name. This is typically suitable, if not too many query columns
-                        are defined. For many query columns, manual method name specification if preferable).
-                    </xs:documentation>
-                </xs:annotation>
-            </xs:attribute>
-            <xs:attribute name="generatedClassName" type="xs:string">
-                <xs:annotation>
-                    <xs:documentation>
-                        The name of the Java class to be generated (Optional, by default NoORM generates one
-                        single class named "DeclaredQueries" for all declared queries. By explicitly specifying
-                        a class name it is possible to group the declared queries).
-                    </xs:documentation>
-                </xs:annotation>
-            </xs:attribute>
-            <xs:attribute name="singleRowQuery" type="xs:boolean">
-                <xs:annotation>
-                    <xs:documentation>
-                        Indicates, whether the generated query is expected to return a single row only.
-                        This will change the method return type from "java.util.List" to the respective
-                        type (default is false).
-                    </xs:documentation>
-                </xs:annotation>
-            </xs:attribute>
-            <xs:attribute name="acquireLock" type="xs:boolean">
-                <xs:annotation>
-                    <xs:documentation>
-                        Indicates, whether NoORM should acquire a lock for the retrieved rows (by appending
-                        the "FOR UPDATE" clause to the generated SQL).
-                        Note that this option is only useful when used in an explicitly managed transaction
-                        (user-managed), otherwise an exception is thrown.
-                    </xs:documentation>
-                </xs:annotation>
-            </xs:attribute>
-            <xs:attribute name="useFilterExtension" type="xs:boolean">
-                <xs:annotation>
-                    <xs:documentation>
-                        Indicates, whether the generated API for this query should include a FilterExtension.
-                        The FilterExtension provides support for paging and sorting for the given query.
-                        Note that this functionality is not available (and does not make sense either) for
-                        single row queries.
-                    </xs:documentation>
-                </xs:annotation>
-            </xs:attribute>
+            <xs:complexContent>
+                <xs:extension base="queryDeclarationType"/>
+            </xs:complexContent>
         </xs:complexType>
     </xs:element>
+
+    <xs:complexType name="queryDeclarationType">
+        <xs:sequence>
+            <xs:element name="queryColumn" type="queryColumn" minOccurs="0" maxOccurs="unbounded"/>
+        </xs:sequence>
+        <xs:attribute name="tableName" use="required" type="xs:string">
+            <xs:annotation>
+                <xs:documentation>
+                    The name of the database entity (table or view) to query against.
+                </xs:documentation>
+            </xs:annotation>
+        </xs:attribute>
+        <xs:attribute name="baseTable" type="xs:string">
+            <xs:annotation>
+                <xs:documentation>
+                    The name of the database entity (table or view), which is the base for the returning
+                    type. When parameter "tableName" is a view, the desired return type may be only one of
+                    the tables contained in the view.
+                </xs:documentation>
+            </xs:annotation>
+        </xs:attribute>
+        <xs:attribute name="generatedMethodName" type="xs:string">
+            <xs:annotation>
+                <xs:documentation>
+                    The (Java) method name for the generated code (if omitted, NoORM automatically
+                    generates a method name. This is typically suitable, if not too many query columns
+                    are defined. For many query columns, manual method name specification if preferable).
+                </xs:documentation>
+            </xs:annotation>
+        </xs:attribute>
+        <xs:attribute name="generatedClassName" type="xs:string">
+            <xs:annotation>
+                <xs:documentation>
+                    The name of the Java class to be generated (Optional, by default NoORM generates one
+                    single class named "DeclaredQueries" for all declared queries. By explicitly specifying
+                    a class name it is possible to group the declared queries).
+                </xs:documentation>
+            </xs:annotation>
+        </xs:attribute>
+        <xs:attribute name="singleRowQuery" type="xs:boolean">
+            <xs:annotation>
+                <xs:documentation>
+                    Indicates, whether the generated query is expected to return a single row only.
+                    This will change the method return type from "java.util.List" to the respective
+                    type (default is false).
+                </xs:documentation>
+            </xs:annotation>
+        </xs:attribute>
+        <xs:attribute name="acquireLock" type="xs:boolean">
+            <xs:annotation>
+                <xs:documentation>
+                    Indicates, whether NoORM should acquire a lock for the retrieved rows (by appending
+                    the "FOR UPDATE" clause to the generated SQL).
+                    Note that this option is only useful when used in an explicitly managed transaction
+                    (user-managed), otherwise an exception is thrown.
+                </xs:documentation>
+            </xs:annotation>
+        </xs:attribute>
+        <xs:attribute name="useFilterExtension" type="xs:boolean">
+            <xs:annotation>
+                <xs:documentation>
+                    Indicates, whether the generated API for this query should include a FilterExtension.
+                    The FilterExtension provides support for paging and sorting for the given query.
+                    Note that this functionality is not available (and does not make sense either) for
+                    single row queries.
+                </xs:documentation>
+            </xs:annotation>
+        </xs:attribute>
+    </xs:complexType>
 
     <xs:complexType name="deleteDeclarations">
         <xs:annotation>
@@ -453,34 +451,34 @@
     </xs:complexType>
 
     <xs:element name="deleteDeclaration">
-        <xs:annotation>
-            <xs:documentation>
-                Delete declarations provide a convenient and simple way to specify delete statements for bulk
-                delete operations based on SQL queries without the need to explicitly write SQL code.
-            </xs:documentation>
-        </xs:annotation>
         <xs:complexType>
-            <xs:sequence>
-                <xs:element name="queryColumn" type="queryColumn" minOccurs="0" maxOccurs="unbounded"/>
-            </xs:sequence>
-            <xs:attribute name="tableName" use="required" type="xs:string">
-                <xs:annotation>
-                    <xs:documentation>
-                        The name of the database entity (table or view) to delete/query against.
-                    </xs:documentation>
-                </xs:annotation>
-            </xs:attribute>
-            <xs:attribute name="generatedMethodName" type="xs:string">
-                <xs:annotation>
-                    <xs:documentation>
-                        The (Java) method name for the generated code (if omitted, NoORM automatically
-                        generates a method name. This is typically suitable, if not too many query columns
-                        are defined. For many query columns, manual method name specification if preferable).
-                    </xs:documentation>
-                </xs:annotation>
-            </xs:attribute>
+            <xs:complexContent>
+                <xs:extension base="deleteDeclarationType"/>
+            </xs:complexContent>
         </xs:complexType>
     </xs:element>
+
+    <xs:complexType name="deleteDeclarationType">
+        <xs:sequence>
+            <xs:element name="queryColumn" type="queryColumn" minOccurs="0" maxOccurs="unbounded"/>
+        </xs:sequence>
+        <xs:attribute name="tableName" use="required" type="xs:string">
+            <xs:annotation>
+                <xs:documentation>
+                    The name of the database entity (table or view) to delete/query against.
+                </xs:documentation>
+            </xs:annotation>
+        </xs:attribute>
+        <xs:attribute name="generatedMethodName" type="xs:string">
+            <xs:annotation>
+                <xs:documentation>
+                    The (Java) method name for the generated code (if omitted, NoORM automatically
+                    generates a method name. This is typically suitable, if not too many query columns
+                    are defined. For many query columns, manual method name specification if preferable).
+                </xs:documentation>
+            </xs:annotation>
+        </xs:attribute>
+    </xs:complexType>
 
     <xs:complexType name="queryColumn">
         <xs:annotation>

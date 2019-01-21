@@ -22,6 +22,8 @@ import java.util.regex.Pattern;
  */
 public class GeneratorUtil {
 
+    private static final String DEFAULT_METHOD_NAME_PART3 = "By";
+
 	public static void generateFile(final File pDir,
 									final String pVelocityTemplateFile,
 									final String pJavaName,
@@ -393,5 +395,36 @@ public class GeneratorUtil {
             return false;
         }
         return true;
+    }
+
+    public static String generateMethodName(final IDeclaration pQueryDeclaration,
+                                            final String pBaseTable,
+                                            final String pMethodNamePrefix,
+                                            final GeneratorConfiguration configuration) {
+
+        final StringBuilder methodName = new StringBuilder();
+        methodName.append(pMethodNamePrefix);
+        String t0 = pQueryDeclaration.getTableName();
+        if (pBaseTable != null && !pBaseTable.isEmpty()) {
+            t0 = pBaseTable;
+        }
+        final String javaTableName =
+                GeneratorUtil.convertTableName2JavaName(t0, configuration.getTableNameMappings());
+        methodName.append(javaTableName);
+        if (!pQueryDeclaration.getQueryColumn().isEmpty()) {
+            methodName.append(DEFAULT_METHOD_NAME_PART3);
+            // With an increasing number of parameters, we use a substring of decreasing length of the
+            // parameter name for method name construction
+            int substringLength = 16;
+            if (pQueryDeclaration.getQueryColumn().size() > 1) { substringLength = 8; }
+            if (pQueryDeclaration.getQueryColumn().size() > 2) { substringLength = 4; }
+            if (pQueryDeclaration.getQueryColumn().size() > 4) { substringLength = 2; }
+            if (pQueryDeclaration.getQueryColumn().size() > 8) { substringLength = 1; }
+            for (final QueryColumn queryColumn : pQueryDeclaration.getQueryColumn()) {
+                final String javaColumnName = Utils.convertDBName2JavaName(queryColumn.getName(), true);
+                methodName.append(javaColumnName, 0, Math.min(substringLength, javaColumnName.length()));
+            }
+        }
+        return methodName.toString();
     }
 }
