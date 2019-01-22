@@ -111,15 +111,16 @@ public class BeanDMLGenerator {
 					}
 					updateDescriptor.setBeanName(beanName);
 					int paramIndex = 1;
-					for (final String updateColumn : updateDeclaration.getUpdateColumn()) {
+					for (final UpdateColumn updateColumn : updateDeclaration.getUpdateColumn()) {
 						final ParameterDescriptor parameterDescriptor = new ParameterDescriptor();
+						final String updateColumnName = updateColumn.getName();
 						final String index = String.format("%02d", paramIndex++);
-						parameterDescriptor.setJavaName
-								(PARAMETER_PREFIX + index + Utils.convertDBName2JavaName(updateColumn, true));
-						parameterDescriptor.setDbParamName(updateColumn);
+						parameterDescriptor.setJavaName(PARAMETER_PREFIX + index
+								+ Utils.convertDBName2JavaName(updateColumnName, true));
+						parameterDescriptor.setDbParamName(updateColumnName);
 						String javaType = null;
 						for (final TableMetadata tableMetadata : tableMetadataList) {
-							if (tableMetadata.getColumnName().equals(updateColumn)) {
+							if (tableMetadata.getColumnName().equals(updateColumnName)) {
 								javaType = GeneratorUtil.convertDatabaseType2JavaType(
 										tableMetadata.getJDBCType(),
 										tableMetadata.getDecimalDigits(),
@@ -130,7 +131,7 @@ public class BeanDMLGenerator {
 						}
 						if (javaType == null) {
 							throw new GeneratorException("Invalid update declaration: no metadata found for table "
-									.concat(t0).concat(" and column ").concat(updateColumn));
+									.concat(t0).concat(" and column ").concat(updateColumnName));
 						}
 						parameterDescriptor.setJavaType(javaType);
 						updateDescriptor.addUpdateParameter(parameterDescriptor);

@@ -75,10 +75,17 @@
             <queryColumn name="RAW_TYPE_COLUMN"/>
         </queryDeclaration>
     </queryDeclarations>
+    <updateDeclarations>
+        <updateDeclaration tableName="OPT_LOCK_DATE"
+                           generatedMethodName="updateOptLockDateText">
+            <updateColumn name="OPT_TEXT"/>
+            <queryColumn name="OPT_ID"/>
+        </updateDeclaration>
+    </updateDeclarations>
     <deleteDeclarations>
         <deleteDeclaration tableName="OPT_LOCK_DATE"
-                           generatedMethodName="deleteOptLockDateByText">
-            <queryColumn name="OPT_TEXT"/>
+                           generatedMethodName="deleteOptLockDateById">
+            <queryColumn name="OPT_ID"/>
         </deleteDeclaration>
     </deleteDeclarations>
     <typeMappings>

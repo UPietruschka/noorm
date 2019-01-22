@@ -468,7 +468,7 @@
 
     <xs:complexType name="updateDeclarationType">
         <xs:sequence>
-            <xs:element name="updateColumn" type="xs:string" maxOccurs="unbounded"/>
+            <xs:element name="updateColumn" type="updateColumn" maxOccurs="unbounded"/>
             <xs:element name="queryColumn" type="queryColumn" minOccurs="0" maxOccurs="unbounded"/>
         </xs:sequence>
         <xs:attribute name="tableName" use="required" type="xs:string">
@@ -487,6 +487,16 @@
                 </xs:documentation>
             </xs:annotation>
         </xs:attribute>
+    </xs:complexType>
+
+    <xs:complexType name="updateColumn">
+        <xs:annotation>
+            <xs:documentation>
+                An update column is a database column specification used in a update declaration to define
+                columns subject to updates.
+            </xs:documentation>
+        </xs:annotation>
+        <xs:attribute name="name" use="required" type="xs:string"/>
     </xs:complexType>
 
     <xs:complexType name="deleteDeclarations">

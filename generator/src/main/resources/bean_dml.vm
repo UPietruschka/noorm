@@ -121,7 +121,7 @@ public class $class.getJavaName() {
 #end
 		final Map<String, Object> updateParameters = new HashMap<String, Object>();
 #foreach ($param in $update.UpdateParameters)
-		parameters.put("$param.getDbParamName().toLowerCase()", $param.JavaName);
+		updateParameters.put("$param.getDbParamName().toLowerCase()", $param.JavaName);
 #end
 		final Map<QueryColumn, Object> parameters = new HashMap<QueryColumn, Object>();
 #foreach ($param in $update.Parameters)
