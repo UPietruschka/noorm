@@ -9,7 +9,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.TreeMap;
 
 /**
  * Processor for JDBC database access.
@@ -25,6 +24,7 @@ public class JDBCQueryProcessor<T> {
     private static final boolean USE_NAMED_PARAMETERS = false;
 
 	private static JDBCQueryProcessor queryProcessor = new JDBCQueryProcessor();
+    private final Utils utils = new Utils();
     private final LoggingHelper loggingHelper = new LoggingHelper();
 
     private JDBCQueryProcessor() { }
@@ -61,14 +61,14 @@ public class JDBCQueryProcessor<T> {
      * supported here.
      *
      * @param pTableName the table or view name used for the SQL query
-     * @param pInParameters the parameters for the where-clause of the SQL query
+     * @param pQueryParameters the parameters for the where-clause of the SQL query
      * @param pBeanClass the return type
      * @param pAcquireLock flag to indicate, whether a write lock should be acquired for the retrieved records
      * @param pFilterExtension additional parameters for paging and sorting
      * @return a list containing the results of type pBeanClass
      */
     public List<T> getBeanListFromSQL(final String pTableName,
-                                      final Map<QueryColumn, Object> pInParameters,
+                                      final Map<QueryColumn, Object> pQueryParameters,
                                       final Class<T> pBeanClass,
                                       final boolean pAcquireLock,
                                       final FilterExtension pFilterExtension) {
@@ -79,15 +79,15 @@ public class JDBCQueryProcessor<T> {
             if (pBeanClass == null) {
                 throw new IllegalArgumentException("Parameter [pBeanClass] must not be null.");
             }
-            if (pInParameters == null) {
-                throw new IllegalArgumentException("Parameter [pInParameters] must not be null.");
+            if (pQueryParameters == null) {
+                throw new IllegalArgumentException("Parameter [pQueryParameters] must not be null.");
             }
         } catch (IllegalArgumentException e) {
             throw new DataAccessException(DataAccessException.Type.PARAMETERS_MUST_NOT_BE_NULL, e);
         }
 
         if (log.isDebugEnabled()) {
-            loggingHelper.debugSQLCall(pTableName, pInParameters, pBeanClass, pFilterExtension);
+            loggingHelper.debugSQLCall(pTableName, pQueryParameters, pBeanClass, pFilterExtension);
         }
 
         boolean success = true;
@@ -109,7 +109,7 @@ public class JDBCQueryProcessor<T> {
                 }
             }
             final String sqlStmt = platform.buildSQLStatement
-                    (pTableName, pInParameters, USE_NAMED_PARAMETERS, pAcquireLock, pFilterExtension);
+                    (pTableName, pQueryParameters, USE_NAMED_PARAMETERS, pAcquireLock, pFilterExtension);
             if (log.isDebugEnabled()) {
                 log.debug("Preparing and executing SQL statement: ".concat(sqlStmt)
                         .concat("; using connection : ".concat(con.toString())));
@@ -117,25 +117,7 @@ public class JDBCQueryProcessor<T> {
             pstmt = con.prepareStatement(sqlStmt);
 
             int parameterIndex = 1;
-            final Map<QueryColumn, Object> orderedParameters = new TreeMap<>(pInParameters);
-            for (final QueryColumn queryColumn : orderedParameters.keySet()) {
-                if (!queryColumn.getOperator().isUnary()) {
-                    Object value = orderedParameters.get(queryColumn);
-                    if (value instanceof java.util.Date) {
-                        value = new Timestamp(((java.util.Date) value).getTime());
-                    }
-                    if (value instanceof List) {
-                        final List<Object> inClauseValues = ((List<Object>) orderedParameters.get(queryColumn));
-                        for (final Object inClauseValue : inClauseValues) {
-                            platform.setObject(pstmt, inClauseValue, parameterIndex++, -1);
-                        }
-                    } else {
-                        if (value != null) {
-                            platform.setObject(pstmt, value, parameterIndex++, -1);
-                        }
-                    }
-                }
-            }
+            utils.setQueryParameter(pQueryParameters, pstmt, parameterIndex);
             ResultSet rs = pstmt.executeQuery();
 
             final BeanMapper<T> mapper = BeanMapper.getInstance();

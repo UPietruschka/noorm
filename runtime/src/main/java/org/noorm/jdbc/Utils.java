@@ -1,7 +1,14 @@
 package org.noorm.jdbc;
 
+import org.noorm.jdbc.platform.IPlatform;
+
 import javax.xml.bind.annotation.adapters.HexBinaryAdapter;
+import java.sql.PreparedStatement;
+import java.sql.SQLException;
+import java.sql.Timestamp;
 import java.util.List;
+import java.util.Map;
+import java.util.TreeMap;
 
 /**
  * Utility methods to support JDBCProcedureProcessor and the class generators.
@@ -17,26 +24,6 @@ public class Utils {
 	private static final String DB_NAME_TOKEN_SPLIT = "_";
 	private static final String ENUM_UNSUPPORTED_REGEX = "[ /\\-\\,\\.;]";
 	private static final String ENUM_UNSUPPORTED_REGEX_SUBSTITUTE = "_";
-
-    /**
-     * Converts a Java name into a database name. Inversion of convertDBName2JavaName.
-     * @see #convertDBName2JavaName(String, boolean)
-     * @param pJavaName the Java name
-     * @return the database name
-     */
-	public static String convertJavaName2DBName(final String pJavaName) {
-
-		char[] javaNameChars = pJavaName.toCharArray();
-		char[] lowerJavaNameChars = pJavaName.toLowerCase().toCharArray();
-		StringBuilder dbNameBuilder = new StringBuilder();
-		for (int i = 0; i < javaNameChars.length; i++) {
-			if ((javaNameChars[i] != lowerJavaNameChars[i]) && i > 0) {
-				dbNameBuilder.append('_');
-			}
-			dbNameBuilder.append(lowerJavaNameChars[i]);
-		}
-		return dbNameBuilder.toString();
-	}
 
     /**
      * Converts a database object name into a java name. Database names (table names, column names, etc.) are
@@ -130,5 +117,39 @@ public class Utils {
             }
         }
         return parameterToString;
+    }
+
+    /**
+     * Sets the provided query parameters for the provided prepared statement for further processing.
+     *
+     * @param pQueryParameters the map of query parameters
+     * @param pStmt the JDBC prepared statement
+     * @param pParameterIndex the current parameter index within the JDBC prepared statement
+     * @throws SQLException SQL processing exception thrown by database driver
+     */
+    public void setQueryParameter(final Map<QueryColumn, Object> pQueryParameters,
+                                  final PreparedStatement pStmt,
+                                  int pParameterIndex) throws SQLException {
+
+        final IPlatform platform = DataSourceProvider.getPlatform();
+        final Map<QueryColumn, Object> orderedQueryParameters = new TreeMap<>(pQueryParameters);
+        for (final QueryColumn queryColumn : orderedQueryParameters.keySet()) {
+            if (!queryColumn.getOperator().isUnary()) {
+                Object value = orderedQueryParameters.get(queryColumn);
+                if (value instanceof java.util.Date) {
+                    value = new Timestamp(((java.util.Date) value).getTime());
+                }
+                if (value instanceof List) {
+                    final List<Object> inClauseValues = ((List<Object>) orderedQueryParameters.get(queryColumn));
+                    for (final Object inClauseValue : inClauseValues) {
+                        platform.setObject(pStmt, inClauseValue, pParameterIndex++, -1);
+                    }
+                } else {
+                    if (value != null) {
+                        platform.setObject(pStmt, value, pParameterIndex++, -1);
+                    }
+                }
+            }
+        }
     }
 }

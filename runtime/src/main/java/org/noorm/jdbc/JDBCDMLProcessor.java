@@ -30,6 +30,7 @@ public class JDBCDMLProcessor<T> {
 
     private static JDBCDMLProcessor dmlProcessor = new JDBCDMLProcessor();
     private final StatementBuilder statementBuilder = new StatementBuilder();
+    private final Utils utils = new Utils();
     private final LoggingHelper loggingHelper = new LoggingHelper();
 
     private JDBCDMLProcessor() {
@@ -467,32 +468,12 @@ public class JDBCDMLProcessor<T> {
                 if (value != null) {
                     if (value instanceof java.util.Date) {
                         value = new Timestamp(((java.util.Date) value).getTime());
-                    } else {
-                        platform.setObject(pstmt, value, parameterIndex++, -1);
                     }
+                    platform.setObject(pstmt, value, parameterIndex++, -1);
                 }
             }
 
-            final Map<QueryColumn, Object> orderedQueryParameters = new TreeMap<>(pQueryParameters);
-            for (final QueryColumn queryColumn : orderedQueryParameters.keySet()) {
-                if (!queryColumn.getOperator().isUnary()) {
-                    Object value = orderedQueryParameters.get(queryColumn);
-                    if (value instanceof java.util.Date) {
-                        value = new Timestamp(((java.util.Date) value).getTime());
-                    }
-                    if (value instanceof List) {
-                        final List<Object> inClauseValues = ((List<Object>) orderedQueryParameters.get(queryColumn));
-                        for (final Object inClauseValue : inClauseValues) {
-                            platform.setObject(pstmt, inClauseValue, parameterIndex++, -1);
-                        }
-                    } else {
-                        if (value != null) {
-                            platform.setObject(pstmt, value, parameterIndex++, -1);
-                        }
-                    }
-                }
-            }
-
+            utils.setQueryParameter(pQueryParameters, pstmt, parameterIndex);
             int updateCount = pstmt.executeUpdate();
             if (log.isDebugEnabled()) {
                 log.debug("Bulk update operation updated " + updateCount + " records");
@@ -553,7 +534,6 @@ public class JDBCDMLProcessor<T> {
         PreparedStatement pstmt = null;
         try {
             con = DataSourceProvider.getConnection();
-            final IPlatform platform = DataSourceProvider.getPlatform();
             final String sqlStmt = statementBuilder.buildDelete(pTableName, pQueryParameters, USE_NAMED_PARAMETERS);
             if (log.isDebugEnabled()) {
                 log.debug("Preparing and executing DELETE statement: ".concat(sqlStmt)
@@ -562,25 +542,7 @@ public class JDBCDMLProcessor<T> {
             pstmt = con.prepareStatement(sqlStmt);
 
             int parameterIndex = 1;
-            final Map<QueryColumn, Object> orderedQueryParameters = new TreeMap<>(pQueryParameters);
-            for (final QueryColumn queryColumn : orderedQueryParameters.keySet()) {
-                if (!queryColumn.getOperator().isUnary()) {
-                    Object value = orderedQueryParameters.get(queryColumn);
-                    if (value instanceof java.util.Date) {
-                        value = new Timestamp(((java.util.Date) value).getTime());
-                    }
-                    if (value instanceof List) {
-                        final List<Object> inClauseValues = ((List<Object>) orderedQueryParameters.get(queryColumn));
-                        for (final Object inClauseValue : inClauseValues) {
-                            platform.setObject(pstmt, inClauseValue, parameterIndex++, -1);
-                        }
-                    } else {
-                        if (value != null) {
-                            platform.setObject(pstmt, value, parameterIndex++, -1);
-                        }
-                    }
-                }
-            }
+            utils.setQueryParameter(pQueryParameters, pstmt, parameterIndex);
             int deleteCount = pstmt.executeUpdate();
             if (log.isDebugEnabled()) {
                 log.debug("Bulk deletion operation deleted " + deleteCount + " records");
