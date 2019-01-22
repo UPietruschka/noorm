@@ -17,7 +17,7 @@ public class LoggingHelper {
     private static final Logger log = LoggerFactory.getLogger(LoggingHelper.class);
 
     public void debugSQLCall(final String pTableName,
-                             final Map<QueryColumn, Object> pInParameters,
+                             final Map<QueryColumn, Object> pQueryParameters,
                              final Class pBeanClass,
                              final FilterExtension pFilterExtension) {
 
@@ -33,26 +33,43 @@ public class LoggingHelper {
                 formattedParameters.append(" / ").append(sortCriteria.getDirection());
             }
         }
-        log.debug(debugQueryColumns(formattedParameters, pInParameters, pBeanClass).toString());
+        log.debug(debugQueryColumns(formattedParameters, pQueryParameters, pBeanClass).toString());
     }
 
-    public void debugDelete(final String pTableName,
-                            final Map<QueryColumn, Object> pInParameters,
+    public void debugUpdate(final String pTableName,
+                            final Map<String, Object> pUpdateParameters,
+                            final Map<QueryColumn, Object> pQueryParameters,
                             final Class pBeanClass) {
 
         final StringBuilder formattedParameters = new StringBuilder();
-        formattedParameters.append("Executing SQL statement on table ").append(pTableName);
-        log.debug(debugQueryColumns(formattedParameters, pInParameters, pBeanClass).toString());
+        formattedParameters.append("Executing UPDATE statement on table ").append(pTableName);
+        String prefix = "\nUpdate parameters: ";
+        for (final String updateColumn : pUpdateParameters.keySet()) {
+            final Object parameter = pUpdateParameters.get(updateColumn);
+            String parameterToString = Utils.getParameter2String(parameter);
+            formattedParameters.append(prefix).append(updateColumn).append(" = ").append(parameterToString);
+            prefix = "\n                  ";
+        }
+        log.debug(debugQueryColumns(formattedParameters, pQueryParameters, pBeanClass).toString());
+    }
+
+    public void debugDelete(final String pTableName,
+                            final Map<QueryColumn, Object> pQueryParameters,
+                            final Class pBeanClass) {
+
+        final StringBuilder formattedParameters = new StringBuilder();
+        formattedParameters.append("Executing DELETE statement on table ").append(pTableName);
+        log.debug(debugQueryColumns(formattedParameters, pQueryParameters, pBeanClass).toString());
     }
 
     private StringBuilder debugQueryColumns(final StringBuilder formattedParameters,
-                                            final Map<QueryColumn, Object> pInParameters,
+                                            final Map<QueryColumn, Object> pQueryParameters,
                                             final Class pBeanClass) {
-        if (pInParameters != null) {
-            String prefix = "\nInput parameters: ";
-            for (final QueryColumn queryColumn : pInParameters.keySet()) {
+        if (pQueryParameters != null) {
+            String prefix = "\nQuery parameters: ";
+            for (final QueryColumn queryColumn : pQueryParameters.keySet()) {
                 final String paramName = queryColumn.getColumnName();
-                final Object parameter = pInParameters.get(queryColumn);
+                final Object parameter = pQueryParameters.get(queryColumn);
                 String parameterToString = Utils.getParameter2String(parameter);
                 formattedParameters.append(prefix).append(paramName)
                         .append(queryColumn.getOperator().getOperatorSyntax()).append(parameterToString);

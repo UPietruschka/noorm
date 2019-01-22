@@ -1,10 +1,7 @@
 package org.noorm.generator.beangenerator;
 
 import org.noorm.generator.*;
-import org.noorm.generator.schema.DeleteDeclaration;
-import org.noorm.generator.schema.GeneratorConfiguration;
-import org.noorm.generator.schema.OperatorName;
-import org.noorm.generator.schema.QueryColumn;
+import org.noorm.generator.schema.*;
 import org.noorm.jdbc.DataSourceProvider;
 import org.noorm.jdbc.Utils;
 import org.noorm.jdbc.platform.IMetadata;
@@ -26,7 +23,8 @@ import java.util.Map;
 public class BeanDMLGenerator {
 
 	private static final Logger log = LoggerFactory.getLogger(BeanDMLGenerator.class);
-	private static final String DEFAULT_METHOD_NAME_PREFIX = "delete";
+	private static final String UPDATE_METHOD_NAME_PREFIX = "update";
+	private static final String DELETE_METHOD_NAME_PREFIX = "delete";
 	private static final String PARAMETER_PREFIX = "p";
 	private static final String BEAN_DML_VM_TEMPLATE_FILE = "/bean_dml.vm";
 
@@ -88,11 +86,109 @@ public class BeanDMLGenerator {
 				beanDMLClassDescriptor.setDataSourceName(configuration.getDataSource().getName());
 			}
 
+			for (final UpdateDeclaration updateDeclaration : configuration.getUpdateDeclarations()) {
+				if (updateDeclaration.getTableName().equals(tableName0)) {
+					if (updateDeclaration.getGeneratedMethodName() == null) {
+						updateDeclaration.setGeneratedMethodName(GeneratorUtil.generateMethodName(updateDeclaration,
+								null, UPDATE_METHOD_NAME_PREFIX, configuration));
+					}
+					final UpdateDescriptor updateDescriptor = new UpdateDescriptor();
+					String t0 = updateDeclaration.getTableName();
+					List<TableMetadata> baseTableMetadataList = tableColumnMap.get(t0);
+					List<TableMetadata> tableMetadataList = tableColumnMap.get(t0);
+					if (baseTableMetadataList == null) {
+						throw new GeneratorException("Invalid update declaration: no metadata found for table "
+								.concat(updateDeclaration.getTableName()));
+					}
+					updateDescriptor.setUpdateDeclaration(updateDeclaration);
+					String beanName = GeneratorUtil.convertTableName2JavaName(t0, configuration.getTableNameMappings());
+					if (configuration.getExtendedBeanMappings() != null) {
+						final String extBeanName =
+								GeneratorUtil.getMappedString(beanName, configuration.getExtendedBeanMappings());
+						if (!extBeanName.isEmpty()) {
+							beanName = extBeanName;
+						}
+					}
+					updateDescriptor.setBeanName(beanName);
+					int paramIndex = 1;
+					for (final String updateColumn : updateDeclaration.getUpdateColumn()) {
+						final ParameterDescriptor parameterDescriptor = new ParameterDescriptor();
+						final String index = String.format("%02d", paramIndex++);
+						parameterDescriptor.setJavaName
+								(PARAMETER_PREFIX + index + Utils.convertDBName2JavaName(updateColumn, true));
+						parameterDescriptor.setDbParamName(updateColumn);
+						String javaType = null;
+						for (final TableMetadata tableMetadata : tableMetadataList) {
+							if (tableMetadata.getColumnName().equals(updateColumn)) {
+								javaType = GeneratorUtil.convertDatabaseType2JavaType(
+										tableMetadata.getJDBCType(),
+										tableMetadata.getDecimalDigits(),
+										tableMetadata.getTableName(),
+										tableMetadata.getColumnName(),
+										configuration.getTypeMappings());
+							}
+						}
+						if (javaType == null) {
+							throw new GeneratorException("Invalid update declaration: no metadata found for table "
+									.concat(t0).concat(" and column ").concat(updateColumn));
+						}
+						parameterDescriptor.setJavaType(javaType);
+						updateDescriptor.addUpdateParameter(parameterDescriptor);
+					}
+					for (final QueryColumn queryColumn : updateDeclaration.getQueryColumn()) {
+						final ParameterDescriptor parameterDescriptor = new ParameterDescriptor();
+						final String columnName = queryColumn.getName();
+						final String index = String.format("%02d", paramIndex++);
+						parameterDescriptor.setJavaName
+								(PARAMETER_PREFIX + index + Utils.convertDBName2JavaName(columnName, true));
+						parameterDescriptor.setDbParamName(columnName);
+						final String customExpression = queryColumn.getCustomExpression();
+						parameterDescriptor.setCustomExpression(customExpression);
+						if (customExpression == null && queryColumn.getOperator() == OperatorName.CUSTOM) {
+							throw new GeneratorException("Invalid update declaration: custom expression missing for table "
+									.concat(t0).concat(" and column ").concat(columnName));
+						}
+						if (customExpression != null && queryColumn.getOperator() != OperatorName.CUSTOM) {
+							throw new GeneratorException("Invalid update declaration: custom expression not allowed for table "
+									.concat(t0).concat(" and column ").concat(columnName));
+						}
+						String javaType = null;
+						for (final TableMetadata tableMetadata : tableMetadataList) {
+							if (tableMetadata.getColumnName().equals(columnName)) {
+								javaType = GeneratorUtil.convertDatabaseType2JavaType(
+										tableMetadata.getJDBCType(),
+										tableMetadata.getDecimalDigits(),
+										tableMetadata.getTableName(),
+										tableMetadata.getColumnName(),
+										configuration.getTypeMappings());
+							}
+						}
+						if (javaType == null) {
+							throw new GeneratorException("Invalid update declaration: no metadata found for table "
+									.concat(t0).concat(" and column ").concat(columnName));
+						}
+						parameterDescriptor.setJavaType(javaType);
+						parameterDescriptor.setOperator(queryColumn.getOperator());
+						if (queryColumn.getOperator().equals(OperatorName.IS_NULL)) {
+							parameterDescriptor.setUnaryOperator(true);
+						}
+						if (queryColumn.getOperator().equals(OperatorName.IS_NOT_NULL)) {
+							parameterDescriptor.setUnaryOperator(true);
+						}
+						if (queryColumn.getOperator().equals(OperatorName.IN)) {
+							parameterDescriptor.setIsList(true);
+						}
+						updateDescriptor.addParameter(parameterDescriptor);
+					}
+					beanDMLClassDescriptor.addUpdate(updateDescriptor);
+				}
+			}
+
 			for (final DeleteDeclaration deleteDeclaration : configuration.getDeleteDeclarations()) {
 				if (deleteDeclaration.getTableName().equals(tableName0)) {
 					if (deleteDeclaration.getGeneratedMethodName() == null) {
 						deleteDeclaration.setGeneratedMethodName(GeneratorUtil.generateMethodName(deleteDeclaration,
-								null, DEFAULT_METHOD_NAME_PREFIX, configuration));
+								null, DELETE_METHOD_NAME_PREFIX, configuration));
 					}
 					final DeleteDescriptor deleteDescriptor = new DeleteDescriptor();
 					String t0 = deleteDeclaration.getTableName();

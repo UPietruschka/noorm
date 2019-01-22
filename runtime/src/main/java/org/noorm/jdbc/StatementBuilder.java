@@ -160,6 +160,7 @@ public class StatementBuilder {
 	private static final String UPDATE_PREFIX = "UPDATE ";
 	private static final String UPDATE_DELIM_1 = " SET ";
 	private static final String UPDATE_DELIM_2 = ",";
+    private static final String UPDATE_NULL = "NULL";
 
 	public String buildUpdate(final IBean pBean,
                               final boolean pUseOptLockFullRowCompare,
@@ -253,12 +254,16 @@ public class StatementBuilder {
             pSQLStatement.append(UPDATE_PREFIX).append(pTableName);
         }
         String delimiter = UPDATE_DELIM_1;
-        for (final String updateParameterName : pUpdateParameters.keySet()) {
+        for (final String updateColumn : pUpdateParameters.keySet()) {
             pSQLStatement.append(delimiter);
-            if (pUseNamedParameters) {
-                pSQLStatement.append(updateParameterName).append(EQUALS).append(ASG).append(updateParameterName);
+            if (pUpdateParameters.get(updateColumn) == null) {
+                pSQLStatement.append(updateColumn).append(EQUALS).append(UPDATE_NULL);
             } else {
-                pSQLStatement.append(updateParameterName).append(EQUALS).append(ASG2);
+                if (pUseNamedParameters) {
+                    pSQLStatement.append(updateColumn).append(EQUALS).append(ASG).append(updateColumn);
+                } else {
+                    pSQLStatement.append(updateColumn).append(EQUALS).append(ASG2);
+                }
             }
             delimiter = UPDATE_DELIM_2;
         }

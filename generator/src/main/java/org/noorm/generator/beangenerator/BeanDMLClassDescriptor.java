@@ -17,6 +17,7 @@ public class BeanDMLClassDescriptor {
 	private String interfacePackageName;
 	private String beanPackageName;
 	private final List<BeanClassDescriptor> beans = new ArrayList<>();
+	private final List<UpdateDescriptor> updates = new ArrayList<>();
 	private final List<DeleteDescriptor> deletes = new ArrayList<>();
 	private boolean isInterface = false;
     private String dataSourceName;
@@ -74,6 +75,14 @@ public class BeanDMLClassDescriptor {
 
 	public List<BeanClassDescriptor> getBeans() {
 		return beans;
+	}
+
+	public void addUpdate(final UpdateDescriptor pUpdate) {
+		updates.add(pUpdate);
+	}
+
+	public List<UpdateDescriptor> getUpdates() {
+		return updates;
 	}
 
 	public void addDelete(final DeleteDescriptor pDelete) {

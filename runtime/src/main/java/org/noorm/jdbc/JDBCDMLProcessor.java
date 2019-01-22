@@ -408,18 +408,20 @@ public class JDBCDMLProcessor<T> {
     }
 
     /**
-     * Executes a generic DELETE statement for the given table (or view) name with the given query parameters.
+     * Executes a generic UPDATE statement for the given table (or view) name with the given query parameters.
      * This functionality is designated to support the query declaration available in the Maven generator plugin.
      * Any complex SQL like joins is expected to be encapsulated within a database view definition and is not
      * supported here.
      *
      * @param pTableName the table or view name used for the SQL query
-     * @param pInParameters the parameters for the where-clause of the SQL query
+     * @param pUpdateParameters the column names and values to be updated
+     * @param pQueryParameters the parameters for the where-clause of the SQL query
      * @param pBeanClass the return type
-     * @return the number of deleted records
+     * @return the number of updated records
      */
-    public int delete(final String pTableName,
-                      final Map<QueryColumn, Object> pInParameters,
+    public int update(final String pTableName,
+                      final Map<String, Object> pUpdateParameters,
+                      final Map<QueryColumn, Object> pQueryParameters,
                       final Class<T> pBeanClass) {
 
         try {
@@ -429,15 +431,18 @@ public class JDBCDMLProcessor<T> {
             if (pBeanClass == null) {
                 throw new IllegalArgumentException("Parameter [pBeanClass] must not be null.");
             }
-            if (pInParameters == null) {
-                throw new IllegalArgumentException("Parameter [pInParameters] must not be null.");
+            if (pUpdateParameters == null || pUpdateParameters.size() == 0) {
+                throw new IllegalArgumentException("Parameter [pUpdateParameters] must not be empty or null.");
+            }
+            if (pQueryParameters == null) {
+                throw new IllegalArgumentException("Parameter [pQueryParameters] must not be null.");
             }
         } catch (IllegalArgumentException e) {
             throw new DataAccessException(DataAccessException.Type.PARAMETERS_MUST_NOT_BE_NULL, e);
         }
 
         if (log.isDebugEnabled()) {
-            loggingHelper.debugDelete(pTableName, pInParameters, pBeanClass);
+            loggingHelper.debugUpdate(pTableName, pUpdateParameters, pQueryParameters, pBeanClass);
         }
 
         boolean success = true;
@@ -446,23 +451,126 @@ public class JDBCDMLProcessor<T> {
         try {
             con = DataSourceProvider.getConnection();
             final IPlatform platform = DataSourceProvider.getPlatform();
-            final String sqlStmt = statementBuilder.buildDelete(pTableName, pInParameters, USE_NAMED_PARAMETERS);
+            final String sqlStmt = statementBuilder.buildUpdate
+                    (pTableName, pUpdateParameters, pQueryParameters, USE_NAMED_PARAMETERS);
             if (log.isDebugEnabled()) {
-                log.debug("Preparing and executing SQL statement: ".concat(sqlStmt)
+                log.debug("Preparing and executing UPDATE statement: ".concat(sqlStmt)
                         .concat("; using connection : ".concat(con.toString())));
             }
             pstmt = con.prepareStatement(sqlStmt);
 
             int parameterIndex = 1;
-            final Map<QueryColumn, Object> orderedParameters = new TreeMap<>(pInParameters);
-            for (final QueryColumn queryColumn : orderedParameters.keySet()) {
+
+            final Map<String, Object> orderedUpdateParameters = new TreeMap<>(pUpdateParameters);
+            for (final String updateColumn : orderedUpdateParameters.keySet()) {
+                Object value = orderedUpdateParameters.get(updateColumn);
+                if (value != null) {
+                    if (value instanceof java.util.Date) {
+                        value = new Timestamp(((java.util.Date) value).getTime());
+                    } else {
+                        platform.setObject(pstmt, value, parameterIndex++, -1);
+                    }
+                }
+            }
+
+            final Map<QueryColumn, Object> orderedQueryParameters = new TreeMap<>(pQueryParameters);
+            for (final QueryColumn queryColumn : orderedQueryParameters.keySet()) {
                 if (!queryColumn.getOperator().isUnary()) {
-                    Object value = orderedParameters.get(queryColumn);
+                    Object value = orderedQueryParameters.get(queryColumn);
                     if (value instanceof java.util.Date) {
                         value = new Timestamp(((java.util.Date) value).getTime());
                     }
                     if (value instanceof List) {
-                        final List<Object> inClauseValues = ((List<Object>) orderedParameters.get(queryColumn));
+                        final List<Object> inClauseValues = ((List<Object>) orderedQueryParameters.get(queryColumn));
+                        for (final Object inClauseValue : inClauseValues) {
+                            platform.setObject(pstmt, inClauseValue, parameterIndex++, -1);
+                        }
+                    } else {
+                        if (value != null) {
+                            platform.setObject(pstmt, value, parameterIndex++, -1);
+                        }
+                    }
+                }
+            }
+
+            int updateCount = pstmt.executeUpdate();
+            if (log.isDebugEnabled()) {
+                log.debug("Bulk update operation updated " + updateCount + " records");
+            }
+            return updateCount;
+        } catch (Exception e) {
+            log.error(DataAccessException.Type.COULD_NOT_ACCESS_DATA.getDescription(), e);
+            success = false;
+            throw new DataAccessException(DataAccessException.Type.COULD_NOT_ACCESS_DATA, e);
+        } finally {
+            try {
+                if (pstmt != null) {
+                    pstmt.close();
+                }
+                if (con != null && !con.isClosed()) {
+                    DataSourceProvider.returnConnection(success);
+                }
+            } catch (SQLException ignored) {
+            } // Nothing to do
+        }
+    }
+
+    /**
+     * Executes a generic DELETE statement for the given table (or view) name with the given query parameters.
+     * This functionality is designated to support the query declaration available in the Maven generator plugin.
+     * Any complex SQL like joins is expected to be encapsulated within a database view definition and is not
+     * supported here.
+     *
+     * @param pTableName the table or view name used for the SQL query
+     * @param pQueryParameters the parameters for the where-clause of the SQL query
+     * @param pBeanClass the return type
+     * @return the number of deleted records
+     */
+    public int delete(final String pTableName,
+                      final Map<QueryColumn, Object> pQueryParameters,
+                      final Class<T> pBeanClass) {
+
+        try {
+            if (pTableName == null || pTableName.isEmpty()) {
+                throw new IllegalArgumentException("Parameter [pTableName] must not be null.");
+            }
+            if (pBeanClass == null) {
+                throw new IllegalArgumentException("Parameter [pBeanClass] must not be null.");
+            }
+            if (pQueryParameters == null) {
+                throw new IllegalArgumentException("Parameter [pQueryParameters] must not be null.");
+            }
+        } catch (IllegalArgumentException e) {
+            throw new DataAccessException(DataAccessException.Type.PARAMETERS_MUST_NOT_BE_NULL, e);
+        }
+
+        if (log.isDebugEnabled()) {
+            loggingHelper.debugDelete(pTableName, pQueryParameters, pBeanClass);
+        }
+
+        boolean success = true;
+        Connection con = null;
+        PreparedStatement pstmt = null;
+        try {
+            con = DataSourceProvider.getConnection();
+            final IPlatform platform = DataSourceProvider.getPlatform();
+            final String sqlStmt = statementBuilder.buildDelete(pTableName, pQueryParameters, USE_NAMED_PARAMETERS);
+            if (log.isDebugEnabled()) {
+                log.debug("Preparing and executing DELETE statement: ".concat(sqlStmt)
+                        .concat("; using connection : ".concat(con.toString())));
+            }
+            pstmt = con.prepareStatement(sqlStmt);
+
+            int parameterIndex = 1;
+            final Map<QueryColumn, Object> orderedQueryParameters = new TreeMap<>(pQueryParameters);
+            for (final QueryColumn queryColumn : orderedQueryParameters.keySet()) {
+                if (!queryColumn.getOperator().isUnary()) {
+                    Object value = orderedQueryParameters.get(queryColumn);
+                    if (value instanceof java.util.Date) {
+                        value = new Timestamp(((java.util.Date) value).getTime());
+                    }
+                    if (value instanceof List) {
+                        final List<Object> inClauseValues = ((List<Object>) orderedQueryParameters.get(queryColumn));
                         for (final Object inClauseValue : inClauseValues) {
                             platform.setObject(pstmt, inClauseValue, parameterIndex++, -1);
                         }

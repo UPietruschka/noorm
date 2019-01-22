@@ -14,7 +14,7 @@ import java.util.List;
 public class DeleteDescriptor {
 
     private DeleteDeclaration deleteDeclaration;
-    private final List<ParameterDescriptor> parameters = new ArrayList<ParameterDescriptor>();
+    private final List<ParameterDescriptor> parameters = new ArrayList<>();
     private String beanName;
     private String beanShortName;
 
