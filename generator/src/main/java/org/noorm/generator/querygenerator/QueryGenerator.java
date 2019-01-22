@@ -26,7 +26,6 @@ public class QueryGenerator {
 
     private static final Logger log = LoggerFactory.getLogger(QueryGenerator.class);
     private static final String DECLARED_QUERIES_DEFAULT_CLASS_NAME = "DeclaredQueries";
-    private static final String PARAMETER_PREFIX = "p";
     private static final String DEFAULT_METHOD_NAME_PREFIX = "find";
     private static final String QUERY_VM_TEMPLATE_FILE = "/declared_queries.vm";
 
@@ -98,7 +97,7 @@ public class QueryGenerator {
                             .concat(queryDeclaration.getTableName()));
                 }
             }
-            queryDescriptor.setQueryDeclaration(queryDeclaration);
+            queryDescriptor.setSearchDeclaration(queryDeclaration);
             String beanName = GeneratorUtil.convertTableName2JavaName(t0, configuration.getTableNameMappings());
             if (configuration.getExtendedBeanMappings() != null) {
                 final String extBeanName =
@@ -113,8 +112,8 @@ public class QueryGenerator {
                 final ParameterDescriptor parameterDescriptor = new ParameterDescriptor();
                 final String columnName = queryColumn.getName();
                 final String index = String.format("%02d", paramIndex++);
-                parameterDescriptor.setJavaName
-                        (PARAMETER_PREFIX + index + Utils.convertDBName2JavaName(columnName, true));
+                parameterDescriptor.setJavaName(GeneratorUtil.PARAMETER_PREFIX
+                        + index + Utils.convertDBName2JavaName(columnName, true));
                 parameterDescriptor.setDbParamName(columnName);
                 final String customExpression = queryColumn.getCustomExpression();
                 parameterDescriptor.setCustomExpression(customExpression);

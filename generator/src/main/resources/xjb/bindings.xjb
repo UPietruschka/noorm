@@ -8,13 +8,13 @@
 
     <jxb:bindings schemaLocation="../xsd/noorm-generator-configuration.xsd">
         <jxb:bindings node="//xs:complexType[@name='queryDeclarationType']">
-            <inheritance:implements>org.noorm.generator.IDeclaration</inheritance:implements>
+            <inheritance:implements>org.noorm.generator.ISearchDeclaration</inheritance:implements>
         </jxb:bindings>
         <jxb:bindings node="//xs:complexType[@name='deleteDeclarationType']">
-            <inheritance:implements>org.noorm.generator.IDeclaration</inheritance:implements>
+            <inheritance:implements>org.noorm.generator.ISearchDeclaration</inheritance:implements>
         </jxb:bindings>
         <jxb:bindings node="//xs:complexType[@name='updateDeclarationType']">
-            <inheritance:implements>org.noorm.generator.IDeclaration</inheritance:implements>
+            <inheritance:implements>org.noorm.generator.ISearchDeclaration</inheritance:implements>
         </jxb:bindings>
     </jxb:bindings>
 

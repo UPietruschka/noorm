@@ -8,7 +8,7 @@ import java.util.List;
  *         Date: 21.01.13
  *         Time: 13:50
  */
-public interface IDeclaration {
+public interface ISearchDeclaration {
 
     /**
      * Returns the table name for the SQL/DML code generation

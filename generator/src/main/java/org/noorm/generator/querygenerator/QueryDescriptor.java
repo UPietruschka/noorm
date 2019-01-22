@@ -1,9 +1,9 @@
 package org.noorm.generator.querygenerator;
 
 import org.noorm.generator.ParameterDescriptor;
+import org.noorm.generator.SearchDescriptor;
 import org.noorm.generator.schema.QueryDeclaration;
 
-import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -11,39 +11,18 @@ import java.util.List;
  *         Date: 21.01.13
  *         Time: 19:53
  */
-public class QueryDescriptor {
-
-    private QueryDeclaration queryDeclaration;
-    private final List<ParameterDescriptor> parameters = new ArrayList<>();
-    private String beanName;
-    private String beanShortName;
-
-    public QueryDeclaration getQueryDeclaration() {
-        return queryDeclaration;
-    }
-
-    public void setQueryDeclaration(final QueryDeclaration pQueryDeclaration) {
-        queryDeclaration = pQueryDeclaration;
-    }
-
-    public String getTableName() {
-        return queryDeclaration.getTableName();
-    }
-
-    public String getMethodName() {
-        return queryDeclaration.getGeneratedMethodName();
-    }
+public class QueryDescriptor extends SearchDescriptor {
 
     public boolean isSingleRowQuery() {
-        return queryDeclaration.isSingleRowQuery();
+        return ((QueryDeclaration) searchDeclaration).isSingleRowQuery();
     }
 
     public boolean useFilterExtension() {
-        return queryDeclaration.isUseFilterExtension();
+        return ((QueryDeclaration) searchDeclaration).isUseFilterExtension();
     }
 
     public boolean isAcquireLock() {
-        return queryDeclaration.isAcquireLock();
+        return ((QueryDeclaration) searchDeclaration).isAcquireLock();
     }
 
     public List<ParameterDescriptor> getParameters() {
@@ -60,13 +39,5 @@ public class QueryDescriptor {
 
     public void setBeanName(final String pBeanName) {
         beanName = pBeanName;
-    }
-
-    public String getBeanShortName() {
-        return beanShortName;
-    }
-
-    public void setBeanShortName(final String pBeanShortName) {
-        beanShortName = pBeanShortName;
     }
 }

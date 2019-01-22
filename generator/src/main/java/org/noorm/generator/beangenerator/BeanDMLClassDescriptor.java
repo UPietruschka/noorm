@@ -1,5 +1,7 @@
 package org.noorm.generator.beangenerator;
 
+import org.noorm.generator.SearchDescriptor;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -16,9 +18,8 @@ public class BeanDMLClassDescriptor {
 	private String packageName;
 	private String interfacePackageName;
 	private String beanPackageName;
-	private final List<BeanClassDescriptor> beans = new ArrayList<>();
 	private final List<UpdateDescriptor> updates = new ArrayList<>();
-	private final List<DeleteDescriptor> deletes = new ArrayList<>();
+	private final List<SearchDescriptor> deletes = new ArrayList<>();
 	private boolean isInterface = false;
     private String dataSourceName;
 
@@ -69,14 +70,6 @@ public class BeanDMLClassDescriptor {
 		beanPackageName = pBeanPackageName;
 	}
 
-	public void addBean(final BeanClassDescriptor pBean) {
-		beans.add(pBean);
-	}
-
-	public List<BeanClassDescriptor> getBeans() {
-		return beans;
-	}
-
 	public void addUpdate(final UpdateDescriptor pUpdate) {
 		updates.add(pUpdate);
 	}
@@ -85,11 +78,11 @@ public class BeanDMLClassDescriptor {
 		return updates;
 	}
 
-	public void addDelete(final DeleteDescriptor pDelete) {
+	public void addDelete(final SearchDescriptor pDelete) {
 		deletes.add(pDelete);
 	}
 
-	public List<DeleteDescriptor> getDeletes() {
+	public List<SearchDescriptor> getDeletes() {
 		return deletes;
 	}
 

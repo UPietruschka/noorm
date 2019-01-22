@@ -5,6 +5,7 @@ import org.apache.velocity.VelocityContext;
 import org.apache.velocity.app.Velocity;
 import org.noorm.generator.schema.*;
 import org.noorm.jdbc.Utils;
+import org.noorm.jdbc.platform.TableMetadata;
 
 import java.io.BufferedWriter;
 import java.io.File;
@@ -23,6 +24,8 @@ import java.util.regex.Pattern;
 public class GeneratorUtil {
 
     private static final String DEFAULT_METHOD_NAME_PART3 = "By";
+
+    public static final String PARAMETER_PREFIX = "p";
 
 	public static void generateFile(final File pDir,
 									final String pVelocityTemplateFile,
@@ -397,34 +400,88 @@ public class GeneratorUtil {
         return true;
     }
 
-    public static String generateMethodName(final IDeclaration pQueryDeclaration,
+    public static String generateMethodName(final ISearchDeclaration pSearchDeclaration,
                                             final String pBaseTable,
                                             final String pMethodNamePrefix,
                                             final GeneratorConfiguration configuration) {
 
         final StringBuilder methodName = new StringBuilder();
         methodName.append(pMethodNamePrefix);
-        String t0 = pQueryDeclaration.getTableName();
+        String t0 = pSearchDeclaration.getTableName();
         if (pBaseTable != null && !pBaseTable.isEmpty()) {
             t0 = pBaseTable;
         }
         final String javaTableName =
                 GeneratorUtil.convertTableName2JavaName(t0, configuration.getTableNameMappings());
         methodName.append(javaTableName);
-        if (!pQueryDeclaration.getQueryColumn().isEmpty()) {
+        if (!pSearchDeclaration.getQueryColumn().isEmpty()) {
             methodName.append(DEFAULT_METHOD_NAME_PART3);
             // With an increasing number of parameters, we use a substring of decreasing length of the
             // parameter name for method name construction
             int substringLength = 16;
-            if (pQueryDeclaration.getQueryColumn().size() > 1) { substringLength = 8; }
-            if (pQueryDeclaration.getQueryColumn().size() > 2) { substringLength = 4; }
-            if (pQueryDeclaration.getQueryColumn().size() > 4) { substringLength = 2; }
-            if (pQueryDeclaration.getQueryColumn().size() > 8) { substringLength = 1; }
-            for (final QueryColumn queryColumn : pQueryDeclaration.getQueryColumn()) {
+            if (pSearchDeclaration.getQueryColumn().size() > 1) { substringLength = 8; }
+            if (pSearchDeclaration.getQueryColumn().size() > 2) { substringLength = 4; }
+            if (pSearchDeclaration.getQueryColumn().size() > 4) { substringLength = 2; }
+            if (pSearchDeclaration.getQueryColumn().size() > 8) { substringLength = 1; }
+            for (final QueryColumn queryColumn : pSearchDeclaration.getQueryColumn()) {
                 final String javaColumnName = Utils.convertDBName2JavaName(queryColumn.getName(), true);
                 methodName.append(javaColumnName, 0, Math.min(substringLength, javaColumnName.length()));
             }
         }
         return methodName.toString();
+    }
+
+    public static void processSearchColumns(final SearchDescriptor pSearchDescriptor,
+                                            final List<TableMetadata> pTableMetadataList,
+                                            final List<TypeMapping> pTypeMappings,
+                                            int pParameterIndex) {
+
+        final ISearchDeclaration searchDeclaration = pSearchDescriptor.getSearchDeclaration();
+        final String tableName = searchDeclaration.getTableName();
+        for (final QueryColumn queryColumn : searchDeclaration.getQueryColumn()) {
+            final ParameterDescriptor parameterDescriptor = new ParameterDescriptor();
+            final String columnName = queryColumn.getName();
+            final String index = String.format("%02d", pParameterIndex++);
+            parameterDescriptor.setJavaName
+                    (PARAMETER_PREFIX + index + Utils.convertDBName2JavaName(columnName, true));
+            parameterDescriptor.setDbParamName(columnName);
+            final String customExpression = queryColumn.getCustomExpression();
+            parameterDescriptor.setCustomExpression(customExpression);
+            if (customExpression == null && queryColumn.getOperator() == OperatorName.CUSTOM) {
+                throw new GeneratorException("Invalid search declaration: custom expression missing for table "
+                        .concat(tableName).concat(" and column ").concat(columnName));
+            }
+            if (customExpression != null && queryColumn.getOperator() != OperatorName.CUSTOM) {
+                throw new GeneratorException("Invalid search declaration: custom expression not allowed for table "
+                        .concat(tableName).concat(" and column ").concat(columnName));
+            }
+            String javaType = null;
+            for (final TableMetadata tableMetadata : pTableMetadataList) {
+                if (tableMetadata.getColumnName().equals(columnName)) {
+                    javaType = GeneratorUtil.convertDatabaseType2JavaType(
+                            tableMetadata.getJDBCType(),
+                            tableMetadata.getDecimalDigits(),
+                            tableMetadata.getTableName(),
+                            tableMetadata.getColumnName(),
+                            pTypeMappings);
+                }
+            }
+            if (javaType == null) {
+                throw new GeneratorException("Invalid search declaration: no metadata found for table "
+                        .concat(tableName).concat(" and column ").concat(columnName));
+            }
+            parameterDescriptor.setJavaType(javaType);
+            parameterDescriptor.setOperator(queryColumn.getOperator());
+            if (queryColumn.getOperator().equals(OperatorName.IS_NULL)) {
+                parameterDescriptor.setUnaryOperator(true);
+            }
+            if (queryColumn.getOperator().equals(OperatorName.IS_NOT_NULL)) {
+                parameterDescriptor.setUnaryOperator(true);
+            }
+            if (queryColumn.getOperator().equals(OperatorName.IN)) {
+                parameterDescriptor.setIsList(true);
+            }
+            pSearchDescriptor.addParameter(parameterDescriptor);
+        }
     }
 }
