@@ -2,11 +2,8 @@ package org.noorm.generator.querygenerator;
 
 import org.noorm.generator.*;
 import org.noorm.generator.schema.GeneratorConfiguration;
-import org.noorm.generator.schema.OperatorName;
-import org.noorm.generator.schema.QueryColumn;
 import org.noorm.generator.schema.QueryDeclaration;
 import org.noorm.jdbc.DataSourceProvider;
-import org.noorm.jdbc.Utils;
 import org.noorm.jdbc.platform.IMetadata;
 import org.noorm.jdbc.platform.TableMetadata;
 import org.slf4j.Logger;
@@ -107,52 +104,8 @@ public class QueryGenerator {
                 }
             }
             queryDescriptor.setBeanName(beanName);
-            int paramIndex = 1;
-            for (final QueryColumn queryColumn : queryDeclaration.getQueryColumn()) {
-                final ParameterDescriptor parameterDescriptor = new ParameterDescriptor();
-                final String columnName = queryColumn.getName();
-                final String index = String.format("%02d", paramIndex++);
-                parameterDescriptor.setJavaName(GeneratorUtil.PARAMETER_PREFIX
-                        + index + Utils.convertDBName2JavaName(columnName, true));
-                parameterDescriptor.setDbParamName(columnName);
-                final String customExpression = queryColumn.getCustomExpression();
-                parameterDescriptor.setCustomExpression(customExpression);
-                if (customExpression == null && queryColumn.getOperator() == OperatorName.CUSTOM) {
-                    throw new GeneratorException("Invalid query declaration: custom expression missing for table "
-                            .concat(t0).concat(" and column ").concat(columnName));
-                }
-                if (customExpression != null && queryColumn.getOperator() != OperatorName.CUSTOM) {
-                    throw new GeneratorException("Invalid query declaration: custom expression not allowed for table "
-                            .concat(t0).concat(" and column ").concat(columnName));
-                }
-                String javaType = null;
-                for (final TableMetadata tableMetadata : tableMetadataList) {
-                    if (tableMetadata.getColumnName().equals(columnName)) {
-                        javaType = GeneratorUtil.convertDatabaseType2JavaType(
-                                tableMetadata.getJDBCType(),
-                                tableMetadata.getDecimalDigits(),
-                                tableMetadata.getTableName(),
-                                tableMetadata.getColumnName(),
-                                configuration.getTypeMappings());
-                    }
-                }
-                if (javaType == null) {
-                    throw new GeneratorException("Invalid query declaration: no metadata found for table "
-                            .concat(t0).concat(" and column ").concat(columnName));
-                }
-                parameterDescriptor.setJavaType(javaType);
-                parameterDescriptor.setOperator(queryColumn.getOperator());
-                if (queryColumn.getOperator().equals(OperatorName.IS_NULL)) {
-                    parameterDescriptor.setUnaryOperator(true);
-                }
-                if (queryColumn.getOperator().equals(OperatorName.IS_NOT_NULL)) {
-                    parameterDescriptor.setUnaryOperator(true);
-                }
-                if (queryColumn.getOperator().equals(OperatorName.IN)) {
-                    parameterDescriptor.setIsList(true);
-                }
-                queryDescriptor.addParameter(parameterDescriptor);
-            }
+            GeneratorUtil.processSearchColumns
+                    (queryDescriptor, tableMetadataList, configuration.getTypeMappings(), 1);
             String javaName = queryDeclaration.getGeneratedClassName();
             if (javaName == null || javaName.isEmpty()) {
                 javaName = DECLARED_QUERIES_DEFAULT_CLASS_NAME;
