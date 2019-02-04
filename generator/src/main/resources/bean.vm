@@ -34,12 +34,16 @@ public class $class.Name<T>#if($class.getSuperClassName()) extends $class.SuperC
 	@JDBCColumn(name=PAGING_TOTAL, dataType=Types.NUMERIC, insertable=false, updatable=false)
 	protected Integer pagingTotal;
 #foreach ($att in $class.Attributes)
+#if (!$att.OmitSuperClassAttribute)
 	@JDBCColumn(name="$att.ColumnName", dataType=$att.DataType#if(!$att.Insertable), insertable=false#end#if(!$att.Updatable), updatable=false#end#if(!$att.Nullable), nullable=false#end#if($att.CaseSensitiveName), caseSensitiveName=true#end#if($att.MaxLength>0), maxLength=$att.MaxLength#end)
 	protected $att.Type $att.Name;
 #end
+#end
 	private transient T auxiliaryData;
 #if ($class.enableOptLockFullRowCompare())
-	private HashMap<String, Object> modifiedFieldsInitialValue = new HashMap<String, Object>();
+#if(!$class.getSuperClassName())
+	protected HashMap<String, Object> modifiedFieldsInitialValue = new HashMap<String, Object>();
+#end
 #end
 
     @Override
@@ -118,6 +122,7 @@ public class $class.Name<T>#if($class.getSuperClassName()) extends $class.SuperC
 	}
 #end
 #foreach ($att in $class.Attributes)
+#if (!$att.OmitSuperClassAttribute)
 
 	public $att.Type get$att.getMethodNamePostfix()() {
 		return $att.Name;
@@ -131,6 +136,7 @@ public class $class.Name<T>#if($class.getSuperClassName()) extends $class.SuperC
 #end
 		$att.Name = p$att.getMethodNamePostfix();
 	}
+#end
 #end
 #if ($class.hasPrimaryKey())
 #if ($class.generatePKBasedEqualsAndHashCode())

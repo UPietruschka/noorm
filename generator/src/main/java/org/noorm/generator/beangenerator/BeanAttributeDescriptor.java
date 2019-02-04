@@ -18,6 +18,7 @@ public class BeanAttributeDescriptor {
 	private boolean updatable = true;
 	private boolean nullable = true;
     private boolean caseSensitiveName = false;
+    private boolean omitSuperClassAttribute = false;
 	private int maxLength = 0;
 
     public void setName(final String pName) {
@@ -99,4 +100,12 @@ public class BeanAttributeDescriptor {
     public void setCaseSensitiveName(final boolean pCaseSensitiveName) {
         caseSensitiveName = pCaseSensitiveName;
     }
+
+	public boolean isOmitSuperClassAttribute() {
+		return omitSuperClassAttribute;
+	}
+
+	public void setOmitSuperClassAttribute(final boolean pOmitSuperClassAttribute) {
+		omitSuperClassAttribute = pOmitSuperClassAttribute;
+	}
 }

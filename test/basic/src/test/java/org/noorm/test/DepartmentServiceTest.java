@@ -59,9 +59,10 @@ public class DepartmentServiceTest {
             final List<VDepartments> departmentsList =
                     departmentService.findDepartmentsById(newDepartments1.getDepartmentId());
             assertEquals(1L, departmentsList.size());
-            newDepartments1.setLocationId(NEW_DEPARTMENT_LOCATION_ID1);
-            departmentsDML.updateDepartments(newDepartments1);
-            departmentsDML.deleteDepartments(newDepartments1);
+            final VDepartments newDepartment2 = departmentsList.get(0);
+            newDepartment2.setLocationId(NEW_DEPARTMENT_LOCATION_ID1);
+            departmentsDML.updateDepartments(newDepartment2);
+            departmentsDML.deleteDepartments(newDepartment2);
             final List<VDepartments> departmentsList1 =
                     departmentService.findDepartmentsById(newDepartments1.getDepartmentId());
             assertEquals(0L, departmentsList1.size());

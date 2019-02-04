@@ -17,6 +17,9 @@
     <table2InterfaceMappings>
         <mapping key="(EMPLOYEES)" value="org.noorm.test.TestInterface"/>
     </table2InterfaceMappings>
+    <table2SuperClassTableMappings>
+        <mapping key="V_DEPARTMENTS" value="DEPARTMENTS"/>
+    </table2SuperClassTableMappings>
     <inlineSequenceTableFilter regex="(OPT_.*)"/>
     <columnNameMappings>
         <mapping key="([oO]pt|[Nn]swp|[Nn]snp)(.*)" value="$2"/>
@@ -30,7 +33,7 @@
         <mapping key="COMPLEX_.*" value="VERSION"/>
         <mapping key="case_.*" value="version"/>
     </optLockVersionColumnMappings>
-    <optLockFullRowCompareTableFilter regex="V_DEPARTMENTS|JOBS|JOB_HISTORY"/>
+    <optLockFullRowCompareTableFilter regex="V_DEPARTMENTS|DEPARTMENTS|JOBS|JOB_HISTORY"/>
     <singleRowFinderProcedureFilter regex="(.*_unique.*)"/>
     <queryDeclarations>
         <queryDeclaration tableName="EMPLOYEES">

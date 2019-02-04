@@ -187,6 +187,9 @@ public class BeanGenerator {
 					if (isNotInSuperClass) {
 						beanAttributeDescriptor.setInsertable(false);
 						beanAttributeDescriptor.setUpdatable(false);
+					} else {
+						// We omit the attribute, since it is already present in the super class and protected
+						beanAttributeDescriptor.setOmitSuperClassAttribute(true);
 					}
 				}
 

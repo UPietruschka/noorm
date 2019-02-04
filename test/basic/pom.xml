@@ -68,7 +68,7 @@
                          over time. For custom application development, it is recommended to integrate
                          the required DML with the build process -->
                     <execution>
-                        <id>create NoORM dynamic SQL template table</id>
+                        <id>Create test tables and synonyms</id>
                         <goals>
                             <goal>execute</goal>
                         </goals>
@@ -88,7 +88,7 @@
                         </configuration>
                     </execution>
                     <execution>
-                        <id>create PL/SQL packages</id>
+                        <id>Create PL/SQL packages</id>
                         <goals>
                             <goal>execute</goal>
                         </goals>
