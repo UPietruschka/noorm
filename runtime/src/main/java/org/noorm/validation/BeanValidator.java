@@ -43,7 +43,8 @@ public class BeanValidator {
 
 	public void validateBean(final IBean pBean) {
 
-		final String tableName = pBean.getTableName();
+		// We utilize the view attribute only here for bean validation
+		final String tableName = pBean.getViewName();
 		final String javaBeanName = pBean.getClass().getName();
 		log.info("Validating Java Bean ".concat(javaBeanName).concat(" against database table ".concat(tableName)));
 		final List<TableMetadata> tableMetadataList = tableColumnMap.get(tableName);

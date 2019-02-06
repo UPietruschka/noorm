@@ -124,6 +124,7 @@ PACKAGE BODY noorm_metadata AS
       END IF;
     END IF;
   EXCEPTION
+    WHEN NO_DATA_FOUND THEN RETURN;
     WHEN OTHERS THEN
       raise_application_error(-20011, 'Error retrieving ref cursor usage in procedure parameters using source code.');
   END get_parameter_rowtype;

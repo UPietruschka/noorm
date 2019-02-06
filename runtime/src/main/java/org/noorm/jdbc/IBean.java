@@ -48,10 +48,16 @@ public interface IBean<T> {
     HashMap<String, Object> getModifiedFieldsInitialValue();
 
 	/**
-	 * The database name of this Bean. Can either be a table or an updateable view.
+	 * The database table name of this Bean.
 	 * @return the database name
 	 */
 	String getTableName();
+
+	/**
+	 * The database view name of this Bean.
+	 * @return the database name
+	 */
+	String getViewName();
 
     /**
      * Indicates, whether the table name is case sensitive.

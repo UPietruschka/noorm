@@ -30,6 +30,8 @@ public class $class.Name<T>#if($class.getSuperClassName()) extends $class.SuperC
 #else
 	protected static final JDBCType VERSION_COLUMN_TYPE = JDBCType.$class.VersionColumnType;
 #end
+#else
+	protected static final String VIEW_NAME = "$class.TableName";
 #end
 	@JDBCColumn(name=PAGING_TOTAL, dataType=Types.NUMERIC, insertable=false, updatable=false)
 	protected Integer pagingTotal;
@@ -41,7 +43,7 @@ public class $class.Name<T>#if($class.getSuperClassName()) extends $class.SuperC
 #end
 	private transient T auxiliaryData;
 #if ($class.enableOptLockFullRowCompare())
-#if(!$class.getSuperClassName())
+#if (!$class.getSuperClassName())
 	protected HashMap<String, Object> modifiedFieldsInitialValue = new HashMap<String, Object>();
 #end
 #end
@@ -63,7 +65,7 @@ public class $class.Name<T>#if($class.getSuperClassName()) extends $class.SuperC
 
     @Override
 	public HashMap<String, Object> getModifiedFieldsInitialValue() {
-#if ($class.enableOptLockFullRowCompare())
+#if ($class.enableOptLockFullRowCompare() && !$class.getSuperClassName())
 		return modifiedFieldsInitialValue;
 #else
 		return null;
@@ -120,6 +122,16 @@ public class $class.Name<T>#if($class.getSuperClassName()) extends $class.SuperC
 	public JDBCType getVersionColumnType() {
 		return VERSION_COLUMN_TYPE;
 	}
+
+    @Override
+	public String getViewName() {
+		return getTableName();
+	}
+#else
+    @Override
+	public String getViewName() {
+		return VIEW_NAME;
+	}
 #end
 #foreach ($att in $class.Attributes)
 #if (!$att.OmitSuperClassAttribute)
@@ -129,7 +141,7 @@ public class $class.Name<T>#if($class.getSuperClassName()) extends $class.SuperC
 	}
 
 	public void set$att.getMethodNamePostfix()(final $att.Type p$att.getMethodNamePostfix()) {
-#if ($class.enableOptLockFullRowCompare())
+#if ($class.enableOptLockFullRowCompare() && !$class.getSuperClassName())
 		if (!modifiedFieldsInitialValue.containsKey("$att.ColumnName")) {
 			modifiedFieldsInitialValue.put("$att.ColumnName", $att.Name);
 		}

@@ -67,14 +67,6 @@ public class OracleMetadata extends JDBCMetadata {
         return convertOracleType2JDBCType(pDataTypeName, pDecimalDigits);
     }
 
-	private List<OracleTableMetadata> findTableMetadata0() {
-
-		final JDBCProcedureProcessor<OracleTableMetadata> statementProcessor = JDBCProcedureProcessor.getInstance();
-		final Map<String, Object> filterParameters = new HashMap<>();
-		return statementProcessor.getBeanListFromProcedure
-                ("noorm_metadata.find_table_metadata", "p_table_metadata", filterParameters, OracleTableMetadata.class);
-	}
-
     /**
      * Returns the list of packages of stored procedures subject to Java code generation.
      *
