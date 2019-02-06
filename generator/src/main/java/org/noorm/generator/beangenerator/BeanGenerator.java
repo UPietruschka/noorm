@@ -116,7 +116,7 @@ public class BeanGenerator {
 			}
 
 			final String superClassTableName =
-					GeneratorUtil.getMappedString(tableName0, configuration.getTable2SuperClassTableMappings());
+					GeneratorUtil.getMappedString(tableName0, configuration.getView2TableMappings());
 			List<TableMetadata> superClassTableMetadataList = null;
 			if (superClassTableName != null && !superClassTableName.isEmpty()) {
 				superClassTableMetadataList = tableColumnMap.get(superClassTableName);

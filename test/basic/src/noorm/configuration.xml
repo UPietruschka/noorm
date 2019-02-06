@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<generatorConfiguration xmlns="http://www.noorm.org/generator-configuration/1.4.0"
+<generatorConfiguration xmlns="http://www.noorm.org/generator-configuration/1.4.1"
                         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-                        xsi:schemaLocation="http://www.noorm.org/generator-configuration/1.4.0 http://www.noorm.org/xsd/generator-configuration-1.4.0.xsd">
+                        xsi:schemaLocation="http://www.noorm.org/generator-configuration/1.4.1 http://www.noorm.org/xsd/generator-configuration-1.4.1.xsd">
 
     <beanJavaPackage name="org.noorm.test.hr.beans"/>
     <enumJavaPackage name="org.noorm.test.hr.enums"/>
@@ -17,9 +17,9 @@
     <table2InterfaceMappings>
         <mapping key="(EMPLOYEES)" value="org.noorm.test.TestInterface"/>
     </table2InterfaceMappings>
-    <table2SuperClassTableMappings>
+    <view2TableMappings>
         <mapping key="V_DEPARTMENTS" value="DEPARTMENTS"/>
-    </table2SuperClassTableMappings>
+    </view2TableMappings>
     <inlineSequenceTableFilter regex="(OPT_.*)"/>
     <columnNameMappings>
         <mapping key="([oO]pt|[Nn]swp|[Nn]snp)(.*)" value="$2"/>
