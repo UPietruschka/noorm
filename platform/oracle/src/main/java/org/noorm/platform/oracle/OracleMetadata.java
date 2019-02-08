@@ -192,8 +192,27 @@ public class OracleMetadata extends JDBCMetadata {
         return primaryKeyColumnList;
 	}
 
+    private static final String PROCEDURE_PARAMETER_QUERY =
+            "SELECT argument_name name, " +
+            "       data_type, " +
+            "       type_name, " +
+            "       in_out direction " +
+            "FROM   user_arguments " +
+            "WHERE  object_name = p_procedure_name " +
+            "AND    package_name = p_package_name " +
+            "AND    data_level = 0 " +
+            "AND    argument_name IS NOT NULL " +
+            "ORDER  BY sequence";
+
     /**
-     * Returns the parameters for a given stored procedure.
+     * Unfortunately, PL/SQL record definitions are only subject to the PL/SQL compiler interpretation
+     * and not available in the Oracle data dictionary. For reverse engineering PL/SQL procedure calls
+     * based on PL/SQL records (which include implicit record definitions using %ROWTYPE) the list of
+     * fields in the record can be retrieved using data dictionary view USER_ARGUMENTS, but without a
+     * reference to the declaring row-type, if any.
+     * For this reason, evaluating the referenced row-type is done by comparing the given list with all
+     * explicitly declared row-types, i.e. tables and views. Currently, this limits the supported record
+     * definitions to row-types declared by tables and views.
      *
      * @param pPackageName the package name
      * @param pProcedureName the procedure name
@@ -202,22 +221,20 @@ public class OracleMetadata extends JDBCMetadata {
 	@Override
     public List<Parameter> findProcedureParameters(final String pPackageName, final String pProcedureName) {
 
-		final JDBCProcedureProcessor<OracleParameter> statementProcessor = JDBCProcedureProcessor.getInstance();
-		final Map<String, Object> filterParameters = new HashMap<>();
-		filterParameters.put("p_package_name", pPackageName);
-		filterParameters.put("p_procedure_name", pProcedureName);
-		final List<OracleParameter> oracleParameterList = statementProcessor.getBeanListFromProcedure
-                ("noorm_metadata.find_procedure_parameters", "p_parameters", filterParameters, OracleParameter.class);
-        final List<Parameter> parameters = new ArrayList<Parameter>();
-        for (final OracleParameter oracleParameter : oracleParameterList) {
+	    String query = PROCEDURE_PARAMETER_QUERY;
+        query = query.replace("p_procedure_name", "'" + pProcedureName + "'");
+        query = query.replace("p_package_name", "'" + pPackageName + "'");
+        final List<Parameter> parameterList = new ArrayList<>();
+        final List<Map<String, Object>> paramResults = queryProcessor.executeGenericSelect(query);
+        for (final Map<String, Object> paramResult : paramResults) {
             final Parameter parameter = new Parameter();
-            parameter.setName(oracleParameter.getName());
-            parameter.setDirection(oracleParameter.getDirection());
-            parameter.setTypeName(oracleParameter.getTypeName());
-            parameter.setJDBCType(convertOracleType2JDBCType(oracleParameter.getDataType(), 0));
-            parameters.add(parameter);
+            parameter.setName((String) paramResult.get("NAME"));
+            parameter.setDirection((String) paramResult.get("DIRECTION"));
+            parameter.setTypeName((String) paramResult.get("TYPE_NAME"));
+            parameter.setJDBCType(convertOracleType2JDBCType((String) paramResult.get("DATA_TYPE"), 0));
+            parameterList.add(parameter);
         }
-        return parameters;
+        return parameterList;
 	}
 
     /**

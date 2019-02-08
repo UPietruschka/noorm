@@ -35,10 +35,6 @@ PACKAGE noorm_metadata AS
 
   PROCEDURE get_version(p_version OUT VARCHAR2);
 
-  PROCEDURE find_procedure_parameters(p_package_name IN VARCHAR2,
-                                      p_procedure_name IN VARCHAR2,
-                                      p_parameters OUT parameter_refcur);
-
   PROCEDURE get_package_hash_value(p_package_name IN VARCHAR2,
                                    p_code_hash_value OUT NUMBER);
 

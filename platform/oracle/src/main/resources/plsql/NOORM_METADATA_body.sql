@@ -6,33 +6,6 @@ PACKAGE BODY noorm_metadata AS
     p_version := '${pom.version}';
   END get_version;
 
-  /*
-    Unfortunately, PL/SQL record definitions are only subject to the PL/SQL compiler interpretation
-    and not available in the Oracle data dictionary. For reverse engineering PL/SQL procedure calls
-    based on PL/SQL records (which include implicit record definitions using %ROWTYPE) the list of
-    fields in the record can be retrieved using data dictionary view USER_ARGUMENTS, but without a
-    reference to the declaring row-type, if any.
-    For this reason, evaluating the referenced row-type is done by comparing the given list with all
-    explicitly declared row-types, i.e. tables and views. Currently, this limits the supported record
-    definitions to row-types declared by tables and views.
-  */
-  PROCEDURE find_procedure_parameters(p_package_name IN VARCHAR2,
-                                      p_procedure_name IN VARCHAR2,
-                                      p_parameters OUT parameter_refcur) AS
-  BEGIN
-    OPEN p_parameters FOR
-    SELECT argument_name name,
-           data_type,
-           type_name,
-           in_out direction
-    FROM   user_arguments
-    WHERE  object_name = p_procedure_name
-    AND    package_name = p_package_name
-    AND    data_level = 0
-    AND    argument_name IS NOT NULL
-    ORDER  BY sequence;
-  END find_procedure_parameters;
-
   PROCEDURE get_package_hash_value(p_package_name IN VARCHAR2,
                                    p_code_hash_value OUT NUMBER) AS
 
