@@ -6,24 +6,6 @@ PACKAGE BODY noorm_metadata AS
     p_version := '${pom.version}';
   END get_version;
 
-  PROCEDURE find_package_names(p_search_regex IN VARCHAR2, p_package_names OUT name_refcur) AS
-  BEGIN
-    OPEN p_package_names FOR
-    SELECT object_name name
-    FROM   user_objects
-    WHERE  object_type = 'PACKAGE'
-    AND    REGEXP_LIKE(object_name, p_search_regex);
-  END find_package_names;
-
-  PROCEDURE find_procedure_names(p_package_name IN VARCHAR2, p_procedure_names OUT name_refcur) AS
-  BEGIN
-    OPEN p_procedure_names FOR
-    SELECT procedure_name name
-    FROM   user_procedures
-    WHERE  object_name = p_package_name
-    AND    procedure_name IS NOT NULL;
-  END find_procedure_names;
-
   /*
     Unfortunately, PL/SQL record definitions are only subject to the PL/SQL compiler interpretation
     and not available in the Oracle data dictionary. For reverse engineering PL/SQL procedure calls

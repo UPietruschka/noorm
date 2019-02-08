@@ -1,8 +1,6 @@
 package org.noorm.platform.oracle;
 
-import org.noorm.jdbc.JDBCMetadata;
-import org.noorm.jdbc.JDBCProcedureProcessor;
-import org.noorm.jdbc.JDBCQueryProcessor;
+import org.noorm.jdbc.*;
 import org.noorm.jdbc.platform.Parameter;
 import org.noorm.jdbc.platform.PrimaryKeyColumn;
 import org.noorm.jdbc.platform.Sequence;
@@ -67,6 +65,18 @@ public class OracleMetadata extends JDBCMetadata {
         return convertOracleType2JDBCType(pDataTypeName, pDecimalDigits);
     }
 
+    public static class ObjectName {
+
+        @JDBCColumn(name="OBJECT_NAME", updatable=false)
+        private String name;
+        public String getName() {
+            return name;
+        }
+        public void setName(final String pName) {
+            name = pName;
+        }
+    }
+
     /**
      * Returns the list of packages of stored procedures subject to Java code generation.
      *
@@ -76,17 +86,29 @@ public class OracleMetadata extends JDBCMetadata {
 	@Override
     public List<String> findPackageNames(final String pSearchRegex) {
 
-		final JDBCProcedureProcessor<OracleName> statementProcessor = JDBCProcedureProcessor.getInstance();
-		final Map<String, Object> filterParameters = new HashMap<>();
-		filterParameters.put("p_search_regex", pSearchRegex);
-		final List<OracleName> names = statementProcessor.getBeanListFromProcedure
-                ("noorm_metadata.find_package_names", "p_package_names", filterParameters, OracleName.class);
+        final Map<QueryColumn, Object> parameters = new HashMap<QueryColumn, Object>();
+        parameters.put(new QueryColumn("object_type", new Operator(Operator.Name.EQUAL_TO), null), "PACKAGE");
+        parameters.put(new QueryColumn("object_name", new Operator(Operator.Name.CUSTOM), "REGEXP_LIKE(OBJECT_NAME, ?)"), pSearchRegex);
+        final JDBCQueryProcessor<ObjectName> queryProcessor = JDBCQueryProcessor.getInstance();
+        final List<ObjectName> results = queryProcessor.getBeanListFromSQL("USER_OBJECTS", parameters, ObjectName.class, false);
         final List<String> nameList = new ArrayList<String>();
-        for (final OracleName name : names) {
+        for (final ObjectName name : results) {
             nameList.add(name.getName());
         }
         return nameList;
 	}
+
+    public static class ProcedureName {
+
+        @JDBCColumn(name="PROCEDURE_NAME", updatable=false)
+        private String name;
+        public String getName() {
+            return name;
+        }
+        public void setName(final String pName) {
+            name = pName;
+        }
+    }
 
     /**
      * Returns the list of procedures contained in the given package.
@@ -97,13 +119,13 @@ public class OracleMetadata extends JDBCMetadata {
 	@Override
     public List<String> findProcedureNames(final String pPackageName) {
 
-		final JDBCProcedureProcessor<OracleName> statementProcessor = JDBCProcedureProcessor.getInstance();
-		final Map<String, Object> filterParameters = new HashMap<>();
-		filterParameters.put("p_package_name", pPackageName);
-        final List<OracleName> names = statementProcessor.getBeanListFromProcedure
-                ("noorm_metadata.find_procedure_names", "p_procedure_names", filterParameters, OracleName.class);
+        final Map<QueryColumn, Object> parameters = new HashMap<QueryColumn, Object>();
+        parameters.put(new QueryColumn("object_name", new Operator(Operator.Name.EQUAL_TO), null), pPackageName);
+        parameters.put(new QueryColumn("procedure_name", new Operator(Operator.Name.IS_NOT_NULL), null), null);
+        final JDBCQueryProcessor<ProcedureName> queryProcessor = JDBCQueryProcessor.getInstance();
+        final List<ProcedureName> results = queryProcessor.getBeanListFromSQL("USER_PROCEDURES", parameters, ProcedureName.class, false);
         final List<String> nameList = new ArrayList<String>();
-        for (final OracleName name : names) {
+        for (final ProcedureName name : results) {
             nameList.add(name.getName());
         }
         return nameList;

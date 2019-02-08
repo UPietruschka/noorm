@@ -24,7 +24,6 @@ PACKAGE noorm_metadata AS
     (
     name VARCHAR2(128)
     );
-  TYPE name_refcur IS REF CURSOR RETURN name_record;
   TYPE parameter_record IS RECORD
     (
     name VARCHAR2(30),
@@ -35,10 +34,6 @@ PACKAGE noorm_metadata AS
   TYPE parameter_refcur IS REF CURSOR RETURN parameter_record;
 
   PROCEDURE get_version(p_version OUT VARCHAR2);
-
-  PROCEDURE find_package_names(p_search_regex IN VARCHAR2, p_package_names OUT name_refcur);
-
-  PROCEDURE find_procedure_names(p_package_name IN VARCHAR2, p_procedure_names OUT name_refcur);
 
   PROCEDURE find_procedure_parameters(p_package_name IN VARCHAR2,
                                       p_procedure_name IN VARCHAR2,
