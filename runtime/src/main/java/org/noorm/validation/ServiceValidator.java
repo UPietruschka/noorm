@@ -21,13 +21,13 @@ public class ServiceValidator {
 
 		final String databasePackageName = pService.getDatabasePackageName().toUpperCase();
 		log.debug("Retrieving PL/SQL package code checksum (hash) from database.");
-		final int codeHashValue = metadata.getPackageHashValue(databasePackageName);
-		if (codeHashValue == -1) {
+		final String codeHashValue = metadata.getPackageHashValue(databasePackageName);
+		if (codeHashValue == null) {
 			validationError("Service ".concat(pService.getClass().getName())
 					.concat(" could not be validated against PL/SQL package code for ")
 					.concat(databasePackageName).concat(" (No database package found with this name)."));
 		}
-		if (codeHashValue == pService.getCodeHashValue()) {
+		if (codeHashValue.equals(pService.getCodeHashValue())) {
 			log.info("Service ".concat(pService.getClass().getName())
 					.concat(" successfully validated against PL/SQL database code for package ")
 					.concat(databasePackageName));

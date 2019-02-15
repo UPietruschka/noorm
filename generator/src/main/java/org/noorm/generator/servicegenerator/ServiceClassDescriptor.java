@@ -12,7 +12,7 @@ public class ServiceClassDescriptor {
 
 	private static final String INTERFACE_PREFIX = "I";
 
-	private int codeHashValue;
+	private String codeHashValue;
 	private String javaName;
 	private String databasePackageName;
 	private String packageName;
@@ -22,11 +22,11 @@ public class ServiceClassDescriptor {
 	private boolean isInterface = false;
     private String dataSourceName;
 
-    public int getCodeHashValue() {
+    public String getCodeHashValue() {
 		return codeHashValue;
 	}
 
-	public void setCodeHashValue(final int pCodeHashValue) {
+	public void setCodeHashValue(final String pCodeHashValue) {
 
 		codeHashValue = pCodeHashValue;
 	}

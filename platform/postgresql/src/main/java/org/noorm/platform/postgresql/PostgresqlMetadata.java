@@ -110,8 +110,8 @@ public class PostgresqlMetadata extends JDBCMetadata {
      * @return the has value
      */
     @Override
-    public Integer getPackageHashValue(String pPackageName) {
-        return 0;
+    public String getPackageHashValue(String pPackageName) {
+        return "";
     }
 
     /**

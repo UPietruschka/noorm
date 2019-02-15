@@ -95,7 +95,7 @@ public class ServiceGenerator {
             }
 			serviceClassDescriptor.setPackageName(configuration.getServiceJavaPackage().getName());
 			serviceClassDescriptor.setBeanPackageName(configuration.getBeanJavaPackage().getName());
-			final Integer codeHashValue = metadata.getPackageHashValue(packageName);
+			final String codeHashValue = metadata.getPackageHashValue(packageName);
 			serviceClassDescriptor.setCodeHashValue(codeHashValue);
 			validatorClassDescriptor.getClassNames().add(javaClassName);
 			final List<String> procedureNames = metadata.findProcedureNames(packageName);

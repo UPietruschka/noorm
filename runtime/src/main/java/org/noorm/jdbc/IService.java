@@ -18,5 +18,5 @@ public interface IService {
 	 * basis of the full text of the PL/SQL package body used for this service.
 	 * @return the calculated, reproducible hash value.
 	 */
-	int getCodeHashValue();
+	String getCodeHashValue();
 }

@@ -8,7 +8,9 @@ import org.noorm.jdbc.platform.TableMetadata;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.xml.bind.DatatypeConverter;
 import java.math.BigDecimal;
+import java.security.MessageDigest;
 import java.sql.JDBCType;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -237,6 +239,13 @@ public class OracleMetadata extends JDBCMetadata {
         return parameterList;
 	}
 
+    private static final String PACKAGE_HASHVALUE_QUERY =
+            "SELECT text " +
+            "FROM   user_source " +
+            "WHERE  type = 'PACKAGE' " +
+            "AND    name = UPPER(p_package_name) " +
+            "ORDER  BY line";
+
     /**
      * Returns the hash value for the source code of a given stored procedure package.
      *
@@ -244,13 +253,25 @@ public class OracleMetadata extends JDBCMetadata {
      * @return the has value
      */
 	@Override
-    public Integer getPackageHashValue(final String pPackageName) {
+    public String getPackageHashValue(final String pPackageName) {
 
-		final JDBCProcedureProcessor<Integer> statementProcessor = JDBCProcedureProcessor.getInstance();
-		final Map<String, Object> filterParameters = new HashMap<>();
-		filterParameters.put("p_package_name", pPackageName);
-		return statementProcessor.callProcedure
-                ("noorm_metadata.get_package_hash_value", "p_code_hash_value", filterParameters, Integer.class);
+        String query = PACKAGE_HASHVALUE_QUERY;
+        query = query.replace("p_package_name", "'" + pPackageName + "'");
+        final List<Map<String, Object>> sourceLines = queryProcessor.executeGenericSelect(query);
+        if (sourceLines.size() == 0) {
+            return null;
+        }
+        final StringBuilder sourceText = new StringBuilder();
+        for (final Map<String, Object> sourceLine : sourceLines) {
+            sourceText.append((String) sourceLine.get("TEXT"));
+        }
+        try {
+            final MessageDigest digest = MessageDigest.getInstance("SHA-256");
+            final byte[] packageHash = digest.digest(sourceText.toString().getBytes("UTF-8"));
+            return DatatypeConverter.printBase64Binary(packageHash);
+        } catch (Exception e) {
+            throw new DataAccessException(DataAccessException.Type.INITIALIZATION_FAILURE, e);
+        }
 	}
 
     /**

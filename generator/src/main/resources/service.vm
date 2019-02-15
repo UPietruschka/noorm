@@ -32,7 +32,7 @@ public class $class.JavaName implements IService {
 #if ($class.hasDataSourceName())
 	private static final String DATA_SOURCE_NAME = "$class.getDataSourceName()";
 #end
-	private static final int CODE_HASH_VALUE = $class.CodeHashValue;
+	private static final String CODE_HASH_VALUE = "$class.CodeHashValue";
 	private static final String DATABASE_PACKAGE_NAME = "$class.DatabasePackageName";
 	private final JDBCProcedureProcessor typelessProcedureProcessor = JDBCProcedureProcessor.getInstance();
 #if(!$class.hasInterface())
@@ -58,9 +58,9 @@ public class $class.JavaName implements IService {
 	 * @return the calculated, reproducible hash value.
 	 */
 #if($class.isInterface())
-	int getCodeHashValue();
+	String getCodeHashValue();
 #else
-	public int getCodeHashValue() {
+	public String getCodeHashValue() {
 		return CODE_HASH_VALUE;
 	}
 

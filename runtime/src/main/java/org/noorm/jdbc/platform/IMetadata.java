@@ -81,9 +81,9 @@ public interface IMetadata {
      * Returns the hash value for the source code of a given stored procedure package.
      *
      * @param pPackageName the package name
-     * @return the has value
+     * @return the hash value
      */
-    Integer getPackageHashValue(final String pPackageName);
+    String getPackageHashValue(final String pPackageName);
 
     /**
      * Returns the type for a given parameter of a stored procedure.
