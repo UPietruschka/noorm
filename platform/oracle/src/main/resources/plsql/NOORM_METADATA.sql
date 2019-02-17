@@ -40,7 +40,5 @@ PACKAGE noorm_metadata AS
                                   p_parameter_name IN VARCHAR2,
                                   p_rowtype_name OUT VARCHAR2);
 
-  PROCEDURE find_record_metadata(p_record_metadata OUT table_metadata_refcur);
-
 END noorm_metadata;
 /

@@ -332,13 +332,66 @@ public class OracleMetadata extends JDBCMetadata {
 		return recordColumnMap;
 	}
 
+	private static final String RECORD_METADATA_QUERY =
+            "SELECT ref_cursor.type_subname table_name," +
+            "       record_elements.argument_name column_name," +
+            "       record_elements.data_type," +
+            "       record_elements.data_precision," +
+            "       record_elements.data_scale," +
+            "       record_elements.char_length," +
+            "       record_elements.position column_id " +
+            "FROM   user_arguments ref_cursor," +
+            "       user_arguments record_elements " +
+            "WHERE  ref_cursor.type_subname IS NOT NULL " +
+            "AND    ref_cursor.type_subname   != 'ID_RECORD' " +
+            "AND    ref_cursor.type_name      != 'NOORM_METADATA' " +
+            "AND    ref_cursor.data_type       = 'PL/SQL RECORD' " +
+            "AND    ref_cursor.object_name     = record_elements.object_name " +
+            "AND    ref_cursor.package_name    = record_elements.package_name " +
+            "AND    record_elements.data_level = 2 " +
+            "AND    record_elements.data_type != 'PL/SQL RECORD' " +
+            "GROUP  BY ref_cursor.type_subname," +
+            "          record_elements.argument_name," +
+            "          record_elements.data_type," +
+            "          record_elements.data_length," +
+            "          record_elements.data_precision," +
+            "          record_elements.data_scale," +
+            "          record_elements.char_length," +
+            "          record_elements.position " +
+            "ORDER  BY ref_cursor.type_subname," +
+            "          record_elements.position";
+
+    /**
+     * Returned REF CURSOR type variables can either be mapped to a table or view (ROWTYPE) or to a PL/SQL
+     * record type as specified locally in a PL/SQL package. For the latter, the corresponding Java Bean must
+     * be assembled using the information available in data dictionary view USER_ARGUMENTS.
+     */
 	private List<OracleTableMetadata> findRecordMetadata0() {
 
-		final JDBCProcedureProcessor<OracleTableMetadata> statementProcessor = JDBCProcedureProcessor.getInstance();
-		final Map<String, Object> filterParameters = new HashMap<>();
-		return statementProcessor.getBeanListFromProcedure
-                ("noorm_metadata.find_record_metadata", "p_record_metadata", filterParameters, OracleTableMetadata.class);
+        final String query = RECORD_METADATA_QUERY;
+        final List<Map<String, Object>> userArguments = queryProcessor.executeGenericSelect(query);
+        final List<OracleTableMetadata> recordMetadataList = new ArrayList<>();
+        for (final Map<String, Object> userArgument : userArguments) {
+            final OracleTableMetadata recordMetadata = new OracleTableMetadata();
+            recordMetadata.setTableName((String) userArgument.get("TABLE_NAME"));
+            recordMetadata.setColumnName((String) userArgument.get("COLUMN_NAME"));
+            recordMetadata.setDataType((String) userArgument.get("DATA_TYPE"));
+            recordMetadata.setDataPrecision(convertBigDecimal2Long(userArgument.get("DATA_PRECISION")));
+            recordMetadata.setDataScale(convertBigDecimal2Long(userArgument.get("DATA_SCALE")));
+            recordMetadata.setCharLength(convertBigDecimal2Long(userArgument.get("CHAR_LENGTH")));
+            recordMetadata.setNullable("Y");
+            recordMetadata.setColumnId(convertBigDecimal2Long(userArgument.get("COLUMN_ID")));
+            recordMetadata.setUpdatable("N");
+            recordMetadata.setInsertable("N");
+            recordMetadataList.add(recordMetadata);
+        }
+        return recordMetadataList;
 	}
+
+	private Long convertBigDecimal2Long(final Object pValue) {
+
+	    return pValue == null ? null : ((BigDecimal) pValue).longValue();
+    }
 
     private JDBCType convertOracleType2JDBCType(final String pOracleTypeName, final int pDecimalDigits) {
 
