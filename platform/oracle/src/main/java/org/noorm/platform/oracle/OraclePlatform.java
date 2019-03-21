@@ -182,11 +182,11 @@ public class OraclePlatform implements IPlatform {
     private static final String ORACLE_PAGING_WRAPPER =
             "SELECT /*+ first_rows(" + COUNT_PLACEHOLDER + ") */ * FROM "
           + "(SELECT WRAPPED.*, ROWNUM pos, COUNT(*) OVER() " + IBean.PAGING_TOTAL + " FROM "
-          + "(" + BASE_QUERY_PLACEHOLDER + TOTAL_LIMIT_PLACEHOLDER + ORDERBY_PLACEHOLDER + ") WRAPPED) "
+          + "(" + BASE_QUERY_PLACEHOLDER + ORDERBY_PLACEHOLDER + ") WRAPPED " + TOTAL_LIMIT_PLACEHOLDER + ") "
           + "WHERE pos BETWEEN " + STARTROW_PLACEHOLDER + " AND " + ENDROW_PLACEHOLDER;
 
     private static final String ORDER_BY_CLAUSE = " ORDER BY ";
-    private static final String TOTAL_LIMIT_CLAUSE = " AND ROWNUM <= ";
+    private static final String TOTAL_LIMIT_CLAUSE = " WHERE ROWNUM <= ";
 
     /**
      * Constructs a SQL query based on the provided information.
