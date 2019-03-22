@@ -12,13 +12,6 @@ import java.util.Map;
 public interface IMetadata {
 
     /**
-     * Returns the version of the proprietary metadata retrieval implementation.
-     *
-     * @return the version
-     */
-    String getVersion();
-
-    /**
      * Returns the list of table/column metadata accessible for the authenticated database user.
      *
      * @param pSchemaPattern a regular expression narrowing the set of schemas subject to metadata retrieval

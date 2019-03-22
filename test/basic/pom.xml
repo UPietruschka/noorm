@@ -98,8 +98,6 @@
                             <delimiterType>row</delimiterType>
                             <keepFormat>true</keepFormat>
                             <srcFiles>
-                                <srcFile>target/noorm/plsql/NOORM_METADATA.sql</srcFile>
-                                <srcFile>target/noorm/plsql/NOORM_METADATA_body.sql</srcFile>
                                 <srcFile>src/main/resources/sql/EMPLOYEE_SERVICE.sql</srcFile>
                                 <srcFile>src/main/resources/sql/JOB_SERVICE.sql</srcFile>
                                 <srcFile>src/main/resources/sql/V_EMPLOYEES.sql</srcFile>

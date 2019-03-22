@@ -41,21 +41,6 @@ public class OracleMetadata extends JDBCMetadata {
 	}
 
     /**
-     * Returns the version of the proprietary metadata retrieval implementation.
-     *
-     * @return the version
-     */
-	@Override
-    public String getVersion() {
-
-		final JDBCProcedureProcessor<String> statementProcessor = JDBCProcedureProcessor.getInstance();
-		final Map<String, Object> filterParameters = new HashMap<>();
-		return statementProcessor.callProcedure
-                ("noorm_metadata.get_version", "p_version", filterParameters, String.class);
-
-	}
-
-    /**
      * Resolves the JDBC datatype on basis of the platform specific type information found in JDBC metadata
      *
      * @param pDataType      the numeric data type code

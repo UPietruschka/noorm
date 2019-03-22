@@ -4,7 +4,6 @@ import org.junit.Test;
 import org.noorm.test.hr1.beans.GenericBeanValidator;
 import org.noorm.test.hr1.enums.GenericEnumValidator;
 import org.noorm.test.hr1.services.impl.GenericServiceValidator;
-import org.noorm.validation.NoORMValidator;
 
 /**
  * @author Ulf Pietruschka / ulf.pietruschka@etenso.com
@@ -12,11 +11,6 @@ import org.noorm.validation.NoORMValidator;
  *         Time: 18:08
  */
 public class ValidationTestHR1 {
-
-	@Test
-	public void testNoORMValidation() {
-		NoORMValidator.validateNoORMMetadataVersion();
-	}
 
 	@Test
 	public void testBeanValidation() {

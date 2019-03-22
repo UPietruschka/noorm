@@ -22,18 +22,7 @@ public class PostgresqlMetadata extends JDBCMetadata {
     private static final Logger log = LoggerFactory.getLogger(PostgresqlMetadata.class);
 
     private JDBCQueryProcessor queryProcessor = JDBCQueryProcessor.getInstance();
-
-
-    /**
-     * Returns the version of the proprietary metadata retrieval implementation.
-     *
-     * @return the version
-     */
-    @Override
-    public String getVersion() {
-        return "1.2.3";
-    }
-
+    
     /**
      * Returns the list of packages of stored procedures subject to Java code generation.
      *
