@@ -16,6 +16,8 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  * @author Ulf Pietruschka / ulf.pietruschka@etenso.com
@@ -239,13 +241,6 @@ public class OracleMetadata extends JDBCMetadata {
         return parameterList;
 	}
 
-    private static final String PACKAGE_HASHVALUE_QUERY =
-            "SELECT text " +
-            "FROM   user_source " +
-            "WHERE  type = 'PACKAGE' " +
-            "AND    name = UPPER(p_package_name) " +
-            "ORDER  BY line";
-
     /**
      * Returns the hash value for the source code of a given stored procedure package.
      *
@@ -255,19 +250,10 @@ public class OracleMetadata extends JDBCMetadata {
 	@Override
     public String getPackageHashValue(final String pPackageName) {
 
-        String query = PACKAGE_HASHVALUE_QUERY;
-        query = query.replace("p_package_name", "'" + pPackageName + "'");
-        final List<Map<String, Object>> sourceLines = queryProcessor.executeGenericSelect(query);
-        if (sourceLines.size() == 0) {
-            return null;
-        }
-        final StringBuilder sourceText = new StringBuilder();
-        for (final Map<String, Object> sourceLine : sourceLines) {
-            sourceText.append((String) sourceLine.get("TEXT"));
-        }
+        final String sourceText = getUserSource(pPackageName);
         try {
             final MessageDigest digest = MessageDigest.getInstance("SHA-256");
-            final byte[] packageHash = digest.digest(sourceText.toString().getBytes("UTF-8"));
+            final byte[] packageHash = digest.digest(sourceText.getBytes("UTF-8"));
             return DatatypeConverter.printBase64Binary(packageHash);
         } catch (Exception e) {
             throw new DataAccessException(DataAccessException.Type.INITIALIZATION_FAILURE, e);
@@ -276,6 +262,10 @@ public class OracleMetadata extends JDBCMetadata {
 
     /**
      * Returns the type for a given parameter of a stored procedure.
+     * PL/SQL records declared on basis of a rowtype are hard to detect, since no data dictionary view provides
+     * the required information, thus the only way to get the required information is parsing the source code.
+     * For explicitly declared record types things are easier, since the internal name of the record type is
+     * available through data dictionary view USER_ARGUMENTS.
      *
      * @param pPackageName the package name
      * @param pProcedureName the procedure name
@@ -287,15 +277,71 @@ public class OracleMetadata extends JDBCMetadata {
                                       final String pProcedureName,
                                       final String pParameterName) {
 
-		final JDBCProcedureProcessor<String> statementProcessor = JDBCProcedureProcessor.getInstance();
-		final Map<String, Object> filterParameters = new HashMap<>();
-		filterParameters.put("p_package_name", pPackageName);
-		filterParameters.put("p_procedure_name", pProcedureName);
-		filterParameters.put("p_parameter_name", pParameterName);
-		return statementProcessor.callProcedure
-                ("noorm_metadata.get_parameter_rowtype", "p_rowtype_name", filterParameters, String.class);
+	    log.debug("Collecting procedure return parameter type for [package/procedure/parameter] "
+                + pPackageName + "/" + pProcedureName + "/" + pParameterName);
+        String query = PARAMETER_ROWTYPE_QUERY;
+        query = query.replace("p_package_name", "'" + pPackageName + "'");
+        query = query.replace("p_procedure_name", "'" + pProcedureName + "'");
+        final List<Map<String, Object>> parameters = queryProcessor.executeGenericSelect(query);
+        if (parameters.size() != 0) {
+            final Map<String, Object> parameterRecord = parameters.get(0);
+            final String typeName = (String) parameterRecord.get("TYPE_SUBNAME");
+            if (typeName != null) {
+                return typeName;
+            }
+        }
+        final String sourceText = getUserSource(pPackageName).toUpperCase();
+
+        // First, we extract the parameter type of the OUT parameter from the source based on the known parameter name
+        final Pattern procPattern = Pattern.compile("PROCEDURE\\s*" + pProcedureName + "\\((.|\\n)*" + pParameterName + "\\s*OUT\\s*(.*)\\)");
+        final Matcher procMatcher = procPattern.matcher(sourceText);
+        String typeName;
+        if (procMatcher.find()) {
+            typeName = procMatcher.group(2);
+        } else {
+            throw new IllegalArgumentException("Could not retrieve procedure return parameter type name from source.");
+        }
+
+        // Using the previously extracted type, we can extract the row type, which is the format basis for the OUT parameter
+        final Pattern typePattern = Pattern.compile("TYPE\\s*" + typeName + "\\s*IS\\s*REF\\s*CURSOR\\s*RETURN\\s*(.*)\\s*%ROWTYPE");
+        final Matcher typeMatcher = typePattern.matcher(sourceText);
+        String parameterRowType;
+        if (typeMatcher.find()) {
+            parameterRowType = typeMatcher.group(1);
+        } else {
+            throw new IllegalArgumentException("Could not retrieve procedure return parameter type from source.");
+        }
+        return parameterRowType;
 	}
 
+	private String getUserSource(final String pPackageName) {
+
+        String query = USER_SOURCE_QUERY;
+        query = query.replace("p_package_name", "'" + pPackageName + "'");
+        final List<Map<String, Object>> sourceLines = queryProcessor.executeGenericSelect(query);
+        if (sourceLines.size() == 0) {
+            return null;
+        }
+        final StringBuilder sourceText = new StringBuilder();
+        for (final Map<String, Object> sourceLine : sourceLines) {
+            sourceText.append((String) sourceLine.get("TEXT"));
+        }
+        return sourceText.toString();
+    }
+
+    private static final String PARAMETER_ROWTYPE_QUERY =
+	        "SELECT type_subname " +
+            "FROM   user_arguments " +
+            "WHERE  package_name = p_package_name " +
+            "AND    object_name  = p_procedure_name " +
+            "AND    data_type    = 'PL/SQL RECORD'";
+
+	private static final String USER_SOURCE_QUERY =
+            "SELECT text " +
+            "FROM   user_source " +
+            "WHERE  type = 'PACKAGE' " +
+            "AND    name = UPPER(p_package_name) " +
+            "ORDER  BY line";
     /**
      * Returns metadata for a database type definition.
      *
