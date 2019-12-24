@@ -155,8 +155,8 @@ public class GeneratorMojo extends AbstractMojo implements IParameters {
         setConfigurationDefaults();
 
 		// Initialize Velocity and configure Velocity to load resources from the classpath
-		Velocity.setProperty("resource.loader", "class");
-		Velocity.setProperty("class.resource.loader.class", "org.apache.velocity.runtime.resource.loader.ClasspathResourceLoader");
+		Velocity.setProperty("resource.loaders", "class");
+		Velocity.setProperty("resource.loader.class.class", "org.apache.velocity.runtime.resource.loader.ClasspathResourceLoader");
 		Velocity.init();
 
 		// To avoid acquiring a new database connection for every single access to the Metadata, the generators
