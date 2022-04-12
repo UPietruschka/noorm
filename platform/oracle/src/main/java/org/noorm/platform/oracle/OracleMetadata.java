@@ -284,7 +284,9 @@ public class OracleMetadata extends JDBCMetadata {
         if (procMatcher.find()) {
             typeName = procMatcher.group(2);
         } else {
-            throw new IllegalArgumentException("Could not retrieve procedure return parameter type name from source.");
+            throw new IllegalArgumentException
+                    ("Could not retrieve procedure return parameter type name from source: "
+                    + pPackageName + "." + pProcedureName + ":" + pParameterName);
         }
 
         // Using the previously extracted type, we can extract the row type, which is the format basis for the OUT parameter
@@ -294,7 +296,9 @@ public class OracleMetadata extends JDBCMetadata {
         if (typeMatcher.find()) {
             parameterRowType = typeMatcher.group(1);
         } else {
-            throw new IllegalArgumentException("Could not retrieve procedure return parameter type from source.");
+            throw new IllegalArgumentException
+                    ("Could not retrieve procedure return parameter type from source: "
+                    + pPackageName + "." + pProcedureName + ":" + pParameterName);
         }
         return parameterRowType;
 	}
@@ -319,7 +323,7 @@ public class OracleMetadata extends JDBCMetadata {
             "FROM   user_arguments " +
             "WHERE  package_name = p_package_name " +
             "AND    object_name  = p_procedure_name " +
-            "AND    data_type    = 'PL/SQL RECORD'";
+            "AND    (data_type   = 'PL/SQL RECORD' OR data_type = 'REF CURSOR')";
 
 	private static final String USER_SOURCE_QUERY =
             "SELECT text " +
@@ -363,7 +367,22 @@ public class OracleMetadata extends JDBCMetadata {
 		return recordColumnMap;
 	}
 
-	private static final String RECORD_METADATA_QUERY =
+	private static final String DETECT_ORACLE_VERSION =
+            "SELECT version FROM product_component_version";
+
+    private static final String RECORD_METADATA_QUERY_FROM_18C =
+            "SELECT record_elements.type_name table_name," +
+            "       record_elements.attr_name column_name," +
+            "       record_elements.attr_type_name data_type," +
+            "       record_elements.precision data_precision," +
+            "       record_elements.scale data_scale," +
+            "       NVL(record_elements.length, 0) char_length," +
+            "       record_elements.attr_no column_id " +
+            "FROM   user_plsql_type_attrs record_elements " +
+            "ORDER  BY record_elements.type_name," +
+            "          record_elements.attr_no";
+
+	private static final String RECORD_METADATA_QUERY_PRE_18C =
             "SELECT ref_cursor.type_subname table_name," +
             "       record_elements.argument_name column_name," +
             "       record_elements.data_type," +
@@ -399,7 +418,13 @@ public class OracleMetadata extends JDBCMetadata {
      */
 	private List<OracleTableMetadata> findRecordMetadata0() {
 
-        final String query = RECORD_METADATA_QUERY;
+        String query = RECORD_METADATA_QUERY_FROM_18C;
+        final List<Map<String, Object>> version = queryProcessor.executeGenericSelect(DETECT_ORACLE_VERSION);
+        final String oracleVersion = (String) version.get(0).get("VERSION");
+        final int majorVersion = Integer.parseInt(oracleVersion.split("\\.")[0]);
+        if (majorVersion < 18) {
+            query = RECORD_METADATA_QUERY_PRE_18C;
+        }
         final List<Map<String, Object>> userArguments = queryProcessor.executeGenericSelect(query);
         final List<OracleTableMetadata> recordMetadataList = new ArrayList<>();
         for (final Map<String, Object> userArgument : userArguments) {

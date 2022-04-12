@@ -7,7 +7,7 @@
     <entry key="HR1.database.url">jdbc:oracle:thin:@
         (DESCRIPTION =
         (ADDRESS_LIST = (ADDRESS = (PROTOCOL = TCP)(HOST = localhost)(PORT = 1521)))
-        (CONNECT_DATA = (SERVER = DEDICATED)(SERVICE_NAME = XE))
+        (CONNECT_DATA = (SERVER = DEDICATED)(SERVICE_NAME = XEPDB1))
         )
     </entry>
     <entry key="HR1.database.username">hr</entry>
@@ -20,7 +20,7 @@
     <entry key="HR2.database.url">jdbc:oracle:thin:@
         (DESCRIPTION =
         (ADDRESS_LIST = (ADDRESS = (PROTOCOL = TCP)(HOST = localhost)(PORT = 1521)))
-        (CONNECT_DATA = (SERVER = DEDICATED)(SERVICE_NAME = XE))
+        (CONNECT_DATA = (SERVER = DEDICATED)(SERVICE_NAME = XEPDB1))
         )
     </entry>
     <entry key="HR2.database.username">hr</entry>

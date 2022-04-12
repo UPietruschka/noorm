@@ -6,7 +6,7 @@
     <entry key="database.url">jdbc:oracle:thin:@
         (DESCRIPTION =
         (ADDRESS_LIST = (ADDRESS = (PROTOCOL = TCP)(HOST = localhost)(PORT = 1521)))
-        (CONNECT_DATA = (SERVER = DEDICATED)(SERVICE_NAME = XE))
+        (CONNECT_DATA = (SERVER = DEDICATED)(SERVICE_NAME = XEPDB1))
         )
     </entry>
     <entry key="database.username">hr</entry>
