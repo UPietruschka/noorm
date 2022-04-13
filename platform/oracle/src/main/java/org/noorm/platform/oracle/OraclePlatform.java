@@ -66,12 +66,15 @@ public class OraclePlatform implements IPlatform {
         // Unfortunately, Oracle stopped development of the build-in connection cache, so, starting with
         // Oracle 11.2, the build-in cache is deprecated. We still use it here, since explicit data source
         // initialization as performed here is not to be used in production systems anyway.
+
+        /* The connection cache is deprecated starting from Oracle 11g and completely removed in 21c
         oracleDataSource.setConnectionCachingEnabled(true);
         Properties cacheProps = new Properties();
         cacheProps.setProperty("MinLimit", "1");
         cacheProps.setProperty("MaxLimit", "8");
         cacheProps.setProperty("InitialLimit", "1");
         oracleDataSource.setConnectionCacheProperties(cacheProps);
+        */
 
         return oracleDataSource;
     }

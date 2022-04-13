@@ -13,8 +13,9 @@
     <artifactId>noorm-oracle-platform</artifactId>
 
     <properties>
-        <oracle.groupId>com.oracle.ojdbc</oracle.groupId>
-        <oracle.version>19.3.0.0</oracle.version>
+        <!-- Builds successfully with Java 8, 11-18. When using Java 11-18, use ojdbc11 -->
+        <oracle.groupId>com.oracle.database.jdbc</oracle.groupId>
+        <oracle.version>21.5.0.0</oracle.version>
         <oracle.driver.artifactId>ojdbc8</oracle.driver.artifactId>
     </properties>
 
@@ -36,6 +37,7 @@
         </dependency>
     </dependencies>
 
+    <!-- See https://docs.oracle.com/middleware/1213/core/MAVEN/config_maven_repo.htm#MAVEN9010 -->
     <repositories>
         <repository>
             <id>maven.oracle.com</id>
